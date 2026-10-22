@@ -1,0 +1,82 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import path from 'path';
+import './models/index.js';
+import { corsOptions } from './config/cors.js';
+import { env } from './config/env.js';
+import { generalLimiter } from './middleware/rateLimiter.js';
+import { errorHandler } from './middleware/errorHandler.js';
+import { notFoundHandler } from './middleware/notFound.js';
+import { mongoSanitize } from './middleware/mongoSanitize.js';
+import { xssClean } from './middleware/xssClean.js';
+import { csrfProtection } from './middleware/csrf.js';
+import { requireAuth } from './middleware/requireAuth.js';
+import routes from './routes/index.js';
+
+const app = express();
+
+// 1. Comprehensive Helmet Security Headers
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'blob:'],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'", 'data:'],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    noSniff: true,
+    frameguard: { action: 'deny' },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  })
+);
+
+// 2. CORS Policy
+app.use(cors(corsOptions));
+
+// 3. Rate Limiting (DDoS & Brute Force Defense)
+app.use(generalLimiter);
+
+// 4. Body Parsing with Strict Payload Limits (DoS Prevention)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// 5. Cookie Parsing
+app.use(cookieParser(env.COOKIE_SECRET));
+
+// 6. NoSQL Injection Sanitization (Strips $ and . operators)
+app.use(mongoSanitize);
+
+// 7. Cross-Site Scripting (XSS) Sanitization
+app.use(xssClean);
+
+// 8. CSRF Protection (Double-Submit Cookie Pattern for State Mutations)
+app.use(csrfProtection);
+
+// 9. Legacy uploaded files (faculty certificates, evidence) — authenticated users only.
+// Secure private documents are handled in /api/documents
+app.use('/uploads', requireAuth, express.static(path.resolve(process.cwd(), 'uploads'), { dotfiles: 'deny', index: false }));
+
+// 10. API Routes
+app.use('/api', routes);
+
+// 11. 404 Not Found Handler
+app.use(notFoundHandler);
+
+// 12. Centralized Error Handler (Scrubs stack traces and handles operational errors)
+app.use(errorHandler);
+
+export default app;

@@ -1,0 +1,159 @@
+:root {
+  /* ===== KPRIET Official Brand Colors (from kpriet.ac.in) ===== */
+  --kpr-blue: #1B345F;        /* KPRIET Signature Navy Blue */
+  --kpr-dark-blue: #112547;   /* KPRIET Deep Header/Sidebar Blue */
+  --kpr-green: #1B924B;       /* KPRIET Iconic Green Accent */
+  --kpr-light-green: #85B050; /* KPRIET Academic Leaf Accent */
+  --kpr-gold: #C9A24B;        /* KPRIET Gold Accent */
+  --kpr-vibrant-blue: #2165DA;/* KPRIET Vibrant Interactive Blue */
+
+  /* ===== Master Color System Mapped to KPRIET Branding ===== */
+  --color-deep-navy: #112547;
+  --color-royal-blue: #1B345F;
+  --color-blue: #2165DA;
+  --color-indigo: #1B345F;
+  --color-accent: #1B924B;
+  --color-secondary: #2165DA;
+  --color-success: #1B924B;
+  --color-warning: #C9A24B;
+  --color-danger: #EF4444;
+  --color-purple: #7C3AED;
+  --color-teal: #19909B;
+
+  /* Primary Mapping (Standard ERP Tokens) */
+  --color-primary: #1B345F;
+  --color-primary-dark: #112547;
+  --color-primary-light: #2165DA;
+  --color-primary-green: #1B924B;
+  --color-primary-gold: #C9A24B;
+  --color-primary-indigo: #1B345F;
+  --color-primary-50: #EDF4FA;
+  --color-primary-100: #D4E4F2;
+  --color-primary-200: #B9D5ED;
+  --color-primary-600: #1B345F;
+
+  /* Neutral & Canvas Palette */
+  --color-background: #F4F6F9;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #FAFCFF;
+  --color-surface-secondary: #F8FAFC;
+  --color-bg-secondary: #F8FAFC;
+  --color-surface-dark: #112547;
+  --color-text: #1E293B;
+  --color-text-title: #112547;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #64748B;
+  --color-border: #E2E8F0;
+  --color-border-light: #F1F5F9;
+  --color-border-subtle: #F1F5F9;
+  --color-border-focus: rgba(27, 52, 95, 0.45);
+  --color-hover: #F8FAFC;
+
+  /* Status Colors & Tinted Backgrounds */
+  --color-success-bg: #EAF7EE;
+  --color-success-border: #A3E3B9;
+  --color-warning-bg: #FEF9EE;
+  --color-warning-border: #F7DC9E;
+  --color-danger-bg: #FEF2F2;
+  --color-danger-border: #FECACA;
+  --color-info: #2165DA;
+  --color-info-bg: #EDF4FD;
+  --color-info-border: #BAD5FA;
+  --color-purple-bg: #F5F3FF;
+  --color-purple-border: #DDD6FE;
+
+  /* ===== Gradient System (KPRIET Brand) ===== */
+  --gradient-primary: linear-gradient(135deg, #1B345F 0%, #2165DA 100%);
+  --gradient-kpr: linear-gradient(135deg, #112547 0%, #1B345F 55%, #1B924B 100%);
+  --gradient-blue: linear-gradient(135deg, #1B345F 0%, #2165DA 100%);
+  --gradient-purple: linear-gradient(135deg, #1B345F 0%, #7C3AED 100%);
+  --gradient-success: linear-gradient(135deg, #1B924B 0%, #7AE1AB 100%);
+  --gradient-hero: linear-gradient(135deg, #112547 0%, #1B345F 55%, #1B924B 100%);
+  --gradient-dark: linear-gradient(180deg, #112547 0%, #1B345F 100%);
+  --gradient-card: linear-gradient(180deg, #FFFFFF 0%, #FAFCFF 100%);
+  --gradient-accent-bar: linear-gradient(90deg, #1B345F, #1B924B, #C9A24B);
+
+  /* Background Atmospheric Gradients */
+  --bg-radial-canvas: radial-gradient(circle at 88% 8%, rgba(27, 52, 95, 0.05) 0%, transparent 42%),
+                      radial-gradient(circle at 12% 92%, rgba(27, 146, 75, 0.04) 0%, transparent 40%),
+                      #F4F6F9;
+
+  /* ===== Typography ===== */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-base: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  /* Shorthand aliases used in dossier & review panels */
+  --font-xs: 0.75rem;
+  --font-sm: 0.8125rem;
+  --font-base: 0.875rem;
+  --font-md: 1rem;
+  --font-lg: 1.125rem;
+  --font-xl: 1.25rem;
+  --font-2xl: 1.5rem;
+  --font-3xl: 1.875rem;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* ===== Spacing ===== */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* ===== Border Radius Hierarchy ===== */
+  --radius-xs: 4px;
+  --radius-sm: 8px;       /* Small components & tags */
+  --radius-md: 10px;      /* Inputs, select & standard buttons */
+  --radius-lg: 14px;      /* Standard Cards & panels */
+  --radius-xl: 18px;      /* Large feature cards & modal shells */
+  --radius-2xl: 22px;     /* Feature banners */
+  --radius-hero: 24px;    /* Hero sections */
+  --radius-pill: 9999px;  /* Badges & pills */
+
+  /* ===== Shadow System Hierarchy ===== */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.10), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-floating: 0 25px 50px -12px rgba(15, 23, 42, 0.22);
+  --shadow-card-hover: 0 12px 24px -4px rgba(37, 99, 235, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.05);
+  --shadow-glow-primary: 0 4px 14px 0 rgba(37, 99, 235, 0.35);
+  --shadow-glow-indigo: 0 4px 14px 0 rgba(79, 70, 229, 0.35);
+
+  /* ===== Layout Dimensions ===== */
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 68px;
+  --header-height: 60px;
+  --container-max-width: 1320px;
+
+  /* ===== Transitions & Micro-Interactions ===== */
+  --transition-instant: 100ms ease;
+  --transition-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-base: 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ===== Focus Rings & Accent Highlights ===== */
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  --focus-ring-danger: 0 0 0 3px rgba(239, 68, 68, 0.20);
+  --focus-ring-success: 0 0 0 3px rgba(16, 185, 129, 0.20);
+  --focus-ring-warning: 0 0 0 3px rgba(245, 158, 11, 0.20);
+}

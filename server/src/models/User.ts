@@ -1,0 +1,136 @@
+import mongoose, { Schema, Document, Types } from 'mongoose';
+import { ROLES, Role } from '../permissions/roles.js';
+
+export const USER_STATUS = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  SUSPENDED: 'SUSPENDED',
+} as const;
+
+export type UserStatus = (typeof USER_STATUS)[keyof typeof USER_STATUS];
+
+export interface IUser extends Document {
+  _id: Types.ObjectId;
+  employeeId: string;
+  facultyId?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  passwordHash: string;
+  role: Role;
+  departmentId?: Types.ObjectId;
+  designation?: string;
+  profilePhoto?: string;
+  status: UserStatus;
+  failedLoginAttempts: number;
+  lockUntil?: Date;
+  lastLogin?: Date;
+  passwordChangedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const userSchema = new Schema<IUser>(
+  {
+    employeeId: {
+      type: String,
+      required: true,
+      unique: true,
+      uppercase: true,
+      trim: true,
+      index: true,
+    },
+    facultyId: {
+      type: String,
+      trim: true,
+      index: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+    phone: {
+      type: String,
+      trim: true,
+    },
+    passwordHash: {
+      type: String,
+      required: true,
+      select: false,
+    },
+    role: {
+      type: String,
+      enum: Object.values(ROLES),
+      required: true,
+      default: ROLES.FACULTY,
+      index: true,
+    },
+    departmentId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Department',
+      index: true,
+    },
+    designation: {
+      type: String,
+      trim: true,
+    },
+    profilePhoto: {
+      type: String,
+      trim: true,
+    },
+    status: {
+      type: String,
+      enum: Object.values(USER_STATUS),
+      default: USER_STATUS.ACTIVE,
+      index: true,
+    },
+    failedLoginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lockUntil: {
+      type: Date,
+    },
+    lastLogin: {
+      type: Date,
+    },
+    // Session tokens issued before this instant are rejected (see requireAuth)
+    passwordChangedAt: {
+      type: Date,
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      transform(_doc, ret: Record<string, unknown>) {
+        delete ret.passwordHash;
+        delete ret.__v;
+        return ret;
+      },
+    },
+  }
+);
+
+// High-performance query indexes
+userSchema.index({ departmentId: 1, role: 1 });
+userSchema.index({ role: 1, status: 1 });
+
+/**
+ * Marks the password as changed so every previously issued session token is invalidated.
+ * Backdated by 1s because JWT `iat` has second precision: a token issued immediately
+ * afterwards (e.g. the user's own refreshed session) must still be accepted.
+ */
+export function markPasswordChanged(user: IUser): void {
+  user.passwordChangedAt = new Date(Date.now() - 1000);
+}
+
+export const User = mongoose.model<IUser>('User', userSchema);

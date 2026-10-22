@@ -1,0 +1,24 @@
+{
+  "name": "kpriet-fms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KPRIET Faculty Management System - Centralized Institutional ERP",
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build:server": "npm --prefix server run build",
+    "build:client": "npm --prefix client run build",
+    "build": "npm run build:server && npm run build:client",
+    "start": "npm --prefix server run start",
+    "lint:server": "npm --prefix server run lint",
+    "lint:client": "npm --prefix client run lint"
+  },
+  "keywords": [
+    "kpriet",
+    "faculty-management-system",
+    "erp",
+    "institutional-management"
+  ],
+  "author": "KPRIET",
+  "license": "UNLICENSED"
+}

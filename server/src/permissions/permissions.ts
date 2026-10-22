@@ -1,0 +1,226 @@
+import { ROLES, Role } from './roles.js';
+
+export const PERMISSIONS = {
+  // Legacy / Baseline Keys
+  USER_VIEW_SELF: 'user:view:self',
+  USER_UPDATE_SELF: 'user:update:self',
+  USER_VIEW_ALL: 'user:view:all',
+  USER_MANAGE: 'user:manage',
+
+  DEPARTMENT_VIEW: 'department:view',
+  DEPARTMENT_MANAGE: 'department:manage',
+
+  FACULTY_VIEW: 'faculty:view',
+  FACULTY_EDIT: 'faculty:edit',
+  FACULTY_APPROVE: 'faculty:approve',
+
+  AUDIT_VIEW: 'audit:view',
+  SYSTEM_CONFIG: 'system:config',
+
+  // =========================================================================
+  // PHASE 42 — CENTRALIZED PERMISSION MATRIX KEYS
+  // =========================================================================
+
+  // 1. Own Profile
+  PROFILE_OWN_CRUD: 'profile:own:crud',
+  PROFILE_HOD_REVIEW: 'profile:hod:review',
+  PROFILE_DEAN_VIEW: 'profile:dean:view',
+  PROFILE_PRINCIPAL_VIEW: 'profile:principal:view',
+  PROFILE_ADMIN_MANAGE: 'profile:admin:manage',
+
+  // 2. Department Faculty
+  DEPT_FACULTY_OWN: 'dept_faculty:own',
+  DEPT_FACULTY_CRUD: 'dept_faculty:crud',
+  DEPT_FACULTY_VIEW: 'dept_faculty:view',
+  DEPT_FACULTY_MANAGE: 'dept_faculty:manage',
+
+  // 3. Publications
+  PUBLICATIONS_OWN: 'publications:own',
+  PUBLICATIONS_HOD_REVIEW: 'publications:hod:review',
+  PUBLICATIONS_DEAN_REVIEW: 'publications:dean:review',
+  PUBLICATIONS_PRINCIPAL_VIEW: 'publications:principal:view',
+  PUBLICATIONS_ADMIN_MANAGE: 'publications:admin:manage',
+
+  // 4. Research (Projects, Patents, Copyrights, Consultancy)
+  RESEARCH_OWN: 'research:own',
+  RESEARCH_HOD_REVIEW: 'research:hod:review',
+  RESEARCH_DEAN_REVIEW: 'research:dean:review',
+  RESEARCH_PRINCIPAL_VIEW: 'research:principal:view',
+  RESEARCH_ADMIN_MANAGE: 'research:admin:manage',
+
+  // 5. Workload
+  WORKLOAD_OWN_VIEW: 'workload:own:view',
+  WORKLOAD_HOD_CRUD: 'workload:hod:crud',
+  WORKLOAD_DEAN_VIEW: 'workload:dean:view',
+  WORKLOAD_PRINCIPAL_VIEW: 'workload:principal:view',
+  WORKLOAD_ADMIN_MANAGE: 'workload:admin:manage',
+
+  // 6. Timetable
+  TIMETABLE_OWN_VIEW: 'timetable:own:view',
+  TIMETABLE_HOD_CRUD: 'timetable:hod:crud',
+  TIMETABLE_DEAN_VIEW: 'timetable:dean:view',
+  TIMETABLE_PRINCIPAL_VIEW: 'timetable:principal:view',
+  TIMETABLE_ADMIN_MANAGE: 'timetable:admin:manage',
+
+  // 7. Attendance
+  ATTENDANCE_OWN: 'attendance:own',
+  ATTENDANCE_HOD_REVIEW: 'attendance:hod:review',
+  ATTENDANCE_DEAN_VIEW: 'attendance:dean:view',
+  ATTENDANCE_PRINCIPAL_VIEW: 'attendance:principal:view',
+  ATTENDANCE_ADMIN_MANAGE: 'attendance:admin:manage',
+
+  // 8. Leave
+  LEAVE_APPLY: 'leave:apply',
+  LEAVE_HOD_APPROVE: 'leave:hod:approve',
+  LEAVE_DEAN_REVIEW: 'leave:dean:review',
+  LEAVE_PRINCIPAL_VIEW: 'leave:principal:view',
+  LEAVE_ADMIN_MANAGE: 'leave:admin:manage',
+
+  // 9. Appraisal
+  APPRAISAL_SUBMIT: 'appraisal:submit',
+  APPRAISAL_HOD_REVIEW: 'appraisal:hod:review',
+  APPRAISAL_DEAN_REVIEW: 'appraisal:dean:review',
+  APPRAISAL_PRINCIPAL_VIEW: 'appraisal:principal:view',
+  APPRAISAL_ADMIN_CONFIGURE: 'appraisal:admin:configure',
+
+  // 10. Reports
+  REPORTS_OWN_LIMITED: 'reports:own:limited',
+  REPORTS_HOD_DEPT: 'reports:hod:dept',
+  REPORTS_DEAN_INST: 'reports:dean:inst',
+  REPORTS_PRINCIPAL_INST: 'reports:principal:inst',
+  REPORTS_ADMIN_ALL: 'reports:admin:all',
+
+  // 11. Audit
+  AUDIT_OWN: 'audit:own',
+  AUDIT_HOD_DEPT: 'audit:hod:dept',
+  AUDIT_DEAN_INST: 'audit:dean:inst',
+  AUDIT_PRINCIPAL_INST: 'audit:principal:inst',
+  AUDIT_ADMIN_ALL: 'audit:admin:all',
+} as const;
+
+export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
+
+export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
+  [ROLES.ADMIN]: [
+    PERMISSIONS.USER_VIEW_SELF,
+    PERMISSIONS.USER_UPDATE_SELF,
+    PERMISSIONS.USER_VIEW_ALL,
+    PERMISSIONS.USER_MANAGE,
+    PERMISSIONS.DEPARTMENT_VIEW,
+    PERMISSIONS.DEPARTMENT_MANAGE,
+    PERMISSIONS.FACULTY_VIEW,
+    PERMISSIONS.FACULTY_EDIT,
+    PERMISSIONS.FACULTY_APPROVE,
+    PERMISSIONS.AUDIT_VIEW,
+    PERMISSIONS.SYSTEM_CONFIG,
+
+    // Phase 42 Matrix — Admin Manage & All
+    PERMISSIONS.PROFILE_ADMIN_MANAGE,
+    PERMISSIONS.DEPT_FACULTY_MANAGE,
+    PERMISSIONS.PUBLICATIONS_ADMIN_MANAGE,
+    PERMISSIONS.RESEARCH_ADMIN_MANAGE,
+    PERMISSIONS.WORKLOAD_ADMIN_MANAGE,
+    PERMISSIONS.TIMETABLE_ADMIN_MANAGE,
+    PERMISSIONS.ATTENDANCE_ADMIN_MANAGE,
+    PERMISSIONS.LEAVE_ADMIN_MANAGE,
+    PERMISSIONS.APPRAISAL_ADMIN_CONFIGURE,
+    PERMISSIONS.REPORTS_ADMIN_ALL,
+    PERMISSIONS.AUDIT_ADMIN_ALL,
+  ],
+
+  [ROLES.PRINCIPAL]: [
+    PERMISSIONS.USER_VIEW_SELF,
+    PERMISSIONS.USER_UPDATE_SELF,
+    PERMISSIONS.USER_VIEW_ALL,
+    PERMISSIONS.DEPARTMENT_VIEW,
+    PERMISSIONS.FACULTY_VIEW,
+    PERMISSIONS.FACULTY_APPROVE,
+    PERMISSIONS.AUDIT_VIEW,
+
+    // Phase 42 Matrix — Principal View & Institution
+    PERMISSIONS.PROFILE_PRINCIPAL_VIEW,
+    PERMISSIONS.DEPT_FACULTY_VIEW,
+    PERMISSIONS.PUBLICATIONS_PRINCIPAL_VIEW,
+    PERMISSIONS.RESEARCH_PRINCIPAL_VIEW,
+    PERMISSIONS.WORKLOAD_PRINCIPAL_VIEW,
+    PERMISSIONS.TIMETABLE_PRINCIPAL_VIEW,
+    PERMISSIONS.ATTENDANCE_PRINCIPAL_VIEW,
+    PERMISSIONS.LEAVE_PRINCIPAL_VIEW,
+    PERMISSIONS.APPRAISAL_PRINCIPAL_VIEW,
+    PERMISSIONS.REPORTS_PRINCIPAL_INST,
+    PERMISSIONS.AUDIT_PRINCIPAL_INST,
+  ],
+
+  [ROLES.DEAN]: [
+    PERMISSIONS.USER_VIEW_SELF,
+    PERMISSIONS.USER_UPDATE_SELF,
+    PERMISSIONS.USER_VIEW_ALL,
+    PERMISSIONS.DEPARTMENT_VIEW,
+    PERMISSIONS.FACULTY_VIEW,
+    PERMISSIONS.FACULTY_APPROVE,
+
+    // Phase 42 Matrix — Dean View/Review & Institution
+    PERMISSIONS.PROFILE_DEAN_VIEW,
+    PERMISSIONS.DEPT_FACULTY_VIEW,
+    PERMISSIONS.PUBLICATIONS_DEAN_REVIEW,
+    PERMISSIONS.RESEARCH_DEAN_REVIEW,
+    PERMISSIONS.WORKLOAD_DEAN_VIEW,
+    PERMISSIONS.TIMETABLE_DEAN_VIEW,
+    PERMISSIONS.ATTENDANCE_DEAN_VIEW,
+    PERMISSIONS.LEAVE_DEAN_REVIEW,
+    PERMISSIONS.APPRAISAL_DEAN_REVIEW,
+    PERMISSIONS.REPORTS_DEAN_INST,
+    PERMISSIONS.AUDIT_DEAN_INST,
+  ],
+
+  [ROLES.HOD]: [
+    PERMISSIONS.USER_VIEW_SELF,
+    PERMISSIONS.USER_UPDATE_SELF,
+    PERMISSIONS.DEPARTMENT_VIEW,
+    PERMISSIONS.FACULTY_VIEW,
+    PERMISSIONS.FACULTY_EDIT,
+    PERMISSIONS.FACULTY_APPROVE,
+
+    // Phase 42 Matrix — HOD Review, CRUD & Department
+    PERMISSIONS.PROFILE_HOD_REVIEW,
+    PERMISSIONS.PROFILE_OWN_CRUD,
+    PERMISSIONS.DEPT_FACULTY_CRUD,
+    PERMISSIONS.PUBLICATIONS_HOD_REVIEW,
+    PERMISSIONS.PUBLICATIONS_OWN,
+    PERMISSIONS.RESEARCH_HOD_REVIEW,
+    PERMISSIONS.RESEARCH_OWN,
+    PERMISSIONS.WORKLOAD_HOD_CRUD,
+    PERMISSIONS.TIMETABLE_HOD_CRUD,
+    PERMISSIONS.ATTENDANCE_HOD_REVIEW,
+    PERMISSIONS.ATTENDANCE_OWN,
+    PERMISSIONS.LEAVE_HOD_APPROVE,
+    PERMISSIONS.LEAVE_APPLY,
+    PERMISSIONS.APPRAISAL_HOD_REVIEW,
+    PERMISSIONS.APPRAISAL_SUBMIT,
+    PERMISSIONS.REPORTS_HOD_DEPT,
+    PERMISSIONS.AUDIT_HOD_DEPT,
+  ],
+
+  [ROLES.FACULTY]: [
+    PERMISSIONS.USER_VIEW_SELF,
+    PERMISSIONS.USER_UPDATE_SELF,
+    PERMISSIONS.FACULTY_VIEW,
+
+    // Phase 42 Matrix — Faculty Own, Apply, Submit
+    PERMISSIONS.PROFILE_OWN_CRUD,
+    PERMISSIONS.DEPT_FACULTY_OWN,
+    PERMISSIONS.PUBLICATIONS_OWN,
+    PERMISSIONS.RESEARCH_OWN,
+    PERMISSIONS.WORKLOAD_OWN_VIEW,
+    PERMISSIONS.TIMETABLE_OWN_VIEW,
+    PERMISSIONS.ATTENDANCE_OWN,
+    PERMISSIONS.LEAVE_APPLY,
+    PERMISSIONS.APPRAISAL_SUBMIT,
+    PERMISSIONS.REPORTS_OWN_LIMITED,
+    PERMISSIONS.AUDIT_OWN,
+  ],
+};
+
+export function hasPermission(role: Role, permission: Permission): boolean {
+  return ROLE_PERMISSIONS[role]?.includes(permission) ?? false;
+}
