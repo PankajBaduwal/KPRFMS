@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { studentProjectService } from '../services/student-project.service';
-import type { 
-  StudentProject, 
-  StudentProjectStatus, 
-  StudentProjectMetrics,
+import type {
+  StudentProject,
+  StudentProjectStatus,
 } from '../types/student-project';
-import { 
+import {
+  STUDENT_PROJECT_STATUS,
   STUDENT_PROJECT_STATUS_CONFIG,
   STUDENT_PROJECT_TYPE_LABELS,
 } from '../types/student-project';
-import { 
-  PageHeader, 
-  Button, 
-  Select, 
+import {
+  PageHeader,
+  Button,
+  Select,
   Skeleton,
   SkeletonTable,
   EmptyState,
@@ -23,12 +23,107 @@ import {
   StudentProjectDetailModal
 } from '../components';
 
+// Workflow order used for the stage tracker, the stage pills and "workflow" sorting
+const WORKFLOW: StudentProjectStatus[] = [
+  STUDENT_PROJECT_STATUS.PROPOSED,
+  STUDENT_PROJECT_STATUS.APPROVED,
+  STUDENT_PROJECT_STATUS.ONGOING,
+  STUDENT_PROJECT_STATUS.SUBMITTED,
+  STUDENT_PROJECT_STATUS.UNDER_REVIEW,
+  STUDENT_PROJECT_STATUS.COMPLETED,
+];
+
+const IN_PROGRESS: StudentProjectStatus[] = ['PROPOSED', 'APPROVED', 'ONGOING'];
+const AWAITING_REVIEW: StudentProjectStatus[] = ['SUBMITTED', 'UNDER_REVIEW'];
+
+type SortKey = 'NEWEST' | 'OLDEST' | 'TITLE' | 'WORKFLOW';
+type ViewMode = 'TABLE' | 'CARDS';
+
+const getInitials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
+
+// Stored file links are relative ("/uploads/..."); external links are kept as-is
+const resolveFileUrl = (url: string) => (/^https?:\/\//i.test(url) ? url : url.startsWith('/') ? url : `/${url}`);
+
+/** Compact 6-step tracker showing where the project sits in the review workflow */
+const WorkflowTracker: React.FC<{ status: StudentProjectStatus }> = ({ status }) => {
+  const current = Math.max(0, WORKFLOW.indexOf(status));
+  const cfg = STUDENT_PROJECT_STATUS_CONFIG[status];
+  return (
+    <div className="sp-workflow" title={`Step ${current + 1} of ${WORKFLOW.length}: ${cfg?.label ?? status}`}>
+      <span className={`badge-custom ${cfg?.badgeClass ?? 'badge-neutral'}`}>{cfg?.label ?? status}</span>
+      <div className="sp-workflow-steps" aria-hidden="true">
+        {WORKFLOW.map((step, i) => (
+          <span
+            key={step}
+            className={`sp-workflow-step ${i < current ? 'is-done' : ''} ${i === current ? 'is-current' : ''}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/** Publication / patent / industry chips; "None yet" when a project has no outcomes */
+const OutcomeChips: React.FC<{ project: StudentProject; hideEmpty?: boolean }> = ({ project, hideEmpty }) => {
+  const chips = [
+    project.publication && { icon: 'bi-journal-text', label: 'Paper', title: `Publication: ${project.publication}`, tone: 'paper' },
+    project.patent && { icon: 'bi-award', label: 'Patent', title: `Patent: ${project.patent}`, tone: 'patent' },
+    project.industryCollaboration && {
+      icon: 'bi-building',
+      label: 'Industry',
+      title: `Industry: ${project.industryCollaboration}`,
+      tone: 'industry',
+    },
+  ].filter(Boolean) as { icon: string; label: string; title: string; tone: string }[];
+
+  if (chips.length === 0) return hideEmpty ? null : <span className="sp-muted">None yet</span>;
+  return (
+    <div className="sp-outcomes">
+      {chips.map((c) => (
+        <span key={c.label} className={`sp-outcome-chip sp-outcome-${c.tone}`} title={c.title}>
+          <i className={`bi ${c.icon}`} aria-hidden="true" />
+          {c.label}
+        </span>
+      ))}
+    </div>
+  );
+};
+
+/** Stacked initials for the team plus the first name, full roster in the tooltip */
+const TeamRoster: React.FC<{ project: StudentProject }> = ({ project }) => {
+  const members = project.teamMembers || [];
+  const roster = members
+    .map((m, i) => (project.registerNumbers?.[i] ? `${m} (${project.registerNumbers[i]})` : m))
+    .join('\n');
+  return (
+    <div className="sp-team" title={roster}>
+      <div className="sp-team-avatars" aria-hidden="true">
+        {members.slice(0, 3).map((m, i) => (
+          <span key={`${m}-${i}`} className="sp-team-avatar">{getInitials(m)}</span>
+        ))}
+        {members.length > 3 && <span className="sp-team-avatar sp-team-more">+{members.length - 3}</span>}
+      </div>
+      <div className="sp-team-text">
+        <div className="sp-team-lead">{members[0] || '—'}</div>
+        <div className="sp-muted">
+          {members.length} student{members.length === 1 ? '' : 's'}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const StudentProjectsPage: React.FC = () => {
   const { user } = useAuthStore();
   const { addToast } = useToast();
 
   const [projects, setProjects] = useState<StudentProject[]>([]);
-  const [metrics, setMetrics] = useState<StudentProjectMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -37,6 +132,11 @@ export const StudentProjectsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [typeFilter, setTypeFilter] = useState<string>('ALL');
   const [batchFilter, setBatchFilter] = useState<string>('ALL');
+  const [sortKey, setSortKey] = useState<SortKey>('NEWEST');
+  // Cards read better than a sideways-scrolling table on phones
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    typeof window !== 'undefined' && window.innerWidth < 768 ? 'CARDS' : 'TABLE'
+  );
 
   // Modals state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,15 +155,10 @@ export const StudentProjectsPage: React.FC = () => {
   const fetchData = async () => {
     try {
       setRefreshing(true);
-      const [listRes, metricsRes] = await Promise.all([
-        studentProjectService.getProjects(),
-        studentProjectService.getMetrics(),
-      ]);
-
+      const listRes = await studentProjectService.getProjects();
       setProjects(listRes.projects || []);
-      setMetrics(metricsRes || null);
     } catch (err: any) {
-      addToast(err?.response?.data?.message || 'Failed to load student projects', 'error');
+      addToast(err?.message || 'Failed to load student projects', 'error');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -74,50 +169,80 @@ export const StudentProjectsPage: React.FC = () => {
     fetchData();
   }, []);
 
-  // Filtered projects
-  const filteredProjects = useMemo(() => {
-    return projects.filter((item) => {
-      // Status filter
-      if (statusFilter !== 'ALL' && item.status !== statusFilter) {
-        return false;
-      }
-      // Type filter
-      if (typeFilter !== 'ALL' && item.projectType !== typeFilter) {
-        return false;
-      }
-      // Batch filter
-      if (batchFilter !== 'ALL' && item.batch !== batchFilter) {
-        return false;
-      }
-      // Search query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const inTitle = item.projectTitle?.toLowerCase().includes(q);
-        const inGuide = (item.guideName || item.guide)?.toLowerCase().includes(q);
-        const inTeam = item.teamMembers?.some(m => m.toLowerCase().includes(q));
-        const inReg = item.registerNumbers?.some(r => r.toLowerCase().includes(q));
-        const inDept = item.department?.toLowerCase().includes(q);
-        const inCompany = item.industryCollaboration?.toLowerCase().includes(q);
+  // Summary figures are derived from the loaded list so tiles and pills always agree with the table
+  const summary = useMemo(() => {
+    const byStatus = Object.fromEntries(WORKFLOW.map((s) => [s, 0])) as Record<StudentProjectStatus, number>;
+    let papers = 0;
+    let patents = 0;
+    let industry = 0;
+    for (const p of projects) {
+      if (byStatus[p.status] !== undefined) byStatus[p.status] += 1;
+      if (p.publication) papers += 1;
+      if (p.patent) patents += 1;
+      if (p.industryCollaboration) industry += 1;
+    }
+    return {
+      byStatus,
+      total: projects.length,
+      inProgress: IN_PROGRESS.reduce((n, s) => n + byStatus[s], 0),
+      awaitingReview: AWAITING_REVIEW.reduce((n, s) => n + byStatus[s], 0),
+      completed: byStatus.COMPLETED,
+      papers,
+      patents,
+      industry,
+    };
+  }, [projects]);
 
-        return inTitle || inGuide || inTeam || inReg || inDept || inCompany;
-      }
-      return true;
-    });
-  }, [projects, statusFilter, typeFilter, batchFilter, searchQuery]);
-
-  // Unique batches for filter dropdown
   const uniqueBatches = useMemo(() => {
-    const batches = Array.from(new Set(projects.map(p => p.batch).filter(Boolean)));
+    const batches = Array.from(new Set(projects.map((p) => p.batch).filter(Boolean)));
     return batches.sort().reverse();
   }, [projects]);
+
+  const filteredProjects = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const list = projects.filter((item) => {
+      if (statusFilter === 'IN_PROGRESS') {
+        if (!IN_PROGRESS.includes(item.status)) return false;
+      } else if (statusFilter === 'AWAITING_REVIEW') {
+        if (!AWAITING_REVIEW.includes(item.status)) return false;
+      } else if (statusFilter !== 'ALL' && item.status !== statusFilter) {
+        return false;
+      }
+      if (typeFilter !== 'ALL' && item.projectType !== typeFilter) return false;
+      if (batchFilter !== 'ALL' && item.batch !== batchFilter) return false;
+      if (!q) return true;
+      return (
+        item.projectTitle?.toLowerCase().includes(q) ||
+        (item.guideName || item.guide)?.toLowerCase().includes(q) ||
+        item.teamMembers?.some((m) => m.toLowerCase().includes(q)) ||
+        item.registerNumbers?.some((r) => r.toLowerCase().includes(q)) ||
+        item.department?.toLowerCase().includes(q) ||
+        item.industryCollaboration?.toLowerCase().includes(q)
+      );
+    });
+
+    const byDate = (p: StudentProject) => new Date(p.createdAt || p.startDate || 0).getTime();
+    return [...list].sort((a, b) => {
+      switch (sortKey) {
+        case 'OLDEST':
+          return byDate(a) - byDate(b);
+        case 'TITLE':
+          return (a.projectTitle || '').localeCompare(b.projectTitle || '');
+        case 'WORKFLOW':
+          return WORKFLOW.indexOf(a.status) - WORKFLOW.indexOf(b.status) || byDate(b) - byDate(a);
+        default:
+          return byDate(b) - byDate(a);
+      }
+    });
+  }, [projects, statusFilter, typeFilter, batchFilter, searchQuery, sortKey]);
 
   const handleUpdateStatus = async (id: string, status: StudentProjectStatus, remarks?: string) => {
     try {
       await studentProjectService.updateStatus(id, { status, reviewRemarks: remarks });
-      addToast(`Status updated to ${status.replace('_', ' ')}`, 'success');
+      addToast(`Status updated to ${STUDENT_PROJECT_STATUS_CONFIG[status]?.label ?? status}`, 'success');
       fetchData();
     } catch (err: any) {
-      addToast(err?.response?.data?.message || 'Failed to update status', 'error');
+      addToast(err?.message || 'Failed to update status', 'error');
     }
   };
 
@@ -127,10 +252,10 @@ export const StudentProjectsPage: React.FC = () => {
     try {
       await studentProjectService.deleteProject(id);
       addToast('Student project record deleted', 'success');
-      setProjects(prev => prev.filter(p => p._id !== id));
+      setProjects((prev) => prev.filter((p) => p._id !== id));
       fetchData();
     } catch (err: any) {
-      addToast(err?.response?.data?.message || 'Failed to delete project', 'error');
+      addToast(err?.message || 'Failed to delete project', 'error');
     } finally {
       setDeletingId(null);
       setDeleteConfirmId(null);
@@ -140,252 +265,326 @@ export const StudentProjectsPage: React.FC = () => {
   const hasActiveFilters =
     searchQuery.trim() !== '' || statusFilter !== 'ALL' || typeFilter !== 'ALL' || batchFilter !== 'ALL';
 
+  const clearFilters = () => {
+    setSearchQuery('');
+    setStatusFilter('ALL');
+    setTypeFilter('ALL');
+    setBatchFilter('ALL');
+  };
+
   const canEditProject = (item: StudentProject) => {
     if (isAdmin || isHOD) return true;
     if (isFaculty && (item.guideUserId === user?.id || item.guideUserId?._id === user?.id)) return true;
     return false;
   };
 
+  const openDetail = (p: StudentProject) => {
+    setSelectedProject(p);
+    setIsDetailModalOpen(true);
+  };
+  const openReview = (p: StudentProject) => {
+    setSelectedProject(p);
+    setIsReviewModalOpen(true);
+  };
+  const openEdit = (p: StudentProject) => {
+    setSelectedProject(p);
+    setIsModalOpen(true);
+  };
+  const openCreate = () => {
+    setSelectedProject(null);
+    setIsModalOpen(true);
+  };
+
+  const renderActions = (p: StudentProject) => {
+    const canEdit = canEditProject(p);
+    if (deleteConfirmId === p._id) {
+      const busy = deletingId === p._id;
+      return (
+        <div className="phd-action-btn-group">
+          <span className="sp-muted" style={{ marginRight: 2 }}>Delete?</span>
+          <Button variant="danger" size="sm" onClick={() => handleDelete(p._id)} loading={busy}>
+            {busy ? 'Deleting...' : 'Delete'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setDeleteConfirmId(null)} disabled={busy}>
+            Cancel
+          </Button>
+        </div>
+      );
+    }
+    return (
+      <div className="phd-action-btn-group">
+        <button type="button" className="phd-action-btn" onClick={() => openDetail(p)} title="View project sheet" aria-label={`View ${p.projectTitle}`}>
+          <i className="bi bi-eye" />
+        </button>
+        <button type="button" className="phd-action-btn" onClick={() => openReview(p)} title="Update status" aria-label={`Update status of ${p.projectTitle}`}>
+          <i className="bi bi-arrow-repeat" />
+        </button>
+        {canEdit && (
+          <button type="button" className="phd-action-btn" onClick={() => openEdit(p)} title="Edit project" aria-label={`Edit ${p.projectTitle}`}>
+            <i className="bi bi-pencil" />
+          </button>
+        )}
+        {canEdit && (
+          <button
+            type="button"
+            className="phd-action-btn delete-btn"
+            onClick={() => setDeleteConfirmId(p._id)}
+            title="Delete project"
+            aria-label={`Delete ${p.projectTitle}`}
+          >
+            <i className="bi bi-trash" />
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  const renderTitleBlock = (p: StudentProject, withOutcomes = false) => {
+    const docUrl = p.documentUrl || p.document;
+    return (
+      <div style={{ minWidth: 0 }}>
+        <button type="button" className="sp-title-btn" onClick={() => openDetail(p)}>
+          {p.projectTitle}
+        </button>
+        <div className="sp-title-meta">
+          <span className="sp-type-tag">{STUDENT_PROJECT_TYPE_LABELS[p.projectType] || p.projectType}</span>
+          {withOutcomes && <OutcomeChips project={p} hideEmpty />}
+          {docUrl && (
+            <a href={resolveFileUrl(docUrl)} target="_blank" rel="noreferrer" className="sp-doc-link">
+              <i className="bi bi-paperclip" aria-hidden="true" />
+              {p.documentName || 'Project report'}
+            </a>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const metricTiles = [
+    {
+      label: 'Total Projects',
+      value: summary.total,
+      desc: `${uniqueBatches.length} batch${uniqueBatches.length === 1 ? '' : 'es'} on record`,
+      icon: 'bi-kanban-fill',
+      accent: 'var(--color-royal-blue)',
+      bg: 'var(--color-primary-50)',
+      filter: 'ALL',
+    },
+    {
+      label: 'In Progress',
+      value: summary.inProgress,
+      desc: `${summary.byStatus.PROPOSED} proposed · ${summary.byStatus.APPROVED} approved · ${summary.byStatus.ONGOING} ongoing`,
+      icon: 'bi-lightning-charge-fill',
+      accent: 'var(--color-info)',
+      bg: 'var(--color-info-bg)',
+      filter: 'IN_PROGRESS',
+    },
+    {
+      label: 'Awaiting Review',
+      value: summary.awaitingReview,
+      desc: `${summary.byStatus.SUBMITTED} submitted · ${summary.byStatus.UNDER_REVIEW} under review`,
+      icon: 'bi-hourglass-split',
+      accent: 'var(--color-warning)',
+      bg: 'var(--color-warning-bg)',
+      filter: 'AWAITING_REVIEW',
+    },
+    {
+      label: 'Completed',
+      value: summary.completed,
+      desc: 'Evaluated and closed',
+      icon: 'bi-check2-all',
+      accent: 'var(--color-success)',
+      bg: 'var(--color-success-bg)',
+      filter: 'COMPLETED',
+    },
+    {
+      label: 'Research Outcomes',
+      value: summary.papers + summary.patents + summary.industry,
+      desc: `${summary.papers} papers · ${summary.patents} patents · ${summary.industry} industry`,
+      icon: 'bi-award-fill',
+      accent: 'var(--color-purple)',
+      bg: 'var(--color-purple-bg)',
+      filter: null,
+    },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
+    <div className="phd-page-shell">
+      {/* 1. Header */}
       <PageHeader
         title="Student Project Management"
         subtitle={
-          isHOD 
-            ? `Department of ${user?.departmentId || 'Engineering'} — Review, manage and guide student technical projects`
-            : isFaculty 
-            ? 'Supervise and guide student capstones, mini projects, research publications and patents' 
+          isHOD
+            ? 'Review, manage and guide your department’s student projects'
+            : isFaculty
+            ? 'Supervise and guide student capstones, mini projects, research publications and patents'
             : 'Institutional student projects overview, industry collaborations and research outputs'
         }
         actions={
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={fetchData}
-              loading={refreshing}
-            >
-              {!refreshing && <i className="bi bi-arrow-clockwise mr-1.5" />}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Button variant="outline" size="sm" onClick={fetchData} loading={refreshing}>
+              {!refreshing && <i className="bi bi-arrow-clockwise" style={{ marginRight: '6px' }} />}
               Refresh
             </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => {
-                setSelectedProject(null);
-                setIsModalOpen(true);
-              }}
-            >
-              <i className="bi bi-plus-lg mr-1.5" />
+            <Button variant="primary" size="sm" onClick={openCreate}>
+              <i className="bi bi-plus-lg" style={{ marginRight: '6px' }} />
               Register Project
             </Button>
           </div>
         }
       />
 
-      {/* METRIC COUNTS (Strictly matching prompt: Completed, Under Review, Submitted, Ongoing) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* Completed */}
-        <div className="card p-4 border-l-4 border-l-emerald-600" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderLeftColor: 'var(--color-success)' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-success)' }}>
-                Completed
-              </p>
-              <h3 className="text-2xl font-bold mt-1" style={{ color: 'var(--color-text)' }}>
-                {loading ? <Skeleton variant="text" width={48} height={28} /> : metrics?.completed ?? 0}
-              </h3>
+      {/* 2. Summary tiles (click to filter) */}
+      <section aria-label="Student project summary" className="phd-metrics-grid sp-metrics-grid">
+        {metricTiles.map((tile) => {
+          const clickable = tile.filter !== null;
+          const content = (
+            <>
+              <div className="phd-metric-top">
+                <span className="phd-metric-label">{tile.label}</span>
+                <div className="phd-metric-icon-box">
+                  <i className={`bi ${tile.icon}`} />
+                </div>
+              </div>
+              <div className="phd-metric-val">
+                {loading ? <Skeleton variant="text" width={48} height={28} /> : tile.value}
+              </div>
+              <div className="phd-metric-desc">{loading ? ' ' : tile.desc}</div>
+            </>
+          );
+          const style = { '--metric-accent': tile.accent, '--metric-bg': tile.bg } as React.CSSProperties;
+          return clickable ? (
+            <button
+              key={tile.label}
+              type="button"
+              className="phd-metric-tile sp-metric-btn"
+              style={style}
+              onClick={() => setStatusFilter(tile.filter as string)}
+              title={`Show ${tile.label.toLowerCase()}`}
+            >
+              {content}
+            </button>
+          ) : (
+            <div key={tile.label} className="phd-metric-tile" style={style}>
+              {content}
             </div>
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}>
-              <i className="bi bi-check2-all" />
-            </div>
-          </div>
-          <p className="text-xs mt-2" style={{ color: 'var(--color-text-secondary)', fontSize: '11px' }}>
-            Successfully evaluated & finished
-          </p>
-        </div>
+          );
+        })}
+      </section>
 
-        {/* Under Review */}
-        <div className="card p-4 border-l-4" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderLeftColor: 'var(--color-primary)' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-primary)' }}>
-                Under Review
-              </p>
-              <h3 className="text-2xl font-bold mt-1" style={{ color: 'var(--color-text)' }}>
-                {loading ? <Skeleton variant="text" width={48} height={28} /> : metrics?.underReview ?? 0}
-              </h3>
-            </div>
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'var(--color-primary-50)', color: 'var(--color-primary)' }}>
-              <i className="bi bi-hourglass-split" />
-            </div>
-          </div>
-          <p className="text-xs mt-2" style={{ color: 'var(--color-text-secondary)', fontSize: '11px' }}>
-            Pending committee/HOD evaluation
-          </p>
-        </div>
-
-        {/* Submitted */}
-        <div className="card p-4 border-l-4" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderLeftColor: 'var(--color-warning)' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-warning)' }}>
-                Submitted
-              </p>
-              <h3 className="text-2xl font-bold mt-1" style={{ color: 'var(--color-text)' }}>
-                {loading ? <Skeleton variant="text" width={48} height={28} /> : metrics?.submitted ?? 0}
-              </h3>
-            </div>
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning)' }}>
-              <i className="bi bi-file-earmark-arrow-up" />
-            </div>
-          </div>
-          <p className="text-xs mt-2" style={{ color: 'var(--color-text-secondary)', fontSize: '11px' }}>
-            Reports & codes submitted
-          </p>
-        </div>
-
-        {/* Ongoing */}
-        <div className="card p-4 border-l-4" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', borderLeftColor: 'var(--color-info)' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-info)' }}>
-                Ongoing
-              </p>
-              <h3 className="text-2xl font-bold mt-1" style={{ color: 'var(--color-text)' }}>
-                {loading ? <Skeleton variant="text" width={48} height={28} /> : metrics?.ongoing ?? 0}
-              </h3>
-            </div>
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'var(--color-info-bg)', color: 'var(--color-info)' }}>
-              <i className="bi bi-lightning-charge" />
-            </div>
-          </div>
-          <p className="text-xs mt-2" style={{ color: 'var(--color-text-secondary)', fontSize: '11px' }}>
-            Active under development
-          </p>
-        </div>
-      </div>
-
-      {/* Auxiliary Outcomes Chips */}
-      <div className="flex flex-wrap items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
-        <span className="font-semibold text-slate-600 dark:text-slate-300">
-          <i className="bi bi-graph-up mr-1 text-indigo-500" /> Research & Innovation Milestones:
-        </span>
-        <span className="badge badge-indigo">
-          Total Projects: {loading ? '…' : metrics?.totalProjects ?? 0}
-        </span>
-        <span className="badge badge-emerald">
-          <i className="bi bi-journal-check mr-1" /> Publications Produced: {loading ? '…' : metrics?.withPublications ?? 0}
-        </span>
-        <span className="badge badge-purple">
-          <i className="bi bi-award mr-1" /> Patents Filed: {loading ? '…' : metrics?.withPatents ?? 0}
-        </span>
-        <span className="badge badge-amber">
-          <i className="bi bi-building mr-1" /> Industry Collaborations: {loading ? '…' : metrics?.withIndustryCollaboration ?? 0}
-        </span>
-      </div>
-
-      {/* Filter and Search Bar */}
-      <div className="card p-4 space-y-3">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          {/* Search Box */}
-          <div className="relative">
+      {/* 3. Search, filters and workflow-stage pills */}
+      <section className="phd-toolbar-card" aria-label="Project filters">
+        <div className="sp-filter-row">
+          <div className="phd-search-box">
+            <i className="bi bi-search" />
             <input
               type="text"
-              placeholder="Search title, student, reg no, guide..."
+              placeholder="Search title, student, register no., guide, company..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="phd-search-input"
+              aria-label="Search student projects"
             />
           </div>
 
-          {/* Status Filter */}
-          <div>
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              options={[
-                { value: 'ALL', label: 'All Statuses' },
-                { value: 'PROPOSED', label: 'Proposed' },
-                { value: 'APPROVED', label: 'Approved' },
-                { value: 'ONGOING', label: 'Ongoing' },
-                { value: 'SUBMITTED', label: 'Submitted' },
-                { value: 'UNDER_REVIEW', label: 'Under Review' },
-                { value: 'COMPLETED', label: 'Completed' },
-              ]}
-            />
-          </div>
+          <Select
+            aria-label="Project type"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            options={[
+              { value: 'ALL', label: 'All project types' },
+              ...Object.entries(STUDENT_PROJECT_TYPE_LABELS).map(([value, label]) => ({ value, label })),
+            ]}
+          />
 
-          {/* Project Type Filter */}
-          <div>
-            <Select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              options={[
-                { value: 'ALL', label: 'All Project Types' },
-                { value: 'CAPSTONE', label: 'Capstone / Final Year' },
-                { value: 'MINI_PROJECT', label: 'Mini Project' },
-                { value: 'UG', label: 'Undergraduate Project' },
-                { value: 'PG', label: 'Postgraduate Thesis' },
-                { value: 'INTERNSHIP', label: 'Internship Project' },
-                { value: 'OTHER', label: 'Other / Special' },
-              ]}
-            />
-          </div>
+          <Select
+            aria-label="Batch"
+            value={batchFilter}
+            onChange={(e) => setBatchFilter(e.target.value)}
+            options={[
+              { value: 'ALL', label: 'All batches' },
+              ...uniqueBatches.map((b) => ({ value: b, label: `Batch ${b}` })),
+            ]}
+          />
 
-          {/* Batch Filter */}
-          <div>
-            <Select
-              value={batchFilter}
-              onChange={(e) => setBatchFilter(e.target.value)}
-              options={[
-                { value: 'ALL', label: 'All Batches' },
-                ...uniqueBatches.map(b => ({ value: b, label: `Batch ${b}` }))
-              ]}
-            />
+          <Select
+            aria-label="Sort projects"
+            value={sortKey}
+            onChange={(e) => setSortKey(e.target.value as SortKey)}
+            options={[
+              { value: 'NEWEST', label: 'Newest first' },
+              { value: 'OLDEST', label: 'Oldest first' },
+              { value: 'TITLE', label: 'Title A–Z' },
+              { value: 'WORKFLOW', label: 'By workflow stage' },
+            ]}
+          />
+
+          <div className="phd-view-toggle" role="group" aria-label="View mode">
+            <button
+              type="button"
+              className={`phd-view-toggle-btn ${viewMode === 'TABLE' ? 'is-active' : ''}`}
+              onClick={() => setViewMode('TABLE')}
+              aria-pressed={viewMode === 'TABLE'}
+            >
+              <i className="bi bi-table" />
+              <span>Table</span>
+            </button>
+            <button
+              type="button"
+              className={`phd-view-toggle-btn ${viewMode === 'CARDS' ? 'is-active' : ''}`}
+              onClick={() => setViewMode('CARDS')}
+              aria-pressed={viewMode === 'CARDS'}
+            >
+              <i className="bi bi-grid-fill" />
+              <span>Cards</span>
+            </button>
           </div>
         </div>
 
-        {/* Quick Filter Pills */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-slate-500 font-medium">Quick Status:</span>
-            {['ALL', 'ONGOING', 'SUBMITTED', 'UNDER_REVIEW', 'COMPLETED'].map((st) => (
+        <div className="phd-stage-pill-row">
+          <div className="phd-stage-pills" role="group" aria-label="Filter by workflow stage">
+            <button
+              type="button"
+              onClick={() => setStatusFilter('ALL')}
+              className={`phd-stage-pill-btn ${statusFilter === 'ALL' ? 'is-active' : ''}`}
+            >
+              All <span className="sp-pill-count">{summary.total}</span>
+            </button>
+            {WORKFLOW.map((st) => (
               <button
                 key={st}
+                type="button"
                 onClick={() => setStatusFilter(st)}
-                className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
-                  statusFilter === st
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
-                }`}
+                className={`phd-stage-pill-btn ${statusFilter === st ? 'is-active' : ''}`}
               >
-                {st === 'ALL' ? 'All' : st.replace('_', ' ')}
+                {STUDENT_PROJECT_STATUS_CONFIG[st].label}{' '}
+                <span className="sp-pill-count">{summary.byStatus[st]}</span>
               </button>
             ))}
           </div>
-          <span className="text-slate-400">
-            {loading ? 'Loading projects...' : (
-              <>Showing <strong>{filteredProjects.length}</strong> of {projects.length} projects</>
-            )}
-          </span>
-        </div>
-      </div>
 
-      {/* Main Content Area */}
+          <div className="sp-result-count">
+            <span>
+              Showing <strong>{filteredProjects.length}</strong> of {projects.length}
+            </span>
+            {hasActiveFilters && (
+              <button type="button" className="sp-link-btn" onClick={clearFilters}>
+                Clear filters
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Projects */}
       {loading ? (
-        <div className="card overflow-hidden" role="status" aria-busy="true" aria-label="Loading student projects">
-          <SkeletonTable rows={6} columns={8} />
+        <div className="phd-table-card" role="status" aria-busy="true" aria-label="Loading student projects">
+          <SkeletonTable rows={6} columns={7} />
         </div>
       ) : filteredProjects.length === 0 ? (
         <EmptyState
           icon="bi-kanban"
-          title={
-            hasActiveFilters
-              ? 'No student projects match your filters'
-              : 'No student projects registered yet'
-          }
+          title={hasActiveFilters ? 'No student projects match your filters' : 'No student projects registered yet'}
           reason={
             hasActiveFilters
               ? 'No records match the current search or filters.'
@@ -393,252 +592,97 @@ export const StudentProjectsPage: React.FC = () => {
               ? 'No student project teams have been registered under your guidance yet.'
               : 'No student project teams have been registered yet.'
           }
-          nextStep={
-            hasActiveFilters
-              ? 'Adjust the search, status, type or batch filters to see more projects.'
-              : undefined
-          }
+          nextStep={hasActiveFilters ? 'Adjust the search, stage, type or batch filters to see more projects.' : undefined}
           action={
-            hasActiveFilters ? undefined : (
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => {
-                  setSelectedProject(null);
-                  setIsModalOpen(true);
-                }}
-              >
-                <i className="bi bi-plus-lg mr-1.5" /> Register Project
+            hasActiveFilters ? (
+              <Button variant="outline" size="sm" onClick={clearFilters}>
+                Clear filters
+              </Button>
+            ) : (
+              <Button variant="primary" size="sm" onClick={openCreate}>
+                <i className="bi bi-plus-lg" style={{ marginRight: '6px' }} /> Register Project
               </Button>
             )
           }
         />
-      ) : (
-        <div className="card overflow-hidden" aria-busy={refreshing}>
+      ) : viewMode === 'TABLE' ? (
+        <div className="phd-table-card" aria-busy={refreshing}>
           {refreshing && <div className="loading-bar" role="progressbar" aria-label="Refreshing projects" />}
-          <div className="overflow-x-auto" style={{ opacity: refreshing ? 0.6 : 1, transition: 'opacity var(--transition-fast)' }}>
-            <table className="table-modern">
+          <div className="table-wrapper" style={{ opacity: refreshing ? 0.6 : 1, transition: 'opacity var(--transition-fast)' }}>
+            <table className="table-custom sp-table">
               <thead>
                 <tr>
-                  <th>Project Title & Scope</th>
-                  <th>Type & Department</th>
-                  <th>Batch / Sec</th>
-                  <th>Guide Faculty</th>
-                  <th>Team Roster</th>
-                  <th>Outcomes</th>
-                  <th>Status</th>
-                  <th className="text-right">Actions</th>
+                  <th style={{ minWidth: 240 }}>Project</th>
+                  <th style={{ minWidth: 120 }}>Stage</th>
+                  <th style={{ minWidth: 150 }}>Team</th>
+                  <th style={{ minWidth: 160 }}>Guide &amp; Batch</th>
+                  <th className="sp-sticky-col" style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-                {filteredProjects.map((p) => {
-                  const statusCfg = STUDENT_PROJECT_STATUS_CONFIG[p.status] || {
-                    label: p.status,
-                    badgeClass: 'badge-outline',
-                  };
-                  const typeLbl = STUDENT_PROJECT_TYPE_LABELS[p.projectType] || p.projectType;
-                  const canEdit = canEditProject(p);
-                  const docUrl = p.documentUrl || p.document;
-
-                  return (
-                    <tr key={p._id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
-                      {/* Title */}
-                      <td className="max-w-xs">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedProject(p);
-                            setIsDetailModalOpen(true);
-                          }}
-                          className="font-bold text-slate-800 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 text-left line-clamp-2 leading-snug"
-                        >
-                          {p.projectTitle}
-                        </button>
-                        {docUrl && (
-                          <div className="flex items-center gap-1 text-[11px] text-slate-500 mt-1">
-                            <i className="bi bi-paperclip text-indigo-500" />
-                            <a
-                              href={`http://localhost:5000${docUrl.startsWith('/') ? docUrl : `/${docUrl}`}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="hover:underline text-indigo-600 dark:text-indigo-400 truncate max-w-[180px]"
-                            >
-                              {p.documentName || 'Project Report'}
-                            </a>
-                          </div>
-                        )}
-                      </td>
-
-                      {/* Type & Dept */}
-                      <td>
-                        <span className="badge badge-outline text-[11px] font-medium">
-                          {typeLbl}
-                        </span>
-                        <p className="text-[11px] text-slate-500 mt-1">Dept: {p.department}</p>
-                      </td>
-
-                      {/* Batch & Sec */}
-                      <td>
-                        <span className="font-semibold text-slate-700 dark:text-slate-200">
-                          {p.batch}
-                        </span>
-                        <p className="text-[11px] text-slate-500">Sec {p.section}</p>
-                      </td>
-
-                      {/* Guide */}
-                      <td>
-                        <p className="font-medium text-slate-800 dark:text-slate-200">
-                          {p.guideName || p.guide}
-                        </p>
-                        {p.coGuide && (
-                          <p className="text-[10px] text-slate-500">Co: {p.coGuide}</p>
-                        )}
-                      </td>
-
-                      {/* Team */}
-                      <td>
-                        <div className="flex items-center gap-1.5">
-                          <span className="badge badge-indigo text-[11px]">
-                            {p.teamMembers.length} Students
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-500 mt-1 truncate max-w-[140px]" title={p.teamMembers.join(', ')}>
-                          {p.teamMembers[0]}
-                          {p.teamMembers.length > 1 ? ` +${p.teamMembers.length - 1} more` : ''}
-                        </p>
-                      </td>
-
-                      {/* Outcomes */}
-                      <td>
-                        <div className="flex items-center gap-1.5">
-                          {p.publication && (
-                            <span 
-                              className="w-6 h-6 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center" 
-                              title={`Publication: ${p.publication}`}
-                            >
-                              <i className="bi bi-journal-text text-xs" />
-                            </span>
-                          )}
-                          {p.patent && (
-                            <span 
-                              className="w-6 h-6 rounded bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center" 
-                              title={`Patent: ${p.patent}`}
-                            >
-                              <i className="bi bi-award text-xs" />
-                            </span>
-                          )}
-                          {p.industryCollaboration && (
-                            <span 
-                              className="w-6 h-6 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center" 
-                              title={`Industry: ${p.industryCollaboration}`}
-                            >
-                              <i className="bi bi-building text-xs" />
-                            </span>
-                          )}
-                          {!p.publication && !p.patent && !p.industryCollaboration && (
-                            <span className="text-slate-400 text-[11px] italic">—</span>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Status */}
-                      <td>
-                        <span className={`badge ${statusCfg.badgeClass}`}>
-                          {statusCfg.label}
-                        </span>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          {/* View Detail */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedProject(p);
-                              setIsDetailModalOpen(true);
-                            }}
-                            className="p-1.5 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
-                            title="View Project Sheet"
-                          >
-                            <i className="bi bi-eye" />
-                          </button>
-
-                          {/* Status Review */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedProject(p);
-                              setIsReviewModalOpen(true);
-                            }}
-                            className="p-1.5 text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
-                            title="Update Status / Workflow"
-                          >
-                            <i className="bi bi-arrow-repeat" />
-                          </button>
-
-                          {/* Edit (if permitted) */}
-                          {canEdit && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedProject(p);
-                                setIsModalOpen(true);
-                              }}
-                              className="p-1.5 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
-                              title="Edit Project"
-                            >
-                              <i className="bi bi-pencil" />
-                            </button>
-                          )}
-
-                          {/* Delete (if permitted) */}
-                          {canEdit && (
-                            deleteConfirmId === p._id ? (
-                              <div className="flex items-center gap-1 ml-1">
-                                <button
-                                  type="button"
-                                  onClick={() => handleDelete(p._id)}
-                                  disabled={deletingId === p._id}
-                                  aria-busy={deletingId === p._id}
-                                  className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-rose-600 text-white rounded hover:bg-rose-700 disabled:opacity-70"
-                                >
-                                  {deletingId === p._id && <span className="spinner spinner-sm" aria-hidden="true" />}
-                                  {deletingId === p._id ? 'Deleting...' : 'Confirm'}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setDeleteConfirmId(null)}
-                                  disabled={deletingId === p._id}
-                                  className="px-1 py-0.5 text-[10px] text-slate-500 hover:text-slate-700 disabled:opacity-50"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => setDeleteConfirmId(p._id)}
-                                className="p-1.5 text-slate-500 hover:text-rose-600 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
-                                title="Delete Project"
-                              >
-                                <i className="bi bi-trash" />
-                              </button>
-                            )
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+              <tbody>
+                {filteredProjects.map((p) => (
+                  <tr key={p._id}>
+                    <td>{renderTitleBlock(p, true)}</td>
+                    <td><WorkflowTracker status={p.status} /></td>
+                    <td><TeamRoster project={p} /></td>
+                    <td>
+                      <div className="sp-strong">{p.guideName || p.guide || '—'}</div>
+                      {p.coGuide && <div className="sp-muted">Co-guide: {p.coGuide}</div>}
+                      <div className="sp-muted">
+                        Batch {p.batch || '—'}
+                        {p.section ? ` · Sec ${p.section}` : ''}
+                      </div>
+                    </td>
+                    <td className="sp-sticky-col">{renderActions(p)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
+      ) : (
+        <div className="sp-cards-grid" aria-busy={refreshing}>
+          {filteredProjects.map((p) => (
+            <article key={p._id} className="phd-scholar-card">
+              <div>
+                <div className="sp-card-head">
+                  {renderTitleBlock(p)}
+                </div>
+                <dl className="sp-card-facts">
+                  <div>
+                    <dt>Team</dt>
+                    <dd><TeamRoster project={p} /></dd>
+                  </div>
+                  <div>
+                    <dt>Guide</dt>
+                    <dd>
+                      <div className="sp-strong">{p.guideName || p.guide || '—'}</div>
+                      {p.coGuide && <div className="sp-muted">Co-guide: {p.coGuide}</div>}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Batch</dt>
+                    <dd>
+                      <span className="sp-strong">{p.batch || '—'}</span>
+                      {p.section && <span className="sp-muted"> · Section {p.section}</span>}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Outcomes</dt>
+                    <dd><OutcomeChips project={p} /></dd>
+                  </div>
+                </dl>
+              </div>
+              <div className="phd-scholar-card-footer">
+                <WorkflowTracker status={p.status} />
+                {renderActions(p)}
+              </div>
+            </article>
+          ))}
+        </div>
       )}
 
       {/* MODALS */}
-      {/* Create / Edit Modal */}
       <StudentProjectModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -652,7 +696,6 @@ export const StudentProjectsPage: React.FC = () => {
         }}
       />
 
-      {/* Review / Status Workflow Modal */}
       <ReviewStudentProjectModal
         isOpen={isReviewModalOpen}
         onClose={() => {
@@ -664,7 +707,6 @@ export const StudentProjectsPage: React.FC = () => {
         userRole={user?.role}
       />
 
-      {/* Project Sheet Detail Modal */}
       <StudentProjectDetailModal
         isOpen={isDetailModalOpen}
         onClose={() => {

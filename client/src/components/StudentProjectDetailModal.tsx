@@ -163,24 +163,15 @@ export const StudentProjectDetailModal: React.FC<StudentProjectDetailModalProps>
               nextStep={canEdit && onEdit ? 'Use Edit to add the student team.' : undefined}
             />
           ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+          <div className="sp-roster-grid">
             {project.teamMembers.map((member, idx) => {
               const regNo = project.registerNumbers[idx] || 'N/A';
               return (
-                <div
-                  key={idx}
-                  className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 flex items-center gap-2.5"
-                >
-                  <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-xs">
-                    {idx + 1}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
-                      {member}
-                    </p>
-                    <p className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
-                      {regNo}
-                    </p>
+                <div key={idx} className="sp-roster-item">
+                  <span className="sp-team-avatar" aria-hidden="true">{idx + 1}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="sp-team-lead" style={{ maxWidth: 'none' }}>{member}</div>
+                    <div className="sp-muted" style={{ fontFamily: 'monospace' }}>{regNo}</div>
                   </div>
                 </div>
               );

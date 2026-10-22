@@ -11,6 +11,9 @@ import { AcademicYear } from '../models/AcademicYear.js';
 import { TimetableSlot } from '../models/TimetableSlot.js';
 import { LeaveApplication } from '../models/LeaveApplication.js';
 import { LeaveBalance } from '../models/LeaveBalance.js';
+import { StudentMentoring } from '../models/StudentMentoring.js';
+import { StudentProject } from '../models/StudentProject.js';
+import { PhdScholar } from '../models/PhdScholar.js';
 import { generateToken } from '../utils/jwt.js';
 import { ROLES } from '../permissions/roles.js';
 
@@ -496,6 +499,14 @@ async function runSystemQASuite() {
     stage: 'COURSEWORK',
   });
   assert(phdCreate.status === 200 || phdCreate.status === 201, 'PhD Scholar Create (POST /phd-scholars)', undefined, phdCreate);
+
+  // Remove the records created above so repeated runs don't pile up in the dev database
+  const createdId = (res: any) => res?.data?.data?._id;
+  await Promise.all([
+    createdId(mentCreate) && StudentMentoring.deleteOne({ _id: createdId(mentCreate) }),
+    createdId(stuProjCreate) && StudentProject.deleteOne({ _id: createdId(stuProjCreate) }),
+    createdId(phdCreate) && PhdScholar.deleteOne({ _id: createdId(phdCreate) }),
+  ]);
 
   // ============================================================================
   // 8. SUBJECTS, ALLOCATION, WORKLOAD & TIMETABLE
