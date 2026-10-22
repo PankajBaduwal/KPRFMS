@@ -10,6 +10,7 @@ import { Faculty } from '../models/Faculty.js';
 import { AcademicYear } from '../models/AcademicYear.js';
 import { TimetableSlot } from '../models/TimetableSlot.js';
 import { LeaveApplication } from '../models/LeaveApplication.js';
+import { LeaveBalance } from '../models/LeaveBalance.js';
 import { generateToken } from '../utils/jwt.js';
 import { ROLES } from '../permissions/roles.js';
 
@@ -578,6 +579,9 @@ async function runSystemQASuite() {
     facultyId: ctx.facultyId,
     startDate: { $gte: new Date('2029-01-01') },
   });
+  // Previous runs' approved leave stays deducted; drop the balance so the service
+  // re-creates it with default entitlements (otherwise repeated runs exhaust it)
+  await LeaveBalance.deleteMany({ facultyId: ctx.facultyId, academicYear: ctx.academicYearStr });
 
   const leaveRes = await apiRequest('POST', '/leaves', ctx.facultyToken, {
     facultyId: ctx.facultyId,
