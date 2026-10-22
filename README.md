@@ -1,223 +1,200 @@
 # KPRIET Faculty Management System (FMS)
 
-Centralized institutional Faculty Management System for **KPR Institute of Engineering and Technology (KPRIET)**.
+Institutional ERP for **KPR Institute of Engineering and Technology (KPRIET)**: faculty records, teaching, research, attendance and leave, appraisals, approvals, analytics and administration — in one role-aware web portal.
 
 ---
 
-## 1. Project Overview
+## Features
 
-The **KPRIET Faculty Management System (FMS)** is an institutional enterprise resource planning platform engineered to streamline faculty academic workloads, research governance, profile credentials, departmental operations, and administrative oversight across all colleges and departments.
+| Area | Modules |
+|---|---|
+| Faculty | Master profile, qualifications, experience, directory, document vault |
+| Teaching | Subjects, workload, timetable (with clash detection), substitutions |
+| Students | Mentoring, student projects, PhD scholars |
+| Research | Publications, funded projects, patents, copyrights, consultancy, academic activities |
+| Operations | Attendance (daily / monthly / corrections / locking), leave applications & balances |
+| Performance | Appraisal cycles, self-appraisal, evidence, multi-level evaluation |
+| Governance | Approval queue, HOD / Dean / Principal consoles, institution analytics, faculty comparison, accreditation reports |
+| Administration | Users & roles, departments, academic years, institution settings, audit logs, notifications, global search |
 
-### Architecture Scope: Phase 1 — Project Initialization + Core Foundation
-Phase 1 establishes the production-grade foundation for all future modules:
-- Monorepo architecture (`client/` and `server/`)
-- Strict TypeScript configuration across both stacks
-- Centralized REST API response standards and error handling
-- Security middleware (Helmet, strict CORS, rate limiting, request-size limits)
-- TanStack Query, Zustand, React Router, and React Hook Form + Zod architecture
-- Professional institutional design system built on Bootstrap 5 and CSS variables (no Tailwind)
-- Modular MongoDB connection and institutional entity blueprints
+### Roles
 
----
+| Role | Scope |
+|---|---|
+| `FACULTY` | Own records; submits items for verification |
+| `HOD` | Own department; verifies and approves faculty submissions |
+| `DEAN` | Institution-wide academic oversight |
+| `PRINCIPAL` | Institution-wide oversight and final approvals |
+| `ADMIN` | Full system administration |
 
-## 2. Technology Stack
-
-### Frontend (`client/`)
-- **Core:** React 19, TypeScript (Strict Mode), Vite
-- **Routing:** React Router v7
-- **Forms & Validation:** React Hook Form, Zod, `@hookform/resolvers`
-- **Server State:** TanStack React Query v5
-- **Client State:** Zustand
-- **UI & Styling:** Bootstrap 5, Bootstrap Icons, Custom CSS Design Tokens (CSS Variables)
-- **HTTP Client:** Axios with centralized error normalization and credential cookies
-- **Utilities:** `date-fns`, `recharts` (installed for future analytics phases)
-
-### Backend (`server/`)
-- **Core:** Node.js, Express, TypeScript (Strict Mode, NodeNext)
-- **Database:** MongoDB, Mongoose ODM
-- **Validation:** Zod schemas
-- **Security:** Helmet, CORS, Express Rate Limit, Cookie Parser
-- **Authentication Prep:** JWT, bcrypt (for Phase 2 implementation)
-- **Logging:** Structured JSON/timestamped logging utility with log sanitization
+Access is enforced on the server (`requireAuth`, `requireRole`, `requirePermission`, department and ownership checks); the client additionally hides pages a role cannot use.
 
 ---
 
-## 3. Directory Structure
+## Tech Stack
+
+- **Client** (`client/`): React 19, TypeScript, Vite, React Router 7, TanStack Query, Zustand, React Hook Form + Zod, Bootstrap 5 + custom CSS tokens, Recharts
+- **Server** (`server/`): Node.js, Express 5, TypeScript, MongoDB + Mongoose, Zod, JWT (HTTP-only cookie), bcrypt, Helmet, express-rate-limit, Multer
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 20+ (developed on 22)
+- MongoDB 7+ running locally on `mongodb://localhost:27017`
+
+### 1. Install dependencies
+
+```bash
+npm --prefix server install
+npm --prefix client install
+```
+
+### 2. Configure environment
+
+```bash
+cp server/.env.example server/.env
+cp client/.env.example client/.env
+```
+
+| Variable (`server/.env`) | Purpose |
+|---|---|
+| `PORT` | API port (default `5000`) |
+| `NODE_ENV` | `development` / `production` / `test` |
+| `MONGODB_URI` | MongoDB connection string |
+| `JWT_SECRET` | Signs session tokens |
+| `JWT_EXPIRES_IN` | Session lifetime (default `7d`) |
+| `COOKIE_SECRET` | Signs cookies |
+| `CLIENT_URL` | Allowed browser origin for CORS |
+
+`client/.env` only needs `VITE_API_URL` (default `http://localhost:5000/api`).
+
+> **Production:** the server refuses to start if `JWT_SECRET` / `COOKIE_SECRET` are shorter than 32 characters, still contain the `.env.example` placeholder, or are identical. Generate them with
+> `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`
+
+### 3. Seed development data
+
+```bash
+npm run seed
+```
+
+### 4. Run
+
+In two terminals, from the project root:
+
+```bash
+npm run dev:server   # API  → http://localhost:5000/api
+npm run dev:client   # Web  → http://localhost:5173
+```
+
+### Development logins
+
+Created by `npm run seed` (development databases only):
+
+| Role | Email | Employee ID | Password |
+|---|---|---|---|
+| Admin | admin@kpriet.ac.in | EMP001 | `Admin@12345` |
+| Principal | principal@kpriet.ac.in | EMP002 | `Principal@12345` |
+| Dean | dean.acad@kpriet.ac.in | EMP003 | `Dean@12345` |
+| HOD (CSE) | hod.cse@kpriet.ac.in | EMP004 | `Hod@12345` |
+| Faculty (CSE) | faculty.cse@kpriet.ac.in | EMP005 | `Faculty@12345` |
+| Inactive (login is rejected) | inactive@kpriet.ac.in | EMP099 | `Inactive@12345` |
+
+Sign in with either the email or the employee ID. These accounts only exist in seeded dev databases — never create them in production.
+
+---
+
+## Scripts
+
+From the project root:
+
+| Command | Effect |
+|---|---|
+| `npm run dev:server` / `npm run dev:client` | Start API / web app in watch mode |
+| `npm run build` | Type-check and build server (`server/dist`) and client (`client/dist`) |
+| `npm start` | Run the built API (`node server/dist/server.js`) |
+| `npm test` | Run every backend test suite and print a pass/fail summary |
+| `npm run seed` | Create / refresh development seed data |
+| `npm run lint:server` / `npm run lint:client` | Type-check server / lint client |
+
+Run only some suites with `npm test -- 2 3 54` (phase numbers).
+
+### Tests
+
+The backend suites live in `server/src/scripts/test-phase*.ts`. They run against the local MongoDB from `server/.env`, and several also call the live API — **start `npm run dev:server` before `npm test`**. They refuse to run against production or a remote database (see below).
+
+---
+
+## Security
+
+- Session JWT in an HTTP-only, `SameSite` cookie; CSRF double-submit token (`X-CSRF-Token`) on every state-changing request
+- Login rate limiting and account lockout (5 failed attempts → 15 min)
+- Changing or resetting a password signs the user out of every other session
+- Users change their own password from the profile menu → **Change Password** (policy: 8+ chars, upper, lower, digit, one of `@$!%*?&`)
+- Request sanitisation against NoSQL operator injection and XSS payloads; Helmet security headers; strict CORS in production
+- Uploaded files require an authenticated session; private documents are stored outside the web root in `server/storage/` and served through `/api/documents` with access checks
+- Every sensitive action is written to the audit log (`/portal/audit-logs`)
+
+`server/storage/`, `uploads/` and all `.env` files are git-ignored — never commit them.
+
+---
+
+## Project Structure
 
 ```
 kpriet-fms/
-├── client/
-│   ├── src/
-│   │   ├── api/          # Axios instance and typed request wrappers
-│   │   ├── app/          # App root, React Router, QueryClient setup
-│   │   ├── components/   # Foundational reusable UI components
-│   │   ├── constants/    # Route names, institutional roles, app constants
-│   │   ├── layouts/      # AppLayout, AuthLayout, PublicLayout
-│   │   ├── pages/        # HomePage, LoginPage, UnauthorizedPage, NotFoundPage
-│   │   ├── stores/       # Zustand UI store & Auth state skeleton
-│   │   ├── styles/       # Design tokens, global CSS, components, responsive styles
-│   │   └── types/        # TypeScript interfaces for API & domain entities
-│   ├── index.html
-│   ├── package.json
-│   ├── tsconfig.json
-│   ├── vite.config.ts
-│   └── .env.example
-│
-├── server/
-│   ├── src/
-│   │   ├── config/       # MongoDB connection, env parser, CORS options
-│   │   ├── middleware/   # Centralized error handler, rate limiters, 404 handler
-│   │   ├── models/       # Mongoose schemas (User, Department)
-│   │   ├── permissions/  # Institutional roles and hierarchy constants
-│   │   ├── routes/       # API router registry, health check endpoint
-│   │   ├── types/        # Typed Express requests and common interfaces
-│   │   ├── utils/        # AppError class, logger, apiResponse helpers
-│   │   ├── app.ts        # Express app initialization & middleware pipeline
-│   │   └── server.ts     # HTTP server lifecycle and graceful shutdown
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── .env.example
-│
-├── package.json          # Root scripts orchestration
-├── .gitignore
-└── README.md
+├── client/src/
+│   ├── api/          Axios instance (credentials, CSRF header, error normalisation)
+│   ├── app/          App root, router, React Query client
+│   ├── components/   Shared UI, modals, dashboard views
+│   ├── constants/    Routes, roles
+│   ├── hooks/        Shared hooks (e.g. double-submit-safe async actions)
+│   ├── layouts/      Public / auth / portal layouts
+│   ├── pages/        One page per module
+│   ├── services/     Typed API calls per module
+│   ├── stores/       Zustand auth + UI state
+│   ├── styles/       Design tokens and global CSS
+│   └── types/        Domain types
+└── server/src/
+    ├── audit/        Audit logger
+    ├── config/       Env validation, database, CORS
+    ├── controllers/  HTTP handlers
+    ├── middleware/   Auth, RBAC, CSRF, sanitisation, uploads, errors
+    ├── models/       Mongoose schemas
+    ├── permissions/  Roles and permission matrix
+    ├── routes/       Routers mounted under /api
+    ├── services/     Business logic
+    ├── validators/   Zod request schemas
+    ├── scripts/      Seed, cleanup, test suites, test runner
+    └── utils/        JWT, passwords, responses, logging
 ```
 
 ---
 
-## 4. Environment Configuration
+## API Conventions
 
-### Server Configuration (`server/.env`)
-Copy `server/.env.example` to `server/.env`:
-```env
-PORT=5000
-NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/kpriet-fms
-JWT_SECRET=your-secure-jwt-secret-min-32-chars
-JWT_EXPIRES_IN=7d
-COOKIE_SECRET=your-secure-cookie-secret-key
-CLIENT_URL=http://localhost:5173
-```
+All endpoints are under `/api`. Health check: `GET /api/health`.
 
-### Client Configuration (`client/.env`)
-Copy `client/.env.example` to `client/.env`:
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
----
-
-## 5. Development & Running
-
-### Starting Development Servers
-
-Run backend (from `server/` directory):
-```bash
-cd server
-npm run dev
-```
-
-Run frontend (from `client/` directory):
-```bash
-cd client
-npm run dev
-```
-
-Or from the root directory:
-```bash
-# Start backend
-npm run dev:server
-
-# Start frontend
-npm run dev:client
-```
-
-### Building for Production
-```bash
-# Build both client and server
-npm run build
-
-# Or individually
-npm run build:server
-npm run build:client
-```
-
-### Starting Production Server
-```bash
-npm run start
-```
-
----
-
-## 6. Centralized API Standard
-
-### Health Endpoint
-`GET /api/health`
 ```json
-{
-  "success": true,
-  "message": "KPRIET FMS API is running",
-  "data": {
-    "status": "healthy",
-    "timestamp": "2026-10-04T09:20:00.000Z",
-    "uptime": 12.34
-  }
-}
-```
-
-### Standard Success Response
-```json
-{
-  "success": true,
-  "message": "Operation successful",
-  "data": {}
-}
-```
-
-### Standard Error Response
-```json
-{
-  "success": false,
-  "message": "Human-readable error message",
-  "code": "ERROR_CODE",
-  "details": []
-}
+{ "success": true,  "message": "Operation successful", "data": {} }
+{ "success": false, "message": "Human-readable error", "code": "ERROR_CODE", "details": [] }
 ```
 
 ---
 
-## 7. Institutional Roles
+## Development Seed Data vs Production Data
 
-The application establishes the following role hierarchy:
-- `ADMIN`: Institutional super-administrator
-- `PRINCIPAL`: Head of the institution
-- `DEAN`: Academic, Research, and Student Affairs leadership
-- `HOD`: Head of Department
-- `FACULTY`: Teaching and research faculty member
-
----
-
-## 8. Next Roadmap (Phase 2)
-- Complete Authentication (JWT in HTTP-only cookies)
-- Role-based Access Control (RBAC) middleware
-- Password hashing with bcrypt
-- Session lifecycle and profile bootstrap
-
----
-
-## Development Seed Data vs Production Data (Phase 37)
-
-Production screens (dashboards, analytics, profiles, reports, filters) read only from database APIs. Academic-year options and defaults come from `GET /api/academic-years`, which is backed by Institution Settings, the Academic Year master and years already used by records. Nothing in the client hardcodes years, statistics or faculty lists.
-
-Development sample data lives only in `server/src/scripts/seed.ts`:
+Production screens read only from database APIs; nothing in the client hardcodes years, statistics or faculty lists. Academic-year options come from `GET /api/academic-years`.
 
 | Command (in `server/`) | Effect |
 |---|---|
 | `npm run seed` | Creates dev seed records. Replaces only earlier seed records. |
 | `npm run seed:clean` | Deletes every dev seed record. Real records are untouched. |
-| `npm run seed:reset` | One-off: also wipes untagged rows left by pre-Phase-37 seeds in the seeded research/teaching collections. |
+| `npm run seed:reset` | One-off: also wipes untagged rows left by older seeds in the seeded research/teaching collections. |
 
 - Every seeded document is stamped `devSeed: { isDevSeed: true, batchId, seededAt }` and listed in the `dev_seed_registry` collection.
-- The seed, cleanup and `test-phase*.ts` scripts refuse to run when `NODE_ENV=production` or when `MONGODB_URI` points to a non-local host (override with `ALLOW_REMOTE_DEV_SEED=true` only for a dedicated dev database).
-- The login page shows the seed accounts only under `vite dev` (`client/src/dev/devSeedAccounts.ts`). They are stripped from production builds, and you can hide them in dev with `VITE_HIDE_DEV_SEED=true`.
-- The `/portal/design-system` component catalogue uses illustrative sample rows and is registered only in development builds.
+- Seed, cleanup and test scripts refuse to run when `NODE_ENV=production` or when `MONGODB_URI` points to a non-local host (override with `ALLOW_REMOTE_DEV_SEED=true` only for a dedicated dev database).
+- The login page shows the seed accounts only under `vite dev`; they are stripped from production builds (hide them in dev with `VITE_HIDE_DEV_SEED=true`).
+- `/portal/design-system` (component catalogue) exists only in development builds.

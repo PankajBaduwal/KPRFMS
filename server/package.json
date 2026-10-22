@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "seed": "tsx src/scripts/seed.ts",
     "lint": "tsc --noEmit",
+    "test": "tsx src/scripts/run-tests.ts",
     "seed:clean": "tsx src/scripts/seed-clean.ts",
     "seed:reset": "tsx src/scripts/seed.ts --reset-legacy"
   },
