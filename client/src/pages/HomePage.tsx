@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiGet } from '../api/client';
 import { ROUTES } from '../constants/routes';
+import { FEATURES } from '../constants/features';
+
+// Profile-domain pills that describe the Teaching module
+const TEACHING_DOMAINS = ['Course Allocation', 'Weekly Workload'];
 import '../styles/home.css';
 
 interface HealthData {
@@ -73,7 +77,7 @@ export const HomePage: React.FC = () => {
               </div>
 
               <p className="hero-description">
-                Centralize faculty profiles, academic responsibilities, workload, research, publications, professional activities, approvals, performance and institutional records in one secure platform.
+                Centralize faculty profiles, academic responsibilities, {FEATURES.TEACHING ? 'workload, ' : ''}research, publications, professional activities, approvals, performance and institutional records in one secure platform.
               </p>
 
               <div className="hero-cta-group">
@@ -131,9 +135,13 @@ export const HomePage: React.FC = () => {
                   <div className="hero-satellite-item">
                     <div className="hero-satellite-head">
                       <i className="bi bi-mortarboard" aria-hidden="true" />
-                      <span>Academic &amp; Teaching</span>
+                      <span>{FEATURES.TEACHING ? 'Academic & Teaching' : 'Academic & Mentoring'}</span>
                     </div>
-                    <p>Subject mapping, contact hours, timetable &amp; mentoring records</p>
+                    <p>
+                      {FEATURES.TEACHING
+                        ? 'Subject mapping, contact hours, timetable & mentoring records'
+                        : 'Qualifications, student mentoring, projects & PhD scholar records'}
+                    </p>
                     <span className="hero-satellite-status">
                       <i className="bi bi-check2" aria-hidden="true" /> Active Sync
                     </span>
@@ -153,9 +161,13 @@ export const HomePage: React.FC = () => {
                   <div className="hero-satellite-item">
                     <div className="hero-satellite-head">
                       <i className="bi bi-speedometer2" aria-hidden="true" />
-                      <span>Workload &amp; Attendance</span>
+                      <span>{FEATURES.TEACHING ? 'Workload & Attendance' : 'Attendance & Leave'}</span>
                     </div>
-                    <p>Weekly contact load ceilings, biometric sync &amp; statutory appraisal</p>
+                    <p>
+                      {FEATURES.TEACHING
+                        ? 'Weekly contact load ceilings, biometric sync & statutory appraisal'
+                        : 'Daily attendance, leave balances & statutory appraisal'}
+                    </p>
                     <span className="hero-satellite-status">
                       <i className="bi bi-check2" aria-hidden="true" /> Real-time Tracking
                     </span>
@@ -216,7 +228,7 @@ export const HomePage: React.FC = () => {
                 <i className="bi bi-calendar3-week" aria-hidden="true" />
               </div>
               <div className="institutional-strip-text">
-                Workload &amp; Timetable
+                {FEATURES.TEACHING ? 'Workload & Timetable' : 'Attendance & Leave'}
               </div>
             </div>
 
@@ -264,7 +276,7 @@ export const HomePage: React.FC = () => {
               </div>
               <h3>1. One Faculty Profile</h3>
               <p>
-                Eliminate fragmented spreadsheets and isolated dossiers. Every faculty member maintains a comprehensive, verified digital academic portfolio containing employment, teaching, research, patents, professional activities, and appraisals.
+                Eliminate fragmented spreadsheets and isolated dossiers. Every faculty member maintains a comprehensive, verified digital academic portfolio containing employment, {FEATURES.TEACHING ? 'teaching, ' : ''}research, patents, professional activities, and appraisals.
               </p>
               <ul className="why-bullets">
                 <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> Continuous lifecycle tracking from joining to promotion</li>
@@ -273,6 +285,7 @@ export const HomePage: React.FC = () => {
             </div>
 
             {/* Block 2 */}
+            {FEATURES.TEACHING && (
             <div className="why-card">
               <div className="why-icon-wrap">
                 <i className="bi bi-link-45deg" aria-hidden="true" />
@@ -286,6 +299,7 @@ export const HomePage: React.FC = () => {
                 <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> Instant ceiling threshold alerts for over/under allocation</li>
               </ul>
             </div>
+            )}
 
             {/* Block 3 */}
             <div className="why-card">
@@ -331,7 +345,7 @@ export const HomePage: React.FC = () => {
               One Complete Faculty Record
             </h2>
             <p className="section-subtitle">
-              The faculty profile consolidates all 18 institutional domains into a verified digital academic portfolio.
+              The faculty profile consolidates all {FEATURES.TEACHING ? 18 : 18 - TEACHING_DOMAINS.length} institutional domains into a verified digital academic portfolio.
             </p>
           </div>
 
@@ -343,7 +357,7 @@ export const HomePage: React.FC = () => {
               'Patents & IPR', 'Industry Consultancy', 'Academic Activities', 'Student Mentoring',
               'PhD Scholars Guided', 'Biometric Attendance', 'Leave Management', 'Annual Appraisal',
               'Document Vault', 'Verification History'
-            ].map((domain) => (
+            ].filter((domain) => FEATURES.TEACHING || !TEACHING_DOMAINS.includes(domain)).map((domain) => (
               <span key={domain} className="domain-pill">
                 <i className="bi bi-check2 text-primary" aria-hidden="true" />
                 {domain}
@@ -382,7 +396,7 @@ export const HomePage: React.FC = () => {
                 { id: 'workload', label: 'Workload Summary' },
                 { id: 'attendance', label: 'Attendance & Leaves' },
                 { id: 'appraisal', label: 'Appraisal & API' },
-              ].map((tab) => (
+              ].filter((tab) => FEATURES.TEACHING || (tab.id !== 'teaching' && tab.id !== 'workload')).map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
@@ -573,6 +587,7 @@ export const HomePage: React.FC = () => {
       {/* ========================================================
           SECTION 5 — ACADEMIC & TEACHING MANAGEMENT
           ======================================================== */}
+      {FEATURES.TEACHING && (
       <section className="home-section" id="teaching" aria-label="Academic & Teaching Workflow">
         <div className="home-container">
           <div className="section-header">
@@ -628,6 +643,7 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* ========================================================
           SECTION 6 — RESEARCH & INNOVATION
@@ -799,7 +815,9 @@ export const HomePage: React.FC = () => {
 
               <div className="role-detail-quote">
                 {activeRole === 'FACULTY' && '"Manage your academic, research and professional record with complete transparency."'}
-                {activeRole === 'HOD' && '"Coordinate department faculty, workload, approvals and academic activities efficiently."'}
+                {activeRole === 'HOD' && (FEATURES.TEACHING
+                  ? '"Coordinate department faculty, workload, approvals and academic activities efficiently."'
+                  : '"Coordinate department faculty, approvals and academic activities efficiently."')}
                 {activeRole === 'DEAN' && '"Monitor academic and research performance across authorized departments and schools."'}
                 {activeRole === 'PRINCIPAL' && '"Gain institution-wide visibility into faculty, academics, research and institutional ranking."'}
                 {activeRole === 'ADMIN' && '"Manage users, institutional configuration, permissions, security and system governance."'}
@@ -807,8 +825,10 @@ export const HomePage: React.FC = () => {
 
               <p className="role-detail-desc">
                 {activeRole === 'FACULTY' && 'Faculty maintain their living digital dossier. Submit research publications, patent records, course completion metrics, student project mentorships, and leave requests for formal departmental verification.'}
-                {activeRole === 'HOD' && 'Department leaders manage subject allocation, timetable balancing, classroom substitutions, and review submissions from department faculty members before institutional endorsement.'}
-                {activeRole === 'DEAN' && 'Academic leadership evaluates cross-departmental curriculum progress, research publication output benchmarks, sponsored funding portfolios, and accreditation criteria data compilation.'}
+                {activeRole === 'HOD' && (FEATURES.TEACHING
+                  ? 'Department leaders manage subject allocation, timetable balancing, classroom substitutions, and review submissions from department faculty members before institutional endorsement.'
+                  : 'Department leaders review submissions, attendance and leave requests from department faculty members before institutional endorsement.')}
+                {activeRole === 'DEAN' && (FEATURES.TEACHING ? 'Academic leadership evaluates cross-departmental curriculum progress, research publication output benchmarks, sponsored funding portfolios, and accreditation criteria data compilation.' : 'Academic leadership evaluates research publication output benchmarks, sponsored funding portfolios, and accreditation criteria data compilation across departments.')}
                 {activeRole === 'PRINCIPAL' && 'The executive authority accesses macroeconomic dashboards, institutional KPIs, department rankings, faculty retention analytics, and authorized regulatory report generation.'}
                 {activeRole === 'ADMIN' && 'Central IT Services manages user provisioning, employee ID bindings, role-based permissions (RBAC), academic year lifecycle initialization, and security audit log monitoring.'}
               </p>
@@ -817,15 +837,15 @@ export const HomePage: React.FC = () => {
                 {activeRole === 'FACULTY' && (
                   <>
                     <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> Personal digital dossier &amp; verifiable credential management</li>
-                    <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> Real-time weekly contact workload tracker with threshold alerts</li>
+                    <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> {FEATURES.TEACHING ? 'Real-time weekly contact workload tracker with threshold alerts' : 'Research, patent & activity submissions with verification tracking'}</li>
                     <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> Self-appraisal submission &amp; performance feedback tracking</li>
                   </>
                 )}
                 {activeRole === 'HOD' && (
                   <>
-                    <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> Subject assignment &amp; section conflict-free allocation</li>
+                    <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> {FEATURES.TEACHING ? 'Subject assignment & section conflict-free allocation' : 'Department attendance & leave approvals'}</li>
                     <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> Department verification queue for papers, patents &amp; activities</li>
-                    <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> Workload distribution balancing across junior and senior staff</li>
+                    <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> {FEATURES.TEACHING ? 'Workload distribution balancing across junior and senior staff' : 'Faculty roster with research & verification overview'}</li>
                   </>
                 )}
                 {activeRole === 'DEAN' && (
@@ -838,7 +858,7 @@ export const HomePage: React.FC = () => {
                 {activeRole === 'PRINCIPAL' && (
                   <>
                     <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> Institution-wide executive KPI cards and trend visualizations</li>
-                    <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> Department rankings based on research, teaching &amp; grants</li>
+                    <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> {FEATURES.TEACHING ? 'Department rankings based on research, teaching & grants' : 'Department rankings based on research & grants'}</li>
                     <li><i className="bi bi-check-circle-fill" aria-hidden="true" /> One-click official statutory compliance report authorization</li>
                   </>
                 )}
@@ -867,8 +887,8 @@ export const HomePage: React.FC = () => {
                       <span className="text-success">&bull; Full Access</span>
                     </div>
                     <div className="role-module-chip">
-                      <span><i className="bi bi-calendar-week me-2 text-primary" />Timetable &amp; Workload</span>
-                      <span className="text-success">&bull; View / Track</span>
+                      <span><i className="bi bi-calendar-week me-2 text-primary" />{FEATURES.TEACHING ? 'Timetable & Workload' : 'Attendance & Leave'}</span>
+                      <span className="text-success">&bull; {FEATURES.TEACHING ? 'View / Track' : 'Apply / Track'}</span>
                     </div>
                     <div className="role-module-chip">
                       <span><i className="bi bi-journal-text me-2 text-primary" />Publications &amp; Patents</span>
@@ -888,12 +908,12 @@ export const HomePage: React.FC = () => {
                       <span className="text-success">&bull; Review &amp; Sign</span>
                     </div>
                     <div className="role-module-chip">
-                      <span><i className="bi bi-diagram-3 me-2 text-primary" />Subject Allocation Console</span>
-                      <span className="text-success">&bull; Manage Mapping</span>
+                      <span><i className="bi bi-diagram-3 me-2 text-primary" />{FEATURES.TEACHING ? 'Subject Allocation Console' : 'Department Console'}</span>
+                      <span className="text-success">&bull; {FEATURES.TEACHING ? 'Manage Mapping' : 'Department-Wide'}</span>
                     </div>
                     <div className="role-module-chip">
-                      <span><i className="bi bi-people me-2 text-primary" />Faculty Workload Monitor</span>
-                      <span className="text-success">&bull; Department-Wide</span>
+                      <span><i className="bi bi-people me-2 text-primary" />{FEATURES.TEACHING ? 'Faculty Workload Monitor' : 'Attendance & Leave Approvals'}</span>
+                      <span className="text-success">&bull; {FEATURES.TEACHING ? 'Department-Wide' : 'Tier-1 Approve'}</span>
                     </div>
                     <div className="role-module-chip">
                       <span><i className="bi bi-graph-up me-2 text-primary" />Appraisal Review</span>
@@ -1060,11 +1080,13 @@ export const HomePage: React.FC = () => {
 
           {/* Macro KPI Cards */}
           <div className="analytics-preview-grid">
-            <div className="analytics-stat-box">
-              <div className="stat-label">Academic Load Index</div>
-              <div className="stat-number">100%</div>
-              <p className="stat-desc">Faculty workload adhering to AICTE contact ceilings</p>
-            </div>
+            {FEATURES.TEACHING && (
+              <div className="analytics-stat-box">
+                <div className="stat-label">Academic Load Index</div>
+                <div className="stat-number">100%</div>
+                <p className="stat-desc">Faculty workload adhering to AICTE contact ceilings</p>
+              </div>
+            )}
 
             <div className="analytics-stat-box">
               <div className="stat-label">Research Productivity</div>
@@ -1267,7 +1289,7 @@ export const HomePage: React.FC = () => {
             </h2>
 
             <p className="final-cta-desc">
-              Bring academic, research, workload, performance and institutional records together in one professional platform.
+              Bring academic, research, {FEATURES.TEACHING ? 'workload, ' : ''}performance and institutional records together in one professional platform.
             </p>
 
             <div>

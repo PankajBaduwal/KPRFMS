@@ -5,6 +5,7 @@ import { ActionItemsBanner } from './ActionItemsBanner';
 import { RecordStatusBadge } from '../RecordStatusBadge';
 import { EmptyState } from '../EmptyState';
 import { ROUTES } from '../../constants/routes';
+import { FEATURES } from '../../constants/features';
 import { hodConsoleService } from '../../services/hod-console.service';
 import { activityService } from '../../services/activity.service';
 import type { IDepartmentFacultyMember } from '../../types/hod-console';
@@ -253,7 +254,9 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
                 lineHeight: 1.5,
               }}
             >
-              Academic operations, faculty workload distribution, research portfolio, and pending endorsements oversight.
+              {FEATURES.TEACHING
+                ? 'Academic operations, faculty workload distribution, research portfolio, and pending endorsements oversight.'
+                : 'Academic operations, research portfolio, and pending endorsements oversight.'}
             </p>
           </div>
 
@@ -263,10 +266,12 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
               <i className="bi bi-check2-square" style={{ marginRight: 6 }} />
               Approvals Queue ({data.pendingApprovals.total})
             </Link>
-            <Link to={ROUTES.WORKLOAD} className="btn-outline-custom btn-sm" style={{ textDecoration: 'none' }}>
-              <i className="bi bi-speedometer2" style={{ marginRight: 6 }} />
-              Workload Matrix
-            </Link>
+            {FEATURES.TEACHING && (
+              <Link to={ROUTES.WORKLOAD} className="btn-outline-custom btn-sm" style={{ textDecoration: 'none' }}>
+                <i className="bi bi-speedometer2" style={{ marginRight: 6 }} />
+                Workload Matrix
+              </Link>
+            )}
             <Link to={ROUTES.HOD_CONSOLE} className="btn-secondary-custom btn-sm" style={{ textDecoration: 'none' }}>
               <i className="bi bi-sliders" style={{ marginRight: 6 }} />
               Full Console
@@ -310,6 +315,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
             </div>
           </div>
 
+          {FEATURES.TEACHING && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
             <div
               style={{
@@ -335,6 +341,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
               </div>
             </div>
           </div>
+          )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
             <div
@@ -473,7 +480,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
             onClick={() => setActiveHodTab('WORKLOAD')}
           >
             <i className="bi bi-speedometer2" />
-            <span>Workload & Attendance</span>
+            <span>{FEATURES.TEACHING ? 'Workload & Attendance' : 'Attendance'}</span>
           </button>
           <button
             type="button"
@@ -693,6 +700,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
         }}
       >
         {/* 4. WORKLOAD OVERVIEW */}
+        {FEATURES.TEACHING && (
         <section aria-label="Workload Overview" className="card-custom">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)' }}>
@@ -805,6 +813,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
             </div>
           </div>
         </section>
+        )}
 
         {/* 5. ATTENDANCE OVERVIEW */}
         <section aria-label="Attendance Overview" className="card-custom">
@@ -813,9 +822,11 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
               <i className="bi bi-calendar-check" style={{ color: 'var(--color-primary)' }} />
               Attendance &amp; Lecture Staffing
             </h3>
-            <Link to={`${ROUTES.TIMETABLE}?tab=substitutions`} style={{ fontSize: '0.8125rem', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>
-              Substitutions &rarr;
-            </Link>
+            {FEATURES.TEACHING && (
+              <Link to={`${ROUTES.TIMETABLE}?tab=substitutions`} style={{ fontSize: '0.8125rem', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>
+                Substitutions &rarr;
+              </Link>
+            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
@@ -953,7 +964,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)' }}>
               <i className="bi bi-easel" style={{ color: 'var(--color-primary)' }} />
-              Timetable &amp; Academic Events
+              {FEATURES.TEACHING ? 'Timetable & Academic Events' : 'Academic Events'}
             </h3>
             <Link to={ROUTES.ACTIVITIES} style={{ fontSize: '0.8125rem', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>
               Activities &rarr;
@@ -961,6 +972,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
           </div>
 
           {/* Timetable Coverage alert */}
+          {FEATURES.TEACHING && (
           <div
             style={{
               padding: 'var(--space-3)',
@@ -991,6 +1003,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
               </span>
             )}
           </div>
+          )}
 
           {/* Recent/Upcoming Activities List */}
           <div>
@@ -1075,7 +1088,9 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
               </span>
             </h3>
             <p style={{ margin: '4px 0 0', fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
-              Complete departmental staff register showing academic rank, teaching load, daily attendance, and verification status.
+              {FEATURES.TEACHING
+                ? 'Complete departmental staff register showing academic rank, teaching load, daily attendance, and verification status.'
+                : 'Complete departmental staff register showing academic rank, daily attendance, and verification status.'}
             </p>
           </div>
 
@@ -1146,17 +1161,19 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
           </select>
 
           {/* Workload Filter */}
-          <select
-            value={workloadFilter}
-            onChange={(e) => setWorkloadFilter(e.target.value)}
-            className="select-custom"
-            style={{ fontSize: '0.85rem', height: 36, minWidth: 140 }}
-          >
-            <option value="">All Workload</option>
-            <option value="NORMAL">Normal (12–18h)</option>
-            <option value="OVERLOADED">Overloaded (&gt;18h)</option>
-            <option value="UNDERLOADED">Underloaded (&lt;12h)</option>
-          </select>
+          {FEATURES.TEACHING && (
+            <select
+              value={workloadFilter}
+              onChange={(e) => setWorkloadFilter(e.target.value)}
+              className="select-custom"
+              style={{ fontSize: '0.85rem', height: 36, minWidth: 140 }}
+            >
+              <option value="">All Workload</option>
+              <option value="NORMAL">Normal (12–18h)</option>
+              <option value="OVERLOADED">Overloaded (&gt;18h)</option>
+              <option value="UNDERLOADED">Underloaded (&lt;12h)</option>
+            </select>
+          )}
 
           {/* Verification Status Filter */}
           <select
@@ -1179,7 +1196,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
               style={{ fontSize: '0.85rem', height: 36 }}
             >
               <option value="name">Sort by Name</option>
-              <option value="workload">Sort by Workload</option>
+              {FEATURES.TEACHING && <option value="workload">Sort by Workload</option>}
               <option value="publications">Sort by Pubs</option>
               <option value="pending">Sort by Pending</option>
             </select>
@@ -1235,8 +1252,8 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
                 <tr>
                   <th style={{ textAlign: 'left', minWidth: 240 }}>Faculty Member</th>
                   <th style={{ textAlign: 'left', minWidth: 150 }}>Designation</th>
-                  <th style={{ textAlign: 'left', minWidth: 140 }}>Subject / Area</th>
-                  <th style={{ textAlign: 'center', minWidth: 140 }}>Workload</th>
+                  {FEATURES.TEACHING && <th style={{ textAlign: 'left', minWidth: 140 }}>Subject / Area</th>}
+                  {FEATURES.TEACHING && <th style={{ textAlign: 'center', minWidth: 140 }}>Workload</th>}
                   <th style={{ textAlign: 'center', minWidth: 120 }}>Attendance</th>
                   <th style={{ textAlign: 'center', minWidth: 130 }}>Verification</th>
                   <th style={{ textAlign: 'right', minWidth: 110 }}>Actions</th>
@@ -1293,18 +1310,22 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
                     </td>
 
                     {/* 3. Subject / Area */}
-                    <td style={{ color: 'var(--color-text-secondary)', fontSize: '0.8125rem' }}>
-                      {fac.metrics.mentoringMenteesCount > 0 ? (
-                        <span>{fac.metrics.mentoringMenteesCount} Mentees assigned</span>
-                      ) : (
-                        <span>Curriculum &amp; Labs</span>
-                      )}
-                    </td>
+                    {FEATURES.TEACHING && (
+                      <td style={{ color: 'var(--color-text-secondary)', fontSize: '0.8125rem' }}>
+                        {fac.metrics.mentoringMenteesCount > 0 ? (
+                          <span>{fac.metrics.mentoringMenteesCount} Mentees assigned</span>
+                        ) : (
+                          <span>Curriculum &amp; Labs</span>
+                        )}
+                      </td>
+                    )}
 
                     {/* 4. Workload */}
-                    <td style={{ textAlign: 'center' }}>
-                      {renderWorkloadBadge(fac.workload.status, fac.workload.weeklyHours)}
-                    </td>
+                    {FEATURES.TEACHING && (
+                      <td style={{ textAlign: 'center' }}>
+                        {renderWorkloadBadge(fac.workload.status, fac.workload.weeklyHours)}
+                      </td>
+                    )}
 
                     {/* 5. Attendance */}
                     <td style={{ textAlign: 'center' }}>

@@ -17,6 +17,7 @@ import { AnalyticsDrillDownModal } from '../components/AnalyticsDrillDownModal';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { SkeletonStats, SkeletonTable } from '../components/Skeleton';
+import { FEATURES } from '../constants/features';
 import type {
   IInstitutionAnalyticsFilters,
   IAnalyticsFilterOptions,
@@ -230,7 +231,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
             Institution Analytics & Academic Insights
           </h1>
           <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-            Interactive oversight across publications, funded research, faculty development, conferences, PhD progress, and teaching workload.
+            Interactive oversight across publications, funded research, faculty development, conferences{FEATURES.TEACHING ? ', PhD progress, and teaching workload.' : ' and PhD progress.'}
           </p>
         </div>
 
@@ -631,6 +632,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
           </div>
 
           {/* Card 6: Workload Average */}
+          {FEATURES.TEACHING && (
           <div
             onClick={() => openDrillDown('workloadDistribution', 'Faculty Workload Details')}
             style={{
@@ -661,6 +663,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               <span style={{ color: '#94a3b8', marginLeft: 'auto' }}>Click to view</span>
             </div>
           </div>
+          )}
         </div>
 
       {/* 4. Domain View Tabs */}
@@ -684,7 +687,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
           { key: 'phd', label: 'PhD Progress', icon: 'bi-mortarboard' },
           { key: 'students', label: 'Student Projects', icon: 'bi-people' },
           { key: 'workload', label: 'Workload', icon: 'bi-speedometer2' },
-        ].map((tab) => {
+        ].filter((tab) => FEATURES.TEACHING || tab.key !== 'workload').map((tab) => {
           const isActive = activeTab === tab.key;
           return (
             <button
@@ -1768,7 +1771,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
           )}
 
           {/* SECTION 8: WORKLOAD DISTRIBUTION */}
-          {(activeTab === 'all' || activeTab === 'workload') && (
+          {FEATURES.TEACHING && (activeTab === 'all' || activeTab === 'workload') && (
             <div
               style={{
                 backgroundColor: '#ffffff',

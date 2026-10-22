@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { FEATURES } from '../constants/features';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { notificationService } from '../services/notification.service';
 import { EmptyState } from '../components/EmptyState';
@@ -997,7 +998,9 @@ export const NotificationsPage: React.FC = () => {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {preferenceFields.map((field) => {
+              {preferenceFields
+                .filter((field) => FEATURES.TEACHING || (field.key !== 'workloadUpdate' && field.key !== 'timetableChange'))
+                .map((field) => {
                 const isEnabled = preferences[field.key];
 
                 return (

@@ -1,4 +1,5 @@
 import type { NotificationEventType } from '../types/notification';
+import { FEATURES } from '../constants/features';
 
 export interface INotificationCategoryDef {
   id: string;
@@ -9,7 +10,7 @@ export interface INotificationCategoryDef {
   types: NotificationEventType[];
 }
 
-export const NOTIFICATION_CATEGORIES: INotificationCategoryDef[] = [
+export const NOTIFICATION_CATEGORIES: INotificationCategoryDef[] = ([
   {
     id: 'APPROVALS',
     label: 'Approval Updates',
@@ -66,7 +67,7 @@ export const NOTIFICATION_CATEGORIES: INotificationCategoryDef[] = [
     bg: '#f1f5f9',
     types: ['SYSTEM_NOTIFICATION'],
   },
-];
+] as INotificationCategoryDef[]).filter((cat) => FEATURES.TEACHING || (cat.id !== 'WORKLOAD' && cat.id !== 'ACADEMIC')); // Teaching module categories
 
 /**
  * Resolves category styling and metadata from a raw NotificationEventType

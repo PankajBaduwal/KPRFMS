@@ -14,6 +14,7 @@ import { Skeleton } from '../components/Skeleton';
 import { formatErrorMessage } from '../utils/errorHandler';
 import { useAuthStore } from '../stores/authStore';
 import { useAcademicYears } from '../hooks/useAcademicYears';
+import { FEATURES } from '../constants/features';
 
 export const ApprovalQueuePage: React.FC = () => {
   const { user } = useAuthStore();
@@ -270,7 +271,7 @@ export const ApprovalQueuePage: React.FC = () => {
                 HOD Approval Queue
               </h1>
               <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
-                Institutional verification console for faculty submissions across research, teaching, leaves, and appraisal
+                Institutional verification console for faculty submissions across research, {FEATURES.TEACHING ? 'teaching, ' : ''}leaves, and appraisal
               </p>
             </div>
           </div>

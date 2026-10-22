@@ -17,6 +17,7 @@ import { ErrorState } from '../components/ErrorState';
 import { SkeletonStats, SkeletonTable } from '../components/Skeleton';
 import { useAcademicYears } from '../hooks/useAcademicYears';
 import { ROUTES } from '../constants/routes';
+import { FEATURES } from '../constants/features';
 import type {
   IPrincipalPrimaryMetrics,
   IPrincipalDepartmentOverview,
@@ -187,7 +188,7 @@ export const PrincipalConsolePage: React.FC = () => {
             Principal Institutional Console
           </h2>
           <p style={{ margin: 0, fontSize: '0.875rem', color: '#475569' }}>
-            Central institutional oversight across all academic departments, faculty roster, research grants, workload compliance, and statutory governance.
+            Central institutional oversight across all academic departments, faculty roster, research grants, {FEATURES.TEACHING ? 'workload compliance, ' : ''}and statutory governance.
           </p>
         </div>
 
@@ -262,7 +263,7 @@ export const PrincipalConsolePage: React.FC = () => {
           { id: 'research_funding', label: 'Research & Funding', icon: 'bi-journal-check' },
           { id: 'activities_accreditation', label: 'Activities & Accreditation', icon: 'bi-shield-check' },
           { id: 'approvals', label: 'Approval Queue', icon: 'bi-check2-circle', badge: metrics?.pendingInstitutionalApprovals.total },
-        ].map((tab) => {
+        ].filter((tab) => FEATURES.TEACHING || tab.id !== 'faculty_workload').map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
@@ -532,6 +533,7 @@ export const PrincipalConsolePage: React.FC = () => {
                 </div>
 
                 {/* Metric 8: Teaching Workload */}
+                {FEATURES.TEACHING && (
                 <div
                   style={{
                     backgroundColor: '#ffffff',
@@ -551,6 +553,7 @@ export const PrincipalConsolePage: React.FC = () => {
                     {metrics.workload.overloadedCount} Overloaded • {metrics.workload.normalCount} Compliant
                   </div>
                 </div>
+                )}
               </div>
 
               {/* Multi-Year Academic & Research Trend Charts (Dual View: Chart & Executive Table) */}
@@ -695,6 +698,7 @@ export const PrincipalConsolePage: React.FC = () => {
                 </div>
 
                 {/* Status 2: Workload & Teaching Operations */}
+                {FEATURES.TEACHING && (
                 <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', padding: '1.25rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                     <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>
@@ -734,6 +738,7 @@ export const PrincipalConsolePage: React.FC = () => {
                     Inspect Workload Distribution →
                   </button>
                 </div>
+                )}
 
                 {/* Status 3: Governance Backlog */}
                 <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', padding: '1.25rem' }}>
@@ -938,13 +943,15 @@ export const PrincipalConsolePage: React.FC = () => {
                         >
                           Faculty <i className="bi bi-arrow-down-up ms-1" />
                         </th>
-                        <th
-                          scope="col"
-                          onClick={() => handleSort('workload')}
-                          style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#334155', cursor: 'pointer' }}
-                        >
-                          Avg Workload <i className="bi bi-arrow-down-up ms-1" />
-                        </th>
+                        {FEATURES.TEACHING && (
+                          <th
+                            scope="col"
+                            onClick={() => handleSort('workload')}
+                            style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#334155', cursor: 'pointer' }}
+                          >
+                            Avg Workload <i className="bi bi-arrow-down-up ms-1" />
+                          </th>
+                        )}
                         <th
                           scope="col"
                           onClick={() => handleSort('publications')}
@@ -1039,16 +1046,18 @@ export const PrincipalConsolePage: React.FC = () => {
                               </td>
 
                               {/* Workload */}
-                              <td style={{ padding: '0.85rem 1rem' }}>
-                                <div style={{ fontWeight: 600, color: '#0f172a' }}>{dept.workload.averageHours} hrs/wk</div>
-                                {dept.workload.overloadedCount > 0 ? (
-                                  <div style={{ fontSize: '0.725rem', color: '#b91c1c', fontWeight: 600 }}>
-                                    {dept.workload.overloadedCount} Overloaded
-                                  </div>
-                                ) : (
-                                  <div style={{ fontSize: '0.725rem', color: '#15803d' }}>Compliant</div>
-                                )}
-                              </td>
+                              {FEATURES.TEACHING && (
+                                <td style={{ padding: '0.85rem 1rem' }}>
+                                  <div style={{ fontWeight: 600, color: '#0f172a' }}>{dept.workload.averageHours} hrs/wk</div>
+                                  {dept.workload.overloadedCount > 0 ? (
+                                    <div style={{ fontSize: '0.725rem', color: '#b91c1c', fontWeight: 600 }}>
+                                      {dept.workload.overloadedCount} Overloaded
+                                    </div>
+                                  ) : (
+                                    <div style={{ fontSize: '0.725rem', color: '#15803d' }}>Compliant</div>
+                                  )}
+                                </td>
+                              )}
 
                               {/* Publications */}
                               <td
@@ -1218,6 +1227,7 @@ export const PrincipalConsolePage: React.FC = () => {
                                 </div>
                               </div>
 
+                              {FEATURES.TEACHING && (
                               <div>
                                 <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>AVERAGE WORKLOAD</div>
                                 <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>
@@ -1227,6 +1237,7 @@ export const PrincipalConsolePage: React.FC = () => {
                                   {dept.workload.overloadedCount > 0 ? `${dept.workload.overloadedCount} Overloaded` : 'Workload Compliant'}
                                 </div>
                               </div>
+                              )}
 
                               <div>
                                 <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>SCHOLARS & STUDENT PROJECTS</div>
@@ -1302,6 +1313,7 @@ export const PrincipalConsolePage: React.FC = () => {
                     </div>
 
                     {/* Ranking 3: Workload Compliance */}
+                    {FEATURES.TEACHING && (
                     <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1.25rem' }}>
                       <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
                         Department Teaching Workload Balance
@@ -1322,6 +1334,7 @@ export const PrincipalConsolePage: React.FC = () => {
                           ))}
                       </div>
                     </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1331,7 +1344,7 @@ export const PrincipalConsolePage: React.FC = () => {
           {/* ======================================================== */}
           {/* TAB 3: FACULTY & WORKLOAD GOVERNANCE                     */}
           {/* ======================================================== */}
-          {activeTab === 'faculty_workload' && (
+          {FEATURES.TEACHING && activeTab === 'faculty_workload' && (
             <div>
               {/* Executive Faculty & Workload Cards */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -1647,7 +1660,7 @@ export const PrincipalConsolePage: React.FC = () => {
                       <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Profile Dossier</span>
                     </div>
                     <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.25rem' }}>
-                      Faculty Teaching & Research Dossier
+                      {FEATURES.TEACHING ? 'Faculty Teaching & Research Dossier' : 'Faculty Research Dossier'}
                     </div>
                     <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 0.85rem 0' }}>
                       Complete institutional faculty inventory, qualification verification, experience trace, and student-faculty ratio.
@@ -1694,7 +1707,7 @@ export const PrincipalConsolePage: React.FC = () => {
                       Department Academic Performance
                     </div>
                     <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 0.85rem 0' }}>
-                      Department-wise faculty retention, cadre ratio, workload distribution, and student outcomes.
+                      Department-wise faculty retention, cadre ratio, {FEATURES.TEACHING ? 'workload distribution, ' : ''}and student outcomes.
                     </p>
                     <button
                       onClick={() => navigate(`${ROUTES.REPORTS}?tab=department`)}

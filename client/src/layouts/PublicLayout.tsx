@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
+import { FEATURES } from '../constants/features';
 
 export const PublicLayout: React.FC = () => {
   const location = useLocation();
@@ -96,9 +97,11 @@ export const PublicLayout: React.FC = () => {
             <a href="#records" style={{ color: 'var(--color-text, #1F2937)', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none' }}>
               Faculty Records
             </a>
-            <a href="#teaching" style={{ color: 'var(--color-text, #1F2937)', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none' }}>
-              Teaching &amp; Workload
-            </a>
+            {FEATURES.TEACHING && (
+              <a href="#teaching" style={{ color: 'var(--color-text, #1F2937)', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none' }}>
+                Teaching &amp; Workload
+              </a>
+            )}
             <a href="#research" style={{ color: 'var(--color-text, #1F2937)', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none' }}>
               Research &amp; IPR
             </a>
@@ -188,7 +191,9 @@ export const PublicLayout: React.FC = () => {
               </h5>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.8125rem' }}>
                 <li><Link to={ROUTES.LOGIN} style={{ color: '#94A3B8', textDecoration: 'none' }}>Faculty Profile &amp; Directory</Link></li>
-                <li><Link to={ROUTES.LOGIN} style={{ color: '#94A3B8', textDecoration: 'none' }}>Teaching &amp; Workload Management</Link></li>
+                {FEATURES.TEACHING && (
+                  <li><Link to={ROUTES.LOGIN} style={{ color: '#94A3B8', textDecoration: 'none' }}>Teaching &amp; Workload Management</Link></li>
+                )}
                 <li><Link to={ROUTES.LOGIN} style={{ color: '#94A3B8', textDecoration: 'none' }}>Research, Publications &amp; Patents</Link></li>
                 <li><Link to={ROUTES.LOGIN} style={{ color: '#94A3B8', textDecoration: 'none' }}>Student Mentoring &amp; Projects</Link></li>
                 <li><Link to={ROUTES.LOGIN} style={{ color: '#94A3B8', textDecoration: 'none' }}>Multi-Tier Approval Queue</Link></li>

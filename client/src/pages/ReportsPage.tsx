@@ -8,6 +8,7 @@ import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { Skeleton, SkeletonStats, SkeletonTable } from '../components/Skeleton';
 import { formatErrorMessage } from '../utils/errorHandler';
+import { FEATURES } from '../constants/features';
 import {
   REPORT_TYPES,
   type ReportType,
@@ -19,6 +20,9 @@ import {
   type IFrameworkConfig,
   type ISourceTrace,
 } from '../types/report';
+
+// Report types that belong to the Teaching module (see constants/features.ts)
+const TEACHING_REPORT_TYPES: string[] = [REPORT_TYPES.WORKLOAD, REPORT_TYPES.SUBJECT_ALLOCATION];
 
 export const ReportsPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -75,7 +79,8 @@ export const ReportsPage: React.FC = () => {
           reportService.getFrameworkConfigs(),
           apiClient.get('/departments').catch(() => ({ data: { data: [] } })),
         ]);
-        setReportTypes(typesData);
+        // Workload and subject-allocation reports belong to the Teaching module
+        setReportTypes(FEATURES.TEACHING ? typesData : typesData.filter((r) => !TEACHING_REPORT_TYPES.includes(r.type)));
         setFrameworks(fwData);
         setDepartments(deptRes.data?.data || []);
 

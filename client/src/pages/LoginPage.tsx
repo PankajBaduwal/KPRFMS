@@ -6,6 +6,7 @@ import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-do
 import { Input, Alert, Badge, Modal } from '../components';
 import { useAuthStore } from '../stores/authStore';
 import { ROUTES } from '../constants/routes';
+import { FEATURES } from '../constants/features';
 import { DEV_SEED_ACCOUNTS, SHOW_DEV_SEED_HELPERS } from '../dev/devSeedAccounts';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import '../styles/login.css';
@@ -138,7 +139,7 @@ export const LoginPage: React.FC = () => {
             </div>
 
             <p className="login-brand-desc">
-              Access your faculty records, academic responsibilities, research activities, workload, approvals and institutional services through a single secure platform.
+              Access your faculty records, academic responsibilities, research activities, {FEATURES.TEACHING ? 'workload, ' : ''}approvals and institutional services through a single secure platform.
             </p>
           </div>
 
@@ -164,7 +165,7 @@ export const LoginPage: React.FC = () => {
               </div>
               <div className="login-visual-item">
                 <i className="bi bi-calendar3-week" aria-hidden="true" />
-                <span>Workload &amp; Timetable</span>
+                <span>{FEATURES.TEACHING ? 'Workload & Timetable' : 'Attendance & Leave'}</span>
               </div>
               <div className="login-visual-item" style={{ gridColumn: 'span 2' }}>
                 <i className="bi bi-patch-check" aria-hidden="true" />
@@ -193,7 +194,7 @@ export const LoginPage: React.FC = () => {
               </div>
               <div className="login-highlight-badge">
                 <i className="bi bi-calendar3-week" aria-hidden="true" />
-                <span>Workload &amp; Timetable</span>
+                <span>{FEATURES.TEACHING ? 'Workload & Timetable' : 'Attendance & Leave'}</span>
               </div>
               <div className="login-highlight-badge">
                 <i className="bi bi-graph-up-arrow" aria-hidden="true" />

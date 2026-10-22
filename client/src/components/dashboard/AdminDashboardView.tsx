@@ -4,6 +4,7 @@ import type { AdminDashboardData } from '../../services/dashboard.service';
 import { ActionItemsBanner } from './ActionItemsBanner';
 import { Badge } from '../Badge';
 import { ROUTES } from '../../constants/routes';
+import { FEATURES } from '../../constants/features';
 
 interface AdminDashboardViewProps {
   data: AdminDashboardData;
@@ -224,7 +225,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
       icon: 'bi-gear-wide-connected',
       description: 'Institution short codes, contact credentials, file limits, and maintenance mode.',
     },
-  ];
+  ].filter((mod) => FEATURES.TEACHING || mod.id !== 'subjects');
 
   return (
     <div style={{ padding: '1.25rem', maxWidth: '1520px', margin: '0 auto', fontFamily: 'inherit' }}>
@@ -434,7 +435,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                 <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#64748b' }}>/ {data.masterData.totalDepartments} Active</span>
               </div>
               <div style={{ fontSize: '0.775rem', color: '#64748b' }}>
-                {data.masterData.totalSubjects} Catalog Courses • {data.masterData.masterItemsCount} Master Items
+                {FEATURES.TEACHING && `${data.masterData.totalSubjects} Catalog Courses • `}
+                {data.masterData.masterItemsCount} Master Items
               </div>
             </div>
 
@@ -600,16 +602,18 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                         </Link>
                       </td>
                     </tr>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#0f172a' }}>Curriculum & Subjects</td>
-                      <td style={{ padding: '0.65rem 1rem', color: '#475569' }}>Active Course Syllabus</td>
-                      <td style={{ padding: '0.65rem 1rem' }}>{data.masterData.totalSubjects} Courses</td>
-                      <td style={{ padding: '0.65rem 1rem' }}>
-                        <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=curriculum`} style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>
-                          View →
-                        </Link>
-                      </td>
-                    </tr>
+                    {FEATURES.TEACHING && (
+                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#0f172a' }}>Curriculum & Subjects</td>
+                        <td style={{ padding: '0.65rem 1rem', color: '#475569' }}>Active Course Syllabus</td>
+                        <td style={{ padding: '0.65rem 1rem' }}>{data.masterData.totalSubjects} Courses</td>
+                        <td style={{ padding: '0.65rem 1rem' }}>
+                          <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=curriculum`} style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>
+                            View →
+                          </Link>
+                        </td>
+                      </tr>
+                    )}
                     <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
                       <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#0f172a' }}>Appraisal Submissions</td>
                       <td style={{ padding: '0.65rem 1rem' }}>

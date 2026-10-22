@@ -8,6 +8,7 @@ import type {
   IDepartmentAnalytics,
 } from '../types/hod-console';
 import { ROUTES } from '../constants/routes';
+import { FEATURES } from '../constants/features';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
 import { SkeletonStats, SkeletonTable } from '../components/Skeleton';
@@ -163,7 +164,7 @@ export const DepartmentConsolePage: React.FC = () => {
             )}
           </div>
           <p style={{ margin: '4px 0 0', color: 'var(--color-text-secondary, #64748b)', fontSize: '0.88rem' }}>
-            Head of Department Executive Console • Real-time Academic, Workload, Research & Governance Oversight
+            Head of Department Executive Console • Real-time Academic, {FEATURES.TEACHING ? 'Workload, ' : ''}Research & Governance Oversight
           </p>
         </div>
 
@@ -292,6 +293,7 @@ export const DepartmentConsolePage: React.FC = () => {
           </div>
 
           {/* Card 2: Subjects & Workload */}
+          {FEATURES.TEACHING && (
           <div
             style={{
               padding: '1.2rem',
@@ -313,6 +315,7 @@ export const DepartmentConsolePage: React.FC = () => {
               Avg Workload: <strong>{pInfo.workloadSummary.averageHours} hrs/wk</strong> ({pInfo.workloadSummary.overloaded} Overloaded)
             </div>
           </div>
+          )}
 
           {/* Card 3: Pending Submissions Alert */}
           <div
@@ -531,6 +534,7 @@ export const DepartmentConsolePage: React.FC = () => {
             </select>
 
             {/* Workload Status Filter */}
+            {FEATURES.TEACHING && (
             <select
               value={workloadFilter}
               onChange={(e) => setWorkloadFilter(e.target.value)}
@@ -546,6 +550,7 @@ export const DepartmentConsolePage: React.FC = () => {
               <option value="OVERLOADED">Overloaded (&gt;18 hrs)</option>
               <option value="UNDERLOADED">Underloaded (&lt;12 hrs)</option>
             </select>
+            )}
 
             {/* Verification Status Filter */}
             <select
@@ -576,7 +581,7 @@ export const DepartmentConsolePage: React.FC = () => {
                 }}
               >
                 <option value="name">Sort by Name</option>
-                <option value="workload">Sort by Workload</option>
+                {FEATURES.TEACHING && <option value="workload">Sort by Workload</option>}
                 <option value="publications">Sort by Publications</option>
                 <option value="pending">Sort by Pending Items</option>
               </select>
@@ -662,8 +667,8 @@ export const DepartmentConsolePage: React.FC = () => {
                   <tr style={{ background: 'var(--color-bg-secondary, #f8fafc)', borderBottom: '1px solid var(--color-border, #e2e8f0)', textAlign: 'left' }}>
                     <th style={{ padding: '10px 14px' }}>Faculty</th>
                     <th style={{ padding: '10px 14px' }}>Designation</th>
-                    <th style={{ padding: '10px 14px' }}>Subject / Area</th>
-                    <th style={{ padding: '10px 14px', textAlign: 'center' }}>Workload</th>
+                    {FEATURES.TEACHING && <th style={{ padding: '10px 14px' }}>Subject / Area</th>}
+                    {FEATURES.TEACHING && <th style={{ padding: '10px 14px', textAlign: 'center' }}>Workload</th>}
                     <th style={{ padding: '10px 14px', textAlign: 'center' }}>Attendance</th>
                     <th style={{ padding: '10px 14px', textAlign: 'center' }}>Verification</th>
                     <th style={{ padding: '10px 14px', textAlign: 'right' }}>Actions</th>
@@ -719,6 +724,7 @@ export const DepartmentConsolePage: React.FC = () => {
                           {fac.designation}
                         </td>
 
+                        {FEATURES.TEACHING && (
                         <td style={{ padding: '10px 14px', color: '#64748b', fontSize: '0.8125rem' }}>
                           {fac.metrics.mentoringMenteesCount > 0 ? (
                             <span>{fac.metrics.mentoringMenteesCount} Mentees • R&amp;D</span>
@@ -726,7 +732,9 @@ export const DepartmentConsolePage: React.FC = () => {
                             <span>Curriculum &amp; Labs</span>
                           )}
                         </td>
+                        )}
 
+                        {FEATURES.TEACHING && (
                         <td style={{ padding: '10px 14px', textAlign: 'center' }}>
                           <span
                             style={{
@@ -745,6 +753,7 @@ export const DepartmentConsolePage: React.FC = () => {
                             {fac.workload.status} ({fac.workload.weeklyHours}h/wk)
                           </span>
                         </td>
+                        )}
 
                         <td style={{ padding: '10px 14px', textAlign: 'center' }}>
                           {fac.status === 'INACTIVE' ? (
@@ -932,6 +941,7 @@ export const DepartmentConsolePage: React.FC = () => {
               </div>
 
               {/* Row 2: Workload Distribution across Cadres */}
+              {FEATURES.TEACHING && (
               <div style={{ background: '#fff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                 <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>
                   <i className="bi bi-pie-chart" style={{ marginRight: '6px', color: '#0284c7' }} />
@@ -963,6 +973,7 @@ export const DepartmentConsolePage: React.FC = () => {
                   </div>
                 </div>
               </div>
+              )}
 
               {/* Row 3: FDPs, Mentoring, PhD Scholars, Student Projects */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>

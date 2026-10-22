@@ -59,6 +59,10 @@ import {
 } from '../types/phd-scholar';
 import { ROLES } from '../constants/roles';
 import { ROUTES } from '../constants/routes';
+import { FEATURES } from '../constants/features';
+
+// Profile tabs that belong to the Teaching module; hidden while it is switched off
+const TEACHING_TABS: string[] = FEATURES.TEACHING ? [] : ['teaching', 'workload'];
 import { projectService } from '../services/project.service';
 import { activityService } from '../services/activity.service';
 import { iprService } from '../services/ipr.service';
@@ -88,14 +92,15 @@ export const FacultyProfilePage: React.FC = () => {
 
   const [searchParams] = useSearchParams();
   const urlTab = searchParams.get('tab');
-  const initialTab = (urlTab === 'qualifications' || urlTab === 'experience') ? 'academic' : urlTab || 'overview';
+  const requestedTab = (urlTab === 'qualifications' || urlTab === 'experience') ? 'academic' : urlTab || 'overview';
+  const initialTab = TEACHING_TABS.includes(requestedTab) ? 'overview' : requestedTab;
 
   const [activeTab, setActiveTab] = useState<string>(initialTab);
 
   useEffect(() => {
     if (urlTab) {
       const target = (urlTab === 'qualifications' || urlTab === 'experience') ? 'academic' : urlTab;
-      setActiveTab(target);
+      setActiveTab(TEACHING_TABS.includes(target) ? 'overview' : target);
     }
   }, [urlTab]);
   const [isEditBasicModalOpen, setIsEditBasicModalOpen] = useState(false);
@@ -567,7 +572,7 @@ export const FacultyProfilePage: React.FC = () => {
       <ErrorState
         variant="notFound"
         title="No Faculty Profile Linked"
-        message="This account does not have a faculty master profile. Faculty profiles are created for teaching staff by the administrator."
+        message="This account does not have a faculty master profile. Faculty profiles are created for faculty members by the administrator."
       />
     );
   }
@@ -770,7 +775,7 @@ export const FacultyProfilePage: React.FC = () => {
         role="tablist"
         aria-label="Faculty Profile Dossier Sections"
       >
-        {tabs.map((tab) => {
+        {tabs.filter((tab) => !TEACHING_TABS.includes(tab.id)).map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
@@ -920,6 +925,7 @@ export const FacultyProfilePage: React.FC = () => {
             }}
           >
             {/* Question 2: What do they teach? */}
+            {FEATURES.TEACHING && (
             <div className="card-custom" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
@@ -989,6 +995,7 @@ export const FacultyProfilePage: React.FC = () => {
                 </Button>
               </div>
             </div>
+            )}
 
             {/* Question 3: What have they researched? */}
             <div className="card-custom" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -1321,6 +1328,7 @@ export const FacultyProfilePage: React.FC = () => {
             </div>
 
             {/* Question 8: Current workload? */}
+            {FEATURES.TEACHING && (
             <div className="card-custom" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
@@ -1374,6 +1382,7 @@ export const FacultyProfilePage: React.FC = () => {
                 </Button>
               </div>
             </div>
+            )}
 
             {/* Question 9: Pending verification? */}
             <div className="card-custom" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>

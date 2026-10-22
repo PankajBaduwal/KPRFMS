@@ -11,6 +11,7 @@ import { ErrorState } from '../components/ErrorState';
 import { SkeletonStats, SkeletonTable } from '../components/Skeleton';
 import { useAuthStore } from '../stores/authStore';
 import { ROUTES } from '../constants/routes';
+import { FEATURES } from '../constants/features';
 import { useAcademicYears } from '../hooks/useAcademicYears';
 import { formatErrorMessage } from '../utils/errorHandler';
 
@@ -263,7 +264,9 @@ export const DeanConsolePage: React.FC = () => {
           { label: 'Faculty Development', icon: 'bi-award', active: false, onClick: () => navigate(`${ROUTES.ACTIVITIES}?type=FDP`) },
           { label: 'PhD Scholars', icon: 'bi-mortarboard', active: false, onClick: () => navigate(ROUTES.PHD_SCHOLARS) },
           { label: 'Student Projects', icon: 'bi-kanban', active: false, onClick: () => navigate(ROUTES.STUDENT_PROJECTS) },
-          { label: 'Workload Compliance', icon: 'bi-speedometer2', active: false, onClick: () => navigate(ROUTES.WORKLOAD) },
+          ...(FEATURES.TEACHING
+            ? [{ label: 'Workload Compliance', icon: 'bi-speedometer2', active: false, onClick: () => navigate(ROUTES.WORKLOAD) }]
+            : []),
           { label: 'Academic Activities', icon: 'bi-easel2', active: false, onClick: () => navigate(ROUTES.ACTIVITIES) },
           { label: 'Approval Queue', icon: 'bi-check2-square', badge: metrics?.pendingApprovals?.total, active: false, onClick: () => navigate(ROUTES.APPROVALS) },
           { label: 'Faculty Comparison', icon: 'bi-bar-chart-steps', active: false, onClick: () => navigate(ROUTES.FACULTY_COMPARISON) },
@@ -320,6 +323,7 @@ export const DeanConsolePage: React.FC = () => {
         }}
       >
         {/* Question 1: Workload */}
+        {FEATURES.TEACHING && (
         <div
           style={{
             padding: '1rem 1.15rem',
@@ -359,6 +363,7 @@ export const DeanConsolePage: React.FC = () => {
             </p>
           </div>
         </div>
+        )}
 
         {/* Question 2: Research Activity */}
         <div
@@ -760,7 +765,7 @@ export const DeanConsolePage: React.FC = () => {
               Department Academic & Research Performance
             </h3>
             <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
-              Faculty capacity, workload distribution, research output, scholars, and approval backlogs by department
+              Faculty capacity, {FEATURES.TEACHING ? 'workload distribution, ' : ''}research output, scholars, and approval backlogs by department
             </p>
           </div>
 
@@ -816,7 +821,7 @@ export const DeanConsolePage: React.FC = () => {
                 <option value="funding">Funding Amount</option>
                 <option value="studentProjects">Student Proj</option>
                 <option value="phdScholars">PhD Scholars</option>
-                <option value="workload">Workload Hours</option>
+                {FEATURES.TEACHING && <option value="workload">Workload Hours</option>}
                 <option value="pendingApprovals">Pending Approvals</option>
               </select>
 
@@ -889,7 +894,7 @@ export const DeanConsolePage: React.FC = () => {
                   <th style={{ padding: '12px 16px' }}>Department</th>
                   <th style={{ padding: '12px 14px' }}>HOD</th>
                   <th style={{ padding: '12px 14px', textAlign: 'center' }}>Faculty Count</th>
-                  <th style={{ padding: '12px 14px' }}>Workload</th>
+                  {FEATURES.TEACHING && <th style={{ padding: '12px 14px' }}>Workload</th>}
                   <th style={{ padding: '12px 14px', textAlign: 'center' }}>Publications</th>
                   <th style={{ padding: '12px 14px', textAlign: 'center' }}>Research Projects</th>
                   <th style={{ padding: '12px 14px', textAlign: 'center' }}>Student Proj</th>
@@ -976,6 +981,7 @@ export const DeanConsolePage: React.FC = () => {
                       </td>
 
                       {/* Workload */}
+                      {FEATURES.TEACHING && (
                       <td style={{ padding: '12px 14px', minWidth: '130px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <strong style={{ fontSize: '0.88rem', color: '#0f172a' }}>
@@ -1001,6 +1007,7 @@ export const DeanConsolePage: React.FC = () => {
                           )}
                         </div>
                       </td>
+                      )}
 
                       {/* Publications */}
                       <td style={{ padding: '12px 14px', textAlign: 'center' }}>

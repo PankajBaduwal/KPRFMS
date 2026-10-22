@@ -23,6 +23,7 @@ import type {
   IAdminAuditLog,
 } from '../types/admin';
 import { MASTER_CATEGORIES, MASTER_CATEGORY_LABELS, DEGREE_LEVELS } from '../types/admin';
+import { FEATURES } from '../constants/features';
 
 type TabType =
   | 'overview'
@@ -40,11 +41,13 @@ export const AdminPage: React.FC = () => {
   const rawSub = searchParams.get('sub');
   const rawCategory = searchParams.get('category');
 
-  const validTabs: TabType[] = ['overview', 'users', 'departments', 'academic_calendar', 'curriculum', 'masters', 'settings', 'audit_logs'];
-  const mappedTab: TabType | undefined = 
+  // The curriculum tab belongs to the Teaching module (see constants/features.ts)
+  const validTabs: TabType[] = (['overview', 'users', 'departments', 'academic_calendar', 'curriculum', 'masters', 'settings', 'audit_logs'] as TabType[])
+    .filter((t) => FEATURES.TEACHING || t !== 'curriculum');
+  const mappedTab: TabType | undefined =
     rawTab === 'roles' || rawTab === 'permissions' ? 'users' :
     rawTab === 'departments' || rawTab === 'programs' ? 'departments' :
-    rawTab === 'subjects' ? 'curriculum' :
+    rawTab === 'subjects' && FEATURES.TEACHING ? 'curriculum' :
     rawTab === 'academic_years' || rawTab === 'semesters' ? 'academic_calendar' :
     rawTab === 'designations' || rawTab === 'funding_agencies' || rawTab === 'publication_types' || rawTab === 'activity_types' || rawTab === 'leave_types' ? 'masters' :
     rawTab === 'appraisal' || rawTab === 'appraisal_config' ? 'settings' :
@@ -1077,7 +1080,7 @@ export const AdminPage: React.FC = () => {
           { key: 'masters', label: 'Master Taxonomies', icon: 'bi-tags-fill' },
           { key: 'settings', label: 'Institution Settings', icon: 'bi-sliders2' },
           { key: 'audit_logs', label: 'Audit Trail', icon: 'bi-activity' },
-        ].map((tab) => {
+        ].filter((tab) => FEATURES.TEACHING || tab.key !== 'curriculum').map((tab) => {
           const isActive = activeTab === tab.key;
           return (
             <button
@@ -1131,7 +1134,9 @@ export const AdminPage: React.FC = () => {
           { label: 'Permissions', icon: 'bi-shield-lock', onClick: () => { setActiveTab('users'); setUserSubTab('permissions'); }, active: activeTab === 'users' && userSubTab === 'permissions' },
           { label: 'Departments', icon: 'bi-building', onClick: () => { setActiveTab('departments'); setDeptSubTab('depts'); }, active: activeTab === 'departments' && deptSubTab === 'depts' },
           { label: 'Programs', icon: 'bi-mortarboard', onClick: () => { setActiveTab('departments'); setDeptSubTab('programs'); }, active: activeTab === 'departments' && deptSubTab === 'programs' },
-          { label: 'Subjects', icon: 'bi-book', onClick: () => setActiveTab('curriculum'), active: activeTab === 'curriculum' },
+          ...(FEATURES.TEACHING
+            ? [{ label: 'Subjects', icon: 'bi-book', onClick: () => setActiveTab('curriculum'), active: activeTab === 'curriculum' }]
+            : []),
           { label: 'Academic Years', icon: 'bi-calendar3', onClick: () => { setActiveTab('academic_calendar'); setAySubTab('years'); }, active: activeTab === 'academic_calendar' && (aySubTab === 'years' || aySubTab === 'all') },
           { label: 'Semesters', icon: 'bi-calendar-range', onClick: () => { setActiveTab('academic_calendar'); setAySubTab('semesters'); }, active: activeTab === 'academic_calendar' && aySubTab === 'semesters' },
           { label: 'Designations', icon: 'bi-award', onClick: () => { setActiveTab('masters'); setMasterCategory(MASTER_CATEGORIES.DESIGNATION); }, active: activeTab === 'masters' && masterCategory === MASTER_CATEGORIES.DESIGNATION },
@@ -1257,6 +1262,7 @@ export const AdminPage: React.FC = () => {
               <div style={{ fontSize: '0.75rem', color: '#64748b' }}>UG, PG & Ph.D. degree tracks</div>
             </div>
 
+            {FEATURES.TEACHING && (
             <div
               style={{
                 backgroundColor: '#fff',
@@ -1274,6 +1280,7 @@ export const AdminPage: React.FC = () => {
               </div>
               <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Total courses across departments</div>
             </div>
+            )}
 
             <div
               style={{
@@ -1896,7 +1903,9 @@ export const AdminPage: React.FC = () => {
                           role: 'HOD',
                           name: 'Head of Department',
                           hierarchy: 4,
-                          description: 'Departmental faculty management, subject allocations, timetable coordination, leave/OD approvals, and initial appraisal scoring.',
+                          description: FEATURES.TEACHING
+                            ? 'Departmental faculty management, subject allocations, timetable coordination, leave/OD approvals, and initial appraisal scoring.'
+                            : 'Departmental faculty management, leave/OD approvals, and initial appraisal scoring.',
                           color: '#8b5cf6',
                           bg: '#f3e8ff',
                         },
@@ -1904,7 +1913,9 @@ export const AdminPage: React.FC = () => {
                           role: 'FACULTY',
                           name: 'Department Faculty Member',
                           hierarchy: 5,
-                          description: 'Curriculum delivery, timetable tracking, student mentoring, publications recording, leave applications, and self-appraisal submissions.',
+                          description: FEATURES.TEACHING
+                            ? 'Curriculum delivery, timetable tracking, student mentoring, publications recording, leave applications, and self-appraisal submissions.'
+                            : 'Student mentoring, publications recording, leave applications, and self-appraisal submissions.',
                           color: '#10b981',
                           bg: '#ecfdf5',
                         },
@@ -2047,7 +2058,7 @@ export const AdminPage: React.FC = () => {
                         { module: 'Annual Performance Appraisal', admin: 'Cycle Config', principal: 'Final Endorsement', dean: 'Deanery Assessment', hod: 'Initial Evaluation', faculty: 'Self-Appraisal Form' },
                         { module: 'Institutional Settings & Policies', admin: 'Full Control', principal: 'Review', dean: 'Restricted', hod: 'Restricted', faculty: 'Restricted' },
                         { module: 'Immutable Audit Trail & Forensics', admin: 'Full Forensic', principal: 'Audit Review', dean: 'Deanery Logs', hod: 'Dept Event Log', faculty: 'Restricted' },
-                      ].map((row, idx) => (
+                      ].filter((row) => FEATURES.TEACHING || !/Curriculum|Subject Allocation|Timetable/.test(row.module)).map((row, idx) => (
                         <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9', backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
                           <td style={{ padding: '0.65rem 1rem', fontWeight: 600, color: '#1e293b' }}>
                             {row.module}

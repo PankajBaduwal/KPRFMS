@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { DeanDashboardData } from '../../services/dashboard.service';
 import { ActionItemsBanner } from './ActionItemsBanner';
 import { ROUTES } from '../../constants/routes';
+import { FEATURES } from '../../constants/features';
 import { deanConsoleService } from '../../services/dean-console.service';
 import type { DeanPrimaryMetrics } from '../../types/dean-console';
 
@@ -250,7 +251,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             onClick={() => setActiveDeanTab('WORKLOAD')}
           >
             <i className="bi bi-speedometer2" />
-            <span>Faculty &amp; Workload</span>
+            <span>{FEATURES.TEACHING ? 'Faculty & Workload' : 'Faculty'}</span>
           </button>
           <button
             type="button"
@@ -436,6 +437,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
         </section>
 
         {/* 5. WORKLOAD OVERVIEW */}
+        {FEATURES.TEACHING && (
         <section aria-label="Workload Overview" className="card-custom">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)' }}>
@@ -492,6 +494,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             </div>
           </div>
         </section>
+        )}
       </div>
       )}
 
@@ -646,7 +649,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
               Department Comparative Performance &amp; Rankings
             </h3>
             <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginTop: 2 }}>
-              Analytical comparison of teaching faculty capacity, research publication output, and external grant funding.
+              Analytical comparison of {FEATURES.TEACHING ? 'teaching ' : ''}faculty capacity, research publication output, and external grant funding.
             </div>
           </div>
 

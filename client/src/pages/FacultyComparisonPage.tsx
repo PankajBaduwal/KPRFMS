@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { facultyComparisonService } from '../services/faculty-comparison.service';
 import { FacultyComparisonDrillDownModal } from '../components/FacultyComparisonDrillDownModal';
 import { EmptyState, SkeletonTable, ErrorState } from '../components';
+import { FEATURES } from '../constants/features';
 import type {
   IFacultyComparisonFilters,
   IComparisonFilterOptions,
@@ -464,7 +465,7 @@ export const FacultyComparisonPage: React.FC = () => {
             Institutional Faculty & Department Comparison
           </h2>
           <p style={{ margin: 0, color: '#475569', fontSize: '0.875rem' }}>
-            Objective institutional comparative metrics for workload balancing, research productivity, and departmental benchmarking.
+            Objective institutional comparative metrics for {FEATURES.TEACHING ? 'workload balancing, ' : ''}research productivity, and departmental benchmarking.
           </p>
         </div>
 
@@ -578,6 +579,7 @@ export const FacultyComparisonPage: React.FC = () => {
           </div>
         </div>
 
+        {FEATURES.TEACHING && (
         <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', padding: '1rem' }}>
           <div style={{ fontSize: '0.725rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
             Workload Average
@@ -589,6 +591,7 @@ export const FacultyComparisonPage: React.FC = () => {
             {summaryStats.complianceRate}% Workload Compliant
           </div>
         </div>
+        )}
       </div>
 
       {/* 3. Comprehensive Filter Toolbar */}
@@ -894,6 +897,7 @@ export const FacultyComparisonPage: React.FC = () => {
                         </div>
                         <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{d.fundedProjectsCount} funded projects</div>
                       </div>
+                      {FEATURES.TEACHING && (
                       <div>
                         <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>AVERAGE WORKLOAD</div>
                         <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>{d.avgWorkloadHours} hrs/wk</div>
@@ -901,6 +905,7 @@ export const FacultyComparisonPage: React.FC = () => {
                           {d.overloadedCount > 0 ? `${d.overloadedCount} overloaded` : 'Optimal load'}
                         </div>
                       </div>
+                      )}
                       <div>
                         <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>SCHOLARS & MENTORING</div>
                         <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>
@@ -939,9 +944,11 @@ export const FacultyComparisonPage: React.FC = () => {
                     <th scope="col" onClick={() => handleDeptSort('phdScholars')} style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#334155', cursor: 'pointer' }}>
                       PhD Scholars <i className="bi bi-arrow-down-up ms-1" />
                     </th>
-                    <th scope="col" onClick={() => handleDeptSort('workload')} style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#334155', cursor: 'pointer' }}>
-                      Avg Workload <i className="bi bi-arrow-down-up ms-1" />
-                    </th>
+                    {FEATURES.TEACHING && (
+                      <th scope="col" onClick={() => handleDeptSort('workload')} style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#334155', cursor: 'pointer' }}>
+                        Avg Workload <i className="bi bi-arrow-down-up ms-1" />
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -979,6 +986,7 @@ export const FacultyComparisonPage: React.FC = () => {
                           ₹{(d.totalSanctionedAmount / 100000).toFixed(1)}L
                         </td>
                         <td style={{ padding: '0.85rem 1rem', fontWeight: 600 }}>{d.phdScholarsTotal}</td>
+                        {FEATURES.TEACHING && (
                         <td style={{ padding: '0.85rem 1rem' }}>
                           <span style={{ fontWeight: 600 }}>{d.avgWorkloadHours}h/wk</span>
                           {d.overloadedCount > 0 && (
@@ -987,6 +995,7 @@ export const FacultyComparisonPage: React.FC = () => {
                             </span>
                           )}
                         </td>
+                        )}
                       </tr>
                     );
                   })}
@@ -1071,15 +1080,17 @@ export const FacultyComparisonPage: React.FC = () => {
                         </div>
                       </div>
 
-                      <div
-                        onClick={() => openDrillDown(f.facultyId, f.name, 'workload', 'Workload')}
-                        style={{ padding: '0.6rem', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' }}
-                      >
-                        <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>WEEKLY WORKLOAD</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>
-                          {f.workload.weeklyHours} hrs/wk
+                      {FEATURES.TEACHING && (
+                        <div
+                          onClick={() => openDrillDown(f.facultyId, f.name, 'workload', 'Workload')}
+                          style={{ padding: '0.6rem', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' }}
+                        >
+                          <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>WEEKLY WORKLOAD</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>
+                            {f.workload.weeklyHours} hrs/wk
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       <div
                         onClick={() => openDrillDown(f.facultyId, f.name, 'phdScholars', 'PhD Scholars')}
@@ -1160,9 +1171,11 @@ export const FacultyComparisonPage: React.FC = () => {
                       <th scope="col" onClick={() => handleSort('facultyDevelopment')} style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#334155', cursor: 'pointer' }}>
                         FDP / STTP <i className="bi bi-arrow-down-up ms-1" />
                       </th>
-                      <th scope="col" onClick={() => handleSort('workload')} style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#334155', cursor: 'pointer' }}>
-                        Workload <i className="bi bi-arrow-down-up ms-1" />
-                      </th>
+                      {FEATURES.TEACHING && (
+                        <th scope="col" onClick={() => handleSort('workload')} style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#334155', cursor: 'pointer' }}>
+                          Workload <i className="bi bi-arrow-down-up ms-1" />
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -1240,6 +1253,7 @@ export const FacultyComparisonPage: React.FC = () => {
                             >
                               <div style={{ fontWeight: 600, color: '#0f172a' }}>{f.facultyDevelopment.total}</div>
                             </td>
+                            {FEATURES.TEACHING && (
                             <td
                               style={{ padding: '0.85rem 1rem', cursor: 'pointer' }}
                               onClick={() => openDrillDown(f.facultyId, f.name, 'workload', 'Workload')}
@@ -1270,6 +1284,7 @@ export const FacultyComparisonPage: React.FC = () => {
                                 </span>
                               </div>
                             </td>
+                            )}
                           </tr>
                         );
                       })

@@ -6,6 +6,7 @@ import { Badge, GlobalSearchModal, NotificationDropdown } from '../components';
 import { ChangePasswordModal } from '../components/ChangePasswordModal';
 import { ROLE_LABELS } from '../constants/roles';
 import { ROUTES } from '../constants/routes';
+import { FEATURES, isHiddenPath } from '../constants/features';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { useAcademicYears } from '../hooks/useAcademicYears';
 
@@ -104,7 +105,7 @@ export const AppLayout: React.FC = () => {
   }
 
   // Structured Institutional Navigation Sections
-  const navSections: NavSection[] = [
+  const allNavSections: NavSection[] = [
     {
       sectionTitle: 'Overview',
       groups: [
@@ -125,7 +126,7 @@ export const AppLayout: React.FC = () => {
       ],
     },
     {
-      sectionTitle: 'Academic & Teaching',
+      sectionTitle: FEATURES.TEACHING ? 'Academic & Teaching' : 'Academic',
       groups: [
         {
           id: 'faculty',
@@ -283,7 +284,9 @@ export const AppLayout: React.FC = () => {
             { to: `${ROUTES.ADMIN_CONSOLE}?tab=users`, label: 'Users', icon: 'bi-people-fill' },
             { to: `${ROUTES.ADMIN_CONSOLE}?tab=users&sub=roles`, label: 'Roles', icon: 'bi-shield-lock-fill' },
             { to: `${ROUTES.ADMIN_CONSOLE}?tab=departments`, label: 'Departments', icon: 'bi-buildings' },
-            { to: `${ROUTES.ADMIN_CONSOLE}?tab=curriculum`, label: 'Subjects', icon: 'bi-book-half' },
+            ...(FEATURES.TEACHING
+              ? [{ to: `${ROUTES.ADMIN_CONSOLE}?tab=curriculum`, label: 'Subjects', icon: 'bi-book-half' }]
+              : []),
             { to: `${ROUTES.ADMIN_CONSOLE}?tab=academic_calendar`, label: 'Academic Years', icon: 'bi-calendar-event' },
             { to: `${ROUTES.ADMIN_CONSOLE}?tab=masters`, label: 'Master Data', icon: 'bi-database-gear' },
             { to: `${ROUTES.ADMIN_CONSOLE}?tab=settings&sub=appraisal`, label: 'Appraisal', icon: 'bi-award' },
@@ -293,6 +296,14 @@ export const AppLayout: React.FC = () => {
       ],
     },
   ];
+
+  // Drop links into switched-off modules (see constants/features.ts); empty groups disappear
+  const navSections: NavSection[] = allNavSections.map((section) => ({
+    ...section,
+    groups: section.groups
+      .filter((group) => !group.subItems || group.subItems.some((sub) => !isHiddenPath(sub.to)))
+      .map((group) => ({ ...group, subItems: group.subItems?.filter((sub) => !isHiddenPath(sub.to)) })),
+  }));
 
   // Accordion open groups state
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -694,7 +705,7 @@ export const AppLayout: React.FC = () => {
             >
               <i className="bi bi-search" style={{ fontSize: '12px' }} />
               <span className="search-placeholder-text">
-                Search faculty, publications, subjects...
+                {FEATURES.TEACHING ? 'Search faculty, publications, subjects...' : 'Search faculty, publications, projects...'}
               </span>
               <kbd className="search-kbd-shortcut">
                 Ctrl K

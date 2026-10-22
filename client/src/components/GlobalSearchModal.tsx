@@ -8,6 +8,7 @@ import type {
   SearchEntityType,
 } from '../types/search';
 import { SEARCH_ENTITY_TYPES } from '../types/search';
+import { FEATURES, isHiddenPath } from '../constants/features';
 
 // Canonical Groups mandated by Phase 15
 export type CanonicalGroupId =
@@ -30,7 +31,7 @@ export interface ICanonicalGroupDef {
   serverTypes: SearchEntityType[];
 }
 
-export const CANONICAL_GROUPS: ICanonicalGroupDef[] = [
+export const CANONICAL_GROUPS: ICanonicalGroupDef[] = ([
   {
     id: 'FACULTY',
     label: 'Faculty',
@@ -99,7 +100,7 @@ export const CANONICAL_GROUPS: ICanonicalGroupDef[] = [
       SEARCH_ENTITY_TYPES.SEMINAR,
     ],
   },
-];
+] as ICanonicalGroupDef[]).filter((g) => FEATURES.TEACHING || g.id !== 'SUBJECTS'); // Subjects belong to the Teaching module
 
 interface IGroupedResults {
   canonicalId: CanonicalGroupId;
@@ -132,7 +133,7 @@ const SUGGESTED_PROMPTS = [
   { label: 'SCOPUS Indexed', query: 'SCOPUS' },
   { label: 'Curriculum Subjects', query: 'CS' },
   { label: 'Patents', query: 'Patent' },
-];
+].filter((p) => FEATURES.TEACHING || p.label !== 'Curriculum Subjects');
 
 // Quick jump direct navigation links
 const QUICK_JUMP_LINKS = [
@@ -144,7 +145,7 @@ const QUICK_JUMP_LINKS = [
   { label: 'Subjects Catalog', url: '/portal/subjects', icon: 'bi-book', color: '#0891b2' },
   { label: 'Academic Activities', url: '/portal/activities', icon: 'bi-calendar-check', color: '#e11d48' },
   { label: 'Documents Repository', url: '/portal/documents', icon: 'bi-files', color: '#475569' },
-];
+].filter((link) => !isHiddenPath(link.url));
 
 interface GlobalSearchModalProps {
   isOpen: boolean;
@@ -456,7 +457,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
             ref={inputRef}
             type="text"
             className="global-search-input"
-            placeholder="Search faculty, publications, projects, documents, subjects..."
+            placeholder={FEATURES.TEACHING ? "Search faculty, publications, projects, documents, subjects..." : "Search faculty, publications, projects, documents..."}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleInputKeyDown}

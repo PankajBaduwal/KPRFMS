@@ -13,6 +13,7 @@ import {
 import type { PrincipalDashboardData } from '../../services/dashboard.service';
 import { ActionItemsBanner } from './ActionItemsBanner';
 import { ROUTES } from '../../constants/routes';
+import { FEATURES } from '../../constants/features';
 import { principalConsoleService } from '../../services/principal-console.service';
 import type { IPrincipalPrimaryMetrics } from '../../types/principal-console';
 
@@ -145,16 +146,20 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
             </div>
           </div>
 
-          <div style={{ width: '1px', height: '28px', background: 'var(--color-border)' }} />
+          {FEATURES.TEACHING && (
+            <>
+              <div style={{ width: '1px', height: '28px', background: 'var(--color-border)' }} />
 
-          <div style={{ textAlign: 'right' }}>
-            <span style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>
-              Timetable Execution
-            </span>
-            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#1B345F' }}>
-              {data.academicIndicators.timetableExecutionRate}
-            </div>
-          </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>
+                  Timetable Execution
+                </span>
+                <div style={{ fontSize: '1rem', fontWeight: 800, color: '#1B345F' }}>
+                  {data.academicIndicators.timetableExecutionRate}
+                </div>
+              </div>
+            </>
+          )}
 
           <button
             type="button"
@@ -283,6 +288,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
         </div>
 
         {/* Card 3: Academic Governance & Workload */}
+        {FEATURES.TEACHING && (
         <div
           style={{
             background: 'var(--color-surface)',
@@ -327,6 +333,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
             Syllabus Coverage Index: <strong>{data.academicIndicators.syllabusCoverageIndex}</strong>
           </div>
         </div>
+        )}
 
         {/* Card 4: Major Institutional Approvals */}
         <div

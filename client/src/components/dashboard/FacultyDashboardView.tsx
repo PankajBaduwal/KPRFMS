@@ -4,6 +4,7 @@ import type { FacultyDashboardData } from '../../services/dashboard.service';
 import { ActionItemsBanner } from './ActionItemsBanner';
 import { Badge } from '../Badge';
 import { ROUTES } from '../../constants/routes';
+import { FEATURES } from '../../constants/features';
 import { publicationService } from '../../services/publication.service';
 import { projectService } from '../../services/project.service';
 import { phdScholarService } from '../../services/phd-scholar.service';
@@ -25,7 +26,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
   const [mentoringCount, setMentoringCount] = useState<number | null>(null);
   const [activities, setActivities] = useState<AcademicActivity[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [activeFocusTab, setActiveFocusTab] = useState<'TEACHING' | 'RESEARCH' | 'APPRAISAL' | 'NOTIFICATIONS' | 'ALL'>('TEACHING');
+  const [activeFocusTab, setActiveFocusTab] = useState<'TEACHING' | 'RESEARCH' | 'APPRAISAL' | 'NOTIFICATIONS' | 'ALL'>(FEATURES.TEACHING ? 'TEACHING' : 'RESEARCH');
   const [showAllMetricTiles, setShowAllMetricTiles] = useState(false);
   const [moreActionsOpen, setMoreActionsOpen] = useState(false);
 
@@ -148,15 +149,17 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
                 <i className="bi bi-folder-plus" aria-hidden="true" />
                 <span>Add Research Project</span>
               </Link>
-              <Link
-                to={ROUTES.WORKLOAD}
-                className="dashboard-quick-action-btn"
-                style={{ width: '100%', justifyContent: 'flex-start', border: 'none' }}
-                onClick={() => setMoreActionsOpen(false)}
-              >
-                <i className="bi bi-speedometer2" aria-hidden="true" />
-                <span>View Full Workload</span>
-              </Link>
+              {FEATURES.TEACHING && (
+                <Link
+                  to={ROUTES.WORKLOAD}
+                  className="dashboard-quick-action-btn"
+                  style={{ width: '100%', justifyContent: 'flex-start', border: 'none' }}
+                  onClick={() => setMoreActionsOpen(false)}
+                >
+                  <i className="bi bi-speedometer2" aria-hidden="true" />
+                  <span>View Full Workload</span>
+                </Link>
+              )}
               <Link
                 to={ROUTES.APPRAISALS}
                 className="dashboard-quick-action-btn"
@@ -166,15 +169,17 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
                 <i className="bi bi-award" aria-hidden="true" />
                 <span>View Appraisal</span>
               </Link>
-              <Link
-                to={ROUTES.TIMETABLE}
-                className="dashboard-quick-action-btn"
-                style={{ width: '100%', justifyContent: 'flex-start', border: 'none' }}
-                onClick={() => setMoreActionsOpen(false)}
-              >
-                <i className="bi bi-calendar3" aria-hidden="true" />
-                <span>View Timetable</span>
-              </Link>
+              {FEATURES.TEACHING && (
+                <Link
+                  to={ROUTES.TIMETABLE}
+                  className="dashboard-quick-action-btn"
+                  style={{ width: '100%', justifyContent: 'flex-start', border: 'none' }}
+                  onClick={() => setMoreActionsOpen(false)}
+                >
+                  <i className="bi bi-calendar3" aria-hidden="true" />
+                  <span>View Timetable</span>
+                </Link>
+              )}
             </div>
           )}
         </div>
@@ -214,6 +219,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
 
         <div className="dashboard-compact-metrics-grid">
           {/* Workload Metric */}
+          {FEATURES.TEACHING && (
           <div className="compact-metric-tile">
             <div className="compact-metric-header">
               <span className="compact-metric-label">Teaching Workload</span>
@@ -238,6 +244,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
               <Link to={ROUTES.WORKLOAD} className="dashboard-section-link">Details &rarr;</Link>
             </div>
           </div>
+          )}
 
           {/* Publications Metric */}
           <div className="compact-metric-tile">
@@ -343,14 +350,16 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
       <section aria-label="Dashboard Content Sections">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
           <div className="dashboard-segmented-nav">
-            <button
-              type="button"
-              className={`dashboard-nav-pill ${activeFocusTab === 'TEACHING' ? 'active' : ''}`}
-              onClick={() => setActiveFocusTab('TEACHING')}
-            >
-              <i className="bi bi-journal-check" />
-              <span>Teaching & Today</span>
-            </button>
+            {FEATURES.TEACHING && (
+              <button
+                type="button"
+                className={`dashboard-nav-pill ${activeFocusTab === 'TEACHING' ? 'active' : ''}`}
+                onClick={() => setActiveFocusTab('TEACHING')}
+              >
+                <i className="bi bi-journal-check" />
+                <span>Teaching & Today</span>
+              </button>
+            )}
             <button
               type="button"
               className={`dashboard-nav-pill ${activeFocusTab === 'RESEARCH' ? 'active' : ''}`}
@@ -388,7 +397,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
       </section>
 
       {/* 5. Teaching & Today Section */}
-      {(activeFocusTab === 'TEACHING' || activeFocusTab === 'ALL') && (
+      {FEATURES.TEACHING && (activeFocusTab === 'TEACHING' || activeFocusTab === 'ALL') && (
         <section aria-label="Teaching Workload and Today's Schedule">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 'var(--space-6)' }}>
             {/* Workload Analysis & Course Allocations */}

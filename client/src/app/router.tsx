@@ -5,6 +5,7 @@ import { ProtectedRoute } from '../components/ProtectedRoute';
 import { LoadingState } from '../components/LoadingState';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { ROUTES } from '../constants/routes';
+import { FEATURES } from '../constants/features';
 
 // Lazy-loaded route components for maximum code-splitting performance
 const HomePage = React.lazy(() => import('../pages/HomePage').then((m) => ({ default: m.HomePage })));
@@ -137,17 +138,18 @@ export const router = createBrowserRouter([
         path: 'phd-scholars',
         element: lazyRoute(PhdScholarsPage),
       },
+      // Teaching module pages redirect to the dashboard while FEATURES.TEACHING is off
       {
         path: 'subjects',
-        element: lazyRoute(SubjectsPage),
+        element: FEATURES.TEACHING ? lazyRoute(SubjectsPage) : <Navigate to={ROUTES.PORTAL} replace />,
       },
       {
         path: 'workload',
-        element: lazyRoute(WorkloadPage),
+        element: FEATURES.TEACHING ? lazyRoute(WorkloadPage) : <Navigate to={ROUTES.PORTAL} replace />,
       },
       {
         path: 'timetable',
-        element: lazyRoute(TimetablePage),
+        element: FEATURES.TEACHING ? lazyRoute(TimetablePage) : <Navigate to={ROUTES.PORTAL} replace />,
       },
       {
         path: 'attendance',

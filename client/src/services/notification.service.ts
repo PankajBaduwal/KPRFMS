@@ -1,4 +1,5 @@
 import { apiClient } from '../api/client';
+import { FEATURES } from '../constants/features';
 import type {
   NotificationItem,
   NotificationListResponse,
@@ -7,6 +8,7 @@ import type {
 } from '../types/notification';
 
 const BASE = '/notifications';
+const TEACHING_NOTIFICATION_TYPES: string[] = ['WORKLOAD_UPDATE', 'TIMETABLE_CHANGE'];
 
 export const notificationService = {
   /**
@@ -20,7 +22,11 @@ export const notificationService = {
     if (filters.type && filters.type !== 'ALL') params.type = filters.type;
 
     const res = await apiClient.get(BASE, { params });
-    return res.data.data;
+    const data: NotificationListResponse = res.data.data;
+    if (FEATURES.TEACHING || !data?.items) return data;
+    // Hide Teaching-module notifications (workload / timetable) while the module is switched off
+    const items = data.items.filter((n) => !TEACHING_NOTIFICATION_TYPES.includes(n.type));
+    return { ...data, items };
   },
 
   /**
