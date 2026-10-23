@@ -5,7 +5,26 @@ import { comparePassword, hashPassword } from '../utils/password.js';
 import { generateToken, AUTH_COOKIE_NAME, getAuthCookieOptions } from '../utils/jwt.js';
 import { recordAudit } from '../audit/auditLogger.js';
 import { AUDIT_ACTIONS } from '../models/AuditLog.js';
-import { ChangePasswordInput, LoginInput, UpdateRoleInput, UpdateStatusInput } from '../validators/auth.validator.js';
+import {
+  ChangePasswordInput,
+  LoginInput,
+  RegisterInput,
+  REGISTRATION_DESIGNATIONS,
+  UpdateRoleInput,
+  UpdateStatusInput,
+} from '../validators/auth.validator.js';
+import { Department } from '../models/Department.js';
+import { InstitutionSettings } from '../models/InstitutionSettings.js';
+import { ROLES } from '../permissions/roles.js';
+import { notificationService } from './notification.service.js';
+
+const DEFAULT_COLLEGE_DOMAIN = 'kpriet.ac.in';
+
+/** College email domain, derived from the institution's contact email (e.g. admin@kpriet.ac.in). */
+function collegeEmailDomain(contactEmail?: string | null): string {
+  const domain = contactEmail?.split('@')[1]?.trim().toLowerCase();
+  return domain || DEFAULT_COLLEGE_DOMAIN;
+}
 
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCK_TIME_MS = 15 * 60 * 1000; // 15 minutes
@@ -86,7 +105,9 @@ export class AuthService {
         details: { identifier: rawIdentifier, reason: 'Account inactive or suspended', status: user.status },
       });
       throw AppError.forbidden(
-        `Your account status is ${user.status}. Please contact the institution administrator.`
+        user.status === USER_STATUS.PENDING
+          ? 'Your registration is awaiting administrator approval. You can sign in once it is approved.'
+          : `Your account status is ${user.status}. Please contact the institution administrator.`
       );
     }
 
@@ -141,6 +162,98 @@ export class AuthService {
     }
 
     return { message: 'Signed out successfully.' };
+  }
+
+  /** Public info the registration form needs; the email domain comes from the institution's contact email. */
+  async getRegistrationOptions() {
+    const settings = await InstitutionSettings.findOne().select('allowSelfRegistration contactEmail').lean();
+    const departments = await Department.find({ isActive: true }).select('name code').sort({ name: 1 }).lean();
+    return {
+      enabled: Boolean(settings?.allowSelfRegistration),
+      emailDomain: collegeEmailDomain(settings?.contactEmail),
+      departments: departments.map((d) => ({ _id: String(d._id), name: d.name, code: d.code })),
+      designations: [...REGISTRATION_DESIGNATIONS],
+    };
+  }
+
+  /**
+   * Faculty self-registration with a college email. Creates a PENDING account that cannot
+   * sign in until an administrator approves it (the faculty profile is created on approval).
+   */
+  async register(input: RegisterInput, req: Request) {
+    const settings = await InstitutionSettings.findOne().select('allowSelfRegistration contactEmail').lean();
+    if (!settings?.allowSelfRegistration) {
+      throw AppError.forbidden('Self-registration is currently disabled. Please contact the administrator.');
+    }
+
+    const domain = collegeEmailDomain(settings.contactEmail);
+    if (!input.email.endsWith(`@${domain}`)) {
+      throw new AppError(`Use your college email address ending in @${domain}.`, 422, 'VALIDATION_ERROR', [
+        { field: 'email', message: `Must be a @${domain} address` },
+      ]);
+    }
+
+    const department = await Department.findOne({ _id: input.departmentId, isActive: true });
+    if (!department) {
+      throw new AppError('Select a valid department.', 422, 'VALIDATION_ERROR', [
+        { field: 'departmentId', message: 'Department not found' },
+      ]);
+    }
+
+    const existing = await User.findOne({ $or: [{ email: input.email }, { employeeId: input.employeeId }] }).select('email').lean();
+    if (existing) {
+      const field = existing.email === input.email ? 'email' : 'employeeId';
+      throw new AppError(
+        field === 'email'
+          ? 'An account with this email already exists. Sign in instead, or contact the administrator.'
+          : 'An account with this employee ID already exists. Contact the administrator if this is your ID.',
+        409,
+        'CONFLICT',
+        [{ field, message: 'Already registered' }]
+      );
+    }
+
+    const user = await User.create({
+      employeeId: input.employeeId,
+      name: input.name,
+      email: input.email,
+      phone: input.phone,
+      passwordHash: await hashPassword(input.password),
+      role: ROLES.FACULTY,
+      departmentId: department._id,
+      designation: input.designation,
+      status: USER_STATUS.PENDING,
+    });
+
+    await recordAudit({
+      userId: user._id,
+      action: AUDIT_ACTIONS.USER_CREATED,
+      req,
+      details: { selfRegistered: true, employeeId: user.employeeId, email: user.email, department: department.code },
+    });
+
+    // Tell administrators and the department HOD that a registration is waiting
+    const reviewers = await User.find({
+      status: USER_STATUS.ACTIVE,
+      $or: [{ role: ROLES.ADMIN }, { role: ROLES.HOD, departmentId: department._id }],
+    }).select('_id');
+    await Promise.all(
+      reviewers.map((r) =>
+        notificationService
+          .createNotification({
+            recipientId: String(r._id),
+            title: 'New faculty registration awaiting approval',
+            message: `${user.name} (${user.employeeId}, ${department.code}) registered with ${user.email}.`,
+            type: 'APPROVAL_REQUIRED',
+            relatedEntityId: String(user._id),
+            relatedEntityType: 'USER_REGISTRATION',
+            actionUrl: '/portal/admin-console?tab=users',
+          })
+          .catch(() => null)
+      )
+    );
+
+    return { email: user.email, employeeId: user.employeeId, status: user.status };
   }
 
   async changePassword(input: ChangePasswordInput, userId: string, req: Request, res: Response) {

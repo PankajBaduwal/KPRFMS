@@ -9,6 +9,8 @@ const router = Router();
 
 // Public auth endpoints
 router.post('/login', authLimiter, (req, res, next) => authController.login(req, res, next));
+router.get('/registration-options', (req, res, next) => authController.getRegistrationOptions(req, res, next));
+router.post('/register', authLimiter, (req, res, next) => authController.register(req, res, next));
 
 // Protected session endpoints
 router.post('/logout', requireAuth, (req, res, next) => authController.logout(req, res, next));

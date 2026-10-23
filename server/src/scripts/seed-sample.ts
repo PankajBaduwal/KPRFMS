@@ -292,7 +292,7 @@ async function main() {
     if (existing) await Semester.updateOne({ _id: existing._id }, { $set: { isCurrent: s.isCurrent } });
     else await create(Semester, [{ ...s, academicYear: CURRENT_AY, status: 'ACTIVE' }]);
   }
-  await InstitutionSettings.updateOne({}, { $set: { currentAcademicYear: CURRENT_AY, currentSemesterType: 'ODD' } });
+  await InstitutionSettings.updateOne({}, { $set: { currentAcademicYear: CURRENT_AY, currentSemesterType: 'ODD', allowSelfRegistration: true } });
 
   const deptByCode: Record<string, any> = {};
   for (const def of DEPARTMENTS) {

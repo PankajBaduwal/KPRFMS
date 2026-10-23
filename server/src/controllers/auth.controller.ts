@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/auth.service.js';
 import { sendSuccess } from '../utils/apiResponse.js';
 import { AuthenticatedRequest } from '../types/index.js';
-import { changePasswordSchema, loginSchema, updateRoleSchema, updateStatusSchema } from '../validators/auth.validator.js';
+import { changePasswordSchema, loginSchema, registerSchema, updateRoleSchema, updateStatusSchema } from '../validators/auth.validator.js';
 
 export class AuthController {
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -10,6 +10,24 @@ export class AuthController {
       const validated = loginSchema.parse(req.body);
       const user = await authService.login(validated, req, res);
       sendSuccess(res, user, 'Institutional authentication successful.');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getRegistrationOptions(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      sendSuccess(res, await authService.getRegistrationOptions(), 'Registration options retrieved.');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const validated = registerSchema.parse(req.body);
+      const result = await authService.register(validated, req);
+      sendSuccess(res, result, 'Registration submitted. An administrator will review and activate your account.', 201);
     } catch (error) {
       next(error);
     }

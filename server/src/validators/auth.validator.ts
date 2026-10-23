@@ -25,6 +25,39 @@ export const changePasswordSchema = z.object({
     ),
 });
 
+export const REGISTRATION_DESIGNATIONS = [
+  'Professor',
+  'Associate Professor',
+  'Assistant Professor (Senior Grade)',
+  'Assistant Professor',
+] as const;
+
+/** Public faculty self-registration. The college email domain is enforced in the service. */
+export const registerSchema = z.object({
+  name: z.string().trim().min(3, 'Full name is required').max(80),
+  email: z.string().trim().toLowerCase().email('Enter a valid email address').max(120),
+  employeeId: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z0-9-]{3,20}$/, 'Employee ID must be 3-20 letters, numbers or hyphens'),
+  departmentId: z.string().regex(/^[a-f0-9]{24}$/i, 'Select your department'),
+  designation: z.enum(REGISTRATION_DESIGNATIONS, { message: 'Select your designation' }),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^(\+91[\s-]?)?[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number')
+    .optional()
+    .or(z.literal('').transform(() => undefined)),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .regex(
+      passwordComplexityRegex,
+      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)'
+    ),
+});
+
 export const updateRoleSchema = z.object({
   userId: z.string().min(1, 'User ID is required'),
   role: z.enum([
@@ -47,5 +80,6 @@ export const updateStatusSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type RegisterInput = z.infer<typeof registerSchema>;
 export type UpdateRoleInput = z.infer<typeof updateRoleSchema>;
 export type UpdateStatusInput = z.infer<typeof updateStatusSchema>;

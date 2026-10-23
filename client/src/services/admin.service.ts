@@ -61,6 +61,16 @@ export const adminService = {
     return res.data.data;
   },
 
+  async approveRegistration(id: string): Promise<IAdminUser> {
+    const res = await apiClient.post(`${BASE}/users/${id}/approve-registration`);
+    return res.data.data;
+  },
+
+  async rejectRegistration(id: string, reason?: string): Promise<{ message: string }> {
+    const res = await apiClient.post(`${BASE}/users/${id}/reject-registration`, { reason });
+    return res.data.data;
+  },
+
   async toggleUserStatus(id: string, status: string): Promise<IAdminUser> {
     const res = await apiClient.patch(`${BASE}/users/${id}/status`, { status });
     return res.data.data;

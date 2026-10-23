@@ -48,7 +48,7 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
   }
 
   // 3. Unauthenticated login/health endpoints are exempt from CSRF checks
-  const exemptPaths = ['/api/auth/login', '/api/health'];
+  const exemptPaths = ['/api/auth/login', '/api/auth/register', '/api/health'];
   if (exemptPaths.some((p) => req.path.startsWith(p))) {
     return next();
   }

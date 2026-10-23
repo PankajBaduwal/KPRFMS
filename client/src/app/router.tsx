@@ -10,6 +10,7 @@ import { FEATURES } from '../constants/features';
 // Lazy-loaded route components for maximum code-splitting performance
 const HomePage = React.lazy(() => import('../pages/HomePage').then((m) => ({ default: m.HomePage })));
 const LoginPage = React.lazy(() => import('../pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const RegisterPage = React.lazy(() => import('../pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const UnauthorizedPage = React.lazy(() => import('../pages/UnauthorizedPage').then((m) => ({ default: m.UnauthorizedPage })));
 const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 const PortalPage = React.lazy(() => import('../pages/PortalPage').then((m) => ({ default: m.PortalPage })));
@@ -87,6 +88,16 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: lazyRoute(LoginPage),
+      },
+    ],
+  },
+  {
+    path: ROUTES.REGISTER,
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: lazyRoute(RegisterPage),
       },
     ],
   },

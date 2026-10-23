@@ -343,6 +343,11 @@ export const LoginPage: React.FC = () => {
             </button>
           </form>
 
+          <div className="login-register-cta">
+            New faculty member?{' '}
+            <Link to={ROUTES.REGISTER}>Register with your college email</Link>
+          </div>
+
           {/* Security & Access Statement */}
           <div className="login-security-notice">
             <i className="bi bi-shield-lock-fill" aria-hidden="true" />
@@ -498,7 +503,9 @@ export const LoginPage: React.FC = () => {
       >
         <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text)' }}>
           <p style={{ marginBottom: 'var(--space-3)' }}>
-            All faculty member accounts are provisioned systematically by the Institution during official appointment:
+            New faculty can <Link to={ROUTES.REGISTER}>register with their college email</Link>; the account becomes
+            active once an administrator approves it. Accounts can also be provisioned by the Institution during official
+            appointment:
           </p>
 
           <ol style={{ paddingLeft: 'var(--space-5)', marginBottom: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>

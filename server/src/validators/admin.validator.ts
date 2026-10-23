@@ -32,8 +32,13 @@ export const resetPasswordSchema = z.object({
   temporary: z.boolean().optional().default(true),
 });
 
+export const rejectRegistrationSchema = z.object({
+  reason: z.string().trim().max(300).optional(),
+});
+
 export const toggleUserStatusSchema = z.object({
-  status: z.enum(Object.values(USER_STATUS) as [string, ...string[]]),
+  // PENDING is reserved for self-registrations (approve/reject endpoints)
+  status: z.enum([USER_STATUS.ACTIVE, USER_STATUS.INACTIVE, USER_STATUS.SUSPENDED]),
 });
 
 export const departmentSchema = z.object({

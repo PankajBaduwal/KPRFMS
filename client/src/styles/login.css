@@ -425,3 +425,111 @@
     gap: 6px;
   }
 }
+
+/* ===== Faculty self-registration ===== */
+.register-panel {
+  max-width: 680px;
+  margin: 0 auto;
+}
+.register-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+}
+@media (max-width: 600px) {
+  .register-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.register-password-toggle {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+}
+.register-footer {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+.register-footer a {
+  color: var(--color-royal-blue);
+  font-weight: 600;
+}
+.register-success {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.register-success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+.register-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.register-steps li {
+  position: relative;
+  padding-left: 30px;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+.register-steps li strong {
+  color: var(--color-text);
+}
+.register-steps li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: #FFFFFF;
+}
+.register-steps li.is-done::before {
+  border-color: var(--color-success);
+  background: var(--color-success);
+}
+.register-steps li.is-current::before {
+  border-color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+.login-register-cta {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+.login-register-cta a {
+  color: var(--color-royal-blue);
+  font-weight: 700;
+  text-decoration: none;
+}
+.login-register-cta a:hover {
+  text-decoration: underline;
+}

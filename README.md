@@ -158,6 +158,7 @@ The backend suites live in `server/src/scripts/test-phase*.ts`. They run against
 - Session JWT in an HTTP-only, `SameSite` cookie; CSRF double-submit token (`X-CSRF-Token`) on every state-changing request
 - Login rate limiting and account lockout (5 failed attempts → 15 min)
 - Changing or resetting a password signs the user out of every other session
+- Faculty can **self-register** at `/register` with a college email (domain taken from the institution contact email, e.g. `@kpriet.ac.in`). New accounts stay **PENDING** and cannot sign in until an admin approves them under Admin → Users (the HOD is notified too); approval creates the faculty profile for HOD verification. Switch it on/off in Admin → Settings → "Allow faculty self-registration"
 - Users change their own password from the profile menu → **Change Password** (policy: 8+ chars, upper, lower, digit, one of `@$!%*?&`)
 - Request sanitisation against NoSQL operator injection and XSS payloads; Helmet security headers; strict CORS in production
 - Uploaded files require an authenticated session; private documents are stored outside the web root in `server/storage/` and served through `/api/documents` with access checks

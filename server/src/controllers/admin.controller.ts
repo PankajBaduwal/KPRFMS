@@ -7,6 +7,7 @@ import {
   updateUserSchema,
   resetPasswordSchema,
   toggleUserStatusSchema,
+  rejectRegistrationSchema,
   departmentSchema,
   programSchema,
   subjectAdminSchema,
@@ -87,6 +88,27 @@ export class AdminController {
       const { status } = toggleUserStatusSchema.parse(req.body);
       const updated = await adminService.toggleUserStatus(String(req.params.id), status, req.user!.id, req);
       sendSuccess(res, updated, `User account ${status.toLowerCase()}d successfully.`);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async approveRegistration(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      adminService.validateAdminAccess(req.user!.role);
+      const user = await adminService.approveRegistration(String(req.params.id), req.user!.id, req);
+      sendSuccess(res, user, 'Registration approved. The faculty member can now sign in.');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async rejectRegistration(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      adminService.validateAdminAccess(req.user!.role);
+      const { reason } = rejectRegistrationSchema.parse(req.body ?? {});
+      const result = await adminService.rejectRegistration(String(req.params.id), reason, req.user!.id, req);
+      sendSuccess(res, result, result.message);
     } catch (err) {
       next(err);
     }

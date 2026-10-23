@@ -35,6 +35,7 @@ import {
   InstitutionSettingsInput,
 } from '../validators/admin.validator.js';
 import { computeAcademicYearForDate } from '../utils/academicYear.js';
+import { Notification } from '../models/Notification.js';
 
 export class AdminService {
   /**
@@ -362,6 +363,69 @@ export class AdminService {
     return User.findById(user._id).populate('departmentId', 'name code');
   }
 
+  /** Activates a self-registered account and creates its faculty profile (pending HOD verification). */
+  async approveRegistration(id: string, adminId: string, req?: Request) {
+    const user = await User.findById(id);
+    if (!user) throw AppError.notFound('User not found.');
+    if (user.status !== USER_STATUS.PENDING) {
+      throw AppError.badRequest('Only pending registrations can be approved.');
+    }
+
+    user.status = USER_STATUS.ACTIVE;
+    await user.save();
+
+    if (user.departmentId && !(await Faculty.exists({ $or: [{ userId: user._id }, { employeeId: user.employeeId }] }))) {
+      const title = user.name.match(/^(Dr|Prof|Mr|Ms|Mrs)\./)?.[0] || 'Dr.';
+      await Faculty.create({
+        userId: user._id,
+        employeeId: user.employeeId,
+        name: user.name,
+        designation: user.designation || 'Assistant Professor',
+        departmentId: user.departmentId,
+        verificationStatus: 'PENDING',
+        basicInfo: { title, contactNumber: user.phone },
+      });
+    }
+
+    await Notification.create({
+      recipientId: user._id,
+      senderId: new Types.ObjectId(adminId),
+      title: 'Welcome! Your registration was approved',
+      message: 'Complete your faculty profile — qualifications, experience and contact details — for HOD verification.',
+      type: 'APPROVED',
+      actionUrl: '/portal/profile',
+    });
+
+    await recordAudit({
+      userId: user._id,
+      action: AUDIT_ACTIONS.ACCOUNT_ACTIVATION,
+      req,
+      details: { adminId, registrationApproved: true, targetEmployeeId: user.employeeId, email: user.email },
+    });
+
+    return User.findById(user._id).populate('departmentId', 'name code');
+  }
+
+  /** Rejects a self-registration; the pending account is removed so the email can register again. */
+  async rejectRegistration(id: string, reason: string | undefined, adminId: string, req?: Request) {
+    const user = await User.findById(id);
+    if (!user) throw AppError.notFound('User not found.');
+    if (user.status !== USER_STATUS.PENDING) {
+      throw AppError.badRequest('Only pending registrations can be rejected.');
+    }
+
+    await User.deleteOne({ _id: user._id });
+    await recordAudit({
+      userId: user._id,
+      action: AUDIT_ACTIONS.USER_DELETED,
+      req,
+      reason,
+      details: { adminId, registrationRejected: true, targetEmployeeId: user.employeeId, email: user.email },
+    });
+
+    return { message: `Registration for ${user.name} (${user.email}) was rejected.` };
+  }
+
   async toggleUserStatus(id: string, status: string, adminId: string, req?: Request) {
     const user = await User.findById(id);
     if (!user) throw AppError.notFound('User not found.');
@@ -369,6 +433,9 @@ export class AdminService {
     // Protect against self-deactivation
     if (user._id.toString() === adminId) {
       throw AppError.badRequest('You cannot deactivate your own administrative account.');
+    }
+    if (user.status === USER_STATUS.PENDING) {
+      throw AppError.badRequest('This is a pending registration. Use Approve or Reject instead.');
     }
 
     const previousStatus = user.status;

@@ -125,6 +125,7 @@ export const AdminPage: React.FC = () => {
   const [userRoleFilter, setUserRoleFilter] = useState('ALL');
   const [userDeptFilter, setUserDeptFilter] = useState('ALL');
   const [userStatusFilter, setUserStatusFilter] = useState('ALL');
+  const [pendingRegistrations, setPendingRegistrations] = useState(0);
 
   // User Modals
   const [userModalOpen, setUserModalOpen] = useState(false);
@@ -394,12 +395,37 @@ export const AdminPage: React.FC = () => {
       });
       setUsers(data.data || []);
       setUserTotalPages(data.pagination?.totalPages || 1);
+      // Self-registrations waiting for approval (shown as a banner above the directory)
+      const pending = await adminService.getUsers({ status: 'PENDING', limit: 1 });
+      setPendingRegistrations(pending.pagination?.total ?? (pending.data || []).length);
     } catch (err: unknown) {
       setError(formatErrorMessage(err, 'Failed to load user directory.'));
     } finally {
       setLoading(false);
     }
   }, [userPage, userRoleFilter, userDeptFilter, userStatusFilter, userSearch]);
+
+  const handleApproveRegistration = async (user: IAdminUser) => {
+    try {
+      await adminService.approveRegistration(user._id);
+      showToast(`${user.name} approved. They can now sign in.`);
+      fetchUsers();
+    } catch (err: unknown) {
+      setError(formatErrorMessage(err, 'Failed to approve registration.'));
+    }
+  };
+
+  const handleRejectRegistration = async (user: IAdminUser) => {
+    const reason = window.prompt(`Reject the registration of ${user.name} (${user.email})?\n\nReason (optional):`, '');
+    if (reason === null) return;
+    try {
+      await adminService.rejectRegistration(user._id, reason.trim() || undefined);
+      showToast(`Registration of ${user.name} rejected.`);
+      fetchUsers();
+    } catch (err: unknown) {
+      setError(formatErrorMessage(err, 'Failed to reject registration.'));
+    }
+  };
 
   const fetchDepartmentsAndPrograms = useCallback(async () => {
     try {
@@ -1505,6 +1531,39 @@ export const AdminPage: React.FC = () => {
           {/* Sub Tab: Directory */}
           {userSubTab === 'directory' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {pendingRegistrations > 0 && userStatusFilter !== 'PENDING' && (
+                <div
+                  role="status"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '1rem',
+                    flexWrap: 'wrap',
+                    padding: '0.85rem 1.1rem',
+                    borderRadius: '10px',
+                    border: '1px solid #fcd34d',
+                    backgroundColor: '#fffbeb',
+                    color: '#92400e',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  <span>
+                    <i className="bi bi-person-plus-fill" style={{ marginRight: 8 }} />
+                    <strong>{pendingRegistrations}</strong> faculty registration{pendingRegistrations === 1 ? '' : 's'} awaiting your approval
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-warning"
+                    onClick={() => {
+                      setUserStatusFilter('PENDING');
+                      setUserPage(1);
+                    }}
+                  >
+                    Review registrations
+                  </button>
+                </div>
+              )}
               {/* Filter Bar & Action Header */}
               <div
                 style={{
@@ -1577,6 +1636,7 @@ export const AdminPage: React.FC = () => {
                   >
                     <option value="ALL">All Status</option>
                     <option value="ACTIVE">ACTIVE</option>
+                    <option value="PENDING">PENDING APPROVAL</option>
                     <option value="INACTIVE">INACTIVE</option>
                     <option value="SUSPENDED">SUSPENDED</option>
                   </select>
@@ -1705,14 +1765,34 @@ export const AdminPage: React.FC = () => {
                                     borderRadius: '6px',
                                     fontSize: '0.725rem',
                                     fontWeight: 600,
-                                    backgroundColor: u.status === 'ACTIVE' ? '#dcfce7' : '#f1f5f9',
-                                    color: u.status === 'ACTIVE' ? '#15803d' : '#64748b',
+                                    backgroundColor: u.status === 'ACTIVE' ? '#dcfce7' : u.status === 'PENDING' ? '#fef3c7' : '#f1f5f9',
+                                    color: u.status === 'ACTIVE' ? '#15803d' : u.status === 'PENDING' ? '#92400e' : '#64748b',
                                   }}
                                 >
-                                  {u.status}
+                                  {u.status === 'PENDING' ? 'PENDING APPROVAL' : u.status}
                                 </span>
                               </td>
                               <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                                {u.status === 'PENDING' ? (
+                                <div style={{ display: 'inline-flex', gap: '0.35rem' }}>
+                                  <button
+                                    type="button"
+                                    className="btn btn-sm btn-success"
+                                    title="Approve registration"
+                                    onClick={() => handleApproveRegistration(u)}
+                                  >
+                                    <i className="bi bi-check-lg" /> Approve
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-danger"
+                                    title="Reject registration"
+                                    onClick={() => handleRejectRegistration(u)}
+                                  >
+                                    <i className="bi bi-x-lg" /> Reject
+                                  </button>
+                                </div>
+                                ) : (
                                 <div style={{ display: 'inline-flex', gap: '0.35rem' }}>
                                   <button
                                     type="button"
@@ -1764,6 +1844,7 @@ export const AdminPage: React.FC = () => {
                                     <i className="bi bi-trash" />
                                   </button>
                                 </div>
+                                )}
                               </td>
                             </tr>
                           );
@@ -3647,6 +3728,18 @@ export const AdminPage: React.FC = () => {
                     />
                     <label className="form-check-label font-semibold text-sm" htmlFor="maintenanceSwitch">
                       Maintenance Mode (Restrict non-admin access)
+                    </label>
+                  </div>
+                  <div className="form-check form-switch mt-2">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="selfRegistrationSwitch"
+                      checked={settingsForm.allowSelfRegistration || false}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, allowSelfRegistration: e.target.checked })}
+                    />
+                    <label className="form-check-label font-semibold text-sm" htmlFor="selfRegistrationSwitch">
+                      Allow faculty self-registration (college email, admin approval required)
                     </label>
                   </div>
                 </div>

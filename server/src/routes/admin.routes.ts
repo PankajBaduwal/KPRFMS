@@ -22,6 +22,8 @@ router.get('/users/:id', (req, res, next) => adminController.getUserById(req, re
 router.put('/users/:id', (req, res, next) => adminController.updateUser(req, res, next));
 router.patch('/users/:id', (req, res, next) => adminController.updateUser(req, res, next));
 router.patch('/users/:id/status', (req, res, next) => adminController.toggleUserStatus(req, res, next));
+router.post('/users/:id/approve-registration', (req, res, next) => adminController.approveRegistration(req, res, next));
+router.post('/users/:id/reject-registration', (req, res, next) => adminController.rejectRegistration(req, res, next));
 router.post('/users/:id/reset-password', (req, res, next) => adminController.resetPassword(req, res, next));
 router.delete('/users/:id', (req, res, next) => adminController.deleteUser(req, res, next));
 

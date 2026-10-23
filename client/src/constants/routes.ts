@@ -1,6 +1,7 @@
 export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
+  REGISTER: '/register',
   PORTAL: '/portal',
   FACULTY_PROFILE: '/portal/profile',
   FACULTY_DIRECTORY: '/portal/directory',
