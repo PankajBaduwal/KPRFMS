@@ -864,3 +864,14 @@
 .sidebar-brand.is-collapsed {
   margin: 0 auto;
 }
+
+/* Auth pages (login / register) header on phones: logo + icon-only home link */
+@media (max-width: 600px) {
+  .auth-header {
+    padding: 0 16px !important;
+  }
+  .auth-header-title,
+  .auth-home-label {
+    display: none;
+  }
+}

@@ -428,8 +428,7 @@
 
 /* ===== Faculty self-registration ===== */
 .register-panel {
-  max-width: 680px;
-  margin: 0 auto;
+  justify-content: flex-start;
 }
 .register-grid {
   display: grid;
@@ -532,4 +531,196 @@
 }
 .login-register-cta a:hover {
   text-decoration: underline;
+}
+
+/* Register: two-panel layout (left panel slightly narrower than on login) */
+.register-layout {
+  grid-template-columns: 0.85fr 1.15fr;
+}
+.register-brand {
+  justify-content: space-between;
+  gap: 2rem;
+}
+.register-brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  margin-bottom: 1.5rem;
+  background: #FFFFFF;
+  border-radius: var(--radius-pill);
+  color: var(--color-primary, #1B345F);
+  font-weight: 700;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.register-brand-steps {
+  list-style: none;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+.register-brand-steps li {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+.register-brand-steps li > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+.register-brand-steps strong {
+  color: #FFFFFF;
+  font-size: 0.92rem;
+}
+.register-brand-step-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #7DD3FC;
+}
+.register-brand-need {
+  position: relative;
+  z-index: 1;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+.register-brand-need-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.6rem;
+}
+.register-brand-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.register-brand-chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.14);
+  color: #FFFFFF;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.register-brand-help {
+  margin-top: 0.85rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+.register-brand-help a {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* Register: form sections */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.register-section {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 1.1rem 0.4rem;
+  margin: 0;
+  min-width: 0;
+}
+.register-section-title {
+  float: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+.register-section-title + * {
+  clear: both;
+}
+.register-section-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary-50);
+  color: var(--color-royal-blue);
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.register-email-domain {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  padding-left: 6px;
+  border-left: 1px solid var(--color-border);
+}
+.register-password-rules {
+  list-style: none;
+  margin: -0.25rem 0 0.75rem;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 1rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+.register-password-rules li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color var(--transition-fast);
+}
+.register-password-rules li.is-met {
+  color: var(--color-success);
+}
+.register-fineprint {
+  margin: -0.25rem 0 0;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+@media (max-width: 960px) {
+  .register-layout {
+    grid-template-columns: 1fr;
+  }
+  /* On narrow screens the form comes first; the explainer follows it */
+  .register-brand {
+    order: 2;
+  }
+}
+@media (max-width: 600px) {
+  .register-password-rules {
+    grid-template-columns: 1fr;
+  }
 }

@@ -42,6 +42,7 @@ export const AuthLayout: React.FC = () => {
 
       {/* 2. Main Institutional Navigation Header (Identical Brand Treatment) */}
       <header
+        className="auth-header"
         style={{
           height: '68px',
           backgroundColor: '#FFFFFF',
@@ -75,7 +76,7 @@ export const AuthLayout: React.FC = () => {
               objectFit: 'contain',
             }}
           />
-          <div style={{ borderLeft: '1px solid var(--color-border)', paddingLeft: '12px' }}>
+          <div className="auth-header-title" style={{ borderLeft: '1px solid var(--color-border)', paddingLeft: '12px' }}>
             <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-primary, #1B345F)', lineHeight: 1.15, letterSpacing: '-0.01em' }}>
               Faculty Management System
             </div>
@@ -100,7 +101,7 @@ export const AuthLayout: React.FC = () => {
           }}
         >
           <i className="bi bi-house-door" aria-hidden="true" />
-          <span>Institution Home</span>
+          <span className="auth-home-label">Institution Home</span>
         </Link>
       </header>
 
