@@ -405,53 +405,23 @@ export const AppLayout: React.FC = () => {
             minHeight: 'var(--header-height)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-            {sidebarCollapsed ? (
-              <img
-                src="/images/kpriet-favicon.png"
-                alt="KPRIET"
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-sm)',
-                  objectFit: 'contain',
-                  backgroundColor: '#FFFFFF',
-                  padding: '3px',
-                }}
-              />
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div
-                  style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: 'var(--radius-sm)',
-                    padding: '3px 8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <img
-                    src="/images/kpriet-logo.png"
-                    alt="KPRIET Logo"
-                    style={{
-                      height: '32px',
-                      maxWidth: '140px',
-                      objectFit: 'contain',
-                    }}
-                  />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#FFFFFF', letterSpacing: '0.04em', lineHeight: 1.1 }}>
-                    ERP
-                  </span>
-                  <span style={{ fontSize: '9px', color: '#94A3B8', lineHeight: 1.1 }}>
-                    PORTAL
-                  </span>
-                </div>
-              </div>
+          {/* Brand: emblem tile + readable wordmark (the full logo is unreadable at sidebar size) */}
+          <Link
+            to={ROUTES.PORTAL}
+            className={`sidebar-brand ${sidebarCollapsed ? 'is-collapsed' : ''}`}
+            aria-label="KPRIET Faculty Management System — go to dashboard"
+            title="KPR Institute of Engineering and Technology"
+          >
+            <span className="sidebar-brand-emblem">
+              <img src="/images/kpriet-emblem.png" alt="" width={36} height={36} />
+            </span>
+            {!sidebarCollapsed && (
+              <span className="sidebar-brand-text">
+                <span className="sidebar-brand-name">KPRIET</span>
+                <span className="sidebar-brand-sub">Faculty Management System</span>
+              </span>
             )}
-          </div>
+          </Link>
 
           {/* Mobile close button */}
           <button
