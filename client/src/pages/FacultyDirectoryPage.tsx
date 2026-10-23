@@ -195,7 +195,7 @@ export const FacultyDirectoryPage: React.FC = () => {
                           </div>
                         </td>
                         <td><code>{f.employeeId}</code></td>
-                        <td>{f.publications?.length || 0}</td>
+                        <td>{f.publicationsCount ?? f.publications?.length ?? 0}</td>
                         <td>{f.totalTeachingExperienceYears ? `${f.totalTeachingExperienceYears.toFixed(1)} yrs` : '—'}</td>
                         <td>
                           <Badge variant={getVerificationBadgeVariant(f.verificationStatus)}>

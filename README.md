@@ -104,6 +104,32 @@ Created by `npm run seed` (development databases only):
 
 Sign in with either the email or the employee ID. These accounts only exist in seeded dev databases — never create them in production.
 
+### Full sample data (every module)
+
+```bash
+npm run seed:sample
+```
+
+Run after `npm run seed`. Adds a complete institution for demos and testing — re-runnable, and removed by `npm run seed:clean`:
+
+- 7 departments (CSE, ECE, MECH, EEE, IT, AI&DS, CIVIL) with UG/PG/Ph.D. programs and master data
+- 34 more faculty with full profiles; new HODs for MECH, EEE, IT, AIDS and CIVIL
+- Publications, funded projects, activities, patents, copyrights and consultancy across 2023-24 → 2026-27, in every verification state
+- Student mentoring, student projects and PhD scholars
+- Subjects, allocations, a conflict-free timetable and substitutions
+- Attendance (Sep 2026 → today) with correction requests, leave applications and balances
+- 2026-27 appraisal cycle with appraisals at every workflow stage, plus completed 2025-26 appraisals
+- Document vault with real PDF files, notifications, approval history and audit entries
+
+It also sets 2026-2027 as the current academic year.
+
+| Sample account | Login | Password |
+|---|---|---|
+| HOD — Mechanical | hod.mech@kpriet.ac.in | `Hod@12345` |
+| HOD — EEE / IT / AI&DS / Civil | hod.eee@ / hod.it@ / hod.aids@ / hod.civil@kpriet.ac.in | `Hod@12345` |
+| Faculty — CSE | k.divya.cse@kpriet.ac.in | `Faculty@12345` |
+| Any sample faculty | see the Faculty Directory (employee IDs KPR2101–KPR2134) | `Faculty@12345` |
+
 ---
 
 ## Scripts

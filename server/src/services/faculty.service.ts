@@ -369,7 +369,29 @@ export class FacultyService {
       }
     }
 
-    return facultyRepository.findAll(filter);
+    const faculties = await facultyRepository.findAll(
+      filter,
+      'name employeeId designation departmentId userId verificationStatus profilePhoto basicInfo createdAt experience.roleType experience.totalYears experience.totalMonths'
+    );
+
+    // Real publication counts live in the Publication collection (drafts and rejected entries excluded)
+    const counts = await Publication.aggregate<{ _id: Types.ObjectId; n: number }>([
+      { $match: { facultyId: { $in: faculties.map((f) => f._id) }, verificationStatus: { $nin: ['DRAFT', 'REJECTED'] } } },
+      { $group: { _id: '$facultyId', n: { $sum: 1 } } },
+    ]);
+    const countByFaculty = new Map(counts.map((c) => [String(c._id), c.n]));
+
+    return faculties.map((f: any) => {
+      const teachingYears = (f.experience || [])
+        .filter((e: any) => e.roleType === 'TEACHING')
+        .reduce((sum: number, e: any) => sum + (e.totalYears || 0) + (e.totalMonths || 0) / 12, 0);
+      const { experience: _experience, ...rest } = f;
+      return {
+        ...rest,
+        publicationsCount: countByFaculty.get(String(f._id)) || 0,
+        totalTeachingExperienceYears: Number(teachingYears.toFixed(1)),
+      };
+    }) as unknown as IFaculty[];
   }
 
   async updateMyBasicInfo(userId: string, data: Partial<IFaculty['basicInfo']>): Promise<IFaculty> {

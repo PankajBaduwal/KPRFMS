@@ -333,6 +333,8 @@ export interface FacultyProfile {
   supportingDocuments: SupportingDocument[];
 
   totalTeachingExperienceYears?: number;
+  /** Directory listing only: verified + in-review publications from the Publication collection */
+  publicationsCount?: number;
   totalIndustryExperienceYears?: number;
   totalResearchExperienceYears?: number;
   totalOverallExperienceYears?: number;
