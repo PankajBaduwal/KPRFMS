@@ -15,7 +15,8 @@ Institutional ERP for **KPR Institute of Engineering and Technology (KPRIET)**: 
 | Operations | Attendance (daily / monthly / corrections / locking), leave applications & balances |
 | Performance | Appraisal cycles, self-appraisal, evidence, multi-level evaluation |
 | Governance | Approval queue, HOD / Dean / Principal consoles, institution analytics, faculty comparison, accreditation reports |
-| Administration | Users & roles, departments, academic years, institution settings, audit logs, notifications, global search |
+| Administration | Users & roles, Excel bulk import, departments, academic years, institution settings, audit logs, notifications, global search |
+| Accounts | Email password reset, email-confirmed self-registration, two-factor sign-in, signed-in devices, live notifications + email, calendar sync, installable on phones |
 
 ### Roles
 
@@ -67,7 +68,9 @@ cp client/.env.example client/.env
 | `JWT_SECRET` | Signs session tokens |
 | `JWT_EXPIRES_IN` | Session lifetime (default `12h`) |
 | `COOKIE_SECRET` | Signs cookies |
-| `CLIENT_URL` | Allowed browser origin for CORS |
+| `CLIENT_URL` | Allowed browser origin for CORS; also the base of links in emails |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Outgoing email. Without `SMTP_HOST`, every email is written to `server/mail-outbox/` as a JSON file instead (handy in development) |
+| `PUBLIC_API_URL` | Public API address used in calendar-feed links (default `http://localhost:PORT/api`, or `CLIENT_URL/api` in production) |
 
 `client/.env` only needs `VITE_API_URL` (default `http://localhost:5055/api`).
 
@@ -141,7 +144,7 @@ From the project root:
 | `npm run dev:server` / `npm run dev:client` | Start API / web app in watch mode |
 | `npm run build` | Type-check and build server (`server/dist`) and client (`client/dist`) |
 | `npm start` | Run the built API (`node server/dist/server.js`) |
-| `npm test` | Run every backend test suite against an isolated test database |
+| `npm test` | Run every backend test suite against an isolated test database (emails go to `server/mail-outbox-test/`) |
 | `npm run seed` | Create / refresh development seed data |
 | `npm run backup` | Back up the database + uploaded files to `server/backups/<timestamp>/` |
 | `npm run lint:server` / `npm run lint:client` | Type-check server / lint client |
@@ -189,11 +192,31 @@ docker run --rm -v kpriet-fms_uploads:/u -v kpriet-fms_documents:/d -v "$PWD":/o
 
 ---
 
+## Account Features
+
+| Feature | Where | Notes |
+|---|---|---|
+| **Forgot password** | Sign-in page → Forgot Password? | Emails a one-time link valid for 30 minutes; using it signs the account out everywhere. Same reply whether or not the account exists |
+| **Registration email code** | `/register` | A 6-digit code (15 min, 5 tries) confirms the college address. Admins/HOD are alerted only after it is confirmed, and Approve stays disabled until then |
+| **Email notifications** | Automatic | Approval requests, approve/return/reject decisions, leave applications and leave decisions are also emailed. Each user can switch this off under Notifications → Preferences → "Email Me Too" |
+| **Live notifications** | Bell icon | New notifications appear instantly (Server-Sent Events at `/api/notifications/stream`), with a toast. Falls back to polling if the stream drops |
+| **Two-factor sign-in** | Profile menu → Account & Security | Authenticator-app codes (Google/Microsoft Authenticator, Authy) plus 10 one-time recovery codes. Recommended on the page for Admin/Principal/Dean. Admins can reset it for a user who lost their phone (Users list → shield icon) |
+| **Signed-in devices** | Account & Security | Lists every browser/phone signed in, with last activity; sign out one device or all others |
+| **Calendar sync** | Account & Security | Private iCal link with leave (approved + pending) and weekly timetable, for Google Calendar, Outlook or Apple Calendar. Google/Outlook need the server to be reachable from the internet (`PUBLIC_API_URL`) |
+| **Excel bulk import** | Admin → Users → Import from Excel | Download the template, upload, review per-row errors, then import. Each new account is emailed a "set your password" link (7 days) |
+| **DOI / ORCID fill** | Publications → Add / Import from ORCID | Crossref fills title, venue, date, volume/pages, authors and citations from a DOI; ORCID lists a researcher's public works to add one by one. Google Scholar has no public API, so it is not supported |
+| **Install as an app** | Profile menu → Install App (Chrome/Edge/Android), or Share → Add to Home Screen (iPhone) | Production builds register a service worker; API data is never cached |
+
+Live notifications keep their connections in the API process; if you ever run several API instances, add a shared pub/sub (e.g. Redis) in `server/src/services/notification-dispatch.ts`.
+
+---
+
 ## Security
 
 - Session JWT in an HTTP-only, `SameSite` cookie; CSRF double-submit token (`X-CSRF-Token`) on every state-changing request
 - Login rate limiting and account lockout (5 failed attempts → 15 min)
-- Changing or resetting a password signs the user out of every other session
+- Every sign-in is a tracked session (device, IP, last activity) that can be revoked; changing or resetting a password signs the user out of every other session
+- Optional two-factor sign-in (TOTP); secrets are encrypted at rest (AES-256-GCM, key derived from `JWT_SECRET`, so rotating `JWT_SECRET` also requires users to set up two-factor again)
 - Faculty can **self-register** at `/register` with a college email (domain taken from the institution contact email, e.g. `@kpriet.ac.in`). New accounts stay **PENDING** and cannot sign in until an admin approves them under Admin → Users (the HOD is notified too); approval creates the faculty profile for HOD verification. Switch it on/off in Admin → Settings → "Allow faculty self-registration"
 - Users change their own password from the profile menu → **Change Password** (policy: 8+ chars, upper, lower, digit, one of `@$!%*?&`)
 - Request sanitisation against NoSQL operator injection and XSS payloads; Helmet security headers; strict CORS in production

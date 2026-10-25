@@ -9,6 +9,7 @@ import { ROUTES } from '../constants/routes';
 import { FEATURES } from '../constants/features';
 import { DEV_SEED_ACCOUNTS, SHOW_DEV_SEED_HELPERS } from '../dev/devSeedAccounts';
 import { useAsyncAction } from '../hooks/useAsyncAction';
+import { authService, isTwoFactorChallenge } from '../services/auth.service';
 import '../styles/login.css';
 
 const REMEMBERED_ID_KEY = 'kpriet_fms_remembered_id';
@@ -29,13 +30,19 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { login } = useAuthStore();
+  const { login, loginTwoFactor } = useAuthStore();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
   const [activationModalOpen, setActivationModalOpen] = useState(false);
+  const [challengeToken, setChallengeToken] = useState<string | null>(null);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [useRecoveryCode, setUseRecoveryCode] = useState(false);
+  const [forgotIdentifier, setForgotIdentifier] = useState('');
+  const [forgotSent, setForgotSent] = useState<string | null>(null);
+  const [forgotError, setForgotError] = useState<string | null>(null);
 
   const from = (location.state as { from?: { pathname: string }; sessionExpired?: boolean })?.from?.pathname || ROUTES.PORTAL;
 
@@ -43,6 +50,7 @@ export const LoginPage: React.FC = () => {
     register,
     handleSubmit,
     setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -97,7 +105,12 @@ export const LoginPage: React.FC = () => {
         }
       }
 
-      await login(data);
+      const result = await login(data);
+      if (isTwoFactorChallenge(result)) {
+        setChallengeToken(result.challengeToken);
+        setTwoFactorCode('');
+        return;
+      }
       navigate(from, { replace: true });
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'message' in err) {
@@ -107,6 +120,41 @@ export const LoginPage: React.FC = () => {
       }
     }
   });
+
+  const verifyCode = useAsyncAction(async () => {
+    setErrorMessage(null);
+    try {
+      const user = await loginTwoFactor(challengeToken!, twoFactorCode);
+      if (user.recoveryCodesLeft !== undefined) {
+        try {
+          sessionStorage.setItem('fms:recovery-codes-left', String(user.recoveryCodesLeft));
+        } catch {
+          // ignore
+        }
+      }
+      navigate(from, { replace: true });
+    } catch (err: unknown) {
+      const message = (err as { message?: string })?.message || 'That code could not be verified.';
+      setErrorMessage(message);
+      if (/expired/i.test(message)) setChallengeToken(null);
+    }
+  });
+
+  const requestReset = useAsyncAction(async () => {
+    setForgotError(null);
+    try {
+      setForgotSent(await authService.forgotPassword(forgotIdentifier.trim()));
+    } catch (err: unknown) {
+      setForgotError((err as { message?: string })?.message || 'Could not send the reset link. Try again.');
+    }
+  });
+
+  const openForgot = () => {
+    setForgotSent(null);
+    setForgotError(null);
+    setForgotIdentifier((getValues('identifier') || '').trim());
+    setForgotModalOpen(true);
+  };
 
   const setDevSeedCredentials = (id: string, pass: string) => {
     setValue('identifier', id);
@@ -227,9 +275,13 @@ export const LoginPage: React.FC = () => {
               </Link>
             </div>
 
-            <h2 className="login-panel-title">Welcome back</h2>
+            <h2 className="login-panel-title">{challengeToken ? 'Two-step verification' : 'Welcome back'}</h2>
             <p className="login-panel-desc">
-              Sign in to continue to the Faculty Management System.
+              {challengeToken
+                ? useRecoveryCode
+                  ? 'Enter one of the recovery codes you saved when you turned on two-factor sign-in.'
+                  : 'Open your authenticator app and enter the 6-digit code for KPRIET FMS.'
+                : 'Sign in to continue to the Faculty Management System.'}
             </p>
           </div>
 
@@ -259,8 +311,79 @@ export const LoginPage: React.FC = () => {
             </div>
           )}
 
+          {challengeToken && (
+            <form
+              className="login-form"
+              noValidate
+              onSubmit={(e) => {
+                e.preventDefault();
+                verifyCode.run();
+              }}
+            >
+              <Input
+                label={useRecoveryCode ? 'Recovery code' : 'Authentication code'}
+                type="text"
+                inputMode={useRecoveryCode ? 'text' : 'numeric'}
+                autoComplete="one-time-code"
+                autoFocus
+                maxLength={useRecoveryCode ? 12 : 6}
+                placeholder={useRecoveryCode ? 'XXXX-XXXX' : '123456'}
+                prefixIcon={<i className={useRecoveryCode ? 'bi bi-key' : 'bi bi-phone'} aria-hidden="true" />}
+                value={twoFactorCode}
+                onChange={(e) =>
+                  setTwoFactorCode(useRecoveryCode ? e.target.value.toUpperCase() : e.target.value.replace(/\D/g, ''))
+                }
+                style={{ letterSpacing: '0.3em', fontWeight: 600 }}
+              />
+              <button
+                type="submit"
+                className="login-submit-btn"
+                disabled={verifyCode.isPending || (useRecoveryCode ? twoFactorCode.length < 8 : twoFactorCode.length !== 6)}
+              >
+                {verifyCode.isPending ? (
+                  <>
+                    <span className="spinner spinner-sm" aria-hidden="true" />
+                    <span>Verifying...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-shield-check" aria-hidden="true" />
+                    <span>Verify and sign in</span>
+                  </>
+                )}
+              </button>
+              <div className="login-utilities-row">
+                <button
+                  type="button"
+                  className="login-forgot-btn"
+                  onClick={() => {
+                    setUseRecoveryCode((v) => !v);
+                    setTwoFactorCode('');
+                  }}
+                >
+                  {useRecoveryCode ? 'Use authenticator app instead' : 'Lost your phone? Use a recovery code'}
+                </button>
+                <button
+                  type="button"
+                  className="login-forgot-btn"
+                  onClick={() => {
+                    setChallengeToken(null);
+                    setErrorMessage(null);
+                  }}
+                >
+                  Back
+                </button>
+              </div>
+            </form>
+          )}
+
           {/* Authentication Form */}
-          <form onSubmit={handleSubmit((data) => signIn.run(data))} noValidate className="login-form">
+          <form
+            onSubmit={handleSubmit((data) => signIn.run(data))}
+            noValidate
+            className="login-form"
+            style={challengeToken ? { display: 'none' } : undefined}
+          >
             <Input
               label="Institutional Email / Employee ID"
               type="text"
@@ -317,7 +440,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 className="login-forgot-btn"
-                onClick={() => setForgotModalOpen(true)}
+                onClick={openForgot}
               >
                 Forgot Password?
               </button>
@@ -368,7 +491,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="button"
               className="login-support-link"
-              onClick={() => setForgotModalOpen(true)}
+              onClick={openForgot}
             >
               Need IT Support?
             </button>
@@ -426,62 +549,69 @@ export const LoginPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Forgot Password Institutional Modal */}
+      {/* Forgot Password: emailed reset link */}
       <Modal
         isOpen={forgotModalOpen}
         onClose={() => setForgotModalOpen(false)}
-        title="Institutional Credential Recovery"
+        title="Reset your password"
         size="md"
         footer={
-          <button
-            type="button"
-            className="btn-primary-custom btn-sm"
-            onClick={() => setForgotModalOpen(false)}
-          >
-            Acknowledge &amp; Close
-          </button>
+          forgotSent ? (
+            <button type="button" className="btn-primary-custom btn-sm" onClick={() => setForgotModalOpen(false)}>
+              Back to sign in
+            </button>
+          ) : (
+            <>
+              <button type="button" className="btn-secondary-custom btn-sm" onClick={() => setForgotModalOpen(false)}>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="forgot-password-form"
+                className="btn-primary-custom btn-sm"
+                disabled={requestReset.isPending || forgotIdentifier.trim().length < 3}
+              >
+                {requestReset.isPending ? 'Sending...' : 'Email me a reset link'}
+              </button>
+            </>
+          )
         }
       >
         <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text)' }}>
-          <p style={{ marginBottom: 'var(--space-3)' }}>
-            Faculty Management System accounts are managed under strict institutional security policies. For password reset or credential recovery:
+          {forgotSent ? (
+            <Alert variant="success" title="Check your college email">
+              {forgotSent} The link expires in 30 minutes. Check the spam folder if it does not arrive in a few minutes.
+            </Alert>
+          ) : (
+            <form
+              id="forgot-password-form"
+              noValidate
+              onSubmit={(e) => {
+                e.preventDefault();
+                requestReset.run();
+              }}
+            >
+              <p style={{ marginBottom: 'var(--space-3)' }}>
+                Enter your college email or employee ID. We will email a link to choose a new password to the address on
+                your account.
+              </p>
+              <Input
+                label="College email / Employee ID"
+                type="text"
+                autoComplete="username"
+                autoFocus
+                placeholder="e.g. employee.name@kpriet.ac.in or EMP1024"
+                prefixIcon={<i className="bi bi-envelope" aria-hidden="true" />}
+                value={forgotIdentifier}
+                onChange={(e) => setForgotIdentifier(e.target.value)}
+                error={forgotError ?? undefined}
+              />
+            </form>
+          )}
+          <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: 'var(--space-3) 0 0' }}>
+            No access to your college email? Contact IT Services (helpdesk@kpriet.ac.in, ext. 4101) or your HOD. An
+            administrator can reset the password from the admin console.
           </p>
-
-          <div
-            style={{
-              background: 'var(--color-background)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              padding: 'var(--space-4)',
-              marginBottom: 'var(--space-4)',
-            }}
-          >
-            <div style={{ fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-primary)' }}>
-              1. Contact Central IT Services
-            </div>
-            <p style={{ fontSize: 'var(--font-size-xs)', marginBottom: 'var(--space-2)', color: 'var(--color-text-secondary)' }}>
-              Submit a credential reset request from your registered institutional email or in-person at the IT Center (Admin Block, 2nd Floor).
-            </p>
-            <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text)' }}>
-              <strong>Email:</strong> helpdesk@kpriet.ac.in &bull; <strong>Extension:</strong> 4101
-            </div>
-          </div>
-
-          <div
-            style={{
-              background: 'var(--color-background)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              padding: 'var(--space-4)',
-            }}
-          >
-            <div style={{ fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--space-2)', color: 'var(--color-primary)' }}>
-              2. Departmental Administrator Verification
-            </div>
-            <p style={{ fontSize: 'var(--font-size-xs)', margin: 0, color: 'var(--color-text-secondary)' }}>
-              Your Department Head (HOD) or Dean Office can initiate a temporary password reset through the administrative console upon identity confirmation.
-            </p>
-          </div>
         </div>
       </Modal>
 

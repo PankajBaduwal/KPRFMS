@@ -23,10 +23,42 @@ export interface RegistrationInput {
   password: string;
 }
 
+/** Accounts with two-factor sign-in get a challenge instead of a session after the password step. */
+export interface TwoFactorChallenge {
+  twoFactorRequired: true;
+  challengeToken: string;
+}
+
+export const isTwoFactorChallenge = (value: unknown): value is TwoFactorChallenge =>
+  Boolean(value && typeof value === 'object' && 'twoFactorRequired' in value);
+
 export const authService = {
-  async login(credentials: LoginCredentials): Promise<User> {
-    const response = await apiPost<User>('/auth/login', credentials);
+  async login(credentials: LoginCredentials): Promise<User | TwoFactorChallenge> {
+    const response = await apiPost<User | TwoFactorChallenge>('/auth/login', credentials);
     return response.data;
+  },
+
+  async loginTwoFactor(challengeToken: string, code: string): Promise<User & { recoveryCodesLeft?: number }> {
+    const response = await apiPost<User & { recoveryCodesLeft?: number }>('/auth/login/2fa', { challengeToken, code });
+    return response.data;
+  },
+
+  async forgotPassword(identifier: string): Promise<string> {
+    const response = await apiPost<{ message: string }>('/auth/forgot-password', { identifier });
+    return response.message;
+  },
+
+  async resetPassword(token: string, password: string): Promise<string> {
+    const response = await apiPost<{ message: string }>('/auth/reset-password', { token, password });
+    return response.message;
+  },
+
+  async verifyEmail(email: string, code: string): Promise<void> {
+    await apiPost('/auth/verify-email', { email, code });
+  },
+
+  async resendVerification(email: string): Promise<void> {
+    await apiPost('/auth/resend-verification', { email });
   },
 
   async logout(): Promise<void> {
@@ -38,8 +70,13 @@ export const authService = {
     return response.data;
   },
 
-  async register(payload: RegistrationInput): Promise<{ email: string; employeeId: string; status: string }> {
-    const response = await apiPost<{ email: string; employeeId: string; status: string }>('/auth/register', payload);
+  async register(
+    payload: RegistrationInput
+  ): Promise<{ email: string; employeeId: string; status: string; emailVerificationRequired?: boolean }> {
+    const response = await apiPost<{ email: string; employeeId: string; status: string; emailVerificationRequired?: boolean }>(
+      '/auth/register',
+      payload
+    );
     return response.data;
   },
 

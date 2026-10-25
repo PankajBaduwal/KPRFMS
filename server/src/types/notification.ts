@@ -30,6 +30,7 @@ export interface INotificationPreferences {
   timetableChange: boolean;
   appraisalCycle: boolean;
   systemNotification: boolean;
+  emailNotifications: boolean;
 }
 
 export interface CreateNotificationInput {

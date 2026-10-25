@@ -10,6 +10,8 @@ import { FEATURES } from '../constants/features';
 // Lazy-loaded route components for maximum code-splitting performance
 const HomePage = React.lazy(() => import('../pages/HomePage').then((m) => ({ default: m.HomePage })));
 const LoginPage = React.lazy(() => import('../pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const ResetPasswordPage = React.lazy(() => import('../pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })));
+const AccountSecurityPage = React.lazy(() => import('../pages/AccountSecurityPage').then((m) => ({ default: m.AccountSecurityPage })));
 const RegisterPage = React.lazy(() => import('../pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const UnauthorizedPage = React.lazy(() => import('../pages/UnauthorizedPage').then((m) => ({ default: m.UnauthorizedPage })));
 const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
@@ -98,6 +100,16 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: lazyRoute(RegisterPage),
+      },
+    ],
+  },
+  {
+    path: ROUTES.RESET_PASSWORD,
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: lazyRoute(ResetPasswordPage),
       },
     ],
   },
@@ -241,6 +253,10 @@ export const router = createBrowserRouter([
       {
         path: 'reports',
         element: lazyRoute(ReportsPage),
+      },
+      {
+        path: 'security',
+        element: lazyRoute(AccountSecurityPage),
       },
       {
         path: 'notifications',

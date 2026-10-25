@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../types/index.js';
 import { AppError } from '../utils/AppError.js';
 import { verifyToken, AUTH_COOKIE_NAME, refreshSessionIfStale } from '../utils/jwt.js';
 import { User, USER_STATUS } from '../models/User.js';
+import { Session } from '../models/Session.js';
 
 export async function requireAuth(
   req: AuthenticatedRequest,
@@ -11,6 +12,7 @@ export async function requireAuth(
 ): Promise<void> {
   try {
     let token = req.cookies?.[AUTH_COOKIE_NAME] || req.signedCookies?.[AUTH_COOKIE_NAME];
+    const fromCookie = Boolean(token);
 
     if (!token && req.headers.authorization?.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
@@ -24,6 +26,20 @@ export async function requireAuth(
     try {
       payload = verifyToken(token);
     } catch {
+      throw AppError.unauthorized('Session has expired or is invalid. Please sign in again.');
+    }
+
+    // Browser sessions are tracked per device so they can be listed and signed out remotely
+    if (payload.sid) {
+      const session = await Session.findOne({ sid: payload.sid }).select('revokedAt lastSeenAt').lean();
+      if (!session || session.revokedAt) {
+        throw AppError.unauthorized('This session was signed out. Please sign in again.');
+      }
+      if (Date.now() - new Date(session.lastSeenAt).getTime() > 60_000) {
+        void Session.updateOne({ sid: payload.sid }, { $set: { lastSeenAt: new Date(), ip: req.ip } }).catch(() => null);
+      }
+    } else if (fromCookie) {
+      // Cookie issued before session tracking existed
       throw AppError.unauthorized('Session has expired or is invalid. Please sign in again.');
     }
 
@@ -50,6 +66,7 @@ export async function requireAuth(
       departmentId: user.departmentId?.toString(),
       status: user.status,
       designation: user.designation,
+      sessionId: payload.sid,
     };
 
     // Cookie sessions slide forward while the user is active (bearer tokens are left as issued)
@@ -59,6 +76,7 @@ export async function requireAuth(
         email: user.email,
         role: user.role,
         departmentId: req.user.departmentId,
+        sid: payload.sid,
         iat: payload.iat,
       });
     }

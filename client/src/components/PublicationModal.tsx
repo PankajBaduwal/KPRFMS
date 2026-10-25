@@ -23,6 +23,15 @@ interface PublicationModalProps {
   onClose: () => void;
   publication?: Publication | null;
   onSuccess: (savedPub: Publication) => void;
+  /** Look this DOI up and pre-fill the form when the modal opens (ORCID import). */
+  prefillDoi?: string;
+}
+
+/** "2024-03-10" -> "2023-2024" (academic year runs June to May). */
+function academicYearOf(date: string): string {
+  const d = new Date(date);
+  const y = d.getFullYear();
+  return d.getMonth() >= 5 ? `${y}-${y + 1}` : `${y - 1}-${y}`;
 }
 
 const PUBLICATION_TYPE_OPTIONS = [
@@ -75,6 +84,7 @@ export const PublicationModal: React.FC<PublicationModalProps> = ({
   onClose,
   publication,
   onSuccess,
+  prefillDoi,
 }) => {
   const { currentYear, years, options: yearOptions } = useAcademicYears();
   const [formData, setFormData] = useState({
@@ -175,6 +185,59 @@ export const PublicationModal: React.FC<PublicationModalProps> = ({
     setError(null);
     setValidationErrors({});
   }, [publication, isOpen]);
+
+  // --- Auto-fill from a DOI (Crossref) ----------------------------------------------
+  const [doiInput, setDoiInput] = useState('');
+  const [doiLoading, setDoiLoading] = useState(false);
+  const [doiMessage, setDoiMessage] = useState<{ variant: 'success' | 'danger'; text: string } | null>(null);
+
+  const fillFromDoi = async (raw: string) => {
+    const doi = raw.trim();
+    if (!doi) return;
+    setDoiLoading(true);
+    setDoiMessage(null);
+    try {
+      const found = await publicationService.lookupDoi(doi);
+      const year = found.publicationDate ? academicYearOf(found.publicationDate) : '';
+      setFormData((prev) => ({
+        ...prev,
+        title: found.title || prev.title,
+        publicationType: (found.publicationType as PublicationType) || prev.publicationType,
+        journalOrConference: found.journalOrConference || prev.journalOrConference,
+        publisher: found.publisher || prev.publisher,
+        issn: found.issn || prev.issn,
+        doi: found.doi || prev.doi,
+        url: found.url || prev.url,
+        publicationDate: found.publicationDate || prev.publicationDate,
+        academicYear: year && years.includes(year) ? year : prev.academicYear,
+        volume: found.volume || prev.volume,
+        issue: found.issue || prev.issue,
+        pages: found.pages || prev.pages,
+        citationCount: String(found.citationCount ?? prev.citationCount),
+        numberOfAuthors: String(found.numberOfAuthors || prev.numberOfAuthors),
+        authorPosition: (found.suggestedAuthorPosition as AuthorPosition) || prev.authorPosition,
+        coAuthorsText: found.coAuthors.length ? found.coAuthors.join(', ') : prev.coAuthorsText,
+        publicationStatus: 'PUBLISHED',
+      }));
+      setValidationErrors({});
+      setDoiMessage({
+        variant: 'success',
+        text: `Filled from Crossref${found.authors.length ? ` (${found.authors.length} authors)` : ''}. Check indexing, quartile and your author position before saving.`,
+      });
+    } catch (err: any) {
+      setDoiMessage({ variant: 'danger', text: err?.message || 'Could not look up this DOI.' });
+    } finally {
+      setDoiLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setDoiMessage(null);
+    setDoiInput(prefillDoi || '');
+    if (prefillDoi && !publication) void fillFromDoi(prefillDoi);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, prefillDoi]);
 
   // Default to the current academic year once it has loaded
   useEffect(() => {
@@ -332,6 +395,43 @@ export const PublicationModal: React.FC<PublicationModalProps> = ({
         style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}
       >
         {error && <Alert variant="danger">{error}</Alert>}
+
+        {/* Quick fill from DOI */}
+        <div className="publication-doi-fill">
+          <div className="publication-doi-fill-label">
+            <i className="bi bi-magic" aria-hidden="true" />
+            <span>
+              <strong>Have a DOI?</strong> Fill the details automatically.
+            </span>
+          </div>
+          <div className="publication-doi-fill-row">
+            <Input
+              aria-label="DOI"
+              placeholder="10.1109/ACCESS.2024.1234567 or https://doi.org/…"
+              value={doiInput}
+              onChange={(e) => setDoiInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  void fillFromDoi(doiInput);
+                }
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              loading={doiLoading}
+              disabled={!doiInput.trim()}
+              onClick={() => void fillFromDoi(doiInput)}
+            >
+              Fill from DOI
+            </Button>
+          </div>
+          {doiMessage && (
+            <div className={`publication-doi-fill-msg is-${doiMessage.variant}`}>{doiMessage.text}</div>
+          )}
+        </div>
 
         {/* SECTION 1: Publication Title & Venue */}
         <fieldset

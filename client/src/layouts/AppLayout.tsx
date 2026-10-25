@@ -4,6 +4,7 @@ import { useUIStore } from '../stores/uiStore';
 import { useAuthStore } from '../stores/authStore';
 import { Badge, GlobalSearchModal, NotificationDropdown } from '../components';
 import { ChangePasswordModal } from '../components/ChangePasswordModal';
+import { useInstallPrompt } from '../hooks/useInstallPrompt';
 import { ROLE_LABELS } from '../constants/roles';
 import { ROUTES } from '../constants/routes';
 import { FEATURES, isHiddenPath } from '../constants/features';
@@ -18,6 +19,7 @@ export const AppLayout: React.FC = () => {
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const installPrompt = useInstallPrompt();
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   // Dynamic Academic Year from server
@@ -367,6 +369,7 @@ export const AppLayout: React.FC = () => {
     if (p.includes('/faculty-comparison')) return { section: 'Governance', page: 'Faculty Comparison' };
     if (p.includes('/reports')) return { section: 'Governance', page: 'Reports' };
     if (p.includes('/notifications')) return { section: 'Overview', page: 'Notifications' };
+    if (p.includes('/security')) return { section: 'Overview', page: 'Account & Security' };
     if (p.includes('/documents')) return { section: 'Operations', page: 'Documents' };
     if (p.includes('/admin-console')) return { section: 'Administration', page: 'System Console' };
     if (p.includes('/audit-logs')) return { section: 'Administration', page: 'Audit Logs' };
@@ -797,6 +800,31 @@ export const AppLayout: React.FC = () => {
                       <i className="bi bi-key" aria-hidden="true" />
                       <span>Change Password</span>
                     </button>
+
+                    <Link
+                      to={ROUTES.ACCOUNT_SECURITY}
+                      className="header-profile-dropdown-item"
+                      role="menuitem"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    >
+                      <i className="bi bi-shield-lock" aria-hidden="true" />
+                      <span>Account &amp; Security</span>
+                    </Link>
+
+                    {installPrompt.canInstall && (
+                      <button
+                        type="button"
+                        className="header-profile-dropdown-item"
+                        role="menuitem"
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          void installPrompt.install();
+                        }}
+                      >
+                        <i className="bi bi-phone" aria-hidden="true" />
+                        <span>Install App</span>
+                      </button>
+                    )}
 
                     <div className="header-profile-dropdown-divider" />
 

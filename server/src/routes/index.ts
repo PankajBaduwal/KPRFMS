@@ -1,3 +1,4 @@
+import calendarRoutes from './calendar.routes.js';
 import { Router } from 'express';
 import healthRoutes from './health.routes.js';
 import authRoutes from './auth.routes.js';
@@ -75,5 +76,6 @@ router.use('/search', searchRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/documents', documentRoutes);
 router.use('/academic-years', academicYearRoutes);
+router.use('/calendar', calendarRoutes);
 
 export default router;

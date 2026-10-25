@@ -3,7 +3,8 @@ import { sendError } from '../utils/apiResponse.js';
 
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 100 : 5000,
+  // Generous per-IP budget: a whole campus can share one NAT address, and each page makes several calls
+  max: process.env.NODE_ENV === 'production' ? 2000 : 5000,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => {

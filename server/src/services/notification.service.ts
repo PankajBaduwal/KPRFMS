@@ -25,7 +25,10 @@ export const DEFAULT_PREFERENCES: INotificationPreferences = {
   timetableChange: true,
   appraisalCycle: true,
   systemNotification: true,
+  emailNotifications: true,
 };
+
+const PREFERENCE_KEYS = Object.keys(DEFAULT_PREFERENCES) as (keyof INotificationPreferences)[];
 
 function isEventEnabledInPreferences(
   type: string,
@@ -245,6 +248,7 @@ export const notificationService = {
       timetableChange: doc.timetableChange ?? true,
       appraisalCycle: doc.appraisalCycle ?? true,
       systemNotification: doc.systemNotification ?? true,
+      emailNotifications: doc.emailNotifications ?? true,
     };
   },
 
@@ -259,9 +263,15 @@ export const notificationService = {
       throw AppError.badRequest('Invalid user ID.');
     }
 
+    // Only known boolean switches can be changed
+    const clean: Partial<INotificationPreferences> = {};
+    for (const key of PREFERENCE_KEYS) {
+      if (typeof updates?.[key] === 'boolean') clean[key] = updates[key];
+    }
+
     const updated = await NotificationPreference.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
-      { $set: updates },
+      { $set: clean },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     ).lean();
 
@@ -276,6 +286,7 @@ export const notificationService = {
       timetableChange: updated.timetableChange,
       appraisalCycle: updated.appraisalCycle,
       systemNotification: updated.systemNotification,
+      emailNotifications: updated.emailNotifications ?? true,
     };
   },
 

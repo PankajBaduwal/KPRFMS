@@ -14,6 +14,16 @@ const envSchema = z.object({
   CLIENT_URL: z.string().default('http://localhost:5173'),
   // Set when running behind a reverse proxy (nginx / load balancer) so client IPs are correct
   TRUST_PROXY: z.string().optional(),
+  // Public base URL of the API (used in calendar feed links). Defaults to http://localhost:PORT/api
+  PUBLIC_API_URL: z.string().optional(),
+  // Outgoing email. Without SMTP_HOST, emails are written to MAIL_OUTBOX_DIR instead of being sent
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().default('587').transform(Number),
+  SMTP_SECURE: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  MAIL_FROM: z.string().default('KPRIET FMS <no-reply@kpriet.ac.in>'),
+  MAIL_OUTBOX_DIR: z.string().default('mail-outbox'),
 });
 
 const parsed = envSchema.safeParse(process.env);

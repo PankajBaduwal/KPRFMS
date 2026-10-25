@@ -156,4 +156,5 @@ export { NotificationDetailModal } from './NotificationDetailModal';
 export { SaveFeedback } from './SaveFeedback';
 export { DocumentPreviewModal } from './DocumentPreviewModal';
 export { DocumentUploadModal } from './DocumentUploadModal';
-
+export { OrcidImportModal } from './OrcidImportModal';
+export { PasswordChecklist } from './PasswordChecklist';

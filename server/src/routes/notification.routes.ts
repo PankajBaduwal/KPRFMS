@@ -11,6 +11,9 @@ router.use(requireAuth);
 router.get('/preferences', (req, res, next) => notificationController.getPreferences(req, res, next));
 router.put('/preferences', (req, res, next) => notificationController.updatePreferences(req, res, next));
 
+// Live updates (Server-Sent Events)
+router.get('/stream', (req, res) => notificationController.stream(req, res));
+
 // 2. Unread count badge
 router.get('/unread-count', (req, res, next) => notificationController.getUnreadCount(req, res, next));
 

@@ -14,8 +14,12 @@ import { xssClean } from './middleware/xssClean.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { requireAuth } from './middleware/requireAuth.js';
 import routes from './routes/index.js';
+import { registerNotificationDispatch } from './services/notification-dispatch.js';
 
 const app = express();
+
+// Live push + email for every new notification
+registerNotificationDispatch();
 
 if (env.TRUST_PROXY) {
   // e.g. TRUST_PROXY=1 behind one nginx hop; required for correct rate limiting and secure cookies

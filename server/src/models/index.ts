@@ -184,3 +184,4 @@ export {
 } from './SystemMasterItem.js';
 export { InstitutionSettings, type IInstitutionSettings } from './InstitutionSettings.js';
 export { DocumentRecord, type IDocument } from './Document.js';
+export { Session, type ISession } from './Session.js';

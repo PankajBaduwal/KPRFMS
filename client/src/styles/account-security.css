@@ -1,0 +1,228 @@
+/* Account & Security page */
+.security-page {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.security-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.security-card-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 14px;
+}
+
+.security-card-head h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.security-card-head p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.security-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-50);
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+}
+
+.security-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.security-actions a {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.security-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.security-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+/* Two-factor setup */
+.security-setup {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.security-setup-qr img {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  background: #fff;
+}
+
+.security-setup-steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.security-secret {
+  font-size: 0.85rem;
+  background: var(--color-background);
+  padding: 2px 6px;
+  border-radius: 6px;
+  letter-spacing: 0.06em;
+  word-break: break-all;
+}
+
+.security-inline-form {
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.security-recovery {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.security-recovery-grid {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  background: var(--color-background);
+  border-radius: var(--radius-md);
+}
+
+.security-recovery-grid code {
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+}
+
+/* Sessions */
+.security-sessions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.security-sessions li {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.security-sessions li > i {
+  font-size: 1.25rem;
+  color: var(--color-text-secondary);
+}
+
+.security-sessions strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.security-sessions span {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+/* Calendar */
+.security-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.security-link-row {
+  display: flex;
+  gap: 8px;
+}
+
+.security-link-row input {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+@media (max-width: 640px) {
+  .security-card-head {
+    grid-template-columns: auto 1fr;
+  }
+
+  .security-card-head > :last-child:not(div) {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .security-setup {
+    grid-template-columns: 1fr;
+  }
+}

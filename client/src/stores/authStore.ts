@@ -1,13 +1,15 @@
 import { create } from 'zustand';
 import type { User } from '../types';
-import { authService, type LoginCredentials } from '../services/auth.service';
+import { authService, isTwoFactorChallenge, type LoginCredentials, type TwoFactorChallenge } from '../services/auth.service';
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   initAuth: () => Promise<void>;
-  login: (credentials: LoginCredentials) => Promise<User>;
+  /** Resolves with the user, or with a challenge when the account needs an authenticator code. */
+  login: (credentials: LoginCredentials) => Promise<User | TwoFactorChallenge>;
+  loginTwoFactor: (challengeToken: string, code: string) => Promise<User & { recoveryCodesLeft?: number }>;
   logout: () => Promise<void>;
 }
 
@@ -28,13 +30,23 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (credentials: LoginCredentials) => {
     set({ isLoading: true });
     try {
-      const user = await authService.login(credentials);
-      set({ user, isAuthenticated: true, isLoading: false });
-      return user;
+      const result = await authService.login(credentials);
+      if (isTwoFactorChallenge(result)) {
+        set({ isLoading: false });
+      } else {
+        set({ user: result, isAuthenticated: true, isLoading: false });
+      }
+      return result;
     } catch (error) {
       set({ isLoading: false });
       throw error;
     }
+  },
+
+  loginTwoFactor: async (challengeToken: string, code: string) => {
+    const user = await authService.loginTwoFactor(challengeToken, code);
+    set({ user, isAuthenticated: true, isLoading: false });
+    return user;
   },
 
   logout: async () => {

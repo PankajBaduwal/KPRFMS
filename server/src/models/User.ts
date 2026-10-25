@@ -28,6 +28,24 @@ export interface IUser extends Document {
   lockUntil?: Date;
   lastLogin?: Date;
   passwordChangedAt?: Date;
+  /** Set for self-registrations: the address must be confirmed with an emailed code before approval */
+  emailVerificationRequired?: boolean;
+  emailVerifiedAt?: Date;
+  emailVerification?: { codeHash: string; expiresAt: Date; attempts: number };
+  passwordReset?: { tokenHash: string; expiresAt: Date };
+  twoFactor?: {
+    enabled: boolean;
+    /** Encrypted TOTP secret (see utils/totp.ts) */
+    secret?: string;
+    /** Secret being set up, not yet confirmed with a code */
+    pendingSecret?: string;
+    recoveryCodeHashes: string[];
+    /** Last accepted TOTP time step, to block code replay */
+    lastUsedStep?: number;
+    enabledAt?: Date;
+  };
+  /** SHA-256 of the private calendar (iCal) feed token */
+  calendarFeedTokenHash?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -109,12 +127,41 @@ const userSchema = new Schema<IUser>(
     passwordChangedAt: {
       type: Date,
     },
+    emailVerificationRequired: { type: Boolean },
+    emailVerifiedAt: { type: Date },
+    emailVerification: {
+      type: { codeHash: String, expiresAt: Date, attempts: { type: Number, default: 0 } },
+      select: false,
+      _id: false,
+    },
+    passwordReset: {
+      type: { tokenHash: { type: String, index: true }, expiresAt: Date },
+      select: false,
+      _id: false,
+    },
+    twoFactor: {
+      type: {
+        enabled: { type: Boolean, default: false },
+        secret: String,
+        pendingSecret: String,
+        recoveryCodeHashes: { type: [String], default: [] },
+        lastUsedStep: Number,
+        enabledAt: Date,
+      },
+      select: false,
+      _id: false,
+    },
+    calendarFeedTokenHash: { type: String, index: true, sparse: true, select: false },
   },
   {
     timestamps: true,
     toJSON: {
       transform(_doc, ret: Record<string, unknown>) {
         delete ret.passwordHash;
+        delete ret.emailVerification;
+        delete ret.passwordReset;
+        delete ret.twoFactor;
+        delete ret.calendarFeedTokenHash;
         delete ret.__v;
         return ret;
       },

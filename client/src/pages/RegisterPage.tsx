@@ -7,16 +7,9 @@ import { Alert, Input, Select, LoadingState } from '../components';
 import { authService, type RegistrationOptions } from '../services/auth.service';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { ROUTES } from '../constants/routes';
+import { PasswordChecklist } from '../components/PasswordChecklist';
+import { PASSWORD_POLICY } from '../utils/passwordPolicy';
 import '../styles/login.css';
-
-// Mirrors the server-side policy in server/src/validators/auth.validator.ts
-const PASSWORD_RULES = [
-  { label: 'At least 8 characters', test: (v: string) => v.length >= 8 },
-  { label: 'Upper & lower case letters', test: (v: string) => /[a-z]/.test(v) && /[A-Z]/.test(v) },
-  { label: 'At least one number', test: (v: string) => /\d/.test(v) },
-  { label: 'One special character (@$!%*?&)', test: (v: string) => /[@$!%*?&]/.test(v) },
-];
-const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const buildSchema = (emailDomain: string) =>
   z
@@ -54,6 +47,7 @@ type RegisterForm = z.input<ReturnType<typeof buildSchema>>;
 
 const STEPS = [
   { icon: 'bi-pencil-square', title: 'Fill in your details', text: 'Use your official employee ID and college email.' },
+  { icon: 'bi-envelope-check', title: 'Confirm your email', text: 'Enter the 6-digit code we send to your college inbox.' },
   { icon: 'bi-shield-check', title: 'Administrator approval', text: 'Your HOD and the administrator verify you against the staff roll.' },
   { icon: 'bi-person-badge', title: 'Sign in & complete your profile', text: 'Add qualifications and experience for HOD verification.' },
 ];
@@ -62,8 +56,17 @@ export const RegisterPage: React.FC = () => {
   const [options, setOptions] = useState<RegistrationOptions | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState<{ email: string } | null>(null);
+  const [submitted, setSubmitted] = useState<{ email: string; verified: boolean } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [code, setCode] = useState('');
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [resendIn, setResendIn] = useState(0);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const t = setTimeout(() => setResendIn((n) => n - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendIn]);
 
   useEffect(() => {
     authService
@@ -101,7 +104,8 @@ export const RegisterPage: React.FC = () => {
         phone: parsed.phone || undefined,
         password: parsed.password,
       });
-      setSubmitted({ email: result.email });
+      setSubmitted({ email: result.email, verified: result.emailVerificationRequired === false });
+      setResendIn(60);
     } catch (err: any) {
       // Server field errors (duplicate email / employee ID) are shown next to the field
       for (const d of err?.details || []) {
@@ -110,6 +114,22 @@ export const RegisterPage: React.FC = () => {
       }
       setServerError(err?.message || 'Registration failed. Please try again.');
     }
+  });
+
+  const verify = useAsyncAction(async () => {
+    setCodeError(null);
+    try {
+      await authService.verifyEmail(submitted!.email, code);
+      setSubmitted({ email: submitted!.email, verified: true });
+    } catch (err: any) {
+      setCodeError(err?.message || 'That code could not be verified.');
+    }
+  });
+
+  const resend = useAsyncAction(async () => {
+    setCodeError(null);
+    await authService.resendVerification(submitted!.email).catch(() => null);
+    setResendIn(60);
   });
 
   const passwordToggle = (
@@ -226,21 +246,7 @@ export const RegisterPage: React.FC = () => {
               {...register('confirmPassword')}
             />
           </div>
-          <ul className="register-password-rules" aria-label="Password requirements">
-            {PASSWORD_RULES.map((rule) => {
-              const ok = rule.test(password);
-              return (
-                <li key={rule.label} className={ok ? 'is-met' : ''}>
-                  <i className={`bi ${ok ? 'bi-check-circle-fill' : 'bi-circle'}`} aria-hidden="true" />
-                  {rule.label}
-                </li>
-              );
-            })}
-            <li className={confirmPassword && confirmPassword === password ? 'is-met' : ''}>
-              <i className={`bi ${confirmPassword && confirmPassword === password ? 'bi-check-circle-fill' : 'bi-circle'}`} aria-hidden="true" />
-              Passwords match
-            </li>
-          </ul>
+          <PasswordChecklist password={password} confirmPassword={confirmPassword} />
         </fieldset>
 
         <button type="submit" disabled={submit.isPending} className="login-submit-btn">
@@ -257,8 +263,8 @@ export const RegisterPage: React.FC = () => {
           )}
         </button>
         <p className="register-fineprint">
-          <i className="bi bi-info-circle" aria-hidden="true" /> You can sign in after an administrator approves your
-          registration.
+          <i className="bi bi-info-circle" aria-hidden="true" /> We will email a code to confirm your address. You can
+          sign in after an administrator approves your registration.
         </p>
       </form>
     </>
@@ -312,11 +318,15 @@ export const RegisterPage: React.FC = () => {
         {/* Right: form / status */}
         <div className="login-auth-panel register-panel">
           <div className="login-panel-header" style={{ marginBottom: '1.25rem' }}>
-            <h2 className="login-panel-title">{submitted ? 'Registration submitted' : 'Create your account'}</h2>
+            <h2 className="login-panel-title">
+              {!submitted ? 'Create your account' : submitted.verified ? 'Registration submitted' : 'Confirm your email'}
+            </h2>
             <p className="login-panel-desc">
-              {submitted
-                ? 'Your account is waiting for administrator approval.'
-                : 'Faculty of KPRIET only — takes about two minutes.'}
+              {!submitted
+                ? 'Faculty of KPRIET only — takes about two minutes.'
+                : submitted.verified
+                  ? 'Your account is waiting for administrator approval.'
+                  : `We sent a 6-digit code to ${submitted.email}.`}
             </p>
           </div>
 
@@ -335,14 +345,64 @@ export const RegisterPage: React.FC = () => {
             </Alert>
           )}
 
-          {submitted && (
+          {submitted && !submitted.verified && (
+            <form
+              className="register-form"
+              noValidate
+              onSubmit={(e) => {
+                e.preventDefault();
+                verify.run();
+              }}
+            >
+              <Input
+                label="Verification code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                autoFocus
+                maxLength={6}
+                placeholder="123456"
+                prefixIcon={<i className="bi bi-envelope-check" aria-hidden="true" />}
+                hint="The code expires in 15 minutes. Check the spam folder if you can't find it."
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                error={codeError ?? undefined}
+                style={{ letterSpacing: '0.35em', fontWeight: 600 }}
+              />
+              <button type="submit" className="login-submit-btn" disabled={verify.isPending || code.length !== 6}>
+                {verify.isPending ? (
+                  <>
+                    <span className="spinner spinner-sm" aria-hidden="true" />
+                    <span>Checking...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check2-circle" aria-hidden="true" />
+                    <span>Confirm email</span>
+                  </>
+                )}
+              </button>
+              <p className="register-fineprint">
+                Didn&apos;t get it?{' '}
+                <button
+                  type="button"
+                  className="login-forgot-btn"
+                  disabled={resendIn > 0 || resend.isPending}
+                  onClick={() => resend.run()}
+                >
+                  {resendIn > 0 ? `Send a new code in ${resendIn}s` : 'Send a new code'}
+                </button>
+              </p>
+            </form>
+          )}
+
+          {submitted?.verified && (
             <div className="register-success">
               <div className="register-success-icon" aria-hidden="true">
                 <i className="bi bi-hourglass-split" />
               </div>
               <ol className="register-steps">
                 <li className="is-done">
-                  <strong>Registration received</strong>
+                  <strong>Email confirmed</strong>
                   <span>{submitted.email}</span>
                 </li>
                 <li className="is-current">

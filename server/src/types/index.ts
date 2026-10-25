@@ -11,6 +11,8 @@ export interface AuthenticatedUser {
   departmentId?: string;
   status: UserStatus;
   designation?: string;
+  /** Id of the browser session (absent for bearer tokens) */
+  sessionId?: string;
 }
 
 export interface AuthenticatedRequest extends Request {

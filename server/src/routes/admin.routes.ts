@@ -3,6 +3,7 @@ import { requireAuth } from '../middleware/requireAuth.js';
 import { requireRole } from '../middleware/requireRole.js';
 import { ROLES } from '../permissions/roles.js';
 import { adminController } from '../controllers/admin.controller.js';
+import { spreadsheetUpload } from '../middleware/upload.js';
 
 const router = Router();
 
@@ -17,6 +18,8 @@ router.get('/roles', (req, res, next) => adminController.getRoles(req, res, next
 
 // Users Management
 router.get('/users', (req, res, next) => adminController.getUsers(req, res, next));
+router.get('/users/import/template', (req, res, next) => adminController.downloadImportTemplate(req, res, next));
+router.post('/users/import', spreadsheetUpload.single('file'), (req, res, next) => adminController.importUsers(req, res, next));
 router.post('/users', (req, res, next) => adminController.createUser(req, res, next));
 router.get('/users/:id', (req, res, next) => adminController.getUserById(req, res, next));
 router.put('/users/:id', (req, res, next) => adminController.updateUser(req, res, next));
@@ -25,6 +28,7 @@ router.patch('/users/:id/status', (req, res, next) => adminController.toggleUser
 router.post('/users/:id/approve-registration', (req, res, next) => adminController.approveRegistration(req, res, next));
 router.post('/users/:id/reject-registration', (req, res, next) => adminController.rejectRegistration(req, res, next));
 router.post('/users/:id/reset-password', (req, res, next) => adminController.resetPassword(req, res, next));
+router.post('/users/:id/reset-2fa', (req, res, next) => adminController.resetTwoFactor(req, res, next));
 router.delete('/users/:id', (req, res, next) => adminController.deleteUser(req, res, next));
 
 // Departments

@@ -1,3 +1,4 @@
+import { notificationStream, publishUnreadCount } from '../services/notification-dispatch.js';
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types/index.js';
 import { notificationService } from '../services/notification.service.js';
@@ -64,6 +65,7 @@ export class NotificationController {
 
       const id = String(req.params.id);
       const notification = await notificationService.markAsRead(req.user.id, id);
+      void publishUnreadCount(req.user.id);
       sendSuccess(res, notification, 'Notification marked as read.');
     } catch (err) {
       next(err);
@@ -81,6 +83,7 @@ export class NotificationController {
       }
 
       const result = await notificationService.markAllAsRead(req.user.id);
+      void publishUnreadCount(req.user.id);
       sendSuccess(res, result, 'All notifications marked as read.');
     } catch (err) {
       next(err);
@@ -108,6 +111,11 @@ export class NotificationController {
    * PUT /api/v1/notifications/preferences
    * Update current user's notification preferences.
    */
+  /** Keeps a Server-Sent Events stream open; new notifications are pushed as they are created. */
+  stream(req: AuthenticatedRequest, res: Response): void {
+    notificationStream.subscribe(req.user!.id, res, (cb) => req.on('close', cb));
+  }
+
   async updatePreferences(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user?.id) {

@@ -27,6 +27,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       required,
       disabled,
       value,
+      style,
       ...props
     },
     ref
@@ -66,6 +67,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             style={{
               paddingLeft: prefixIcon ? '34px' : undefined,
               paddingRight: onClear || suffixIcon || suffixAction ? '38px' : undefined,
+              ...style,
             }}
             disabled={disabled}
             required={required}

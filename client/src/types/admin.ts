@@ -16,8 +16,26 @@ export interface IAdminUser {
   failedLoginAttempts?: number;
   lockUntil?: string;
   lastLogin?: string;
+  /** Self-registrations must confirm their email before approval */
+  emailVerificationRequired?: boolean;
+  emailVerifiedAt?: string;
+  twoFactorEnabled?: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface IImportRow {
+  row: number;
+  employeeId: string;
+  name: string;
+  email: string;
+  department: string;
+  departmentName?: string;
+  designation: string;
+  phone: string;
+  role: string;
+  errors: string[];
+  created?: boolean;
 }
 
 export interface IAdminDepartment {

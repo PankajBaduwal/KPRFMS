@@ -37,6 +37,9 @@ const testEnv: NodeJS.ProcessEnv = {
   TEST_API_URL,
   PORT: String(TEST_API_PORT),
   NODE_ENV: 'development',
+  // Emails go to a separate outbox folder that phase 60 reads
+  MAIL_OUTBOX_DIR: 'mail-outbox-test',
+  SMTP_HOST: '',
 };
 
 interface SuiteResult {

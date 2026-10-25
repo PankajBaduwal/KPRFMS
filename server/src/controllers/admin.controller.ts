@@ -17,7 +17,48 @@ import {
   institutionSettingsSchema,
 } from '../validators/admin.validator.js';
 
+import { facultyImportService } from '../services/faculty-import.service.js';
+import { twoFactorService } from '../services/two-factor.service.js';
+import { AppError } from '../utils/AppError.js';
+
 export class AdminController {
+  // Bulk faculty import from Excel
+  async downloadImportTemplate(_req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const buffer = await facultyImportService.buildTemplate();
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename="faculty-import-template.xlsx"');
+      res.send(buffer);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async importUsers(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const file = req.file;
+      if (!file) throw AppError.badRequest('Choose an .xlsx or .csv file to upload.');
+      const dryRun = String(req.body?.dryRun ?? 'true') !== 'false';
+      if (dryRun) {
+        sendSuccess(res, await facultyImportService.preview(file.buffer, file.originalname), 'Import preview ready.');
+      } else {
+        const result = await facultyImportService.import(file.buffer, file.originalname, req.user!.id, req);
+        sendSuccess(res, result, `Imported ${result.created} faculty account(s).`);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async resetTwoFactor(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const result = await twoFactorService.adminReset(String(req.params.id), req.user!.id, req);
+      sendSuccess(res, result, result.message);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   // 1. Overview
   async getOverview(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {

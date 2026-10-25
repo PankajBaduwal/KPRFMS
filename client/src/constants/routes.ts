@@ -2,6 +2,8 @@ export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
+  RESET_PASSWORD: '/reset-password',
+  ACCOUNT_SECURITY: '/portal/security',
   PORTAL: '/portal',
   FACULTY_PROFILE: '/portal/profile',
   FACULTY_DIRECTORY: '/portal/directory',

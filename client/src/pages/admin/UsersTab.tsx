@@ -2,8 +2,11 @@
 import { EmptyState } from '../../components/EmptyState';
 import { Pagination } from '../../components/Pagination';
 import { FEATURES } from '../../constants/features';
-import React from 'react';
+import React, { useState } from 'react';
 import type { IAdminDepartment, IAdminOverview, IAdminRole, IAdminUser } from '../../types/admin';
+import { ConfirmationDialog } from '../../components/ConfirmationDialog';
+import { adminService } from '../../services/admin.service';
+import { FacultyImportModal } from './FacultyImportModal';
 
 export interface UsersTabProps {
   departmentsList: IAdminDepartment[];
@@ -32,9 +35,31 @@ export interface UsersTabProps {
   userSubTab: "roles" | "permissions" | "directory";
   userTotalPages: number;
   users: IAdminUser[];
+  /** Reload the user list (after an import or a security reset) */
+  onUsersChanged: () => void;
+  showToast: (message: string) => void;
 }
 
-export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleApproveRegistration, handleDeleteUser, handleRejectRegistration, handleResetPassword, handleToggleUserStatus, overview, pendingRegistrations, rolesList, setEditingUser, setUserDeptFilter, setUserFormData, setUserModalOpen, setUserPage, setUserRoleFilter, setUserSearch, setUserStatusFilter, setUserSubTab, userDeptFilter, userPage, userRoleFilter, userSearch, userStatusFilter, userSubTab, userTotalPages, users }) => {
+export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleApproveRegistration, handleDeleteUser, handleRejectRegistration, handleResetPassword, handleToggleUserStatus, overview, pendingRegistrations, rolesList, setEditingUser, setUserDeptFilter, setUserFormData, setUserModalOpen, setUserPage, setUserRoleFilter, setUserSearch, setUserStatusFilter, setUserSubTab, userDeptFilter, userPage, userRoleFilter, userSearch, userStatusFilter, userSubTab, userTotalPages, users, onUsersChanged, showToast }) => {
+  const [importOpen, setImportOpen] = useState(false);
+  const [resetTarget, setResetTarget] = useState<IAdminUser | null>(null);
+  const [resetting, setResetting] = useState(false);
+
+  const confirmResetTwoFactor = async () => {
+    if (!resetTarget) return;
+    setResetting(true);
+    try {
+      const res = await adminService.resetTwoFactor(resetTarget._id);
+      showToast(res.message);
+      onUsersChanged();
+    } catch (err: any) {
+      showToast(err?.message || 'Could not reset two-factor sign-in.');
+    } finally {
+      setResetting(false);
+      setResetTarget(null);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* Sub Navigation: Directory / Roles / Permissions */}
@@ -179,6 +204,15 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                     </select>
                   </div>
   
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary btn-sm"
+                    onClick={() => setImportOpen(true)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                  >
+                    <i className="bi bi-file-earmark-spreadsheet" /> Import from Excel
+                  </button>
                   <button
                     type="button"
                     className="btn btn-primary btn-sm"
@@ -201,6 +235,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                   >
                     <i className="bi bi-person-plus-fill" /> Add New User
                   </button>
+                  </div>
                 </div>
   
                 {/* Users Table */}
@@ -308,6 +343,17 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                                   >
                                     {u.status === 'PENDING' ? 'PENDING APPROVAL' : u.status}
                                   </span>
+                                  {u.status === 'PENDING' && u.emailVerificationRequired && (
+                                    <div style={{ fontSize: '0.7rem', marginTop: 4, color: u.emailVerifiedAt ? '#15803d' : '#b45309' }}>
+                                      <i className={`bi ${u.emailVerifiedAt ? 'bi-envelope-check' : 'bi-envelope-exclamation'}`} />{' '}
+                                      {u.emailVerifiedAt ? 'Email confirmed' : 'Email not confirmed yet'}
+                                    </div>
+                                  )}
+                                  {u.twoFactorEnabled && (
+                                    <div style={{ fontSize: '0.7rem', marginTop: 4, color: '#1d4ed8' }} title="Two-factor sign-in is on">
+                                      <i className="bi bi-shield-lock-fill" /> 2-step sign-in
+                                    </div>
+                                  )}
                                 </td>
                                 <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
                                   {u.status === 'PENDING' ? (
@@ -315,7 +361,8 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                                     <button
                                       type="button"
                                       className="btn btn-sm btn-success"
-                                      title="Approve registration"
+                                      title={u.emailVerificationRequired && !u.emailVerifiedAt ? 'Waiting for the person to confirm their email' : 'Approve registration'}
+                                      disabled={Boolean(u.emailVerificationRequired && !u.emailVerifiedAt)}
                                       onClick={() => handleApproveRegistration(u)}
                                     >
                                       <i className="bi bi-check-lg" /> Approve
@@ -364,6 +411,16 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                                     >
                                       <i className="bi bi-key-fill" />
                                     </button>
+                                    {u.twoFactorEnabled && (
+                                      <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-warning"
+                                        title="Reset two-factor sign-in (lost phone)"
+                                        onClick={() => setResetTarget(u)}
+                                      >
+                                        <i className="bi bi-shield-x" />
+                                      </button>
+                                    )}
                                     <button
                                       type="button"
                                       className={`btn btn-sm ${u.status === 'ACTIVE' ? 'btn-outline-secondary' : 'btn-outline-success'}`}
@@ -713,6 +770,31 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                 </div>
               </div>
             )}
-          </div>
+            <FacultyImportModal
+        isOpen={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImported={(created) => {
+          if (created > 0) {
+            showToast(`${created} faculty account(s) imported. Each was emailed a link to set their password.`);
+            onUsersChanged();
+          }
+        }}
+      />
+      <ConfirmationDialog
+        isOpen={Boolean(resetTarget)}
+        onClose={() => setResetTarget(null)}
+        onConfirm={confirmResetTwoFactor}
+        loading={resetting}
+        variant="warning"
+        title="Reset two-factor sign-in?"
+        message={
+          <>
+            <strong>{resetTarget?.name}</strong> will sign in with their password only until they set up two-factor
+            sign-in again. Do this only after confirming their identity (for example, a lost phone).
+          </>
+        }
+        confirmLabel="Reset"
+      />
+    </div>
   );
 };

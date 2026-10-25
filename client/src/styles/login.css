@@ -724,3 +724,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Single-card auth pages (reset password) */
+.reset-password-panel {
+  max-width: 480px;
+  margin: 1rem auto;
+}

@@ -65,3 +65,13 @@ export const secureDocumentUpload = multer({
     fileSize: 15 * 1024 * 1024, // 15MB
   },
 });
+
+/** Spreadsheet uploads for bulk import (.xlsx / .csv), kept in memory and never written to disk. */
+export const spreadsheetUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    if (/\.(xlsx|csv)$/i.test(file.originalname)) cb(null, true);
+    else cb(new AppError('Upload an Excel (.xlsx) or .csv file.', 400, 'INVALID_FILE_TYPE'));
+  },
+});

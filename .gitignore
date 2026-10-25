@@ -61,3 +61,6 @@ server/backups/
 
 # Test runner API log
 server/test-api.log
+
+# Development email outbox (emails written instead of sent)
+mail-outbox*/

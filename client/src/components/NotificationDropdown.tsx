@@ -6,6 +6,8 @@ import { ROUTES } from '../constants/routes';
 import { EmptyState } from './EmptyState';
 import { NotificationDetailModal } from './NotificationDetailModal';
 import { getNotificationMeta, formatRelativeTime } from '../utils/notificationTypes';
+import { useNotificationStream } from '../hooks/useNotificationStream';
+import { useToast } from './Toast';
 
 export const NotificationDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,11 +47,25 @@ export const NotificationDropdown: React.FC = () => {
     }
   };
 
+  // New notifications arrive live; while the stream is down, poll as a fallback
+  const { addToast } = useToast();
+  const isOpenRef = useRef(isOpen);
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
+  const { connected } = useNotificationStream({
+    onUnreadCount: setUnreadCount,
+    onNotification: (n) => {
+      addToast(n.title, 'info');
+      if (isOpenRef.current) fetchRecent();
+    },
+  });
+
   useEffect(() => {
     fetchCount();
-    const interval = setInterval(fetchCount, 30000);
+    const interval = setInterval(fetchCount, connected ? 300_000 : 30_000);
     return () => clearInterval(interval);
-  }, []);
+  }, [connected]);
 
   // When dropdown opens or filterMode changes, fetch latest notifications
   useEffect(() => {

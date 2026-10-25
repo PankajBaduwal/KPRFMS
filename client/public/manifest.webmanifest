@@ -1,0 +1,22 @@
+{
+  "name": "KPRIET Faculty Management System",
+  "short_name": "KPRIET FMS",
+  "description": "Faculty records, attendance, leave, research and approvals for KPR Institute of Engineering and Technology.",
+  "id": "/portal",
+  "start_url": "/portal",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F4F6F9",
+  "theme_color": "#1B345F",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Attendance", "url": "/portal/attendance", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Apply for leave", "url": "/portal/leaves", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Notifications", "url": "/portal/notifications", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

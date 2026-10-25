@@ -13,6 +13,7 @@ import type {
   IAdminAuditLog,
   ICreateUserResult,
   IResetPasswordResult,
+  IImportRow,
 } from '../types/admin';
 import type { PaginatedData } from '../types';
 
@@ -81,6 +82,28 @@ export const adminService = {
     data?: { newPassword?: string; temporary?: boolean }
   ): Promise<IResetPasswordResult> {
     const res = await apiClient.post(`${BASE}/users/${id}/reset-password`, data || {});
+    return res.data.data;
+  },
+
+  async downloadImportTemplate(): Promise<Blob> {
+    const res = await apiClient.get(`${BASE}/users/import/template`, { responseType: 'blob' });
+    return res.data as Blob;
+  },
+
+  /** dryRun: validate only. Otherwise creates every valid row and emails each a set-password link. */
+  async importUsers(
+    file: File,
+    dryRun: boolean
+  ): Promise<{ rows: IImportRow[]; valid?: number; invalid?: number; created?: number; emailed?: number; skipped?: number }> {
+    const form = new FormData();
+    form.append('dryRun', String(dryRun));
+    form.append('file', file);
+    const res = await apiClient.post(`${BASE}/users/import`, form, { headers: { 'Content-Type': 'multipart/form-data' } });
+    return res.data.data;
+  },
+
+  async resetTwoFactor(id: string): Promise<{ message: string }> {
+    const res = await apiClient.post(`${BASE}/users/${id}/reset-2fa`);
     return res.data.data;
   },
 

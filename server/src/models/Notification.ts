@@ -93,4 +93,26 @@ const notificationSchema = new Schema<INotification>(
 
 notificationSchema.index({ recipientId: 1, isRead: 1, createdAt: -1 });
 
+// Every notification saved by any module (Notification.create or the service) is handed to the
+// listeners — live push to open browsers and email delivery (see services/notification-dispatch.ts).
+// insertMany (seed scripts) deliberately skips this.
+type NotificationListener = (doc: INotification) => void;
+const listeners: NotificationListener[] = [];
+export function onNotificationCreated(listener: NotificationListener): void {
+  listeners.push(listener);
+}
+notificationSchema.pre('save', function () {
+  this.$locals.wasNew = this.isNew;
+});
+notificationSchema.post('save', function (doc) {
+  if (!doc.$locals.wasNew) return;
+  for (const listener of listeners) {
+    try {
+      listener(doc);
+    } catch {
+      // listeners must never break the workflow that created the notification
+    }
+  }
+});
+
 export const Notification = mongoose.model<INotification>('Notification', notificationSchema);

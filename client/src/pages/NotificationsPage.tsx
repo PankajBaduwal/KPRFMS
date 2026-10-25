@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { LIVE_NOTIFICATION_EVENT } from '../hooks/useNotificationStream';
 import { FEATURES } from '../constants/features';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { notificationService } from '../services/notification.service';
@@ -60,6 +61,7 @@ export const NotificationsPage: React.FC = () => {
     timetableChange: true,
     appraisalCycle: true,
     systemNotification: true,
+    emailNotifications: true,
   });
   const [prefsLoading, setPrefsLoading] = useState<boolean>(false);
   const [prefsLoaded, setPrefsLoaded] = useState<boolean>(false);
@@ -124,6 +126,14 @@ export const NotificationsPage: React.FC = () => {
     } else {
       fetchNotifications();
     }
+  }, [activeTab, fetchNotifications]);
+
+  // A new notification arrived live (see useNotificationStream): refresh the list
+  useEffect(() => {
+    if (activeTab === 'preferences') return;
+    const refresh = () => fetchNotifications();
+    window.addEventListener(LIVE_NOTIFICATION_EVENT, refresh);
+    return () => window.removeEventListener(LIVE_NOTIFICATION_EVENT, refresh);
   }, [activeTab, fetchNotifications]);
 
   const handleTabChange = (tab: 'all' | 'unread' | 'preferences') => {
@@ -235,6 +245,12 @@ export const NotificationsPage: React.FC = () => {
     description: string;
     icon: string;
   }> = [
+    {
+      key: 'emailNotifications',
+      title: 'Email Me Too',
+      description: 'Also send approval requests, approval/return/rejection decisions and leave decisions to my college email.',
+      icon: 'bi-envelope-at',
+    },
     {
       key: 'approvalRequired',
       title: 'Approvals Required',

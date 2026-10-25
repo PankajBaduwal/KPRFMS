@@ -83,3 +83,47 @@ export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type UpdateRoleInput = z.infer<typeof updateRoleSchema>;
 export type UpdateStatusInput = z.infer<typeof updateStatusSchema>;
+
+const strongPassword = z
+  .string()
+  .min(8, 'Password must be at least 8 characters long')
+  .regex(
+    passwordComplexityRegex,
+    'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)'
+  );
+
+export const forgotPasswordSchema = z.object({
+  identifier: z.string().trim().min(3, 'Enter your email or employee ID').max(120),
+});
+
+export const resetPasswordWithTokenSchema = z.object({
+  token: z.string().trim().min(20, 'Reset link is incomplete').max(200),
+  password: strongPassword,
+});
+
+export const verifyEmailSchema = z.object({
+  email: z.string().trim().toLowerCase().email('Enter a valid email address').max(120),
+  code: z.string().trim().regex(/^\d{6}$/, 'Enter the 6-digit code from the email'),
+});
+
+export const resendVerificationSchema = z.object({
+  email: z.string().trim().toLowerCase().email('Enter a valid email address').max(120),
+});
+
+export const twoFactorLoginSchema = z.object({
+  challengeToken: z.string().min(20).max(1000),
+  code: z.string().trim().min(6, 'Enter the 6-digit code').max(20),
+});
+
+export const twoFactorCodeSchema = z.object({
+  code: z.string().trim().regex(/^\d{6}$/, 'Enter the 6-digit code from your authenticator app'),
+});
+
+export const disableTwoFactorSchema = z.object({
+  password: z.string().min(1, 'Enter your password'),
+});
+
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordWithTokenInput = z.infer<typeof resetPasswordWithTokenSchema>;
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+export type TwoFactorLoginInput = z.infer<typeof twoFactorLoginSchema>;

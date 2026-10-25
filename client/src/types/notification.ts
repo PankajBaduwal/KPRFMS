@@ -49,6 +49,8 @@ export interface NotificationPreferences {
   timetableChange: boolean;
   appraisalCycle: boolean;
   systemNotification: boolean;
+  /** Also email decisions and approval requests */
+  emailNotifications: boolean;
 }
 
 export interface NotificationQueryFilters {

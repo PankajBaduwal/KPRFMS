@@ -16,6 +16,7 @@ import {
   FilterBar,
   ConfirmationDialog,
   PublicationModal,
+  OrcidImportModal,
   ReviewPublicationModal,
   ErrorState,
   useToast,
@@ -69,6 +70,8 @@ export const PublicationsPage: React.FC = () => {
   // Modals state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPub, setEditingPub] = useState<Publication | null>(null);
+  const [orcidOpen, setOrcidOpen] = useState(false);
+  const [prefillDoi, setPrefillDoi] = useState<string | undefined>(undefined);
   const [reviewingPub, setReviewingPub] = useState<Publication | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -471,17 +474,28 @@ export const PublicationsPage: React.FC = () => {
         subtitle="Institutional scholarly publications repository and accreditation metrics for KPRIET"
         badge={<Badge variant="primary" dot size="md">{hasLoadedList ? totalCount : '…'} Publications</Badge>}
         actions={
-          <Button
-            variant="primary"
-            size="sm"
-            icon={<i className="bi bi-plus-lg" />}
-            onClick={() => {
-              setEditingPub(null);
-              setIsModalOpen(true);
-            }}
-          >
-            Add Publication
-          </Button>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<i className="bi bi-person-badge" />}
+              onClick={() => setOrcidOpen(true)}
+            >
+              Import from ORCID
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              icon={<i className="bi bi-plus-lg" />}
+              onClick={() => {
+                setEditingPub(null);
+                setPrefillDoi(undefined);
+                setIsModalOpen(true);
+              }}
+            >
+              Add Publication
+            </Button>
+          </div>
         }
       />
 
@@ -746,11 +760,24 @@ export const PublicationsPage: React.FC = () => {
         onClose={() => {
           setIsModalOpen(false);
           setEditingPub(null);
+          setPrefillDoi(undefined);
         }}
         publication={editingPub}
+        prefillDoi={prefillDoi}
         onSuccess={() => {
           fetchPublications();
           fetchAnalytics();
+        }}
+      />
+
+      <OrcidImportModal
+        isOpen={orcidOpen}
+        onClose={() => setOrcidOpen(false)}
+        onPick={(doi) => {
+          setOrcidOpen(false);
+          setEditingPub(null);
+          setPrefillDoi(doi);
+          setIsModalOpen(true);
         }}
       />
 

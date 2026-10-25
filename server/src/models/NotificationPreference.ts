@@ -12,6 +12,8 @@ export interface INotificationPreference extends Document {
   timetableChange: boolean;
   appraisalCycle: boolean;
   systemNotification: boolean;
+  /** Also email decisions and approval requests (see services/notification-dispatch.ts) */
+  emailNotifications: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -62,6 +64,10 @@ const notificationPreferenceSchema = new Schema<INotificationPreference>(
       default: true,
     },
     systemNotification: {
+      type: Boolean,
+      default: true,
+    },
+    emailNotifications: {
       type: Boolean,
       default: true,
     },

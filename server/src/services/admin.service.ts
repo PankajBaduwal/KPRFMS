@@ -1,3 +1,5 @@
+import { sessionService } from './session.service.js';
+import { mailService } from './mail.service.js';
 import { Types } from 'mongoose';
 import { Request } from 'express';
 import {
@@ -170,8 +172,15 @@ export class AdminService {
       User.countDocuments(filter),
     ]);
 
+    // Security flags for the admin list (the secrets themselves are never selected)
+    const withTwoFactor = new Set(
+      (await User.find({ _id: { $in: users.map((u) => u._id) }, 'twoFactor.enabled': true }).select('_id').lean()).map((u) =>
+        String(u._id)
+      )
+    );
+
     return {
-      data: users,
+      data: users.map((u) => ({ ...u, twoFactorEnabled: withTwoFactor.has(String(u._id)) })),
       pagination: {
         page,
         limit,
@@ -370,6 +379,11 @@ export class AdminService {
     if (user.status !== USER_STATUS.PENDING) {
       throw AppError.badRequest('Only pending registrations can be approved.');
     }
+    if (user.emailVerificationRequired && !user.emailVerifiedAt) {
+      throw AppError.badRequest(
+        'This person has not confirmed their email address yet. Ask them to enter the code sent to their college email.'
+      );
+    }
 
     user.status = USER_STATUS.ACTIVE;
     await user.save();
@@ -390,8 +404,9 @@ export class AdminService {
     await Notification.create({
       recipientId: user._id,
       senderId: new Types.ObjectId(adminId),
+      // Also emailed by the notification dispatcher (APPROVED type)
       title: 'Welcome! Your registration was approved',
-      message: 'Complete your faculty profile — qualifications, experience and contact details — for HOD verification.',
+      message: 'You can now sign in with your college email or employee ID. Complete your faculty profile — qualifications, experience and contact details — for HOD verification.',
       type: 'APPROVED',
       actionUrl: '/portal/profile',
     });
@@ -421,6 +436,17 @@ export class AdminService {
       req,
       reason,
       details: { adminId, registrationRejected: true, targetEmployeeId: user.employeeId, email: user.email },
+    });
+
+    mailService.queue({
+      to: user.email,
+      subject: 'Your KPRIET FMS registration was not approved',
+      lines: [
+        `Dear ${user.name},`,
+        'Your registration on the KPRIET Faculty Management System was not approved.',
+        ...(reason ? [`Reason: ${reason}`] : []),
+        'If you think this is a mistake, contact the institution administrator.',
+      ],
     });
 
     return { message: `Registration for ${user.name} (${user.email}) was rejected.` };
@@ -479,6 +505,7 @@ export class AdminService {
     // Sign the user out everywhere (e.g. a compromised account)
     markPasswordChanged(user);
     await user.save();
+    await sessionService.revokeAllForUser(user._id);
 
     await recordAudit({
       userId: user._id,

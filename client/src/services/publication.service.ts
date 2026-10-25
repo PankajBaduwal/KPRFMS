@@ -7,7 +7,45 @@ import type {
   PublicationVerificationStatus,
 } from '../types/publication';
 
+export interface DoiLookupResult {
+  doi: string;
+  title: string;
+  publicationType: string;
+  journalOrConference: string;
+  publisher?: string;
+  issn?: string;
+  url?: string;
+  publicationDate?: string;
+  volume?: string;
+  issue?: string;
+  pages?: string;
+  citationCount: number;
+  authors: string[];
+  numberOfAuthors: number;
+  suggestedAuthorPosition?: string;
+  coAuthors: string[];
+}
+
+export interface OrcidWork {
+  title: string;
+  type?: string;
+  year?: string;
+  journal?: string;
+  doi: string | null;
+  alreadyAdded: boolean;
+}
+
 export const publicationService = {
+  /** Publication details from Crossref by DOI. */
+  async lookupDoi(doi: string): Promise<DoiLookupResult> {
+    return (await apiGet<DoiLookupResult>(`/publications/lookup/doi?doi=${encodeURIComponent(doi)}`)).data;
+  },
+
+  /** Works listed on a public ORCID record. */
+  async lookupOrcid(orcid: string): Promise<{ orcid: string; works: OrcidWork[] }> {
+    return (await apiGet<{ orcid: string; works: OrcidWork[] }>(`/publications/lookup/orcid?orcid=${encodeURIComponent(orcid)}`)).data;
+  },
+
   async getPublications(filters?: PublicationFilters): Promise<PublicationListResponse> {
     const params = new URLSearchParams();
     if (filters) {

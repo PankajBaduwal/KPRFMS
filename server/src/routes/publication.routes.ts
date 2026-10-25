@@ -12,6 +12,10 @@ router.get('/analytics', requireAuth, (req, res, next) =>
   publicationController.getAnalytics(req, res, next)
 );
 
+// Auto-fill from Crossref (DOI) or a public ORCID record
+router.get('/lookup/doi', requireAuth, (req, res, next) => publicationController.lookupDoi(req, res, next));
+router.get('/lookup/orcid', requireAuth, (req, res, next) => publicationController.lookupOrcid(req, res, next));
+
 // Publication PDF upload
 router.post(
   '/upload-pdf',

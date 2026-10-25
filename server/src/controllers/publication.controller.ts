@@ -1,3 +1,4 @@
+import { publicationLookupService } from '../services/publication-lookup.service.js';
 import { Response, NextFunction } from 'express';
 import { publicationService } from '../services/publication.service.js';
 import { sendSuccess } from '../utils/apiResponse.js';
@@ -13,6 +14,24 @@ import { recordAudit } from '../audit/auditLogger.js';
 import { AUDIT_ACTIONS } from '../models/AuditLog.js';
 
 export class PublicationController {
+  async lookupDoi(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const result = await publicationLookupService.byDoi(String(req.query.doi ?? ''), req.user!.name);
+      sendSuccess(res, result, 'Publication details found.');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async lookupOrcid(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const result = await publicationLookupService.byOrcid(String(req.query.orcid ?? ''), req.user!.id);
+      sendSuccess(res, result, `${result.works.length} work(s) found on ORCID.`);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async create(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const validated = publicationSchema.parse(req.body);
