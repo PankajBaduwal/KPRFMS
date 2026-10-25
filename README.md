@@ -141,15 +141,51 @@ From the project root:
 | `npm run dev:server` / `npm run dev:client` | Start API / web app in watch mode |
 | `npm run build` | Type-check and build server (`server/dist`) and client (`client/dist`) |
 | `npm start` | Run the built API (`node server/dist/server.js`) |
-| `npm test` | Run every backend test suite and print a pass/fail summary |
+| `npm test` | Run every backend test suite against an isolated test database |
 | `npm run seed` | Create / refresh development seed data |
+| `npm run backup` | Back up the database + uploaded files to `server/backups/<timestamp>/` |
 | `npm run lint:server` / `npm run lint:client` | Type-check server / lint client |
 
 Run only some suites with `npm test -- 2 3 54` (phase numbers).
 
 ### Tests
 
-The backend suites live in `server/src/scripts/test-phase*.ts`. They run against the local MongoDB from `server/.env`, and several also call the live API — **start `npm run dev:server` before `npm test`**. They refuse to run against production or a remote database (see below).
+The backend suites live in `server/src/scripts/test-phase*.ts`. `npm test` never touches your development database: it resets a separate `kpriet-fms-test` database (override with `TEST_MONGODB_URI`), seeds it with the base + sample data, starts a private API on port 5099 (`TEST_API_PORT`), runs the suites and stops the API. No dev server needs to be running. CI runs the same on every push (`.github/workflows/ci.yml`).
+
+---
+
+## Deployment
+
+A production-style stack (MongoDB + API + nginx serving the web app) is defined in `docker-compose.yml`:
+
+```bash
+cp .env.production.example .env.production   # fill in JWT_SECRET, COOKIE_SECRET, CLIENT_URL
+docker compose --env-file .env.production up -d --build
+```
+
+- The app is served on port `8080` (`WEB_PORT`); nginx proxies `/api` and `/uploads` to the API, so the browser talks to a single origin.
+- **Put HTTPS in front** (institutional reverse proxy / load balancer) — production cookies are `Secure`. `TRUST_PROXY=1` is set so rate limiting sees real client IPs.
+- Data lives in Docker volumes: `mongo-data` (database), `uploads` and `documents` (uploaded files and the secure document vault).
+- Sessions expire after `JWT_EXPIRES_IN` of inactivity (default `12h`); active users are renewed automatically.
+
+### Backups
+
+```bash
+npm run backup                                # -> server/backups/<timestamp>/
+BACKUP_DIR=D:\fms-backups BACKUP_KEEP=30 npm run backup
+npm run restore -- server/backups/<timestamp> --yes        # replaces DB + files
+```
+
+Backups contain every collection (type-preserving, gzipped) plus `uploads/` and `storage/`, and the newest 14 are kept by default. No extra tools are needed. **Schedule it daily** (Windows Task Scheduler or cron) and copy the backup folder to another machine or cloud storage — a backup on the same disk does not survive a disk failure.
+
+With the Docker stack, back up the database with the `mongodump` built into the MongoDB image, and the file volumes with `tar`:
+
+```bash
+docker compose exec -T mongo mongodump --db kpriet-fms --archive --gzip > fms-db-$(date +%F).archive.gz
+docker run --rm -v kpriet-fms_uploads:/u -v kpriet-fms_documents:/d -v "$PWD":/out alpine \
+  tar czf /out/fms-files-$(date +%F).tgz -C / u d
+# restore the database: docker compose exec -T mongo mongorestore --archive --gzip --drop < fms-db-<date>.archive.gz
+```
 
 ---
 

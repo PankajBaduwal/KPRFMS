@@ -8,9 +8,12 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
   JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
-  JWT_EXPIRES_IN: z.string().default('7d'),
+  // Idle session lifetime; active sessions are renewed automatically (see refreshSessionIfStale)
+  JWT_EXPIRES_IN: z.string().default('12h'),
   COOKIE_SECRET: z.string().min(1, 'COOKIE_SECRET is required'),
   CLIENT_URL: z.string().default('http://localhost:5173'),
+  // Set when running behind a reverse proxy (nginx / load balancer) so client IPs are correct
+  TRUST_PROXY: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

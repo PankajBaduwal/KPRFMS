@@ -1,5 +1,5 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
-import { CookieOptions } from 'express';
+import { CookieOptions, Response } from 'express';
 import { env } from '../config/env.js';
 import { Role } from '../permissions/roles.js';
 
@@ -12,15 +12,25 @@ export interface JwtPayload {
   departmentId?: string;
 }
 
+const UNIT_MS: Record<string, number> = { s: 1000, m: 60_000, h: 3_600_000, d: 86_400_000 };
+
+/** Session lifetime in ms, parsed from JWT_EXPIRES_IN ("12h", "30m", "7d" or seconds). */
+export function getSessionLifetimeMs(): number {
+  const raw = String(env.JWT_EXPIRES_IN).trim();
+  const match = raw.match(/^(\d+)\s*([smhd])?$/i);
+  if (!match) return 12 * UNIT_MS.h;
+  return Number(match[1]) * (match[2] ? UNIT_MS[match[2].toLowerCase()] : 1000);
+}
+
 export function generateToken(payload: JwtPayload): string {
   const options: SignOptions = {
-    expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
+    expiresIn: Math.floor(getSessionLifetimeMs() / 1000),
   };
   return jwt.sign(payload, env.JWT_SECRET, options);
 }
 
-export function verifyToken(token: string): JwtPayload & { iat?: number } {
-  return jwt.verify(token, env.JWT_SECRET) as JwtPayload & { iat?: number };
+export function verifyToken(token: string): JwtPayload & { iat?: number; exp?: number } {
+  return jwt.verify(token, env.JWT_SECRET) as JwtPayload & { iat?: number; exp?: number };
 }
 
 export function getAuthCookieOptions(): CookieOptions {
@@ -29,7 +39,19 @@ export function getAuthCookieOptions(): CookieOptions {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? 'strict' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+    maxAge: getSessionLifetimeMs(),
     path: '/',
   };
+}
+
+/**
+ * Sliding session: once more than half of a token's lifetime has passed, issue a fresh one.
+ * Active users stay signed in; idle sessions expire after JWT_EXPIRES_IN.
+ */
+export function refreshSessionIfStale(res: Response, payload: JwtPayload & { iat?: number }): void {
+  if (!payload.iat) return;
+  const ageMs = Date.now() - payload.iat * 1000;
+  if (ageMs < getSessionLifetimeMs() / 2) return;
+  const { id, email, role, departmentId } = payload;
+  res.cookie(AUTH_COOKIE_NAME, generateToken({ id, email, role, departmentId }), getAuthCookieOptions());
 }

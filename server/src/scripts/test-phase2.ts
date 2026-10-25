@@ -5,7 +5,7 @@ import { Department } from '../models/Department.js';
 import { AuditLog } from '../models/AuditLog.js';
 import { connectDatabase, disconnectDatabase } from '../config/database.js';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.TEST_API_URL || 'http://localhost:5000/api';
 const TEST_CSRF_TOKEN = 'phase-test-csrf-token';
 axios.defaults.headers.common['x-csrf-token'] = TEST_CSRF_TOKEN;
 

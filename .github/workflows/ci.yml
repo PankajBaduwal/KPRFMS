@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  client:
+    name: Web app — type-check, lint, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - run: npm run build # tsc -b && vite build
+      - run: npx oxlint 
+
+  server:
+    name: API — type-check, build, test suites
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok'"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      NODE_ENV: development
+      MONGODB_URI: mongodb://localhost:27017/kpriet-fms
+      TEST_MONGODB_URI: mongodb://localhost:27017/kpriet-fms-test
+      JWT_SECRET: ci-only-jwt-secret-not-used-anywhere-else-000000
+      COOKIE_SECRET: ci-only-cookie-secret-not-used-anywhere-else-00
+      CLIENT_URL: http://localhost:5173
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run build
+      # Seeds an isolated test database, starts a private API and runs every suite
+      - run: npm test
+
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t kpriet-fms-server ./server
+      - run: docker build -t kpriet-fms-web ./client

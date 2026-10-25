@@ -24,7 +24,7 @@ import {
 } from '../models/index.js';
 import { recordAudit } from '../audit/auditLogger.js';
 import { hashPassword, comparePassword } from '../utils/password.js';
-import { generateToken, verifyToken, getAuthCookieOptions, AUTH_COOKIE_NAME } from '../utils/jwt.js';
+import { generateToken, verifyToken, getAuthCookieOptions, getSessionLifetimeMs, AUTH_COOKIE_NAME } from '../utils/jwt.js';
 import { sanitizeMongoInput } from '../middleware/mongoSanitize.js';
 import { sanitizeXssString, sanitizeXssInput } from '../middleware/xssClean.js';
 import { generateCsrfToken } from '../middleware/csrf.js';
@@ -152,7 +152,7 @@ async function runPhase30SecurityAudit() {
     const cookieOpts = getAuthCookieOptions();
     assert(cookieOpts.httpOnly === true, 'Auth cookie has httpOnly: true (prevents XSS theft)');
     assert(cookieOpts.path === '/', 'Auth cookie path is scoped to /');
-    assert(cookieOpts.maxAge === 7 * 24 * 60 * 60 * 1000, 'Session maxAge is strictly configured (7 days)');
+    assert(cookieOpts.maxAge === getSessionLifetimeMs() && cookieOpts.maxAge <= 24 * 60 * 60 * 1000, 'Session cookie lifetime matches JWT_EXPIRES_IN and is at most 24h');
 
     // Token creation and verification
     const token = generateToken({

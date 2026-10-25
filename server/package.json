@@ -12,6 +12,8 @@
     "test": "tsx src/scripts/run-tests.ts",
     "seed:clean": "tsx src/scripts/seed-clean.ts",
     "seed:sample": "tsx src/scripts/seed-sample.ts",
+    "backup": "tsx src/scripts/backup.ts",
+    "restore": "tsx src/scripts/restore.ts",
     "seed:reset": "tsx src/scripts/seed.ts --reset-legacy"
   },
   "keywords": [],
@@ -37,6 +39,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.3.0",
     "@types/node": "^26.6.4",
+    "axios": "^1.13.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }

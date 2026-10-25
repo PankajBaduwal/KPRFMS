@@ -1,0 +1,74 @@
+/**
+ * Restore a backup created by `npm run backup`.
+ *
+ *   npm run restore -- backups/2026-10-25T12-00-00-000Z --yes [--db-only]
+ *
+ * REPLACES every collection in the backup and the uploads/storage folders. Without --yes it
+ * only prints what would be restored. Target database = MONGODB_URI.
+ */
+import fs from 'fs';
+import path from 'path';
+import zlib from 'zlib';
+import readline from 'readline';
+import mongoose from 'mongoose';
+import { connectDatabase, disconnectDatabase } from '../config/database.js';
+import { logger } from '../utils/logger.js';
+
+const { EJSON } = mongoose.mongo.BSON;
+
+async function main() {
+  const [folderArg, ...flags] = process.argv.slice(2);
+  if (!folderArg) throw new Error('Usage: npm run restore -- <backup folder> [--yes]');
+  const folder = path.resolve(folderArg);
+  const manifestPath = path.join(folder, 'manifest.json');
+  if (!fs.existsSync(manifestPath)) throw new Error(`${folder} is not a backup (manifest.json missing)`);
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const confirmed = flags.includes('--yes');
+
+  logger.info(`Backup from ${manifest.createdAt} (database "${manifest.database}"): ${Object.keys(manifest.collections).length} collections`);
+  if (!confirmed) {
+    logger.info('Dry run. Re-run with --yes to REPLACE the current data with this backup.');
+    return;
+  }
+
+  await connectDatabase();
+  const db = mongoose.connection.db!;
+  for (const name of Object.keys(manifest.collections)) {
+    const file = path.join(folder, 'db', `${name}.ejson.gz`);
+    if (!fs.existsSync(file)) continue;
+    await db.collection(name).deleteMany({});
+    const rl = readline.createInterface({ input: fs.createReadStream(file).pipe(zlib.createGunzip()), crlfDelay: Infinity });
+    let batch: any[] = [];
+    let count = 0;
+    for await (const line of rl) {
+      if (!line.trim()) continue;
+      batch.push(EJSON.parse(line, { relaxed: false }));
+      if (batch.length === 1000) {
+        await db.collection(name).insertMany(batch, { ordered: false });
+        count += batch.length;
+        batch = [];
+      }
+    }
+    if (batch.length) {
+      await db.collection(name).insertMany(batch, { ordered: false });
+      count += batch.length;
+    }
+    logger.info(`  ${name}: ${count} documents`);
+  }
+  await disconnectDatabase();
+
+  for (const dir of flags.includes('--db-only') ? [] : manifest.fileDirs || []) {
+    const src = path.join(folder, 'files', dir);
+    if (!fs.existsSync(src)) continue;
+    const dest = path.join(process.cwd(), dir);
+    fs.rmSync(dest, { recursive: true, force: true });
+    fs.cpSync(src, dest, { recursive: true });
+  }
+  logger.info('Restore complete. Restart the API server.');
+}
+
+main().catch(async (err) => {
+  logger.error('Restore failed:', err instanceof Error ? err.message : err);
+  await disconnectDatabase().catch(() => undefined);
+  process.exit(1);
+});

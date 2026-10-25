@@ -1,12 +1,12 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types/index.js';
 import { AppError } from '../utils/AppError.js';
-import { verifyToken, AUTH_COOKIE_NAME } from '../utils/jwt.js';
+import { verifyToken, AUTH_COOKIE_NAME, refreshSessionIfStale } from '../utils/jwt.js';
 import { User, USER_STATUS } from '../models/User.js';
 
 export async function requireAuth(
   req: AuthenticatedRequest,
-  _res: Response,
+  res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
@@ -51,6 +51,17 @@ export async function requireAuth(
       status: user.status,
       designation: user.designation,
     };
+
+    // Cookie sessions slide forward while the user is active (bearer tokens are left as issued)
+    if (req.cookies?.[AUTH_COOKIE_NAME] && payload.iat) {
+      refreshSessionIfStale(res, {
+        id: req.user.id,
+        email: user.email,
+        role: user.role,
+        departmentId: req.user.departmentId,
+        iat: payload.iat,
+      });
+    }
 
     next();
   } catch (error) {

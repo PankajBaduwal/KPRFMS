@@ -24,7 +24,7 @@ export function setCsrfCookie(res: Response, token: string): void {
     secure: isProd,
     sameSite: isProd ? 'strict' : 'lax',
     path: '/',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 30 * 24 * 60 * 60 * 1000, // CSRF token outlives sessions; it is not a credential
   });
 }
 

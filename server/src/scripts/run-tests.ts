@@ -1,18 +1,23 @@
 /**
- * Runs every src/scripts/test-phase*.ts suite in sequence and prints one summary.
+ * Runs every src/scripts/test-phase*.ts suite against an ISOLATED test database.
  *
  *   npm test                 # all suites
  *   npm test -- 2 3 54       # only phases 2, 3 and 54
  *
- * Suites run against the local MongoDB from .env; a few also call the live API,
- * so start the dev server (npm run dev) first.
+ * Each run: drops the test database (default mongodb://localhost:27017/kpriet-fms-test,
+ * override with TEST_MONGODB_URI), seeds it with the base + full sample data, starts a
+ * private API server on TEST_API_PORT (default 5099) connected to it, runs the suites, and
+ * stops the server. Your development database is never touched.
  */
-import { spawn } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import mongoose from 'mongoose';
 
 const SCRIPTS_DIR = path.resolve(process.cwd(), 'src', 'scripts');
-const API_HEALTH_URL = 'http://localhost:5000/api/health';
+const TEST_DB_URI = process.env.TEST_MONGODB_URI || 'mongodb://localhost:27017/kpriet-fms-test';
+const TEST_API_PORT = Number(process.env.TEST_API_PORT || 5099);
+const TEST_API_URL = `http://localhost:${TEST_API_PORT}/api`;
 const SUITE_TIMEOUT_MS = 180_000;
 
 // Suites report results in a few different formats; any of these means a failure
@@ -25,6 +30,15 @@ const FAILURE_PATTERNS = [
   /FAILED:\s*[1-9]/,
 ];
 
+// Every child process gets the test database; the API URL points at the private test server
+const testEnv: NodeJS.ProcessEnv = {
+  ...process.env,
+  MONGODB_URI: TEST_DB_URI,
+  TEST_API_URL,
+  PORT: String(TEST_API_PORT),
+  NODE_ENV: 'development',
+};
+
 interface SuiteResult {
   name: string;
   ok: boolean;
@@ -32,9 +46,7 @@ interface SuiteResult {
   durationMs: number;
 }
 
-function phaseNumber(file: string): number {
-  return Number(/test-phase(\d+)/.exec(file)?.[1] ?? 0);
-}
+const phaseNumber = (file: string) => Number(/test-phase(\d+)/.exec(file)?.[1] ?? 0);
 
 function discoverSuites(filter: string[]): string[] {
   return fs
@@ -44,30 +56,64 @@ function discoverSuites(filter: string[]): string[] {
     .sort((a, b) => phaseNumber(a) - phaseNumber(b) || a.localeCompare(b));
 }
 
-function runSuite(file: string): Promise<SuiteResult> {
-  const started = Date.now();
+function runTsx(script: string, timeoutMs = SUITE_TIMEOUT_MS): Promise<{ code: number | null; output: string }> {
   return new Promise((resolve) => {
-    const child = spawn('npx', ['tsx', path.join('src', 'scripts', file)], {
-      cwd: process.cwd(),
-      shell: process.platform === 'win32',
-      env: process.env,
-    });
+    const child = spawn('npx', ['tsx', script], { cwd: process.cwd(), shell: process.platform === 'win32', env: testEnv });
     let output = '';
     child.stdout.on('data', (d) => (output += d));
     child.stderr.on('data', (d) => (output += d));
-
-    const timer = setTimeout(() => child.kill(), SUITE_TIMEOUT_MS);
+    const timer = setTimeout(() => child.kill(), timeoutMs);
     child.on('close', (code) => {
       clearTimeout(timer);
-      const durationMs = Date.now() - started;
-      const failedLine = output.split('\n').find((line) => FAILURE_PATTERNS.some((p) => p.test(line)));
-      if (code !== 0 || failedLine) {
-        resolve({ name: file, ok: false, reason: failedLine?.trim() || `exit code ${code}`, durationMs });
-      } else {
-        resolve({ name: file, ok: true, durationMs });
-      }
+      resolve({ code, output });
     });
   });
+}
+
+async function prepareDatabase() {
+  if (!/test/i.test(new URL(TEST_DB_URI.replace(/^mongodb(\+srv)?:\/\//, 'http://')).pathname)) {
+    throw new Error(`Refusing to reset "${TEST_DB_URI}": the test database name must contain "test".`);
+  }
+  await mongoose.connect(TEST_DB_URI);
+  await mongoose.connection.dropDatabase();
+  await mongoose.disconnect();
+  for (const script of ['src/scripts/seed.ts', 'src/scripts/seed-sample.ts']) {
+    const { code, output } = await runTsx(script, 300_000);
+    if (code !== 0) throw new Error(`${script} failed:\n${output.slice(-2000)}`);
+  }
+}
+
+const API_LOG = path.resolve(process.cwd(), 'test-api.log');
+let apiExited: string | null = null;
+
+async function startTestApi(): Promise<ChildProcess> {
+  const child = spawn('npx', ['tsx', 'src/server.ts'], { cwd: process.cwd(), shell: process.platform === 'win32', env: testEnv });
+  let log = '';
+  const logFile = fs.createWriteStream(API_LOG);
+  child.stdout?.on('data', (d) => { log += d; logFile.write(d); });
+  child.stderr?.on('data', (d) => { log += d; logFile.write(d); });
+  child.on('exit', (code) => {
+    apiExited = `Test API exited unexpectedly (code ${code}). Last log lines:\n${log.split('\n').slice(-15).join('\n')}`;
+  });
+  for (let i = 0; i < 60; i++) {
+    try {
+      const res = await fetch(`${TEST_API_URL}/health`);
+      const body = (await res.json()) as { message?: string };
+      if (body.message?.includes('KPRIET')) return child;
+      throw new Error(`Port ${TEST_API_PORT} is used by another application (set TEST_API_PORT).`);
+    } catch (err) {
+      if (err instanceof Error && err.message.startsWith('Port')) throw err;
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  }
+  child.kill();
+  throw new Error(`Test API did not start on port ${TEST_API_PORT}:\n${log.slice(-1500)}`);
+}
+
+function stopProcessTree(child: ChildProcess) {
+  if (!child.pid) return;
+  if (process.platform === 'win32') spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { shell: true });
+  else child.kill('SIGTERM');
 }
 
 async function main() {
@@ -78,29 +124,43 @@ async function main() {
     process.exit(1);
   }
 
-  try {
-    await fetch(API_HEALTH_URL);
-  } catch {
-    console.warn(`⚠ API not reachable at ${API_HEALTH_URL} — suites that call the live API will fail.`);
-    console.warn('  Start it first with: npm run dev\n');
-  }
+  console.log(`Preparing isolated test database ${TEST_DB_URI} ...`);
+  await prepareDatabase();
+  console.log(`Starting test API on port ${TEST_API_PORT} ...\n`);
+  const api = await startTestApi();
 
   const results: SuiteResult[] = [];
-  for (const suite of suites) {
-    process.stdout.write(`▶ ${suite.padEnd(24)} `);
-    const result = await runSuite(suite);
-    results.push(result);
-    const secs = (result.durationMs / 1000).toFixed(1);
-    console.log(result.ok ? `✓ passed (${secs}s)` : `✗ FAILED (${secs}s)\n    ${result.reason}`);
+  try {
+    for (const suite of suites) {
+      process.stdout.write(`▶ ${suite.padEnd(24)} `);
+      const started = Date.now();
+      const { code, output } = await runTsx(path.join('src', 'scripts', suite));
+      const durationMs = Date.now() - started;
+      const failedLine = output.split('\n').find((line) => FAILURE_PATTERNS.some((p) => p.test(line)));
+      const ok = code === 0 && !failedLine;
+      results.push({ name: suite, ok, reason: failedLine?.trim() || (ok ? undefined : `exit code ${code}`), durationMs });
+      const secs = (durationMs / 1000).toFixed(1);
+      console.log(ok ? `✓ passed (${secs}s)` : `✗ FAILED (${secs}s)\n    ${results[results.length - 1].reason}`);
+      if (apiExited) {
+        console.log(`\n${apiExited}\n(full log: ${API_LOG})`);
+        break;
+      }
+    }
+  } finally {
+    apiExited = apiExited ?? 'stopped';
+    stopProcessTree(api);
   }
 
   const failed = results.filter((r) => !r.ok);
-  console.log(`\n${results.length - failed.length}/${results.length} suites passed.`);
+  console.log(`\n${results.length - failed.length}/${results.length} suites passed (test database: ${TEST_DB_URI}).`);
   if (failed.length > 0) {
     console.log(`Failed: ${failed.map((r) => r.name).join(', ')}`);
-    console.log('Re-run one with: npx tsx src/scripts/<suite> for full output.');
+    console.log(`Re-run one with: MONGODB_URI=${TEST_DB_URI} TEST_API_URL=${TEST_API_URL} npx tsx src/scripts/<suite>`);
     process.exit(1);
   }
 }
 
-void main();
+main().catch((err) => {
+  console.error(err instanceof Error ? err.message : err);
+  process.exit(1);
+});

@@ -22,7 +22,7 @@ import { ROLES } from '../permissions/roles.js';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = process.env.TEST_API_URL || 'http://localhost:5000/api';
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/kpriet-fms';
 
 let passed = 0;

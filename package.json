@@ -14,7 +14,8 @@
     "lint:client": "npm --prefix client run lint",
     "test": "npm --prefix server test",
     "seed": "npm --prefix server run seed",
-    "seed:sample": "npm --prefix server run seed:sample"
+    "seed:sample": "npm --prefix server run seed:sample",
+    "backup": "npm --prefix server run backup"
   },
   "keywords": [
     "kpriet",

@@ -1,0 +1,51 @@
+# Production-style stack: MongoDB + API + web (nginx) on one host.
+#
+#   cp .env.production.example .env.production   # then fill in the secrets
+#   docker compose --env-file .env.production up -d --build
+#
+# The app is served on http://<host>:${WEB_PORT:-8080}. Put HTTPS in front of it (a reverse
+# proxy or load balancer) before going live: production cookies are marked Secure.
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build: ./server
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://mongo:27017/kpriet-fms
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env.production}
+      COOKIE_SECRET: ${COOKIE_SECRET:?set COOKIE_SECRET in .env.production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-12h}
+      CLIENT_URL: ${CLIENT_URL:?set CLIENT_URL (the public https URL) in .env.production}
+      TRUST_PROXY: "1"
+    volumes:
+      # Uploaded certificates/evidence and the secure document vault (back these up!)
+      - uploads:/app/uploads
+      - documents:/app/storage
+
+  web:
+    build: ./client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "${WEB_PORT:-8080}:80"
+
+volumes:
+  mongo-data:
+  uploads:
+  documents:
