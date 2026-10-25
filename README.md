@@ -61,15 +61,15 @@ cp client/.env.example client/.env
 
 | Variable (`server/.env`) | Purpose |
 |---|---|
-| `PORT` | API port (default `5000`) |
+| `PORT` | API port (default `5055`; the Docker stack uses `5000` internally) |
 | `NODE_ENV` | `development` / `production` / `test` |
 | `MONGODB_URI` | MongoDB connection string |
 | `JWT_SECRET` | Signs session tokens |
-| `JWT_EXPIRES_IN` | Session lifetime (default `7d`) |
+| `JWT_EXPIRES_IN` | Session lifetime (default `12h`) |
 | `COOKIE_SECRET` | Signs cookies |
 | `CLIENT_URL` | Allowed browser origin for CORS |
 
-`client/.env` only needs `VITE_API_URL` (default `http://localhost:5000/api`).
+`client/.env` only needs `VITE_API_URL` (default `http://localhost:5055/api`).
 
 > **Production:** the server refuses to start if `JWT_SECRET` / `COOKIE_SECRET` are shorter than 32 characters, still contain the `.env.example` placeholder, or are identical. Generate them with
 > `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`
@@ -85,7 +85,7 @@ npm run seed
 In two terminals, from the project root:
 
 ```bash
-npm run dev:server   # API  → http://localhost:5000/api
+npm run dev:server   # API  → http://localhost:5055/api
 npm run dev:client   # Web  → http://localhost:5173
 ```
 

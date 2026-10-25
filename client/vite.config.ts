@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     // Uploaded files are stored as relative "/uploads/..." URLs; forward them to the API server
     proxy: {
-      '/uploads': 'http://localhost:5000',
+      '/uploads': 'http://localhost:5055',
     },
   },
 })

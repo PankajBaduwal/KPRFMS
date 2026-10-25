@@ -18,7 +18,7 @@ npm run preview   # serve the production build locally
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `VITE_API_URL` | `http://localhost:5000/api` | Base URL of the API |
+| `VITE_API_URL` | `http://localhost:5055/api` | Base URL of the API |
 | `VITE_HIDE_DEV_SEED` | — | `true` hides the seed-account hints on the dev login page |
 
 In development, Vite proxies `/uploads/*` to the API so stored file links open directly.
