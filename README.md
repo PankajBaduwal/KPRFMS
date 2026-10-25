@@ -69,6 +69,7 @@ cp client/.env.example client/.env
 | `JWT_EXPIRES_IN` | Session lifetime (default `12h`) |
 | `COOKIE_SECRET` | Signs cookies |
 | `CLIENT_URL` | Allowed browser origin for CORS; also the base of links in emails |
+| `TWO_FACTOR_KEY` | Encrypts two-factor secrets (random, 32+ characters; required in production; keep stable) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Outgoing email. Without `SMTP_HOST`, every email is written to `server/mail-outbox/` as a JSON file instead (handy in development) |
 | `PUBLIC_API_URL` | Public API address used in calendar-feed links (default `http://localhost:PORT/api`, or `CLIENT_URL/api` in production) |
 
@@ -192,6 +193,30 @@ docker run --rm -v kpriet-fms_uploads:/u -v kpriet-fms_documents:/d -v "$PWD":/o
 
 ---
 
+## Email Setup
+
+Without SMTP settings nothing is sent: every email is saved as a JSON file in `server/mail-outbox/` (fine for development). To send real email, add these to `server/.env` (or `.env.production` for Docker) and restart the API:
+
+| Provider | `SMTP_HOST` | `SMTP_PORT` / `SMTP_SECURE` | `SMTP_USER` / `SMTP_PASS` |
+|---|---|---|---|
+| Microsoft 365 / Outlook (college mailbox) | `smtp.office365.com` | `587` / `false` | the mailbox address / its password (SMTP AUTH must be enabled for that mailbox by the IT admin) |
+| Google Workspace / Gmail | `smtp.gmail.com` | `465` / `true` | the address / a 16-character **App Password** (needs 2-Step Verification on that account) |
+| Institutional mail server | ask IT | usually `587` / `false` | as provided |
+
+Set `MAIL_FROM` to the sending address, e.g. `KPRIET FMS <no-reply@kpriet.ac.in>` (most providers require it to match `SMTP_USER`). Then check it:
+
+```bash
+npm run mail:test -- your.name@kpriet.ac.in
+```
+
+It logs in to the mail server, sends a test message and tells you exactly what is wrong if it fails. In production the API prints a warning at startup while `SMTP_HOST` is empty.
+
+## Calendar Sync on the Hosted Server
+
+The calendar link is built from `PUBLIC_API_URL`. Google Calendar and Outlook fetch it from their own servers, so it must be a public **https** address — a `localhost` link only works for calendar apps on the same computer. When the portal is deployed (e.g. `https://fms.kpriet.ac.in`), set `PUBLIC_API_URL=https://fms.kpriet.ac.in/api` (the Docker stack defaults to `CLIENT_URL/api`, so usually nothing extra is needed). Users then press **Get a new link** once so their link uses the public address.
+
+---
+
 ## Account Features
 
 | Feature | Where | Notes |
@@ -216,7 +241,7 @@ Live notifications keep their connections in the API process; if you ever run se
 - Session JWT in an HTTP-only, `SameSite` cookie; CSRF double-submit token (`X-CSRF-Token`) on every state-changing request
 - Login rate limiting and account lockout (5 failed attempts → 15 min)
 - Every sign-in is a tracked session (device, IP, last activity) that can be revoked; changing or resetting a password signs the user out of every other session
-- Optional two-factor sign-in (TOTP); secrets are encrypted at rest (AES-256-GCM, key derived from `JWT_SECRET`, so rotating `JWT_SECRET` also requires users to set up two-factor again)
+- Optional two-factor sign-in (TOTP); secrets are encrypted at rest with AES-256-GCM using `TWO_FACTOR_KEY` (required in production, separate from `JWT_SECRET` so that can be rotated freely). Never change `TWO_FACTOR_KEY` after go-live — it would turn off everyone's two-factor. Secrets created before the key existed are moved onto it automatically at the user's next sign-in
 - Faculty can **self-register** at `/register` with a college email (domain taken from the institution contact email, e.g. `@kpriet.ac.in`). New accounts stay **PENDING** and cannot sign in until an admin approves them under Admin → Users (the HOD is notified too); approval creates the faculty profile for HOD verification. Switch it on/off in Admin → Settings → "Allow faculty self-registration"
 - Users change their own password from the profile menu → **Change Password** (policy: 8+ chars, upper, lower, digit, one of `@$!%*?&`)
 - Request sanitisation against NoSQL operator injection and XSS payloads; Helmet security headers; strict CORS in production

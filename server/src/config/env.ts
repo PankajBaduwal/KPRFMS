@@ -16,6 +16,8 @@ const envSchema = z.object({
   TRUST_PROXY: z.string().optional(),
   // Public base URL of the API (used in calendar feed links). Defaults to http://localhost:PORT/api
   PUBLIC_API_URL: z.string().optional(),
+  // Encrypts two-factor secrets at rest. Keep it stable: changing it turns off everyone's two-factor
+  TWO_FACTOR_KEY: z.string().optional(),
   // Outgoing email. Without SMTP_HOST, emails are written to MAIL_OUTBOX_DIR instead of being sent
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.string().default('587').transform(Number),
@@ -46,6 +48,15 @@ if (parsed.data.NODE_ENV === 'production') {
     if (/change-in-production|your-.*-secret|secret123|changeme/i.test(value)) {
       problems.push(`${key} is still set to a placeholder value.`);
     }
+  }
+  const tfKey = parsed.data.TWO_FACTOR_KEY;
+  if (!tfKey || tfKey.length < MIN_SECRET_LENGTH || /change|your-|placeholder/i.test(tfKey)) {
+    problems.push(`TWO_FACTOR_KEY must be set to a random value of at least ${MIN_SECRET_LENGTH} characters.`);
+  } else if (tfKey === parsed.data.JWT_SECRET || tfKey === parsed.data.COOKIE_SECRET) {
+    problems.push('TWO_FACTOR_KEY must be different from JWT_SECRET and COOKIE_SECRET.');
+  }
+  if (!parsed.data.SMTP_HOST) {
+    console.warn('Warning: SMTP_HOST is not set, so emails (password reset, registration codes) are NOT sent — they are written to MAIL_OUTBOX_DIR.');
   }
   if (parsed.data.JWT_SECRET === parsed.data.COOKIE_SECRET) {
     problems.push('JWT_SECRET and COOKIE_SECRET must be different.');

@@ -15,7 +15,8 @@
     "test": "npm --prefix server test",
     "seed": "npm --prefix server run seed",
     "seed:sample": "npm --prefix server run seed:sample",
-    "backup": "npm --prefix server run backup"
+    "backup": "npm --prefix server run backup",
+    "mail:test": "npm --prefix server run mail:test --"
   },
   "keywords": [
     "kpriet",

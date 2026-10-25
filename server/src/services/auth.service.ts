@@ -10,7 +10,7 @@ import {
   verifyTwoFactorChallenge,
 } from '../utils/jwt.js';
 import { numericCode, randomToken, sha256, safeEqual } from '../utils/secureToken.js';
-import { decryptSecret, normalizeRecoveryCode, verifyTotp } from '../utils/totp.js';
+import { decryptSecret, encryptSecret, needsReencryption, normalizeRecoveryCode, verifyTotp } from '../utils/totp.js';
 import { recordAudit } from '../audit/auditLogger.js';
 import { AUDIT_ACTIONS } from '../models/AuditLog.js';
 import {
@@ -248,6 +248,10 @@ export class AuthService {
       throw AppError.unauthorized('That code is not valid. Check your authenticator app and try again.');
     }
 
+    // Move secrets stored before TWO_FACTOR_KEY existed onto the new key
+    if (needsReencryption(user.twoFactor.secret)) {
+      user.twoFactor.secret = encryptSecret(decryptSecret(user.twoFactor.secret));
+    }
     user.markModified('twoFactor');
     const result = await this.completeLogin(user, req, res, { twoFactor: method });
     return {

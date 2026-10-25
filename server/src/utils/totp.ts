@@ -80,24 +80,53 @@ export function otpauthUrl(secret: string, accountName: string, issuer = 'KPRIET
   return `otpauth://totp/${label}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=${DIGITS}&period=${STEP_SECONDS}`;
 }
 
-// --- Secret encryption at rest (AES-256-GCM, key derived from JWT_SECRET) -------------------
+// --- Secret encryption at rest (AES-256-GCM) ---------------------------------------------
+// New secrets use TWO_FACTOR_KEY ("v2." prefix), so rotating JWT_SECRET no longer breaks
+// two-factor sign-in. Secrets stored before that key existed were encrypted with a key derived
+// from JWT_SECRET; they still decrypt and are re-encrypted with the new key on the next sign-in.
 
-function encryptionKey(): Buffer {
+const V2_PREFIX = 'v2.';
+
+function legacyKey(): Buffer {
   return Buffer.from(crypto.hkdfSync('sha256', env.JWT_SECRET, 'kpriet-fms', 'totp-secret-v1', 32));
 }
 
-export function encryptSecret(plain: string): string {
+function currentKey(): Buffer | null {
+  if (!env.TWO_FACTOR_KEY) return null;
+  return Buffer.from(crypto.hkdfSync('sha256', env.TWO_FACTOR_KEY, 'kpriet-fms', 'totp-secret-v2', 32));
+}
+
+function seal(plain: string, key: Buffer): string {
   const iv = crypto.randomBytes(12);
-  const cipher = crypto.createCipheriv('aes-256-gcm', encryptionKey(), iv);
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
   const data = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()]);
   return [iv, cipher.getAuthTag(), data].map((b) => b.toString('base64url')).join('.');
 }
 
-export function decryptSecret(stored: string): string {
-  const [iv, tag, data] = stored.split('.').map((p) => Buffer.from(p, 'base64url'));
-  const decipher = crypto.createDecipheriv('aes-256-gcm', encryptionKey(), iv);
+function open(sealed: string, key: Buffer): string {
+  const [iv, tag, data] = sealed.split('.').map((p) => Buffer.from(p, 'base64url'));
+  const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
   decipher.setAuthTag(tag);
   return Buffer.concat([decipher.update(data), decipher.final()]).toString('utf8');
+}
+
+export function encryptSecret(plain: string): string {
+  const key = currentKey();
+  return key ? V2_PREFIX + seal(plain, key) : seal(plain, legacyKey());
+}
+
+export function decryptSecret(stored: string): string {
+  if (stored.startsWith(V2_PREFIX)) {
+    const key = currentKey();
+    if (!key) throw new Error('TWO_FACTOR_KEY is not set, so this two-factor secret cannot be read');
+    return open(stored.slice(V2_PREFIX.length), key);
+  }
+  return open(stored, legacyKey());
+}
+
+/** True when a stored secret should be re-encrypted with TWO_FACTOR_KEY. */
+export function needsReencryption(stored: string): boolean {
+  return Boolean(env.TWO_FACTOR_KEY) && !stored.startsWith(V2_PREFIX);
 }
 
 /** One-time recovery codes like "7KQ2-M9XD" for when the authenticator phone is lost. */

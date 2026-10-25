@@ -13,6 +13,7 @@
     "seed:clean": "tsx src/scripts/seed-clean.ts",
     "seed:sample": "tsx src/scripts/seed-sample.ts",
     "backup": "tsx src/scripts/backup.ts",
+    "mail:test": "tsx src/scripts/mail-test.ts",
     "restore": "tsx src/scripts/restore.ts",
     "seed:reset": "tsx src/scripts/seed.ts --reset-legacy"
   },
