@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuthStore } from '../stores/authStore';
+import { fileUrl } from '../utils/fileUrl';
 import { studentProjectService } from '../services/student-project.service';
 import type {
   StudentProject,
@@ -47,8 +48,6 @@ const getInitials = (name: string) =>
     .map((part) => part[0]?.toUpperCase())
     .join('');
 
-// Stored file links are relative ("/uploads/..."); external links are kept as-is
-const resolveFileUrl = (url: string) => (/^https?:\/\//i.test(url) ? url : url.startsWith('/') ? url : `/${url}`);
 
 /** Compact 6-step tracker showing where the project sits in the review workflow */
 const WorkflowTracker: React.FC<{ status: StudentProjectStatus }> = ({ status }) => {
@@ -350,7 +349,7 @@ export const StudentProjectsPage: React.FC = () => {
           <span className="sp-type-tag">{STUDENT_PROJECT_TYPE_LABELS[p.projectType] || p.projectType}</span>
           {withOutcomes && <OutcomeChips project={p} hideEmpty />}
           {docUrl && (
-            <a href={resolveFileUrl(docUrl)} target="_blank" rel="noreferrer" className="sp-doc-link">
+            <a href={fileUrl(docUrl)} target="_blank" rel="noreferrer" className="sp-doc-link">
               <i className="bi bi-paperclip" aria-hidden="true" />
               {p.documentName || 'Project report'}
             </a>

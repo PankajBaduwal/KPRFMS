@@ -17,6 +17,11 @@ import routes from './routes/index.js';
 
 const app = express();
 
+if (env.TRUST_PROXY) {
+  // e.g. TRUST_PROXY=1 behind one nginx hop; required for correct rate limiting and secure cookies
+  app.set('trust proxy', /^\d+$/.test(env.TRUST_PROXY) ? Number(env.TRUST_PROXY) : env.TRUST_PROXY);
+}
+
 // 1. Comprehensive Helmet Security Headers
 app.use(
   helmet({
@@ -68,7 +73,22 @@ app.use(csrfProtection);
 
 // 9. Legacy uploaded files (faculty certificates, evidence) — authenticated users only.
 // Secure private documents are handled in /api/documents
-app.use('/uploads', requireAuth, express.static(path.resolve(process.cwd(), 'uploads'), { dotfiles: 'deny', index: false }));
+app.use(
+  '/uploads',
+  requireAuth,
+  express.static(path.resolve(process.cwd(), 'uploads'), {
+    dotfiles: 'deny',
+    index: false,
+    setHeaders: (res, filePath) => {
+      // Defense in depth: even if a non-document slipped in, it can never run as a page
+      res.setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox");
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      if (!/\.(pdf|png|jpe?g)$/i.test(filePath)) {
+        res.setHeader('Content-Disposition', 'attachment');
+      }
+    },
+  })
+);
 
 // 10. API Routes
 app.use('/api', routes);

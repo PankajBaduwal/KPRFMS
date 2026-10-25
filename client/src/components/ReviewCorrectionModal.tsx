@@ -6,6 +6,7 @@ import { attendanceService } from '../services/attendance.service';
 import type { AttendanceCorrectionRequest } from '../types/attendance';
 import { AttendanceStatusBadge } from './AttendanceStatusBadge';
 import { CheckCircle, XCircle, FileText } from 'lucide-react';
+import { fileUrl } from '../utils/fileUrl';
 
 interface ReviewCorrectionModalProps {
   isOpen: boolean;
@@ -125,7 +126,7 @@ export const ReviewCorrectionModal: React.FC<ReviewCorrectionModalProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <FileText size={14} color="#3b82f6" />
               <a
-                href={request.supportingDocumentUrl}
+                href={fileUrl(request.supportingDocumentUrl)}
                 target="_blank"
                 rel="noreferrer"
                 style={{ color: '#3b82f6', textDecoration: 'underline', fontSize: '12px' }}

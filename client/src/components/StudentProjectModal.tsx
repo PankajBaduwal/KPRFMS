@@ -16,6 +16,7 @@ import {
   STUDENT_PROJECT_TYPES,
   STUDENT_PROJECT_TYPE_LABELS,
 } from '../types/student-project';
+import { fileUrl } from '../utils/fileUrl';
 
 interface StudentProjectModalProps {
   isOpen: boolean;
@@ -397,7 +398,7 @@ export const StudentProjectModal: React.FC<StudentProjectModalProps> = ({
               )}
               {documentUrl && (
                 <a
-                  href={documentUrl}
+                  href={fileUrl(documentUrl)}
                   target="_blank"
                   rel="noreferrer"
                   style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-primary)', textDecoration: 'underline' }}

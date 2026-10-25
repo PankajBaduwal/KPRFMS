@@ -33,6 +33,7 @@ import {
   INDEXING_TYPE_LABELS,
   AUTHOR_POSITION_LABELS,
 } from '../types/publication';
+import { fileUrl } from '../utils/fileUrl';
 
 export const PublicationsPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -392,7 +393,7 @@ export const PublicationsPage: React.FC = () => {
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px', flexWrap: 'wrap' }}>
             {pub.pdfUrl && (
               <a
-                href={pub.pdfUrl}
+                href={fileUrl(pub.pdfUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-ghost btn-sm"

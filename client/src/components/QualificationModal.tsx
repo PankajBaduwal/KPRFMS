@@ -5,6 +5,7 @@ import { Input } from './Input';
 import { Alert } from './Alert';
 import { facultyService } from '../services/faculty.service';
 import type { Qualification } from '../types/faculty';
+import { fileUrl } from '../utils/fileUrl';
 
 interface QualificationModalProps {
   isOpen: boolean;
@@ -323,7 +324,7 @@ export const QualificationModal: React.FC<QualificationModalProps> = ({
               <i className="bi bi-file-earmark-check-fill me-1" />
               Attached document:{' '}
               <a
-                href={certificateUrl.startsWith('http') ? certificateUrl : `http://localhost:5000${certificateUrl}`}
+                href={fileUrl(certificateUrl)}
                 target="_blank"
                 rel="noreferrer"
                 style={{ fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'underline' }}

@@ -10,6 +10,7 @@ import {
   ACTIVITY_TYPE_LABELS,
   ACTIVITY_STATUS,
 } from '../types/activity';
+import { fileUrl } from '../utils/fileUrl';
 
 interface ReviewActivityModalProps {
   isOpen: boolean;
@@ -111,7 +112,7 @@ export const ReviewActivityModal: React.FC<ReviewActivityModalProps> = ({
           {activity.certificateUrl && (
             <div style={{ marginTop: '4px' }}>
               <a
-                href={activity.certificateUrl}
+                href={fileUrl(activity.certificateUrl)}
                 target="_blank"
                 rel="noreferrer"
                 style={{ fontSize: 'var(--font-xs)', color: 'var(--color-primary)', textDecoration: 'underline' }}

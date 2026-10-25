@@ -8,6 +8,7 @@ import {
   ACTIVITY_STATUS_LABELS,
   ACTIVITY_STATUS_BADGE_VARIANTS,
 } from '../types/activity';
+import { fileUrl } from '../utils/fileUrl';
 
 interface ActivityTimelineProps {
   activities: AcademicActivity[];
@@ -208,7 +209,7 @@ export const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
             {item.certificateUrl && (
               <div style={{ marginTop: '2px' }}>
                 <a
-                  href={item.certificateUrl}
+                  href={fileUrl(item.certificateUrl)}
                   target="_blank"
                   rel="noreferrer"
                   style={{

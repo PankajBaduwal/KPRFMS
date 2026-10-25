@@ -4,6 +4,7 @@ import { Button } from './Button';
 import type { IFacultyAppraisal, IReviewPayload, IAppraisalCycle } from '../types/appraisal';
 import { AppraisalStatusBadge } from './AppraisalStatusBadge';
 import { useAuthStore } from '../stores/authStore';
+import { fileUrl } from '../utils/fileUrl';
 
 interface Props {
   isOpen: boolean;
@@ -368,7 +369,7 @@ export const AppraisalEvaluationModal: React.FC<Props> = ({
                           {cat.evidenceDocuments.map((doc, docIdx) => (
                             <a
                               key={docIdx}
-                              href={doc.documentUrl}
+                              href={fileUrl(doc.documentUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
                               style={{

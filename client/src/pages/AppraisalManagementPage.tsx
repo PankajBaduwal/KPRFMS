@@ -24,6 +24,7 @@ import {
   SkeletonStats,
   SkeletonTable,
 } from '../components';
+import { fileUrl } from '../utils/fileUrl';
 
 export const AppraisalManagementPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -942,7 +943,7 @@ export const AppraisalManagementPage: React.FC = () => {
                           >
                             <i className="bi bi-file-earmark-check-fill" style={{ color: '#1B345F' }} />
                             <a
-                              href={doc.documentUrl}
+                              href={fileUrl(doc.documentUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
                               style={{ textDecoration: 'none', color: '#1B345F', fontWeight: 600 }}

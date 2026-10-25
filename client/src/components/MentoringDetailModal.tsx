@@ -8,6 +8,7 @@ import {
   MENTORING_STATUS_BADGES,
   INTERACTION_TYPE_BADGES,
 } from '../types/mentoring';
+import { fileUrl } from '../utils/fileUrl';
 
 interface MentoringDetailModalProps {
   isOpen: boolean;
@@ -316,7 +317,7 @@ export const MentoringDetailModal: React.FC<MentoringDetailModalProps> = ({
                       {session.evidenceUrl && (
                         <div style={{ marginTop: 'var(--space-1)' }}>
                           <a
-                            href={session.evidenceUrl}
+                            href={fileUrl(session.evidenceUrl)}
                             target="_blank"
                             rel="noreferrer"
                             style={{

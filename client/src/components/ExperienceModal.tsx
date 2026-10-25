@@ -6,6 +6,7 @@ import { Select } from './Select';
 import { Alert } from './Alert';
 import { facultyService } from '../services/faculty.service';
 import type { Experience } from '../types/faculty';
+import { fileUrl } from '../utils/fileUrl';
 
 interface ExperienceModalProps {
   isOpen: boolean;
@@ -289,7 +290,7 @@ export const ExperienceModal: React.FC<ExperienceModalProps> = ({
               <i className="bi bi-file-earmark-check-fill me-1" />
               Attached document:{' '}
               <a
-                href={experienceDocumentUrl.startsWith('http') ? experienceDocumentUrl : `http://localhost:5000${experienceDocumentUrl}`}
+                href={fileUrl(experienceDocumentUrl)}
                 target="_blank"
                 rel="noreferrer"
                 style={{ fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'underline' }}

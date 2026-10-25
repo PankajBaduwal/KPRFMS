@@ -34,6 +34,7 @@ import {
   ACTIVITY_STATUS_LABELS,
   ACTIVITY_STATUS_BADGE_VARIANTS,
 } from '../types/activity';
+import { fileUrl } from '../utils/fileUrl';
 
 type TabView = 'ALL' | 'CONFERENCE' | 'WORKSHOP' | 'SEMINAR' | 'FDP' | 'STTP' | 'TIMELINE';
 
@@ -846,7 +847,7 @@ export const ActivitiesPage: React.FC = () => {
                       <td style={{ padding: '10px 14px', textAlign: 'center', whiteSpace: 'nowrap' }}>
                         {item.certificateUrl ? (
                           <a
-                            href={item.certificateUrl}
+                            href={fileUrl(item.certificateUrl)}
                             target="_blank"
                             rel="noreferrer"
                             style={{
@@ -1134,7 +1135,7 @@ export const ActivitiesPage: React.FC = () => {
             {selectedActivityDetail.certificateUrl && (
               <div style={{ marginBottom: 'var(--space-4)' }}>
                 <a
-                  href={selectedActivityDetail.certificateUrl}
+                  href={fileUrl(selectedActivityDetail.certificateUrl)}
                   target="_blank"
                   rel="noreferrer"
                   style={{

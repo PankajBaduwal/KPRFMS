@@ -3,6 +3,7 @@ import { Modal } from './Modal';
 import { Button } from './Button';
 import { EmptyState } from './EmptyState';
 import type { Subject } from '../types/subject';
+import { fileUrl } from '../utils/fileUrl';
 
 interface SubjectDetailModalProps {
   isOpen: boolean;
@@ -117,7 +118,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
             </h4>
             {subject.syllabusUrl && (
               <a
-                href={subject.syllabusUrl}
+                href={fileUrl(subject.syllabusUrl)}
                 target="_blank"
                 rel="noreferrer"
                 style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-primary)', textDecoration: 'underline' }}

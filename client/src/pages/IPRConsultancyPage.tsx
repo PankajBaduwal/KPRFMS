@@ -35,6 +35,7 @@ import {
   CONSULTANCY_STATUS_BADGES,
   VERIFICATION_STATUS_BADGES,
 } from '../types/ipr';
+import { fileUrl } from '../utils/fileUrl';
 
 type IPRTab = 'PATENTS' | 'COPYRIGHTS' | 'CONSULTANCY' | 'ANALYTICS';
 
@@ -681,7 +682,7 @@ export const IPRConsultancyPage: React.FC = () => {
                       <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
                         {p.documentUrl ? (
                           <a
-                            href={p.documentUrl}
+                            href={fileUrl(p.documentUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{
@@ -854,7 +855,7 @@ export const IPRConsultancyPage: React.FC = () => {
                       <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
                         {c.documentUrl ? (
                           <a
-                            href={c.documentUrl}
+                            href={fileUrl(c.documentUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{
@@ -1040,7 +1041,7 @@ export const IPRConsultancyPage: React.FC = () => {
                       <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
                         {cs.agreementUrl ? (
                           <a
-                            href={cs.agreementUrl}
+                            href={fileUrl(cs.agreementUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{

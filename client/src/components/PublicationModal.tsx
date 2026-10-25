@@ -16,6 +16,7 @@ import type {
   Quartile,
   AuthorPosition,
 } from '../types/publication';
+import { fileUrl } from '../utils/fileUrl';
 
 interface PublicationModalProps {
   isOpen: boolean;
@@ -662,7 +663,7 @@ export const PublicationModal: React.FC<PublicationModalProps> = ({
                 </div>
                 <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                   <a
-                    href={formData.pdfUrl}
+                    href={fileUrl(formData.pdfUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-outline btn-xs"

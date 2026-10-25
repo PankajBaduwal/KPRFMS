@@ -18,6 +18,7 @@ import {
   FUNDING_TYPE_OPTIONS,
   UTILIZATION_STATUS_OPTIONS,
 } from '../types/project';
+import { fileUrl } from '../utils/fileUrl';
 
 interface ProjectModalProps {
   isOpen: boolean;
@@ -637,7 +638,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
                     </div>
                     <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                       <a
-                        href={doc.fileUrl}
+                        href={fileUrl(doc.fileUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-outline btn-xs"

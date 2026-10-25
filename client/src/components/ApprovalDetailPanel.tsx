@@ -11,6 +11,7 @@ import { ErrorState } from './ErrorState';
 import { SkeletonCard } from './Skeleton';
 import { useAuthStore } from '../stores/authStore';
 import { formatErrorMessage } from '../utils/errorHandler';
+import { fileUrl } from '../utils/fileUrl';
 
 interface ApprovalDetailPanelProps {
   recordType: string | null;
@@ -557,7 +558,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                       </div>
 
                       <a
-                        href={doc.url}
+                        href={fileUrl(doc.url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{

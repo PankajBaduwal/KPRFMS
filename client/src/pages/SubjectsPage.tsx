@@ -18,6 +18,7 @@ import {
   FacultyAllocationModal,
   SubjectDetailModal,
 } from '../components';
+import { fileUrl } from '../utils/fileUrl';
 
 export const SubjectsPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -599,7 +600,7 @@ export const SubjectsPage: React.FC = () => {
                               <span className="subject-code-tag">{subj.subjectCode}</span>
                               {subj.syllabusUrl && (
                                 <a
-                                  href={subj.syllabusUrl}
+                                  href={fileUrl(subj.syllabusUrl)}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   title="View Syllabus PDF"

@@ -15,6 +15,7 @@ import {
   PHD_STAGE_BADGES,
   THESIS_STATUS_LABELS,
 } from '../types/phd-scholar';
+import { fileUrl } from '../utils/fileUrl';
 
 interface PhdScholarDetailModalProps {
   isOpen: boolean;
@@ -644,7 +645,7 @@ export const PhdScholarDetailModal: React.FC<PhdScholarDetailModalProps> = ({
 
                     <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
                       <a
-                        href={`http://localhost:5000${doc.url.startsWith('/') ? doc.url : `/${doc.url}`}`}
+                        href={fileUrl(doc.url)}
                         target="_blank"
                         rel="noreferrer"
                         className="btn btn-outline btn-sm"

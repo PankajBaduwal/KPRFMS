@@ -4,6 +4,7 @@ import { Button } from './Button';
 import { Select } from './Select';
 import { Alert } from './Alert';
 import type { Publication, PublicationVerificationStatus } from '../types/publication';
+import { fileUrl } from '../utils/fileUrl';
 
 interface ReviewPublicationModalProps {
   isOpen: boolean;
@@ -104,7 +105,7 @@ export const ReviewPublicationModal: React.FC<ReviewPublicationModalProps> = ({
           {publication.pdfUrl && (
             <div style={{ marginTop: 'var(--space-2)', paddingTop: 'var(--space-2)', borderTop: '1px solid var(--color-border)' }}>
               <a
-                href={publication.pdfUrl}
+                href={fileUrl(publication.pdfUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-primary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)' }}
