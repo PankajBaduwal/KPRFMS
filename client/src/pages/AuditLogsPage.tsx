@@ -159,8 +159,8 @@ export const AuditLogsPage: React.FC = () => {
     <div style={{ padding: '1.75rem', maxWidth: '1540px', margin: '0 auto', color: '#1e293b' }}>
       {/* Standard Institutional Header */}
       <PageHeader
-        title="Enterprise Audit Trail & Security Logs"
-        subtitle="Centralized, Immutable Forensic Log of Authentications, Mutations, Governance & Approvals"
+        title="Audit log"
+        subtitle="Every sign-in, change and approval, in order"
         badge={
           <Badge variant="primary">
             <i className="bi bi-lock-fill" style={{ marginRight: 4 }} aria-hidden="true" />

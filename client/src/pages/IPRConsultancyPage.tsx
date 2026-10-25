@@ -284,7 +284,7 @@ export const IPRConsultancyPage: React.FC = () => {
       {/* 1. PAGE HEADER */}
       <PageHeader
         title="Patents, Copyrights & Consultancy"
-        subtitle="Institutional intellectual property management, patent disclosures, copyright registrations, and industry consultancy engagements."
+        subtitle="Patents, copyrights and consultancy work."
         actions={
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <Button

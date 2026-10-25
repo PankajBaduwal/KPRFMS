@@ -269,7 +269,8 @@ export const PortalPage: React.FC = () => {
         </>
       ) : null}
 
-      {/* Optional Live RBAC Diagnostics Console */}
+      {/* Permission diagnostics: developers only (dev builds, admin role) */}
+      {import.meta.env.DEV && user.role === 'ADMIN' && (
       <div style={{ marginTop: 'var(--space-8)' }}>
         <button
           type="button"
@@ -288,7 +289,7 @@ export const PortalPage: React.FC = () => {
           }}
         >
           <i className={`bi bi-chevron-${showRbacConsole ? 'up' : 'down'}`} />
-          {showRbacConsole ? 'Hide' : 'Show'} Live Backend RBAC Security Console
+          {showRbacConsole ? 'Hide' : 'Show'} permission diagnostics (developer)
         </button>
 
         {showRbacConsole && (
@@ -353,6 +354,7 @@ export const PortalPage: React.FC = () => {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 };

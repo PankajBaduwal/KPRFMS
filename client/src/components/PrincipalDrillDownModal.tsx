@@ -150,7 +150,7 @@ export const PrincipalDrillDownModal: React.FC<PrincipalDrillDownModalProps> = (
               </span>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.35rem', fontSize: '0.8rem', color: '#64748b' }}>
-              <span>Principal Institutional Audit</span>
+              <span>Principal review</span>
               {departmentName && <span>• Department: <strong style={{ color: '#0f172a' }}>{departmentName}</strong></span>}
               {academicYear && academicYear !== 'ALL' && (
                 <span>• AY: <strong style={{ color: '#0f172a' }}>{academicYear}</strong></span>

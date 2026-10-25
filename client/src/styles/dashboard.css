@@ -1,0 +1,291 @@
+/* ============================================================================
+   Dashboard insights: chart cards, tooltips, donut, progress bars, entrance motion
+   ============================================================================ */
+
+.dash-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #13294B;
+  letter-spacing: -0.02em;
+}
+
+.dash-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.insights-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.insights-section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.insights-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.insights-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.insights-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.insights-grid .span-2 { grid-column: span 2; }
+.insights-grid .span-3 { grid-column: 1 / -1; }
+
+@media (max-width: 1100px) {
+  .insights-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .insights-grid-2,
+  .insights-grid-3 { grid-template-columns: minmax(0, 1fr); }
+  .insights-grid .span-2,
+  .insights-grid .span-3 { grid-column: auto; }
+}
+
+/* ---------------------------------------------------------------- Chart card */
+.chart-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px 12px;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  animation: insightIn 520ms var(--ease-out, ease-out) both;
+}
+
+.chart-card:hover {
+  border-color: #D3DBE7;
+  box-shadow: var(--shadow-md);
+}
+
+/* Cards appear one after another the first time the dashboard loads */
+.insights-grid > .chart-card:nth-child(2) { animation-delay: 70ms; }
+.insights-grid > .chart-card:nth-child(3) { animation-delay: 140ms; }
+.insights-grid > .chart-card:nth-child(4) { animation-delay: 210ms; }
+
+@keyframes insightIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.chart-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.chart-card-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: #13294B;
+}
+
+.chart-card-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}
+
+.chart-card-body {
+  position: relative;
+  min-height: 0;
+}
+
+.chart-card-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #8A94A6;
+  font-size: 0.85rem;
+  border: 1px dashed #E3E8EF;
+  border-radius: 10px;
+}
+
+.chart-card-empty i { font-size: 1.4rem; opacity: 0.7; }
+
+/* Recharts focus outline off (keyboard focus still visible on controls) */
+.chart-card .recharts-wrapper:focus,
+.chart-card .recharts-surface:focus,
+.chart-card .recharts-sector:focus { outline: none; }
+
+/* ---------------------------------------------------------------- Tooltip */
+.chart-tooltip {
+  background: #fff;
+  border: 1px solid #E3E8EF;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px -6px rgba(16, 24, 40, 0.18);
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  min-width: 140px;
+}
+
+.chart-tooltip-label {
+  font-weight: 650;
+  color: #13294B;
+  margin-bottom: 4px;
+}
+
+.chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #475467;
+  line-height: 1.6;
+}
+
+.chart-tooltip-row strong {
+  margin-left: auto;
+  color: #1F2937;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------- Donut */
+.donut-layout {
+  display: grid;
+  grid-template-columns: minmax(130px, 46%) 1fr;
+  align-items: center;
+  gap: 14px;
+  height: 100%;
+}
+
+.donut-chart {
+  position: relative;
+  height: 100%;
+  max-height: 210px;
+  aspect-ratio: 1;
+  justify-self: center;
+  width: 100%;
+}
+
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.donut-center-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #13294B;
+  line-height: 1.1;
+}
+
+.donut-center-label {
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  max-width: 80%;
+  text-align: center;
+}
+
+.donut-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8rem;
+}
+
+.donut-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: default;
+  transition: background-color var(--transition-fast);
+}
+
+.donut-legend li:hover,
+.donut-legend li.is-active { background: #F3F6FB; }
+
+.donut-legend-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.donut-legend-name { color: #475467; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.donut-legend strong { font-variant-numeric: tabular-nums; color: #1F2937; }
+
+/* ---------------------------------------------------------------- Progress */
+.progress-list,
+.funnel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  height: 100%;
+}
+
+.progress-row-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #344054;
+  margin-bottom: 5px;
+}
+
+.progress-row-detail {
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-row-track {
+  height: 8px;
+  background: #EEF1F5;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-row-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 900ms var(--ease-out, ease-out);
+}
+
+/* ---------------------------------------------------------------- Trend chip */
+.trend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.trend-chip.is-up { background: #E8F5EE; color: #1E7A47; }
+.trend-chip.is-down { background: #FBEDEF; color: #A23B4A; }
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-card { animation: none; }
+  .progress-row-fill { transition: none; }
+}

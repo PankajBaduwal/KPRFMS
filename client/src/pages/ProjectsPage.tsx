@@ -416,7 +416,7 @@ export const ProjectsPage: React.FC = () => {
       {/* PageHeader */}
       <PageHeader
         title="Research Projects & Sponsored Funding"
-        subtitle="Institutional repository for government grants, industry consultancy, sponsored R&D, and financial utilization"
+        subtitle="Funded research projects, grants and how the money is used"
         badge={<Badge variant="primary" dot size="md">{hasLoadedList ? totalCount : '…'} Projects</Badge>}
         actions={
           <Button

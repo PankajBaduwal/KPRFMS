@@ -26,6 +26,7 @@ import { SystemMasterItem } from '../models/SystemMasterItem.js';
 import { ROLES } from '../permissions/roles.js';
 import { getCurrentAcademicYear } from '../utils/academicYear.js';
 import os from 'os';
+import { dashboardChartsService } from './dashboard-charts.service.js';
 
 export interface ActionItem {
   id: string;
@@ -957,11 +958,11 @@ export class DashboardService {
       workload: {
         institutionalAverageHours: avgWorkload,
         totalAllocatedHours: instTotalHours,
-        complianceRate: '94%',
+        complianceRate: '—', // not tracked while the teaching module is off
       },
       accreditationMetrics: {
         phdFacultyPercentage,
-        studentFacultyRatio: '1:15',
+        studentFacultyRatio: '—', // student enrolment is not stored in FMS
         publicationsPerFaculty: pubPerFaculty,
         totalExternalFunding: totalGrantsSanctioned,
       },
@@ -1037,7 +1038,7 @@ export class DashboardService {
         description: 'Endorse approved annual appraisal scores for increment and promotion clearance.',
         link: '/portal/appraisals?tab=review',
         actionText: 'Authorize Appraisals',
-        badge: 'Executive Approval',
+        badge: 'Your approval',
       });
     }
 
@@ -1050,7 +1051,7 @@ export class DashboardService {
         id: 'act-prin-grants',
         type: 'WARNING',
         title: `${highValueProjects} Major Sponsored Research Grant(s) Pending Final Sanction Review`,
-        description: 'High-value external research grants (>₹5L) awaiting institutional head sign-off.',
+        description: 'High-value external research grants (>₹5L) awaiting your sign-off.',
         link: '/portal/projects',
         actionText: 'Review Grants',
         badge: 'Grant Authorization',
@@ -1060,12 +1061,15 @@ export class DashboardService {
     requiredActions.push({
       id: 'act-prin-inst',
       type: 'INFO',
-      title: 'Institutional NAAC & NBA Readiness Audit',
-      description: `Accreditation criteria compilation for academic year ${currentYear} is ready for executive review.`,
+      title: 'NAAC & NBA readiness',
+      description: `Accreditation criteria compilation for academic year ${currentYear} is ready for your review.`,
       link: '/portal/reports?tab=accreditation',
       actionText: 'View Readiness Scorecard',
-      badge: 'Institutional KPI',
+      badge: 'Accreditation',
     });
+
+    const institutionCharts = await dashboardChartsService.institution();
+    const pct = (v: number | null) => (v === null ? '—' : `${v}%`);
 
     return {
       role: 'PRINCIPAL',
@@ -1077,11 +1081,15 @@ export class DashboardService {
         totalStudentProjects: studentProjects,
         totalPhdScholars: phdScholars,
         totalGrantFunding: totalGrantAmount,
-        institutionalAttendanceRate: '96.2%',
+        // Last 30 days, from attendance records
+        institutionalAttendanceRate: pct(institutionCharts.attendanceRate30d),
       },
       trends: {
         departmentRankings: deptRanking.slice(0, 5),
-        researchGrowthYearOverYear: '+18.4%',
+        researchGrowthYearOverYear:
+          institutionCharts.researchGrowthPercent === null
+            ? '—'
+            : `${institutionCharts.researchGrowthPercent > 0 ? '+' : ''}${institutionCharts.researchGrowthPercent}%`,
       },
       majorPendingApprovals: {
         total: pendingPrincipalAppraisals,
@@ -1100,14 +1108,17 @@ export class DashboardService {
         professors,
         associateProfessors: assocProfs,
         assistantProfessors: asstProfs,
-        retentionRate: '95.6%',
+        // Share of faculty accounts that are active
+        retentionRate: totalFaculty ? `${Math.round((activeFaculty / totalFaculty) * 1000) / 10}%` : '—',
       },
       academicIndicators: {
-        timetableExecutionRate: '98.8%',
-        workloadCompliance: '96.1%',
-        syllabusCoverageIndex: '94.2%',
+        // Not tracked yet (teaching module is switched off); shown as "—" instead of invented figures
+        timetableExecutionRate: '—',
+        workloadCompliance: '—',
+        syllabusCoverageIndex: '—',
       },
       requiredActions,
+      charts: institutionCharts,
     };
   }
 
@@ -1263,18 +1274,31 @@ export class DashboardService {
   // Dispatcher by Role
   // =========================================================================
   async getDashboardForUser(user: { id: string; role: string; departmentId?: string }) {
-    switch (user.role) {
-      case ROLES.ADMIN:
-        return this.getAdminDashboard();
+    return this.getDashboardForRole(user.role, user.id, user.departmentId);
+  }
+
+  /** Role dashboard plus its chart data (also used when leadership previews another role). */
+  async getDashboardForRole(role: string, userId: string, departmentId?: string) {
+    switch (role) {
+      case ROLES.ADMIN: {
+        const [data, charts] = await Promise.all([this.getAdminDashboard(), dashboardChartsService.admin()]);
+        return { ...data, charts };
+      }
       case ROLES.PRINCIPAL:
-        return this.getPrincipalDashboard(user.id);
-      case ROLES.DEAN:
-        return this.getDeanDashboard(user.id);
-      case ROLES.HOD:
-        return this.getHodDashboard(user.id, user.departmentId);
+        return this.getPrincipalDashboard(userId);
+      case ROLES.DEAN: {
+        const [data, charts] = await Promise.all([this.getDeanDashboard(userId), dashboardChartsService.institution()]);
+        return { ...data, charts };
+      }
+      case ROLES.HOD: {
+        const data = await this.getHodDashboard(userId, departmentId);
+        return { ...data, charts: await dashboardChartsService.hod(data.departmentId) };
+      }
       case ROLES.FACULTY:
-      default:
-        return this.getFacultyDashboard(user.id);
+      default: {
+        const [data, charts] = await Promise.all([this.getFacultyDashboard(userId), dashboardChartsService.faculty(userId)]);
+        return { ...data, charts };
+      }
     }
   }
 }

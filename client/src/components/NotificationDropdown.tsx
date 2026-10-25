@@ -49,6 +49,7 @@ export const NotificationDropdown: React.FC = () => {
 
   // New notifications arrive live; while the stream is down, poll as a fallback
   const { addToast } = useToast();
+  const [ringing, setRinging] = useState(false);
   const isOpenRef = useRef(isOpen);
   useEffect(() => {
     isOpenRef.current = isOpen;
@@ -57,6 +58,8 @@ export const NotificationDropdown: React.FC = () => {
     onUnreadCount: setUnreadCount,
     onNotification: (n) => {
       addToast(n.title, 'info');
+      setRinging(true);
+      window.setTimeout(() => setRinging(false), 900);
       if (isOpenRef.current) fetchRecent();
     },
   });
@@ -138,6 +141,7 @@ export const NotificationDropdown: React.FC = () => {
       <button
         type="button"
         id="notification-bell-btn"
+        className={ringing ? 'is-ringing' : undefined}
         onClick={() => setIsOpen(!isOpen)}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
@@ -165,6 +169,8 @@ export const NotificationDropdown: React.FC = () => {
         {unreadCount > 0 && (
           <span
             id="notification-unread-badge"
+            key={unreadCount}
+            className="notification-badge-pop"
             style={{
               position: 'absolute',
               top: '-3px',
@@ -336,7 +342,7 @@ export const NotificationDropdown: React.FC = () => {
                       ? 'You are all caught up. No unread alerts.'
                       : 'You have not received any notifications so far.'
                   }
-                  nextStep="Institutional updates, approvals, and workflow notices will appear here."
+                  nextStep="Updates and approval notices will appear here."
                   compact
                 />
               </div>

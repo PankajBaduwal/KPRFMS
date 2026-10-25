@@ -18,27 +18,14 @@ export class DashboardController {
       // If a leadership role requests another role view:
       if (requestedRole && requestedRole !== user.role) {
         if ([ROLES.ADMIN, ROLES.PRINCIPAL, ROLES.DEAN].includes(user.role as any)) {
-          let data;
-          switch (requestedRole) {
-            case ROLES.ADMIN:
-              if (user.role !== ROLES.ADMIN) throw AppError.forbidden('Only administrators can view Admin Dashboard');
-              data = await dashboardService.getAdminDashboard();
-              break;
-            case ROLES.PRINCIPAL:
-              data = await dashboardService.getPrincipalDashboard(user.id);
-              break;
-            case ROLES.DEAN:
-              data = await dashboardService.getDeanDashboard(user.id);
-              break;
-            case ROLES.HOD:
-              data = await dashboardService.getHodDashboard(user.id, (req.query.departmentId as string) || (user.departmentId?.toString()));
-              break;
-            case ROLES.FACULTY:
-              data = await dashboardService.getFacultyDashboard(user.id);
-              break;
-            default:
-              data = await dashboardService.getDashboardForUser(user);
+          if (requestedRole === ROLES.ADMIN && user.role !== ROLES.ADMIN) {
+            throw AppError.forbidden('Only administrators can view Admin Dashboard');
           }
+          const data = await dashboardService.getDashboardForRole(
+            requestedRole,
+            user.id,
+            requestedRole === ROLES.HOD ? (req.query.departmentId as string) || user.departmentId?.toString() : undefined
+          );
           sendSuccess(res, data, `Dashboard data loaded for role ${requestedRole}`);
           return;
         }

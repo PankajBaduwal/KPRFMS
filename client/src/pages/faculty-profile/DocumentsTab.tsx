@@ -10,7 +10,7 @@ export interface DocumentsTabProps {
 export const DocumentsTab: React.FC<DocumentsTabProps> = ({ profile }) => {
   return (
     <div className="card-custom">
-            <h2 className="card-title">Supporting Institutional Documents</h2>
+            <h2 className="card-title">Supporting documents</h2>
             {(!profile.supportingDocuments || profile.supportingDocuments.length === 0) ? (
               <EmptyState
                 compact

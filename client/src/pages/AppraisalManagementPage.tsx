@@ -310,7 +310,7 @@ export const AppraisalManagementPage: React.FC = () => {
       {/* Standard Institutional Header */}
       <PageHeader
         title="Faculty Performance Appraisal"
-        subtitle="Institutional annual evaluation across all 14 academic, research, and institutional leadership categories."
+        subtitle="Yearly self-appraisal and review."
         badge={<Badge variant="primary">PBAS / AICTE / NBA</Badge>}
         actions={
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>

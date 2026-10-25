@@ -1037,7 +1037,7 @@ export const LeaveManagementPage: React.FC = () => {
             }}
           >
             <div>
-              <h3 style={{ margin: 0, fontSize: '15px' }}>Institutional Leave Entitlement Policy</h3>
+              <h3 style={{ margin: 0, fontSize: '15px' }}>Leave policy</h3>
               <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--color-text-muted)' }}>
                 Annual credit granted at start of Academic Year {academicYear}. Unused Casual Leave lapses at year end.
               </p>

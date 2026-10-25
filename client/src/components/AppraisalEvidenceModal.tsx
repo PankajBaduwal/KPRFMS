@@ -149,7 +149,7 @@ export const AppraisalEvidenceModal: React.FC<Props> = ({
             setError('');
           }}
           required
-          hint="Institutional Drive, ERP repository, or cloud document hyperlink."
+          hint="Link to the document (Drive, OneDrive, etc.)."
         />
 
         <div>

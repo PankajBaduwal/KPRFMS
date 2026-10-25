@@ -108,7 +108,7 @@ export const FacultyDirectoryPage: React.FC = () => {
     <div className="directory-page-container">
       <PageHeader
         title="Faculty Directory"
-        subtitle="Institutional registry of academic faculty members and researchers."
+        subtitle="All faculty members and their profiles."
       />
 
       <div className="card-custom mb-4" style={{ padding: 'var(--space-4)' }}>

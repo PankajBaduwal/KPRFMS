@@ -191,7 +191,7 @@ export const PublicationsTab: React.FC<PublicationsTabProps> = ({ deletePubMutat
                                       variant="primary"
                                       onClick={() => runRowAction(`submitPub:${pub._id}`, () => submitPubMutation.mutateAsync(pub._id))}
                                       {...rowActionProps(`submitPub:${pub._id}`)}
-                                      title="Submit for Institutional Review"
+                                      title="Submit for review"
                                     >
                                       <i className="bi bi-send" />
                                     </Button>

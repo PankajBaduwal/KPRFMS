@@ -212,7 +212,7 @@ export const WorkloadPage: React.FC = () => {
             onClick={() => setActiveTab('institution')}
           >
             <i className="bi bi-buildings" />
-            Institutional Overview
+            Overview
           </button>
         )}
       </div>

@@ -1,0 +1,400 @@
+/* ============================================================================
+   KPRIET FMS theme — calm, flat, institutional.
+   Loaded last (see main.tsx): refines the design tokens and the shared component
+   classes without touching page logic. Principles:
+   - one brand colour (KPRIET navy) + one interactive blue; green/amber/red only for status
+   - flat surfaces: thin borders, no gradients on cards, shadows only to show elevation
+   - one radius scale; numbers use tabular figures so columns line up
+   ============================================================================ */
+
+:root {
+  --font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Interactive blue (links, focus, primary actions); navy stays the brand colour */
+  --color-blue: #2457C5;
+  --color-secondary: #2457C5;
+  --color-primary-light: #2457C5;
+  --kpr-vibrant-blue: #2457C5;
+  --color-purple: #475569;
+  --color-teal: #0F766E;
+  --color-warning: #B7791F;
+
+  /* Canvas */
+  --color-background: #F5F7FA;
+  --bg-radial-canvas: #F5F7FA;
+  --color-surface-subtle: #FFFFFF;
+  --color-border: #E3E8EF;
+  --color-border-light: #EEF1F5;
+  --color-text: #1F2937;
+  --color-text-secondary: #5B6676;
+  --color-text-muted: #6B7685;
+
+  /* Gradients flattened (the variables stay so existing styles keep working) */
+  --gradient-primary: linear-gradient(0deg, #1B345F, #1B345F);
+  --gradient-blue: linear-gradient(0deg, #1B345F, #1B345F);
+  --gradient-purple: linear-gradient(0deg, #1B345F, #1B345F);
+  --gradient-kpr: linear-gradient(0deg, #1B345F, #1B345F);
+  --gradient-hero: linear-gradient(160deg, #112547 0%, #1B345F 100%);
+  --gradient-success: linear-gradient(0deg, #1B924B, #1B924B);
+  --gradient-card: linear-gradient(0deg, #FFFFFF, #FFFFFF);
+  --gradient-accent-bar: linear-gradient(90deg, #1B345F, #1B345F);
+
+  /* One radius scale */
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 16px;
+  --radius-hero: 16px;
+
+  /* Quiet, neutral elevation; no coloured glows */
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.08), 0 2px 4px -2px rgba(16, 24, 40, 0.04);
+  --shadow-lg: 0 12px 20px -6px rgba(16, 24, 40, 0.10), 0 4px 8px -4px rgba(16, 24, 40, 0.05);
+  --shadow-card-hover: 0 8px 18px -6px rgba(16, 24, 40, 0.12), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
+  --shadow-glow-primary: 0 1px 2px rgba(16, 24, 40, 0.08);
+  --shadow-glow-indigo: 0 1px 2px rgba(16, 24, 40, 0.08);
+  --focus-ring: 0 0 0 3px rgba(36, 87, 197, 0.22);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-fast: 150ms var(--ease-out);
+  --transition-base: 200ms var(--ease-out);
+  --transition-smooth: 260ms var(--ease-out);
+}
+
+body {
+  font-family: var(--font-family);
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.003em;
+}
+
+/* Numbers line up in metrics and tables */
+.compact-metric-value,
+.stat-value,
+.table-custom td,
+.table td,
+[class*='metric-value'],
+[class*='stat-number'] {
+  font-variant-numeric: tabular-nums;
+}
+
+h1, h2, h3, .page-title {
+  letter-spacing: -0.015em;
+}
+
+/* ---------------------------------------------------------------- Sidebar */
+.app-layout .app-sidebar {
+  background: #132A4F;
+  box-shadow: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.app-layout .app-sidebar > div:first-child,
+.app-layout .app-sidebar > div:last-child {
+  background: #102342 !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+.sidebar-section-title {
+  color: #8494AC;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.sidebar-nav-item {
+  color: #C9D3E1;
+}
+
+.sidebar-nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  transform: none;
+}
+
+.sidebar-nav-item:hover i {
+  transform: none;
+}
+
+.sidebar-nav-item.is-active {
+  background: rgba(255, 255, 255, 0.10);
+  box-shadow: none;
+}
+
+.sidebar-nav-item.is-active i {
+  color: #FFFFFF !important;
+}
+
+.sidebar-nav-item.is-active::before {
+  background-color: #5FB37C;
+  top: 7px;
+  bottom: 7px;
+}
+
+.sidebar-subnav-item:hover {
+  transform: none;
+}
+
+.sidebar-subnav-item.is-active {
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.sidebar-subnav-item.is-active::before {
+  background-color: #5FB37C;
+  box-shadow: none;
+}
+
+/* ---------------------------------------------------------------- Header */
+.header-profile-avatar,
+.auth-header-logo {
+  background: #1B345F;
+  box-shadow: none;
+}
+
+/* ---------------------------------------------------------------- Buttons */
+.btn-primary,
+.btn-primary-custom {
+  background: #1B345F !important;
+  border: 1px solid #1B345F !important;
+  box-shadow: var(--shadow-xs);
+  font-weight: 600;
+  transition: background-color var(--transition-fast), box-shadow var(--transition-fast), transform 80ms ease;
+}
+
+.btn-primary:hover,
+.btn-primary-custom:hover {
+  background: #142849 !important;
+  transform: none;
+  box-shadow: var(--shadow-sm);
+  opacity: 1;
+}
+
+.btn-primary:active,
+.btn-primary-custom:active,
+.btn-outline:active,
+.btn-outline-custom:active,
+.btn-outline-primary:active,
+.btn-secondary-custom:active,
+.dashboard-quick-action-btn:active {
+  transform: scale(0.98);
+}
+
+.btn-outline:hover,
+.btn-outline-custom:hover,
+.btn-outline-primary:hover,
+.dashboard-quick-action-btn:hover {
+  background-color: #F3F6FB;
+  border-color: #B9C6DA;
+  color: #1B345F !important;
+  transform: none;
+  box-shadow: var(--shadow-xs);
+}
+
+.dashboard-quick-action-btn i {
+  color: #1B345F;
+}
+
+/* ---------------------------------------------------------------- Cards */
+.card,
+.card-custom,
+.compact-metric-tile {
+  box-shadow: var(--shadow-xs);
+}
+
+/* Plain cards don't move; only things you can click lift (see .is-clickable in phase 4) */
+.card:hover,
+.card-custom:hover {
+  transform: none;
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-xs);
+}
+
+.card-header {
+  background: #FFFFFF;
+}
+
+.compact-metric-label {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.compact-metric-value {
+  color: #13294B;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- Badges */
+.badge,
+.badge-custom {
+  box-shadow: none;
+  font-weight: 600;
+  padding: 0.16rem 0.55rem;
+  letter-spacing: 0;
+}
+
+.badge-primary,
+.badge.bg-primary {
+  background-color: #EEF3FA !important;
+  color: #1B345F !important;
+  border-color: #D9E3F1;
+}
+
+.badge-purple {
+  background-color: #F1F5F9 !important;
+  color: #334155 !important;
+}
+
+/* ---------------------------------------------------------------- Tables */
+.table thead th,
+.table-custom thead th {
+  background: #F7F9FC;
+  font-weight: 600;
+  color: #5B6676;
+}
+
+.table tbody tr:hover,
+.table-custom tbody tr:hover {
+  background-color: #F6F9FD;
+}
+
+/* ---------------------------------------------------------------- Forms */
+.form-control-custom:focus,
+.select-custom:focus,
+.form-control:focus,
+.form-select:focus {
+  border-color: #2457C5;
+  box-shadow: var(--focus-ring);
+}
+
+/* ============================================================================
+   Phase 4 — hover and motion. Interactions answer in 150–250 ms; nothing loops
+   except loading indicators; everything is off under "reduce motion".
+   ============================================================================ */
+
+/* Metric tiles are clickable: lift a little and darken the border */
+.compact-metric-tile {
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.compact-metric-tile:hover {
+  transform: translateY(-2px);
+  border-color: #C9D4E5;
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* "Needs your attention": items slide in one after another; the arrow nudges on hover */
+.attention-item {
+  animation: attentionIn 420ms var(--ease-out) both;
+  transition: box-shadow var(--transition-base), transform var(--transition-base) !important;
+}
+
+.attention-item[data-index='1'] { animation-delay: 60ms; }
+.attention-item[data-index='2'] { animation-delay: 120ms; }
+.attention-item[data-index='3'] { animation-delay: 180ms; }
+.attention-item[data-index='4'] { animation-delay: 240ms; }
+.attention-item[data-index='5'] { animation-delay: 300ms; }
+
+.attention-item:hover {
+  box-shadow: var(--shadow-md) !important;
+}
+
+@keyframes attentionIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.attention-cta i {
+  transition: transform var(--transition-base);
+}
+
+.attention-item:hover .attention-cta i,
+.attention-cta:hover i,
+.dashboard-section-link:hover i {
+  transform: translateX(3px);
+}
+
+/* Sidebar submenu opens smoothly */
+.sidebar-subnav-group {
+  animation: subnavOpen 200ms var(--ease-out) both;
+  transform-origin: top;
+}
+
+@keyframes subnavOpen {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Segmented tabs on dashboards: smooth state change */
+.dashboard-segmented-nav button,
+.dashboard-nav-pill {
+  transition: background-color var(--transition-base), color var(--transition-base), box-shadow var(--transition-base);
+}
+
+/* Notification bell: one wiggle when something new arrives; the count pops */
+#notification-bell-btn.is-ringing i {
+  animation: bellRing 800ms ease-in-out;
+  transform-origin: 50% 2px;
+}
+
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(14deg); }
+  30% { transform: rotate(-12deg); }
+  45% { transform: rotate(8deg); }
+  60% { transform: rotate(-5deg); }
+  75% { transform: rotate(2deg); }
+}
+
+.notification-badge-pop {
+  animation: badgePop 320ms var(--ease-out);
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0.4); opacity: 0; }
+  70% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Dialogs and dropdowns: a touch quicker */
+.modal-content-custom,
+.modal-dialog-custom {
+  animation-duration: 180ms !important;
+}
+
+/* Lists and table rows respond to hover */
+.table-custom tbody tr,
+.table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+/* Links inside cards */
+.dashboard-section-link {
+  transition: color var(--transition-fast);
+}
+
+/* Keyboard users always see where they are */
+a:focus-visible,
+button:focus-visible,
+[role='tab']:focus-visible {
+  outline: 2px solid #2457C5;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attention-item,
+  .sidebar-subnav-group,
+  .notification-badge-pop,
+  #notification-bell-btn.is-ringing i {
+    animation: none !important;
+  }
+
+  .compact-metric-tile:hover {
+    transform: none;
+  }
+
+  .attention-cta i,
+  .dashboard-section-link i {
+    transition: none;
+  }
+}

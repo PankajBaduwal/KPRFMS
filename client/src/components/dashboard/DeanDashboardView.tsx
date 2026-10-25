@@ -6,6 +6,7 @@ import { ROUTES } from '../../constants/routes';
 import { FEATURES } from '../../constants/features';
 import { deanConsoleService } from '../../services/dean-console.service';
 import type { DeanPrimaryMetrics } from '../../types/dean-console';
+import { InstitutionInsights } from './insights/DashboardInsights';
 
 interface DeanDashboardViewProps {
   data: DeanDashboardData;
@@ -49,7 +50,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
       {/* 1. INSTITUTIONAL ACADEMIC SUMMARY          */}
       {/* ========================================== */}
       <section
-        aria-label="Institutional Academic Summary"
+        aria-label="Academic summary"
         className="card-custom"
         style={{
           padding: 'var(--space-5)',
@@ -79,14 +80,14 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
                   letterSpacing: '-0.01em',
                 }}
               >
-                Institutional Academic &amp; Research Oversight
+                Academic &amp; research overview
               </h2>
               <span className="badge-custom badge-primary" style={{ fontWeight: 700, fontSize: '0.75rem' }}>
-                Executive Dean Console
+                Dean
               </span>
               <span className="badge-custom badge-neutral" style={{ fontSize: '0.75rem' }}>
                 <i className="bi bi-shield-check" style={{ marginRight: 4, color: 'var(--color-success)' }} />
-                Institutional Compliance Active
+                All departments
               </span>
             </div>
             <p
@@ -97,7 +98,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
                 lineHeight: 1.5,
               }}
             >
-              Higher-level oversight across academic programs, faculty capacity, research output, funded grants, and department comparisons.
+              Programmes, faculty, research output and grants across departments.
             </p>
           </div>
 
@@ -105,7 +106,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
             <Link to={ROUTES.APPROVALS} className="btn-primary-custom btn-sm" style={{ textDecoration: 'none' }}>
               <i className="bi bi-check2-square" style={{ marginRight: 6 }} />
-              Institutional Approvals ({data.pendingApprovals.total})
+              Approvals ({data.pendingApprovals.total})
             </Link>
             <Link to={ROUTES.DEAN_CONSOLE} className="btn-outline-custom btn-sm" style={{ textDecoration: 'none' }}>
               <i className="bi bi-sliders" style={{ marginRight: 6 }} />
@@ -198,10 +199,10 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             </div>
             <div>
               <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 600, color: 'var(--color-text-muted)' }}>
-                Student-Faculty Ratio
+                Publications per faculty
               </div>
               <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-text)' }}>
-                {data.accreditationMetrics.studentFacultyRatio} <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>AICTE Compliant</span>
+                {data.accreditationMetrics.publicationsPerFaculty} <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>this year</span>
               </div>
             </div>
           </div>
@@ -232,6 +233,11 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="insights-section" aria-label="Institution insights">
+        <h2 className="insights-section-title">Research and faculty development</h2>
+        <InstitutionInsights charts={data.charts} variant="dean" />
       </section>
 
       {/* Segmented Focus Navigation - Calms the screen, keeping all sections accessible */}
@@ -299,7 +305,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             Authorized Academic Departments &amp; Divisions
           </h3>
           <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-            {data.departmentComparison.length} Academic Departments Under Dean Scope
+            {data.departmentComparison.length} departments
           </span>
         </div>
 
@@ -463,7 +469,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
           >
             <div>
               <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Institutional Average
+                Institution average
               </div>
               <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text)' }}>
                 {data.workload.institutionalAverageHours} <span style={{ fontSize: '0.8125rem', fontWeight: 500 }}>hrs/wk</span>
@@ -589,12 +595,12 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
       {/* 6. PENDING APPROVALS                       */}
       {/* ========================================== */}
       {(activeDeanTab === 'APPROVALS' || activeDeanTab === 'ALL') && (
-      <section aria-label="Institutional Approvals" className="card-custom">
+      <section aria-label="Approvals" className="card-custom">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
           <div>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)' }}>
               <i className="bi bi-check2-circle" style={{ color: 'var(--color-warning)' }} />
-              Pending Institutional Endorsements
+              Waiting for your approval
               <span className="badge-custom badge-warning" style={{ fontSize: '0.75rem', fontWeight: 700 }}>
                 {data.pendingApprovals.total} Pending Review
               </span>
@@ -723,7 +729,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
           <div>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)' }}>
               <i className="bi bi-file-earmark-bar-graph" style={{ color: 'var(--color-primary)' }} />
-              Accreditation Compliance &amp; Executive Reports
+              Accreditation reports
             </h3>
             <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginTop: 2 }}>
               Direct export of NAAC, NBA, and NIRF statutory institutional reporting datasets.

@@ -10,7 +10,7 @@ export interface AuditTabProps {
 export const AuditTab: React.FC<AuditTabProps> = ({ profile }) => {
   return (
     <div className="card-custom">
-            <h2 className="card-title">Profile Governance & Verification Certification</h2>
+            <h2 className="card-title">Profile verification</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', fontSize: '0.875rem' }}>
               <div>
                 <span className="text-secondary">Current Verification Status:</span>{' '}

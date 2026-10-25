@@ -259,7 +259,7 @@ export const HomePage: React.FC = () => {
       <section className="home-section" id="why-fms" aria-label="Why KPRIET Faculty Management System">
         <div className="home-container">
           <div className="section-header">
-            <span className="section-label">Institutional Value</span>
+            <span className="section-label">Value</span>
             <h2 className="section-title">
               Everything Faculty Management Needs. In One Place.
             </h2>
@@ -574,7 +574,7 @@ export const HomePage: React.FC = () => {
                     <div className="preview-detail-val">Recommended for Senior Grade &bull; Verified</div>
                   </div>
                   <div className="preview-detail-item">
-                    <div className="preview-detail-label">Statutory Dossier Status</div>
+                    <div className="preview-detail-label">Report status</div>
                     <div className="preview-detail-val">Approved by Principal Office &bull; AY 2025-26</div>
                   </div>
                 </div>
@@ -781,7 +781,7 @@ export const HomePage: React.FC = () => {
           </div>
 
           {/* Interactive Role Switcher */}
-          <div className="roles-selector-nav" role="tablist" aria-label="Institutional Roles">
+          <div className="roles-selector-nav" role="tablist" aria-label="Roles">
             {(['FACULTY', 'HOD', 'DEAN', 'PRINCIPAL', 'ADMIN'] as InstitutionalRole[]).map((role) => (
               <button
                 key={role}
@@ -946,7 +946,7 @@ export const HomePage: React.FC = () => {
                 {activeRole === 'PRINCIPAL' && (
                   <>
                     <div className="role-module-chip">
-                      <span><i className="bi bi-speedometer me-2 text-primary" />Executive KPI Dashboard</span>
+                      <span><i className="bi bi-speedometer me-2 text-primary" />Key figures</span>
                       <span className="text-success">&bull; Executive View</span>
                     </div>
                     <div className="role-module-chip">
@@ -954,7 +954,7 @@ export const HomePage: React.FC = () => {
                       <span className="text-success">&bull; Institutional</span>
                     </div>
                     <div className="role-module-chip">
-                      <span><i className="bi bi-shield-check me-2 text-primary" />Statutory Compliance Reports</span>
+                      <span><i className="bi bi-shield-check me-2 text-primary" />Accreditation reports</span>
                       <span className="text-success">&bull; Full Authority</span>
                     </div>
                     <div className="role-module-chip">
@@ -993,10 +993,10 @@ export const HomePage: React.FC = () => {
       {/* ========================================================
           SECTION 8 — WORKFLOW
           ======================================================== */}
-      <section className="home-section home-section-alt" id="workflow" aria-label="Institutional Review Lifecycle">
+      <section className="home-section home-section-alt" id="workflow" aria-label="Review steps">
         <div className="home-container">
           <div className="section-header">
-            <span className="section-label">Institutional Verification</span>
+            <span className="section-label">Verification</span>
             <h2 className="section-title">
               From Submission to Verification
             </h2>
@@ -1066,7 +1066,7 @@ export const HomePage: React.FC = () => {
       {/* ========================================================
           SECTION 9 — INSTITUTIONAL INTELLIGENCE
           ======================================================== */}
-      <section className="home-section" id="intelligence" aria-label="Institutional Intelligence & Reporting">
+      <section className="home-section" id="intelligence" aria-label="Reports">
         <div className="home-container">
           <div className="section-header">
             <span className="section-label">Accreditation &amp; Insights</span>
@@ -1091,7 +1091,7 @@ export const HomePage: React.FC = () => {
             <div className="analytics-stat-box">
               <div className="stat-label">Research Productivity</div>
               <div className="stat-number">18 Formats</div>
-              <p className="stat-desc">Statutory NAAC, NBA &amp; NIRF reports ready for generation</p>
+              <p className="stat-desc">NAAC, NBA &amp; NIRF reports ready to generate</p>
             </div>
 
             <div className="analytics-stat-box">
@@ -1158,10 +1158,10 @@ export const HomePage: React.FC = () => {
       {/* ========================================================
           SECTION 10 — SECURITY & GOVERNANCE
           ======================================================== */}
-      <section className="home-section home-section-alt" id="governance" aria-label="Security and Governance">
+      <section className="home-section home-section-alt" id="governance" aria-label="Security">
         <div className="home-container">
           <div className="section-header">
-            <span className="section-label">Enterprise Security</span>
+            <span className="section-label">Security</span>
             <h2 className="section-title">
               Built for Institutional Governance
             </h2>
@@ -1281,7 +1281,7 @@ export const HomePage: React.FC = () => {
                 alt="KPRIET"
                 style={{ width: '20px', height: '20px', objectFit: 'contain' }}
               />
-              <span>Official Institutional Portal &bull; KPRIET</span>
+              <span>KPRIET Faculty Portal</span>
             </div>
 
             <h2 className="final-cta-title">

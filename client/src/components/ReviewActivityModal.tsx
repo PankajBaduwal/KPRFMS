@@ -63,7 +63,7 @@ export const ReviewActivityModal: React.FC<ReviewActivityModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={loading ? () => {} : onClose}
-      title="Institutional Review: Academic Activity"
+      title="Review academic activity"
       size="md"
       footer={
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>

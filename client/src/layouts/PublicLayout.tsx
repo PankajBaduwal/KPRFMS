@@ -229,7 +229,7 @@ export const PublicLayout: React.FC = () => {
               </div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#4ADE80', background: 'rgba(74, 222, 128, 0.1)', padding: '4px 10px', borderRadius: '4px' }}>
                 <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ADE80' }} />
-                <span>SSL Encrypted Institutional Portal</span>
+                <span>Secure connection</span>
               </div>
             </div>
           </div>

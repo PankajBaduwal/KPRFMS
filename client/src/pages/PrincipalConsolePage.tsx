@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
@@ -22,6 +21,7 @@ import type {
   IPrincipalPrimaryMetrics,
   IPrincipalDepartmentOverview,
 } from '../types/principal-console';
+import { ResponsiveChart as ResponsiveContainer } from '../components/charts';
 
 export const PrincipalConsolePage: React.FC = () => {
   const navigate = useNavigate();
@@ -719,7 +719,7 @@ export const PrincipalConsolePage: React.FC = () => {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.825rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.35rem' }}>
-                      <span style={{ color: '#64748b' }}>Institutional Average:</span>
+                      <span style={{ color: '#64748b' }}>Institution average:</span>
                       <strong style={{ color: '#0f172a' }}>{metrics.workload.averageHours} hrs/week</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.35rem' }}>

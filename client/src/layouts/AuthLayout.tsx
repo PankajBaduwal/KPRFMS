@@ -65,7 +65,7 @@ export const AuthLayout: React.FC = () => {
             alignItems: 'center',
             gap: '12px',
           }}
-          title="Return to Institutional Portal Home"
+          title="Back to home"
         >
           <img
             src="/images/kpriet-logo.png"

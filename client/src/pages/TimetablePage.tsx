@@ -411,7 +411,7 @@ export const TimetablePage: React.FC = () => {
           }`}
         >
           <Layers className="w-4 h-4" />
-          <span>Institutional Matrix & Rooms</span>
+          <span>Rooms</span>
         </button>
 
         <button
@@ -859,7 +859,7 @@ export const TimetablePage: React.FC = () => {
                   <div>
                     <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
                       <MapPin className="w-4 h-4 text-rose-500" />
-                      <span>Institutional Room Occupancy Matrix</span>
+                      <span>Room occupancy</span>
                     </h4>
                     <p className="text-[11px] text-gray-500 mt-0.5">
                       Real-time classroom booking status across all 8 periods for the selected day.

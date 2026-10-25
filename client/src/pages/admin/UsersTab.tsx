@@ -544,7 +544,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                           <th style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #e2e8f0' }}>Designation Title</th>
                           <th style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #e2e8f0' }}>Hierarchy</th>
                           <th style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #e2e8f0' }}>Active Members</th>
-                          <th style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #e2e8f0' }}>Governance Scope</th>
+                          <th style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #e2e8f0' }}>Scope</th>
                           <th style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>Action</th>
                         </tr>
                       </thead>

@@ -182,7 +182,7 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={handleModalClose}
-      title="Upload Document to Institutional Vault"
+      title="Upload document"
       size="lg"
       footer={
         uploadSuccessDoc ? (

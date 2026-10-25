@@ -612,7 +612,7 @@ export const PublicationModal: React.FC<PublicationModalProps> = ({
               onChange={(e) => handleChange('numberOfAuthors', e.target.value)}
             />
             <Input
-              label="Institutional Affiliation"
+              label="Affiliation"
               value={formData.affiliation}
               onChange={(e) => handleChange('affiliation', e.target.value)}
               hint="Defaults to KPR Institute of Engineering and Technology"

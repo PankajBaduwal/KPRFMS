@@ -406,7 +406,7 @@ export const AppLayout: React.FC = () => {
         id="app-sidebar"
         className={`app-sidebar ${sidebarOpen ? 'sidebar-open' : ''} ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}
         role="navigation"
-        aria-label="Institutional Sidebar Navigation"
+        aria-label="Main navigation"
       >
         {/* Sidebar Header with Institutional Seal */}
         <div
@@ -449,7 +449,7 @@ export const AppLayout: React.FC = () => {
 
         {/* Sidebar Navigation Area with Section Groupings */}
         <nav
-          aria-label="Institutional Modules"
+          aria-label="Modules"
           style={{
             flex: 1,
             padding: sidebarCollapsed ? 'var(--space-3) var(--space-2)' : 'var(--space-3)',
@@ -556,7 +556,7 @@ export const AppLayout: React.FC = () => {
                       </button>
 
                       {isOpen && (
-                        <div style={{ marginTop: '1px', display: 'flex', flexDirection: 'column' }}>
+                        <div className="sidebar-subnav-group" style={{ marginTop: '1px', display: 'flex', flexDirection: 'column' }}>
                           {visibleSubItems.map((sub) => {
                             const isSubItmActive = isSubActive(sub.to);
                             return (
@@ -774,7 +774,7 @@ export const AppLayout: React.FC = () => {
                       onClick={() => setProfileDropdownOpen(false)}
                     >
                       <i className="bi bi-file-earmark-lock" aria-hidden="true" />
-                      <span>Institutional Documents</span>
+                      <span>My documents</span>
                     </Link>
 
                     <Link
@@ -847,7 +847,7 @@ export const AppLayout: React.FC = () => {
                       disabled={signOut.isPending}
                     >
                       <i className="bi bi-box-arrow-right" aria-hidden="true" />
-                      <span>{signOut.isPending ? 'Signing out...' : 'Sign Out of Institution'}</span>
+                      <span>{signOut.isPending ? 'Signing out...' : 'Sign out'}</span>
                     </button>
                   </div>
                 )}

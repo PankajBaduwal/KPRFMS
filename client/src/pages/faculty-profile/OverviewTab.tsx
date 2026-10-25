@@ -142,7 +142,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ activeSubjects, batche
   
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   <div>
-                    <span className="text-secondary">Institutional Status:</span>{' '}
+                    <span className="text-secondary">Status:</span>{' '}
                     <Badge variant="neutral">{profile.employment?.employmentType || 'REGULAR'}</Badge>{' '}
                     <Badge variant={profile.employment?.probationStatus === 'CONFIRMED' ? 'success' : 'warning'}>
                       {profile.employment?.probationStatus || 'CONFIRMED'}

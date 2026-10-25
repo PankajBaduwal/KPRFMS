@@ -973,10 +973,10 @@ export const AdminPage: React.FC = () => {
             </div>
             <div>
               <h1 style={{ fontSize: '1.75rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                System Administration Console
+                Administration
               </h1>
               <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b' }}>
-                Enterprise Configuration, Master Taxonomies, Access Management & Security Audit
+                Users, departments, academic calendar, settings and audit log
               </p>
             </div>
           </div>

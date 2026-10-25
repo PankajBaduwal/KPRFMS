@@ -10,6 +10,7 @@ import { hodConsoleService } from '../../services/hod-console.service';
 import { activityService } from '../../services/activity.service';
 import type { IDepartmentFacultyMember } from '../../types/hod-console';
 import type { AcademicActivity } from '../../types/activity';
+import { HodInsights } from './insights/DashboardInsights';
 
 interface HodDashboardViewProps {
   data: HodDashboardData;
@@ -243,7 +244,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
               </span>
               <span className="badge-custom badge-neutral" style={{ fontSize: '0.75rem' }}>
                 <i className="bi bi-shield-check" style={{ marginRight: 4, color: 'var(--color-success)' }} />
-                Institutional Governance Active
+                Department view
               </span>
             </div>
             <p
@@ -256,7 +257,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
             >
               {FEATURES.TEACHING
                 ? 'Academic operations, faculty workload distribution, research portfolio, and pending endorsements oversight.'
-                : 'Academic operations, research portfolio, and pending endorsements oversight.'}
+                : 'Faculty, research and items waiting for your approval.'}
             </p>
           </div>
 
@@ -453,6 +454,11 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
             </div>
           </div>
         )}
+      </section>
+
+      <section className="insights-section" aria-label="Department insights">
+        <h2 className="insights-section-title">Department at a glance</h2>
+        <HodInsights charts={data.charts} />
       </section>
 
       {/* Segmented Focus Navigation - Calms the screen, keeping all sections accessible */}

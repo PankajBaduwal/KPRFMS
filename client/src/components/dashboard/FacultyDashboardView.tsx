@@ -13,6 +13,8 @@ import { activityService } from '../../services/activity.service';
 import { notificationService } from '../../services/notification.service';
 import type { AcademicActivity } from '../../types/activity';
 import type { NotificationItem } from '../../types/notification';
+import { FacultyInsights } from './insights/DashboardInsights';
+import { AnimatedNumber } from '../charts';
 
 interface FacultyDashboardViewProps {
   data: FacultyDashboardData;
@@ -236,7 +238,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
               </Badge>
             </div>
             <div className="compact-metric-value-row">
-              <span className="compact-metric-value">{data.workloadSummary.totalHours}</span>
+              <AnimatedNumber className="compact-metric-value" value={Number(data.workloadSummary.totalHours) || 0} />
               <span className="compact-metric-unit">hrs/wk</span>
             </div>
             <div className="compact-metric-footer">
@@ -253,9 +255,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
               <i className="bi bi-journal-text" style={{ fontSize: '13px', color: 'var(--color-primary)' }} aria-hidden="true" />
             </div>
             <div className="compact-metric-value-row">
-              <span className="compact-metric-value">
-                {publicationsCount !== null ? publicationsCount : data.recentResearchActivity.filter((r) => r.type.includes('Publication')).length}
-              </span>
+              <AnimatedNumber className="compact-metric-value" value={Number(publicationsCount !== null ? publicationsCount : data.recentResearchActivity.filter((r) => r.type.includes('Publication')).length) || 0} />
               <span className="compact-metric-unit">recorded</span>
             </div>
             <div className="compact-metric-footer">
@@ -271,7 +271,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
               <i className="bi bi-people" style={{ fontSize: '13px', color: 'var(--color-primary)' }} aria-hidden="true" />
             </div>
             <div className="compact-metric-value-row">
-              <span className="compact-metric-value">{mentoringCount !== null ? mentoringCount : 0}</span>
+              <AnimatedNumber className="compact-metric-value" value={Number(mentoringCount !== null ? mentoringCount : 0) || 0} />
               <span className="compact-metric-unit">mentees</span>
             </div>
             <div className="compact-metric-footer">
@@ -289,7 +289,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
               </Badge>
             </div>
             <div className="compact-metric-value-row">
-              <span className="compact-metric-value">{data.pendingSubmissions.total}</span>
+              <AnimatedNumber className="compact-metric-value" value={Number(data.pendingSubmissions.total) || 0} />
               <span className="compact-metric-unit">submissions</span>
             </div>
             <div className="compact-metric-footer">
@@ -315,9 +315,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
                   <i className="bi bi-briefcase" style={{ fontSize: '13px', color: 'var(--color-primary)' }} aria-hidden="true" />
                 </div>
                 <div className="compact-metric-value-row">
-                  <span className="compact-metric-value">
-                    {projectsCount !== null ? projectsCount : data.recentResearchActivity.filter((r) => r.type.includes('Project')).length}
-                  </span>
+                  <AnimatedNumber className="compact-metric-value" value={Number(projectsCount !== null ? projectsCount : data.recentResearchActivity.filter((r) => r.type.includes('Project')).length) || 0} />
                   <span className="compact-metric-unit">projects</span>
                 </div>
                 <div className="compact-metric-footer">
@@ -333,7 +331,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
                   <i className="bi bi-mortarboard" style={{ fontSize: '13px', color: 'var(--color-primary)' }} aria-hidden="true" />
                 </div>
                 <div className="compact-metric-value-row">
-                  <span className="compact-metric-value">{phdScholarsCount !== null ? phdScholarsCount : 0}</span>
+                  <AnimatedNumber className="compact-metric-value" value={Number(phdScholarsCount !== null ? phdScholarsCount : 0) || 0} />
                   <span className="compact-metric-unit">scholars</span>
                 </div>
                 <div className="compact-metric-footer">
@@ -344,6 +342,11 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
             </>
           )}
         </div>
+      </section>
+
+      <section className="insights-section" aria-label="My insights">
+        <h2 className="insights-section-title">At a glance</h2>
+        <FacultyInsights charts={data.charts} />
       </section>
 
       {/* 4. Segmented Focus Navigation - Calms the screen, keeping all sections accessible */}
@@ -833,7 +836,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
 
       {/* 8. Activities & Updates Section */}
       {(activeFocusTab === 'NOTIFICATIONS' || activeFocusTab === 'ALL') && (
-        <section aria-label="Institutional Notifications and Activities">
+        <section aria-label="Notifications">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 'var(--space-6)' }}>
             {/* Upcoming Academic Activities */}
             <div className="card-custom">
@@ -890,12 +893,12 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
               )}
             </div>
 
-            {/* Institutional Notifications & Updates */}
+            {/* Notifications & updates */}
             <div className="card-custom">
               <div className="dashboard-section-header">
                 <h2 className="dashboard-section-title">
                   <i className="bi bi-bell" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
-                  Institutional Notifications & Updates
+                  Notifications & updates
                 </h2>
                 <Link to={ROUTES.NOTIFICATIONS} className="dashboard-section-link">
                   Notification Center &rarr;

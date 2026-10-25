@@ -172,7 +172,7 @@ export const AnalyticsDrillDownModal: React.FC<AnalyticsDrillDownModalProps> = (
                 flexWrap: 'wrap',
               }}
             >
-              <span>Drill-down from Institutional Analytics</span>
+              <span>From analytics</span>
               {filters.academicYear && filters.academicYear !== 'ALL' && (
                 <span>• AY: <strong style={{ color: '#0f172a' }}>{filters.academicYear}</strong></span>
               )}

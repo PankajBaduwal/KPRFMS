@@ -1,21 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from 'recharts';
 import type { PrincipalDashboardData } from '../../services/dashboard.service';
 import { ActionItemsBanner } from './ActionItemsBanner';
 import { ROUTES } from '../../constants/routes';
 import { FEATURES } from '../../constants/features';
-import { principalConsoleService } from '../../services/principal-console.service';
-import type { IPrincipalPrimaryMetrics } from '../../types/principal-console';
+import { InstitutionInsights } from './insights/DashboardInsights';
+import { AnimatedNumber } from '../charts';
 
 interface PrincipalDashboardViewProps {
   data: PrincipalDashboardData;
@@ -24,38 +14,8 @@ interface PrincipalDashboardViewProps {
 export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ data }) => {
   const navigate = useNavigate();
 
-  // Multi-year trend data from principalConsoleService
-  const [extraMetrics, setExtraMetrics] = useState<IPrincipalPrimaryMetrics | null>(null);
   const [activePrincipalTab, setActivePrincipalTab] = useState<'TRENDS' | 'DEPARTMENTS' | 'APPROVALS' | 'REPORTS' | 'ALL'>('TRENDS');
 
-  useEffect(() => {
-    let isMounted = true;
-    principalConsoleService
-      .getMetrics()
-      .then((m) => {
-        if (isMounted) setExtraMetrics(m);
-      })
-      .catch((err) => {
-        console.error('Failed to load extra principal metrics', err);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Format historical trend data for concise charts
-  const trendData = (extraMetrics?.yearlyTrends && extraMetrics.yearlyTrends.length > 0)
-    ? extraMetrics.yearlyTrends.map((t) => ({
-        year: t.year,
-        publications: t.verifiedPublications || t.publications,
-        fundingLakhs: parseFloat(((t.fundingSanctioned || 0) / 100000).toFixed(1)),
-      }))
-    : [
-        { year: '2022-23', publications: Math.max(12, Math.round(data.research.totalPublications * 0.7)), fundingLakhs: 24.5 },
-        { year: '2023-24', publications: Math.max(18, Math.round(data.research.totalPublications * 0.85)), fundingLakhs: 38.2 },
-        { year: '2024-25', publications: data.research.totalPublications, fundingLakhs: parseFloat((data.research.totalGrantsSanctioned / 100000).toFixed(1)) },
-      ];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', maxWidth: '1440px', margin: '0 auto' }}>
@@ -87,13 +47,13 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
               width: '44px',
               height: '44px',
               borderRadius: 'var(--radius-md)',
-              background: '#0f172a',
+              background: 'var(--color-primary)',
               color: '#f8fafc',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '1.25rem',
-              boxShadow: '0 2px 6px rgba(15, 23, 42, 0.25)',
+              
             }}
           >
             <i className="bi bi-mortarboard-fill" />
@@ -101,25 +61,12 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.01em' }}>
-                Office of the Principal — Institutional Executive Oversight
+                Institution overview
               </h1>
-              <span
-                style={{
-                  fontSize: '0.72rem',
-                  padding: '2px 8px',
-                  borderRadius: '9999px',
-                  background: '#f1f5f9',
-                  color: '#0f172a',
-                  fontWeight: 700,
-                  border: '1px solid #cbd5e1',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Executive
-              </span>
+
             </div>
             <p style={{ margin: '3px 0 0', fontSize: '0.84rem', color: 'var(--color-text-secondary)' }}>
-              Comprehensive academic governance, faculty deployment, research productivity & statutory compliance
+              Faculty, research and approvals across all departments
             </p>
           </div>
         </div>
@@ -139,7 +86,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
 
           <div style={{ textAlign: 'right' }}>
             <span style={{ fontSize: '0.74rem', color: 'var(--color-text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>
-              Attendance Reliability
+              Attendance (30 days)
             </span>
             <div style={{ fontSize: '1rem', fontWeight: 800, color: '#059669' }}>
               {data.institutionalOverview.institutionalAttendanceRate}
@@ -167,8 +114,8 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
             style={{
               padding: '7px 14px',
               borderRadius: '8px',
-              border: '1px solid #0f172a',
-              background: '#0f172a',
+              border: '1px solid var(--color-primary)',
+              background: 'var(--color-primary)',
               color: '#fff',
               fontSize: '0.84rem',
               fontWeight: 700,
@@ -227,7 +174,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
           </div>
           <div style={{ margin: '8px 0 4px' }}>
             <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.02em' }}>
-              {data.institutionalOverview.totalFaculty}
+              <AnimatedNumber value={data.institutionalOverview.totalFaculty} />
               <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#059669', marginLeft: '6px' }}>
                 ({data.institutionalOverview.activeFaculty} Active)
               </span>
@@ -237,7 +184,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
             </div>
           </div>
           <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
-            Faculty Retention: <strong>{data.faculty.retentionRate}</strong> &bull; AICTE Cadre Standard
+            Active accounts: <strong>{data.faculty.retentionRate}</strong>
           </div>
         </div>
 
@@ -276,7 +223,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
           </div>
           <div style={{ margin: '8px 0 4px' }}>
             <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.02em' }}>
-              ₹{(data.research.totalGrantsSanctioned / 100000).toFixed(1)}L
+              <AnimatedNumber value={data.research.totalGrantsSanctioned / 100000} decimals={1} prefix="₹" suffix="L" />
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
               <strong>{data.research.totalPublications}</strong> Verified Papers &bull; <strong>{data.research.patentsGranted}</strong> Granted Patents
@@ -350,7 +297,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase' }}>
-              Institutional Approvals
+              Approvals
             </span>
             <div
               style={{
@@ -370,7 +317,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
           </div>
           <div style={{ margin: '8px 0 4px' }}>
             <div style={{ fontSize: '1.75rem', fontWeight: 800, color: data.majorPendingApprovals.total > 0 ? '#ea580c' : 'var(--color-text)', letterSpacing: '-0.02em' }}>
-              {data.majorPendingApprovals.total}
+              <AnimatedNumber value={data.majorPendingApprovals.total} />
               <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', marginLeft: '6px' }}>
                 Pending
               </span>
@@ -381,11 +328,16 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
           </div>
           <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
             <Link to={ROUTES.APPROVALS} style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>
-              Review Executive Queue &rarr;
+              Review approvals &rarr;
             </Link>
           </div>
         </div>
       </div>
+
+      <section className="insights-section" aria-label="Institution insights">
+        <h2 className="insights-section-title">Institution at a glance</h2>
+        <InstitutionInsights charts={data.charts} variant="principal" />
+      </section>
 
       {/* Segmented Focus Navigation - Calms the screen, keeping all sections accessible */}
       <section aria-label="Principal Dashboard Focus Views">
@@ -396,7 +348,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
             onClick={() => setActivePrincipalTab('TRENDS')}
           >
             <i className="bi bi-graph-up-arrow" />
-            <span>Institutional Trends &amp; Mentoring</span>
+            <span>Trends &amp; mentoring</span>
           </button>
           <button
             type="button"
@@ -412,7 +364,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
             onClick={() => setActivePrincipalTab('APPROVALS')}
           >
             <i className="bi bi-check2-circle" />
-            <span>Executive Approvals ({data.majorPendingApprovals.total})</span>
+            <span>Approvals ({data.majorPendingApprovals.total})</span>
           </button>
           <button
             type="button"
@@ -443,63 +395,6 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
           gap: 'var(--space-6)',
         }}
       >
-        {/* Concise Visual Trend: Research & Grants Trajectory */}
-        {(activePrincipalTab === 'TRENDS' || activePrincipalTab === 'ALL') && (
-        <div
-          style={{
-            background: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '1.25rem 1.5rem',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Institutional Trajectory
-              </div>
-              <h3 style={{ margin: '2px 0 0', fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text)' }}>
-                Research Productivity & Grant Capital History
-              </h3>
-            </div>
-            <span
-              style={{
-                fontSize: '0.75rem',
-                padding: '3px 8px',
-                borderRadius: '6px',
-                background: '#dcfce7',
-                color: '#15803d',
-                fontWeight: 700,
-              }}
-            >
-              {data.trends.researchGrowthYearOverYear} YoY Growth
-            </span>
-          </div>
-
-          {/* Compact Chart */}
-          <div style={{ width: '100%', height: 230 }}>
-            <ResponsiveContainer>
-              <BarChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="year" fontSize={11} stroke="#64748b" />
-                <YAxis fontSize={11} stroke="#64748b" />
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: '0.78rem', paddingTop: '6px' }} />
-                <Bar dataKey="publications" name="Verified Publications" fill="#1B345F" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="fundingLakhs" name="Sanctioned Grants (₹ Lakhs)" fill="#7c3aed" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '8px', textAlign: 'center' }}>
-            Multi-year verified records tracked across Scopus, Web of Science & sanctioned grant registries.
-          </div>
-        </div>
-        )}
-
         {/* Department Comparative Ranking Matrix */}
         {(activePrincipalTab === 'DEPARTMENTS' || activePrincipalTab === 'ALL') && (
         <div
@@ -727,7 +622,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--color-text)' }}>
-              Executive Approval Queue & Compliance
+              Approvals awaiting you
             </h3>
             <span
               style={{
@@ -784,7 +679,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
                   High-Value Extramural Grants (&gt; ₹5 Lakhs)
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                  Institutional signatory approval for government & industry funding agencies
+                  Your sign-off for government and industry funding
                 </div>
               </div>
               <strong style={{ fontSize: '1.1rem', color: '#7c3aed' }}>

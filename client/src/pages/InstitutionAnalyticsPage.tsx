@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  ResponsiveContainer,
   BarChart,
   Bar,
   PieChart,
@@ -23,6 +22,7 @@ import type {
   IAnalyticsFilterOptions,
   IInstitutionAnalyticsData,
 } from '../types/institution-analytics';
+import { ResponsiveChart as ResponsiveContainer } from '../components/charts';
 
 const COLORS = {
   primary: '#2563eb',
@@ -1553,7 +1553,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                         <tr style={{ background: '#ffffff', borderBottom: '1px solid #f1f5f9', color: '#64748b', fontSize: '0.74rem', textTransform: 'uppercase' }}>
                           <th style={{ padding: '8px 14px' }}>Department</th>
                           <th style={{ padding: '8px 12px', textAlign: 'center' }}>Scholars Under Supervision</th>
-                          <th style={{ padding: '8px 12px', textAlign: 'center' }}>Share of Institutional Research</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'center' }}>Share of research</th>
                           <th style={{ padding: '8px 14px', textAlign: 'right' }}>Action</th>
                         </tr>
                       </thead>
@@ -1934,7 +1934,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                       Department Teaching Load & Norm Compliance Table
                     </span>
                     <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                      Institutional Average: <strong>{data.summaryKpis.avgWeeklyWorkloadHours} hrs/wk</strong> • Target AICTE Norm: 14–16 hrs/wk
+                      Institution average: <strong>{data.summaryKpis.avgWeeklyWorkloadHours} hrs/wk</strong> • Target AICTE Norm: 14–16 hrs/wk
                     </span>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
@@ -1944,7 +1944,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                           <th style={{ padding: '8px 14px' }}>Department</th>
                           <th style={{ padding: '8px 12px', textAlign: 'center' }}>Faculty Allocated</th>
                           <th style={{ padding: '8px 12px', textAlign: 'center' }}>Avg Contact Hours</th>
-                          <th style={{ padding: '8px 12px', textAlign: 'center' }}>Statutory Status</th>
+                          <th style={{ padding: '8px 12px', textAlign: 'center' }}>Status</th>
                           <th style={{ padding: '8px 14px', textAlign: 'right' }}>Action</th>
                         </tr>
                       </thead>

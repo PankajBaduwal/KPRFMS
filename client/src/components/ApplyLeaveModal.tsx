@@ -161,7 +161,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={loading || uploadingDoc ? () => {} : onClose}
-      title="Apply for Institutional Leave"
+      title="Apply for leave"
       size="lg"
       footer={
         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>

@@ -167,7 +167,7 @@ export const LoginPage: React.FC = () => {
         {/* ========================================================
             LEFT SIDE — INSTITUTIONAL BRAND & ARCHITECTURE
             ======================================================== */}
-        <div className="login-brand-panel" role="region" aria-label="Institutional Overview">
+        <div className="login-brand-panel" role="region" aria-label="Overview">
           <div className="login-brand-header">
             <div className="login-institution-badge" style={{ padding: '6px 14px', background: '#FFFFFF', borderRadius: 'var(--radius-pill)', display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
               <img
@@ -194,7 +194,7 @@ export const LoginPage: React.FC = () => {
           {/* Layered Connected Product Architecture Visualization */}
           <div className="login-visual-card">
             <div className="login-visual-top">
-              <span>Connected Institutional Ecosystem</span>
+              <span>Everything in one place</span>
               <Badge variant="primary">AY 2026-2027</Badge>
             </div>
 
@@ -217,7 +217,7 @@ export const LoginPage: React.FC = () => {
               </div>
               <div className="login-visual-item" style={{ gridColumn: 'span 2' }}>
                 <i className="bi bi-patch-check" aria-hidden="true" />
-                <span>Multi-Tier Verification &amp; Statutory Approvals</span>
+                <span>Verification &amp; approvals</span>
               </div>
             </div>
           </div>
@@ -385,7 +385,7 @@ export const LoginPage: React.FC = () => {
             style={challengeToken ? { display: 'none' } : undefined}
           >
             <Input
-              label="Institutional Email / Employee ID"
+              label="College email or employee ID"
               type="text"
               placeholder="e.g. employee.name@kpriet.ac.in or EMP1024"
               autoComplete="username"

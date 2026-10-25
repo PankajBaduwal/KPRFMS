@@ -1,5 +1,7 @@
 import { apiClient } from '../api/client';
 
+import type { AdminCharts, FacultyCharts, HodCharts, InstitutionCharts } from '../components/dashboard/insights/DashboardInsights';
+
 export interface ActionItem {
   id: string;
   type: 'CRITICAL' | 'WARNING' | 'INFO';
@@ -11,6 +13,7 @@ export interface ActionItem {
 }
 
 export interface FacultyDashboardData {
+  charts?: FacultyCharts;
   role: 'FACULTY';
   facultyName: string;
   employeeId: string;
@@ -103,6 +106,7 @@ export interface FacultyDashboardData {
 }
 
 export interface HodDashboardData {
+  charts?: HodCharts | null;
   role: 'HOD';
   departmentName: string;
   departmentId?: string;
@@ -162,6 +166,7 @@ export interface HodDashboardData {
 }
 
 export interface DeanDashboardData {
+  charts?: InstitutionCharts;
   role: 'DEAN';
   academicOverview: {
     totalDepartments: number;
@@ -208,6 +213,7 @@ export interface DeanDashboardData {
 }
 
 export interface PrincipalDashboardData {
+  charts?: InstitutionCharts;
   role: 'PRINCIPAL';
   institutionalOverview: {
     totalDepartments: number;
@@ -256,6 +262,7 @@ export interface PrincipalDashboardData {
 }
 
 export interface AdminDashboardData {
+  charts?: AdminCharts;
   role: 'ADMIN';
   systemHealth: {
     databaseStatus: string;

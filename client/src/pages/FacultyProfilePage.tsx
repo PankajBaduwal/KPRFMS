@@ -820,7 +820,7 @@ export const FacultyProfilePage: React.FC = () => {
       {/* Tab 11: Leave */}
       {activeTab === 'leave' && (
         <div className="card-custom">
-          <h2 className="card-title">Available Institutional Leave Balances</h2>
+          <h2 className="card-title">Leave balance</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-4)' }}>
             <div style={{ padding: 'var(--space-3)', background: 'var(--color-background)', borderRadius: 'var(--radius-sm)' }}>
               <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Casual Leave (CL)</div>
@@ -1074,7 +1074,7 @@ export const FacultyProfilePage: React.FC = () => {
         }}
         closeOnEscape={!submitVerification.isPending}
         closeOnBackdrop={!submitVerification.isPending}
-        title="Institutional Profile Verification"
+        title="Verify profile"
         footer={
           <>
             <Button

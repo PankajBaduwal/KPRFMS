@@ -131,7 +131,7 @@ export const ReviewIPRModal: React.FC<ReviewIPRModalProps> = ({
 
         {/* Remarks / Feedback */}
         <Input
-          label="Verification Remarks / Institutional Notes"
+          label="Remarks"
           value={remarks}
           onChange={(e) => setRemarks(e.target.value)}
           placeholder={

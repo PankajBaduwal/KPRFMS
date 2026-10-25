@@ -180,7 +180,7 @@ export const StudentMentoringPage: React.FC = () => {
           ) : isFaculty ? (
             <Badge variant="primary">Faculty Mentorship</Badge>
           ) : (
-            <Badge variant="success">Institutional View</Badge>
+            <Badge variant="success">Institution view</Badge>
           )
         }
         actions={

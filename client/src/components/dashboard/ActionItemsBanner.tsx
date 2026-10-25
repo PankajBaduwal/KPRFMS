@@ -4,10 +4,11 @@ import type { ActionItem } from '../../services/dashboard.service';
 
 interface ActionItemsBannerProps {
   actions: ActionItem[];
+  /** Not shown any more (it only repeated the user's role); kept so callers need no change */
   roleTitle?: string;
 }
 
-export const ActionItemsBanner: React.FC<ActionItemsBannerProps> = ({ actions, roleTitle }) => {
+export const ActionItemsBanner: React.FC<ActionItemsBannerProps> = ({ actions }) => {
   if (!actions || actions.length === 0) {
     return (
       <div
@@ -91,7 +92,7 @@ export const ActionItemsBanner: React.FC<ActionItemsBannerProps> = ({ actions, r
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           <i className="bi bi-bell-fill" style={{ color: 'var(--color-primary)' }} />
           <h2 style={{ fontSize: '1.0625rem', fontWeight: 600, margin: 0 }}>
-            What Requires Your Attention
+            Needs your attention
           </h2>
           <span
             style={{
@@ -106,20 +107,17 @@ export const ActionItemsBanner: React.FC<ActionItemsBannerProps> = ({ actions, r
             {actions.length} {actions.length === 1 ? 'Item' : 'Items'}
           </span>
         </div>
-        {roleTitle && (
-          <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
-            Focused for {roleTitle}
-          </span>
-        )}
+
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-        {actions.map((act) => {
+        {actions.map((act, index) => {
           const style = getPriorityStyle(act.type);
           return (
             <div
               key={act.id}
-              className="card-custom"
+              className="card-custom attention-item"
+              data-index={Math.min(index, 5)}
               style={{
                 border: style.border,
                 borderLeft: style.borderLeft,
@@ -179,7 +177,7 @@ export const ActionItemsBanner: React.FC<ActionItemsBannerProps> = ({ actions, r
               <div>
                 <Link
                   to={act.link}
-                  className="btn btn-sm btn-outline-primary"
+                  className="btn btn-sm btn-outline-primary attention-cta"
                   style={{
                     fontSize: '0.8125rem',
                     padding: '4px 12px',

@@ -87,7 +87,7 @@ export const AcademicCalendarTab: React.FC<AcademicCalendarTabProps> = ({ academ
                   >
                     <div>
                       <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Academic Years</h3>
-                      <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>Institutional Cycles & Timelines</p>
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>Cycles & timelines</p>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                       <input

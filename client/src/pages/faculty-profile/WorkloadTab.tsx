@@ -16,7 +16,7 @@ export const WorkloadTab: React.FC<WorkloadTabProps> = ({ facultyTimetable, prof
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             <div className="card-custom">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-                <h2 className="card-title" style={{ margin: 0 }}>Weekly Institutional Workload</h2>
+                <h2 className="card-title" style={{ margin: 0 }}>Weekly workload</h2>
                 <Link
                   to="/portal/workload"
                   style={{

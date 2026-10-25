@@ -69,7 +69,7 @@ export const ReviewPublicationModal: React.FC<ReviewPublicationModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={isSubmitting ? () => {} : onClose}
-      title="Institutional Publication Verification"
+      title="Verify publication"
       size="md"
       footer={
         <>

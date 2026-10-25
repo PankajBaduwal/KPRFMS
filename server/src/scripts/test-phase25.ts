@@ -267,7 +267,9 @@ async function runPhase25Tests() {
     );
 
     // 6f. Date Range Filter
-    const today = new Date().toISOString().slice(0, 10);
+    // Local calendar date: the service reads dates as local days (UTC would break between 00:00 and 05:30 IST)
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const dateFilterRes = await auditService.getAuditLogs({ startDate: today, endDate: today });
     assert(dateFilterRes.data.length > 0, 'Filter: date range filtering retrieves today records');
 

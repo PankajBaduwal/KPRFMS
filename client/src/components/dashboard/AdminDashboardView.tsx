@@ -5,6 +5,7 @@ import { ActionItemsBanner } from './ActionItemsBanner';
 import { Badge } from '../Badge';
 import { ROUTES } from '../../constants/routes';
 import { FEATURES } from '../../constants/features';
+import { AdminInsights } from './insights/DashboardInsights';
 
 interface AdminDashboardViewProps {
   data: AdminDashboardData;
@@ -243,32 +244,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-            <span
-              style={{
-                fontSize: '0.725rem',
-                fontWeight: 800,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                backgroundColor: '#0f172a',
-                color: '#ffffff',
-                padding: '0.2rem 0.6rem',
-                borderRadius: '4px',
-              }}
-            >
-              System Administration
-            </span>
-            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-              Operational Control • Configuration Registry • Infrastructure Health
-            </span>
-          </div>
-
-          <h2 style={{ margin: '0.2rem 0', fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
-            System Administrator Operations Dashboard
-          </h2>
-          <p style={{ margin: 0, fontSize: '0.875rem', color: '#475569' }}>
-            Central administration for user accounts, role-based permissions, academic structures, master tables, and statutory configuration.
-          </p>
+          <h2 className="dash-title">Administration overview</h2>
+          <p className="dash-subtitle">Users, departments, academic calendar and system settings.</p>
         </div>
 
         {/* Runtime Diagnostics Pill Strip */}
@@ -294,8 +271,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                 backgroundColor: data.systemHealth.databaseStatus === 'CONNECTED' ? '#16a34a' : '#dc2626',
               }}
             />
-            <span style={{ color: '#64748b' }}>DB:</span>
-            <strong style={{ color: '#0f172a' }}>{data.systemHealth.databaseStatus}</strong>
+            <span style={{ color: '#64748b' }}>Database:</span>
+            <strong style={{ color: '#0f172a' }}>{data.systemHealth.databaseStatus === 'CONNECTED' ? 'Online' : 'Offline'}</strong>
           </div>
 
           <div
@@ -311,25 +288,13 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
             <strong style={{ color: '#0f172a' }}>{data.systemHealth.serverUptime}</strong>
           </div>
 
-          <div
-            style={{
-              padding: '0.4rem 0.75rem',
-              borderRadius: '6px',
-              backgroundColor: '#f8fafc',
-              border: '1px solid #cbd5e1',
-              fontSize: '0.75rem',
-            }}
-          >
-            <span style={{ color: '#64748b' }}>Heap:</span>{' '}
-            <strong style={{ color: '#0f172a' }}>{data.systemHealth.heapMemory}</strong>
-          </div>
 
           <Link
             to={ROUTES.ADMIN_CONSOLE}
             style={{
               padding: '0.4rem 0.85rem',
               borderRadius: '6px',
-              backgroundColor: '#0f172a',
+              backgroundColor: 'var(--color-primary)',
               color: '#ffffff',
               fontSize: '0.8rem',
               fontWeight: 600,
@@ -339,7 +304,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
               gap: '0.35rem',
             }}
           >
-            <i className="bi bi-sliders" /> Full Admin Console
+            <i className="bi bi-sliders" /> Open admin console
           </Link>
         </div>
       </div>
@@ -347,12 +312,17 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
       {/* 2. Operational Action Items & Security Alerts Banner */}
       <ActionItemsBanner actions={data.requiredActions} roleTitle="System Administrator" />
 
+      <section className="insights-section" aria-label="System insights">
+        <h2 className="insights-section-title">Usage</h2>
+        <AdminInsights charts={data.charts} />
+      </section>
+
       {/* 3. Operational Navigation Tabs - Unified styling */}
       <section aria-label="Administrator Operations Tabs" style={{ marginBottom: 'var(--space-4)' }}>
         <div className="dashboard-segmented-nav">
           {[
             { id: 'overview', label: 'Operations & Structure', icon: 'bi-grid-1x2' },
-            { id: 'configuration_hub', label: '16-Domain Configuration Registry', icon: 'bi-folder-check' },
+            { id: 'configuration_hub', label: 'Configuration', icon: 'bi-folder-check' },
             { id: 'audit_activity', label: 'Live Audit Trail', icon: 'bi-journal-text', badge: data.auditActivity?.length },
             { id: 'diagnostics', label: 'System Diagnostics & Environment', icon: 'bi-cpu' },
           ].map((tab) => {
@@ -487,7 +457,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                     User Accounts & Role Distribution
                   </h4>
                   <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                    Institutional role hierarchy and active account census
+                    Accounts by role
                   </div>
                 </div>
                 <Link
@@ -544,10 +514,10 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
               <div style={{ padding: '0.85rem 1.25rem', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>
-                    Academic & Structural Configuration
+                    Academic configuration
                   </h4>
                   <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                    Active calendar, program catalog, and master entities
+                    Calendar, programmes and master data
                   </div>
                 </div>
                 <Link
