@@ -647,7 +647,7 @@
   .pub-hero-copy,
   .pub-hero-visual,
   .pub-role-panel { animation: none; }
-  .pub-reveal { opacity: 1; transform: none; transition: none; }
+
   .pub-browser,
   .pub-browser:hover { transform: none; transition: none; }
   .pub-feature:hover { transform: none; }

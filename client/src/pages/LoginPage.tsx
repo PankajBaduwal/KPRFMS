@@ -36,6 +36,8 @@ export const LoginPage: React.FC = () => {
   const [sessionExpired, setSessionExpired] = useState(false);
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
+  const [shake, setShake] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [useRecoveryCode, setUseRecoveryCode] = useState(false);
   const [forgotIdentifier, setForgotIdentifier] = useState('');
@@ -71,6 +73,20 @@ export const LoginPage: React.FC = () => {
       window.removeEventListener('fms:session-expired', handleSessionExpiredEvent);
     };
   }, [location.state, searchParams]);
+
+  // Shake the card briefly when sign-in fails
+  useEffect(() => {
+    if (!errorMessage) return;
+    setShake(true);
+    const t = setTimeout(() => setShake(false), 500);
+    return () => clearTimeout(t);
+  }, [errorMessage]);
+
+  /** Show a short "Signed in" confirmation on the button, then open the portal. */
+  const finishSignIn = () => {
+    setSignedIn(true);
+    setTimeout(() => navigate(from, { replace: true }), 450);
+  };
 
   // Restore remembered identifier if present
   useEffect(() => {
@@ -109,7 +125,7 @@ export const LoginPage: React.FC = () => {
         setTwoFactorCode('');
         return;
       }
-      navigate(from, { replace: true });
+      finishSignIn();
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'message' in err) {
         setErrorMessage((err as { message: string }).message);
@@ -130,7 +146,7 @@ export const LoginPage: React.FC = () => {
           // ignore
         }
       }
-      navigate(from, { replace: true });
+      finishSignIn();
     } catch (err: unknown) {
       const message = (err as { message?: string })?.message || 'That code could not be verified.';
       setErrorMessage(message);
@@ -163,6 +179,8 @@ export const LoginPage: React.FC = () => {
     <div className="login-page-container">
       <div className="login-split-layout">
         <aside className="login-brand-panel" aria-label="About the Faculty Management System">
+          <span className="login-aurora login-aurora-a" aria-hidden="true" />
+          <span className="login-aurora login-aurora-b" aria-hidden="true" />
           <div className="login-brand-top">
             <div className="login-brand-mark">
               <img src="/images/kpriet-emblem.png" alt="" width={28} height={28} />
@@ -193,7 +211,7 @@ export const LoginPage: React.FC = () => {
         {/* ========================================================
             RIGHT SIDE — LOGIN AUTHENTICATION PANEL
             ======================================================== */}
-        <div className="login-auth-panel" role="region" aria-label="Sign In Panel">
+        <div className={`login-auth-panel ${shake ? 'is-shaking' : ''}`} role="region" aria-label="Sign In Panel">
           <div className="login-panel-header">
             <h2 className="login-panel-title">{challengeToken ? 'Two-step verification' : 'Sign in'}</h2>
             <p className="login-panel-desc">
@@ -257,10 +275,15 @@ export const LoginPage: React.FC = () => {
               />
               <button
                 type="submit"
-                className="login-submit-btn"
-                disabled={verifyCode.isPending || (useRecoveryCode ? twoFactorCode.length < 8 : twoFactorCode.length !== 6)}
+                className={`login-submit-btn ${signedIn ? 'is-success' : ''}`}
+                disabled={signedIn || verifyCode.isPending || (useRecoveryCode ? twoFactorCode.length < 8 : twoFactorCode.length !== 6)}
               >
-                {verifyCode.isPending ? (
+                {signedIn ? (
+                  <>
+                    <i className="bi bi-check2-circle" aria-hidden="true" />
+                    <span>Signed in</span>
+                  </>
+                ) : verifyCode.isPending ? (
                   <>
                     <span className="spinner spinner-sm" aria-hidden="true" />
                     <span>Verifying...</span>
@@ -369,10 +392,15 @@ export const LoginPage: React.FC = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isSubmitting || signIn.isPending}
-              className="login-submit-btn"
+              disabled={isSubmitting || signIn.isPending || signedIn}
+              className={`login-submit-btn ${signedIn ? 'is-success' : ''}`}
             >
-              {isSubmitting || signIn.isPending ? (
+              {signedIn ? (
+                <>
+                  <i className="bi bi-check2-circle" aria-hidden="true" />
+                  <span>Signed in</span>
+                </>
+              ) : isSubmitting || signIn.isPending ? (
                 <>
                   <span className="spinner spinner-sm" aria-hidden="true" />
                   <span>Signing in...</span>

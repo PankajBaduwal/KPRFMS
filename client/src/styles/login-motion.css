@@ -1,0 +1,199 @@
+/* ============================================================================
+   Sign in / register / reset password — motion and hover layer.
+   Full motion: drifting colour in the brand panel, slowly turning emblem, staggered
+   entrance of text and fields, button light sweep, shake on a wrong password.
+   Reduced motion: fades and colour/glow changes only.
+   ============================================================================ */
+
+/* Card entrance: a little scale + fade */
+.login-page-container { animation: authCardIn 600ms var(--ease-out, ease-out) both; }
+@keyframes authCardIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Brand panel: two soft colour fields drift behind the text */
+.login-brand-panel { isolation: isolate; }
+.login-aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+.login-aurora-a {
+  width: 340px;
+  height: 340px;
+  background: rgba(47, 143, 91, 0.35);
+  top: -120px;
+  right: -110px;
+  animation: auroraA 18s ease-in-out infinite alternate;
+}
+.login-aurora-b {
+  width: 300px;
+  height: 300px;
+  background: rgba(36, 87, 197, 0.35);
+  bottom: -120px;
+  left: -90px;
+  animation: auroraB 22s ease-in-out infinite alternate;
+}
+@keyframes auroraA {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-90px, 70px) scale(1.15); }
+}
+@keyframes auroraB {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(80px, -60px) scale(1.1); }
+}
+
+/* Emblem watermark turns very slowly */
+.login-brand-panel::before {
+  z-index: 0;
+  animation: emblemTurn 60s linear infinite;
+}
+@keyframes emblemTurn {
+  to { transform: rotate(360deg); }
+}
+
+/* Brand text and points come in one after another */
+.login-brand-top > *,
+.login-brand-foot {
+  animation: authFadeUp 600ms var(--ease-out, ease-out) both;
+}
+.login-brand-top > :nth-child(1) { animation-delay: 150ms; }
+.login-brand-top > :nth-child(2) { animation-delay: 230ms; }
+.login-brand-top > :nth-child(3) { animation-delay: 310ms; }
+.login-brand-points li { animation: authFadeLeft 520ms var(--ease-out, ease-out) both; transition: transform 200ms var(--ease-out, ease-out), color 200ms ease; }
+.login-brand-points li:nth-child(1) { animation-delay: 420ms; }
+.login-brand-points li:nth-child(2) { animation-delay: 500ms; }
+.login-brand-points li:nth-child(3) { animation-delay: 580ms; }
+.login-brand-points li:hover { transform: translateX(4px); color: #FFFFFF; }
+.login-brand-points li i { transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.login-brand-points li:hover i { transform: scale(1.2); }
+.login-brand-foot { animation-delay: 700ms; }
+.login-brand-mark { transition: background-color 200ms ease, border-color 200ms ease; }
+.login-brand-mark:hover { background: rgba(255, 255, 255, 0.14); border-color: rgba(255, 255, 255, 0.22); }
+
+/* Form: header and fields fade up in sequence */
+.login-panel-header,
+.login-form > *,
+.login-register-cta,
+.login-help {
+  animation: authFadeUp 520ms var(--ease-out, ease-out) both;
+}
+.login-panel-header { animation-delay: 160ms; }
+.login-form > :nth-child(1) { animation-delay: 240ms; }
+.login-form > :nth-child(2) { animation-delay: 300ms; }
+.login-form > :nth-child(3) { animation-delay: 360ms; }
+.login-form > :nth-child(4) { animation-delay: 420ms; }
+.login-register-cta { animation-delay: 480ms; }
+.login-help { animation-delay: 540ms; }
+
+/* Focused field: soft ring and the icon lights up */
+.login-auth-panel .form-control-custom,
+.register-panel .form-control-custom {
+  transition: border-color 180ms ease, box-shadow 220ms ease, background-color 180ms ease;
+}
+.login-auth-panel .form-control-custom:hover,
+.register-panel .form-control-custom:hover { border-color: #B9C6DA; }
+.login-auth-panel .form-control-custom:focus,
+.register-panel .form-control-custom:focus {
+  border-color: #2457C5;
+  box-shadow: 0 0 0 4px rgba(36, 87, 197, 0.14);
+  background: #FFFFFF;
+}
+.login-auth-panel div:focus-within > span:first-child,
+.register-panel div:focus-within > span:first-child { color: #2457C5 !important; transition: color 180ms ease; }
+
+/* Primary button: light sweep on hover, lift, green confirmation after signing in */
+.login-submit-btn { position: relative; overflow: hidden; isolation: isolate; }
+.login-submit-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.28) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 750ms var(--ease-out, ease-out);
+}
+.login-submit-btn:hover:not(:disabled)::before { transform: translateX(120%); }
+.login-submit-btn:hover:not(:disabled) { box-shadow: 0 10px 22px -10px rgba(27, 52, 95, 0.6) !important; }
+.login-submit-btn i { transition: transform 250ms var(--ease-out, ease-out); }
+.login-submit-btn:hover:not(:disabled) i { transform: translateX(3px); }
+.login-submit-btn.is-success,
+.login-submit-btn.is-success:disabled {
+  background: #1E7A47 !important;
+  border-color: #1E7A47 !important;
+  opacity: 1;
+  animation: successPop 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes successPop {
+  0% { transform: scale(0.97); }
+  60% { transform: scale(1.02); }
+  100% { transform: none; }
+}
+
+/* Links: animated underline */
+.login-forgot-btn,
+.login-register-cta a,
+.login-help a,
+.register-footer a {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 250ms var(--ease-out, ease-out), color 150ms ease;
+  text-decoration: none !important;
+}
+.login-forgot-btn:hover,
+.login-register-cta a:hover,
+.login-help a:hover,
+.register-footer a:hover { background-size: 100% 1px; }
+
+/* Wrong password: the card shakes once */
+.login-auth-panel.is-shaking { animation: authShake 450ms ease; }
+@keyframes authShake {
+  0%, 100% { transform: none; }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(2px); }
+}
+
+/* Header "Back to home" arrow nudges */
+.auth-topbar-link i { transition: transform 200ms var(--ease-out, ease-out); }
+.auth-topbar-link:hover i { transform: translateX(-3px); }
+
+@keyframes authFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes authFadeLeft {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes authFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Reduced motion: keep the fades and colour changes, drop movement and loops */
+@media (prefers-reduced-motion: reduce) {
+  .login-aurora,
+  .login-brand-panel::before { animation: none !important; }
+  .login-page-container,
+  .login-brand-top > *,
+  .login-brand-foot,
+  .login-brand-points li,
+  .login-panel-header,
+  .login-form > *,
+  .login-register-cta,
+  .login-help { animation-name: authFade !important; }
+  .login-brand-points li:hover,
+  .login-brand-points li:hover i,
+  .login-submit-btn:hover:not(:disabled) i,
+  .auth-topbar-link:hover i { transform: none; }
+  .login-submit-btn::before { display: none; }
+  .login-auth-panel.is-shaking { animation: none; box-shadow: inset 0 0 0 2px rgba(180, 35, 24, 0.35); }
+  .login-submit-btn.is-success { animation: none; }
+}

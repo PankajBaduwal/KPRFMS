@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import '../styles/public.css';
+import '../styles/public-motion.css';
 
 const NAV = [
   { href: '#features', label: 'Features' },
@@ -14,10 +15,27 @@ const NAV = [
 export const PublicLayout: React.FC = () => {
   const isHome = useLocation().pathname === ROUTES.HOME;
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scroll, setScroll] = useState(0);
+
+  // Scroll progress for the bar under the header, shadow once scrolled, back-to-top button
+  useEffect(() => {
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setScroll(max > 0 ? window.scrollY / max : 0);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
 
   return (
     <div className="public-layout pub">
-      <header className="pub-header">
+      <header className={`pub-header ${scroll > 0.005 ? 'is-scrolled' : ''}`}>
+        <span className="pub-progress" style={{ transform: `scaleX(${scroll})` }} aria-hidden="true" />
         <div className="pub-container pub-header-inner">
           <Link to={ROUTES.HOME} className="pub-brand" title="KPRIET Faculty Management System">
             <img src="/images/kpriet-logo.png" alt="KPR Institute of Engineering and Technology" />
@@ -52,6 +70,18 @@ export const PublicLayout: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {isHome && (
+        <button
+          type="button"
+          className={`pub-to-top ${scroll > 0.15 ? 'is-shown' : ''}`}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Back to top"
+          tabIndex={scroll > 0.15 ? 0 : -1}
+        >
+          <i className="bi bi-arrow-up" aria-hidden="true" />
+        </button>
+      )}
 
       <main className="public-content">
         <Outlet />

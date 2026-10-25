@@ -1,3 +1,4 @@
+import publicRoutes from './public.routes.js';
 import aiRoutes from './ai.routes.js';
 import calendarRoutes from './calendar.routes.js';
 import { Router } from 'express';
@@ -79,5 +80,6 @@ router.use('/documents', documentRoutes);
 router.use('/academic-years', academicYearRoutes);
 router.use('/calendar', calendarRoutes);
 router.use('/ai', aiRoutes);
+router.use('/public', publicRoutes);
 
 export default router;

@@ -64,3 +64,6 @@ server/test-api.log
 
 # Development email outbox (emails written instead of sent)
 mail-outbox*/
+
+# Large animation previews (kept locally)
+docs/ui-redesign/*.gif

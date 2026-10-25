@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import '../styles/login.css';
+import '../styles/login-motion.css';
 
 /** Shell for sign in, register and reset password: slim header, centred content, one-line footer. */
 export const AuthLayout: React.FC = () => {
