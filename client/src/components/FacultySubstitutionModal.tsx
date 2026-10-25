@@ -1,3 +1,4 @@
+import '../styles/legacy-utilities.css';
 import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { Button } from './Button';
@@ -185,6 +186,7 @@ export const FacultySubstitutionModal: React.FC<FacultySubstitutionModalProps> =
 
   return (
     <Modal
+      className="tw-legacy"
       isOpen={isOpen}
       onClose={saving ? () => {} : onClose}
       title="Record Faculty Substitution"

@@ -1,3 +1,4 @@
+import '../styles/legacy-utilities.css';
 import React from 'react';
 import { Modal } from './Modal';
 import { Button } from './Button';
@@ -7,6 +8,7 @@ import {
   STUDENT_PROJECT_STATUS_CONFIG, 
   STUDENT_PROJECT_TYPE_LABELS 
 } from '../types/student-project';
+import { fileUrl } from '../utils/fileUrl';
 
 interface StudentProjectDetailModalProps {
   isOpen: boolean;
@@ -51,6 +53,7 @@ export const StudentProjectDetailModal: React.FC<StudentProjectDetailModalProps>
 
   return (
     <Modal
+      className="tw-legacy"
       isOpen={isOpen}
       onClose={onClose}
       title="Student Project Sheet"
@@ -257,7 +260,7 @@ export const StudentProjectDetailModal: React.FC<StudentProjectDetailModalProps>
                   </span>
                 </div>
                 <a
-                  href={`http://localhost:5000${docUrl.startsWith('/') ? docUrl : `/${docUrl}`}`}
+                  href={fileUrl(docUrl)}
                   target="_blank"
                   rel="noreferrer"
                   className="px-2.5 py-1 text-xs font-semibold rounded bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 inline-flex items-center gap-1"

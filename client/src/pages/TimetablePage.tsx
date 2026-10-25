@@ -1,3 +1,4 @@
+import '../styles/legacy-utilities.css';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
@@ -334,6 +335,7 @@ export const TimetablePage: React.FC = () => {
   }, [instTimetable, roomSearch]);
 
   return (
+    <div className="tw-legacy">
     <div className="space-y-6">
       {/* Page Header */}
       <PageHeader
@@ -1161,6 +1163,7 @@ export const TimetablePage: React.FC = () => {
           }}
         />
       )}
+    </div>
     </div>
   );
 };

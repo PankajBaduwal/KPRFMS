@@ -1,3 +1,4 @@
+import '../styles/legacy-utilities.css';
 import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { Button } from './Button';
@@ -77,6 +78,7 @@ export const ReviewStudentProjectModal: React.FC<ReviewStudentProjectModalProps>
 
   return (
     <Modal
+      className="tw-legacy"
       isOpen={isOpen}
       onClose={submitting ? () => {} : onClose}
       title="Review & Update Project Status"

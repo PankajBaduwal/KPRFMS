@@ -1,3 +1,4 @@
+import '../styles/legacy-utilities.css';
 import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { Button } from './Button';
@@ -121,6 +122,7 @@ export const WorkloadThresholdModal: React.FC<WorkloadThresholdModalProps> = ({
 
   return (
     <Modal
+      className="tw-legacy"
       isOpen={isOpen}
       onClose={saving || resetting ? () => {} : onClose}
       title="Configurable Workload Policy & Thresholds"

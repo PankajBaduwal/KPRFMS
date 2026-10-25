@@ -1,3 +1,4 @@
+import '../styles/legacy-utilities.css';
 import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { Button } from './Button';
@@ -232,6 +233,7 @@ export const TimetableSlotModal: React.FC<TimetableSlotModalProps> = ({
 
   return (
     <Modal
+      className="tw-legacy"
       isOpen={isOpen}
       onClose={saving ? () => {} : onClose}
       title={slot ? 'Edit Timetable Slot' : 'Add Timetable Class Slot'}

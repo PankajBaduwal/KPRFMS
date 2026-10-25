@@ -1,3 +1,4 @@
+import '../styles/legacy-utilities.css';
 import React from 'react';
 import { Modal } from './Modal';
 import { Button } from './Button';
@@ -22,6 +23,7 @@ export const WorkloadTraceabilityModal: React.FC<WorkloadTraceabilityModalProps>
 
   return (
     <Modal
+      className="tw-legacy"
       isOpen={isOpen}
       onClose={onClose}
       title={`Workload Traceability — ${faculty.name}`}

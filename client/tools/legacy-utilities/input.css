@@ -1,0 +1,8 @@
+/* Minimal base for the scoped utilities (zero specificity, so any project class wins) */
+:where(.tw-legacy) :where(*, ::before, ::after) {
+  border-width: 0;
+  border-style: solid;
+  border-color: #e2e8f0;
+}
+
+@tailwind utilities;

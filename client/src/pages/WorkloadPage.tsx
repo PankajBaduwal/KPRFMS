@@ -1,3 +1,4 @@
+import '../styles/legacy-utilities.css';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { workloadService } from '../services/workload.service';
@@ -141,6 +142,7 @@ export const WorkloadPage: React.FC = () => {
   }, [deptWorkload, statusFilter, searchQuery]);
 
   return (
+    <div className="tw-legacy">
     <div className="space-y-6">
       <PageHeader
         title="Faculty Workload Management & Analytics"
@@ -1000,6 +1002,7 @@ export const WorkloadPage: React.FC = () => {
           addToast('Workload configuration policy updated successfully', 'success');
         }}
       />
+    </div>
     </div>
   );
 };
