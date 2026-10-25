@@ -6,7 +6,6 @@ import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-do
 import { Input, Alert, Badge, Modal } from '../components';
 import { useAuthStore } from '../stores/authStore';
 import { ROUTES } from '../constants/routes';
-import { FEATURES } from '../constants/features';
 import { DEV_SEED_ACCOUNTS, SHOW_DEV_SEED_HELPERS } from '../dev/devSeedAccounts';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { authService, isTwoFactorChallenge } from '../services/auth.service';
@@ -36,7 +35,6 @@ export const LoginPage: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
-  const [activationModalOpen, setActivationModalOpen] = useState(false);
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [useRecoveryCode, setUseRecoveryCode] = useState(false);
@@ -164,124 +162,46 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="login-page-container">
       <div className="login-split-layout">
-        {/* ========================================================
-            LEFT SIDE — INSTITUTIONAL BRAND & ARCHITECTURE
-            ======================================================== */}
-        <div className="login-brand-panel" role="region" aria-label="Overview">
-          <div className="login-brand-header">
-            <div className="login-institution-badge" style={{ padding: '6px 14px', background: '#FFFFFF', borderRadius: 'var(--radius-pill)', display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-              <img
-                src="/images/kpriet-favicon.png"
-                alt="KPRIET Seal"
-                style={{ width: '22px', height: '22px', objectFit: 'contain' }}
-              />
-              <span style={{ color: 'var(--color-primary, #1B345F)', fontWeight: 700 }}>KPR Institute of Engineering and Technology</span>
+        <aside className="login-brand-panel" aria-label="About the Faculty Management System">
+          <div className="login-brand-top">
+            <div className="login-brand-mark">
+              <img src="/images/kpriet-emblem.png" alt="" width={28} height={28} />
+              <span>KPR Institute of Engineering and Technology</span>
             </div>
-
-            <h1 className="login-brand-title">
-              Faculty Management System
-            </h1>
-
-            <div className="login-brand-statement">
-              One Connected Platform for Faculty, Academic, Research and Institutional Management.
-            </div>
-
+            <h1 className="login-brand-title">Faculty Management System</h1>
             <p className="login-brand-desc">
-              Access your faculty records, academic responsibilities, research activities, {FEATURES.TEACHING ? 'workload, ' : ''}approvals and institutional services through a single secure platform.
+              Your profile, research, leave, attendance and appraisals in one place.
             </p>
+            <ul className="login-brand-points">
+              <li>
+                <i className="bi bi-check2-circle" aria-hidden="true" />
+                <span>Add a record once; your HOD verifies it online</span>
+              </li>
+              <li>
+                <i className="bi bi-check2-circle" aria-hidden="true" />
+                <span>Apply for leave and follow each approval step</span>
+              </li>
+              <li>
+                <i className="bi bi-check2-circle" aria-hidden="true" />
+                <span>Verified data flows into NAAC and NBA reports</span>
+              </li>
+            </ul>
           </div>
-
-          {/* Layered Connected Product Architecture Visualization */}
-          <div className="login-visual-card">
-            <div className="login-visual-top">
-              <span>Everything in one place</span>
-              <Badge variant="primary">AY 2026-2027</Badge>
-            </div>
-
-            <div className="login-visual-grid">
-              <div className="login-visual-item">
-                <i className="bi bi-person-badge" aria-hidden="true" />
-                <span>Faculty Profile</span>
-              </div>
-              <div className="login-visual-item">
-                <i className="bi bi-mortarboard" aria-hidden="true" />
-                <span>Academic Records</span>
-              </div>
-              <div className="login-visual-item">
-                <i className="bi bi-journal-text" aria-hidden="true" />
-                <span>Research &amp; IPR</span>
-              </div>
-              <div className="login-visual-item">
-                <i className="bi bi-calendar3-week" aria-hidden="true" />
-                <span>{FEATURES.TEACHING ? 'Workload & Timetable' : 'Attendance & Leave'}</span>
-              </div>
-              <div className="login-visual-item" style={{ gridColumn: 'span 2' }}>
-                <i className="bi bi-patch-check" aria-hidden="true" />
-                <span>Verification &amp; approvals</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Institutional Highlights */}
-          <div className="login-highlights-section">
-            <div className="login-highlights-label">
-              Integrated Institutional Capabilities
-            </div>
-            <div className="login-highlights-grid">
-              <div className="login-highlight-badge">
-                <i className="bi bi-mortarboard" aria-hidden="true" />
-                <span>Academic Management</span>
-              </div>
-              <div className="login-highlight-badge">
-                <i className="bi bi-person-lines-fill" aria-hidden="true" />
-                <span>Faculty Records</span>
-              </div>
-              <div className="login-highlight-badge">
-                <i className="bi bi-lightbulb" aria-hidden="true" />
-                <span>Research &amp; Innovation</span>
-              </div>
-              <div className="login-highlight-badge">
-                <i className="bi bi-calendar3-week" aria-hidden="true" />
-                <span>{FEATURES.TEACHING ? 'Workload & Timetable' : 'Attendance & Leave'}</span>
-              </div>
-              <div className="login-highlight-badge">
-                <i className="bi bi-graph-up-arrow" aria-hidden="true" />
-                <span>Performance &amp; Appraisal</span>
-              </div>
-              <div className="login-highlight-badge">
-                <i className="bi bi-file-earmark-check" aria-hidden="true" />
-                <span>Reports &amp; Accreditation</span>
-              </div>
-            </div>
-          </div>
-        </div>
+          <p className="login-brand-foot">Autonomous · Affiliated to Anna University · NAAC &lsquo;A+&rsquo; &amp; NBA accredited</p>
+        </aside>
 
         {/* ========================================================
             RIGHT SIDE — LOGIN AUTHENTICATION PANEL
             ======================================================== */}
         <div className="login-auth-panel" role="region" aria-label="Sign In Panel">
           <div className="login-panel-header">
-            <div className="login-panel-logo" style={{ marginBottom: '1.25rem' }}>
-              <Link to={ROUTES.HOME} style={{ textDecoration: 'none', display: 'inline-block' }}>
-                <img
-                  src="/images/kpriet-logo.png"
-                  alt="KPR Institute of Engineering and Technology"
-                  style={{
-                    height: '46px',
-                    maxWidth: '220px',
-                    objectFit: 'contain',
-                  }}
-                />
-              </Link>
-            </div>
-
-            <h2 className="login-panel-title">{challengeToken ? 'Two-step verification' : 'Welcome back'}</h2>
+            <h2 className="login-panel-title">{challengeToken ? 'Two-step verification' : 'Sign in'}</h2>
             <p className="login-panel-desc">
               {challengeToken
                 ? useRecoveryCode
                   ? 'Enter one of the recovery codes you saved when you turned on two-factor sign-in.'
                   : 'Open your authenticator app and enter the 6-digit code for KPRIET FMS.'
-                : 'Sign in to continue to the Faculty Management System.'}
+                : 'Use your college email or employee ID.'}
             </p>
           </div>
 
@@ -385,7 +305,7 @@ export const LoginPage: React.FC = () => {
             style={challengeToken ? { display: 'none' } : undefined}
           >
             <Input
-              label="College email or employee ID"
+              label="Email or employee ID"
               type="text"
               placeholder="e.g. employee.name@kpriet.ac.in or EMP1024"
               autoComplete="username"
@@ -442,7 +362,7 @@ export const LoginPage: React.FC = () => {
                 className="login-forgot-btn"
                 onClick={openForgot}
               >
-                Forgot Password?
+                Forgot password?
               </button>
             </div>
 
@@ -460,7 +380,7 @@ export const LoginPage: React.FC = () => {
               ) : (
                 <>
                   <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
-                  <span>Sign In</span>
+                  <span>Sign in</span>
                 </>
               )}
             </button>
@@ -471,31 +391,9 @@ export const LoginPage: React.FC = () => {
             <Link to={ROUTES.REGISTER}>Register with your college email</Link>
           </div>
 
-          {/* Security & Access Statement */}
-          <div className="login-security-notice">
-            <i className="bi bi-shield-lock-fill" aria-hidden="true" />
-            <div className="login-security-text">
-              <strong>Authorized institutional access only.</strong> Your access and permissions are automatically governed according to your assigned institutional role.
-            </div>
-          </div>
-
-          {/* Account Activation & Support Links */}
-          <div className="login-support-links">
-            <button
-              type="button"
-              className="login-support-link"
-              onClick={() => setActivationModalOpen(true)}
-            >
-              Account Activation Policy
-            </button>
-            <button
-              type="button"
-              className="login-support-link"
-              onClick={openForgot}
-            >
-              Need IT Support?
-            </button>
-          </div>
+          <p className="login-help">
+            Trouble signing in? Email <a href="mailto:helpdesk@kpriet.ac.in">helpdesk@kpriet.ac.in</a> or call ext. 4101.
+          </p>
 
           {/* DEVELOPMENT SEED ACCOUNTS — Rendered only in local vite dev mode */}
           {SHOW_DEV_SEED_HELPERS && (
@@ -615,59 +513,6 @@ export const LoginPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* Account Activation Institutional Modal */}
-      <Modal
-        isOpen={activationModalOpen}
-        onClose={() => setActivationModalOpen(false)}
-        title="Faculty Account Activation"
-        size="md"
-        footer={
-          <button
-            type="button"
-            className="btn-primary-custom btn-sm"
-            onClick={() => setActivationModalOpen(false)}
-          >
-            Understood
-          </button>
-        }
-      >
-        <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text)' }}>
-          <p style={{ marginBottom: 'var(--space-3)' }}>
-            New faculty can <Link to={ROUTES.REGISTER}>register with their college email</Link>; the account becomes
-            active once an administrator approves it. Accounts can also be provisioned by the Institution during official
-            appointment:
-          </p>
-
-          <ol style={{ paddingLeft: 'var(--space-5)', marginBottom: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-            <li>
-              <strong>HR Provisioning:</strong> Your Employee ID is generated upon submission of verified credentials to Human Resources.
-            </li>
-            <li>
-              <strong>FMS Account Setup:</strong> The System Administrator links your departmental affiliation, designation, and official email.
-            </li>
-            <li>
-              <strong>Temporary Password:</strong> An initial authentication password is sent to your personal email address registered with HR.
-            </li>
-            <li>
-              <strong>First Login:</strong> Upon initial sign-in, you will be prompted to update your password and configure secondary verification details.
-            </li>
-          </ol>
-
-          <div
-            style={{
-              background: 'var(--color-primary-50)',
-              border: '1px solid var(--color-primary-100)',
-              padding: 'var(--space-3)',
-              borderRadius: 'var(--radius-md)',
-              fontSize: 'var(--font-size-xs)',
-              color: 'var(--color-info)',
-            }}
-          >
-            <i className="bi bi-info-circle me-1" aria-hidden="true" />
-            If you have joined recently and have not received your employee ID, please consult the Office of the Dean of Academic Affairs.
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 };

@@ -730,3 +730,294 @@
   max-width: 480px;
   margin: 1rem auto;
 }
+
+/* ==========================================================================
+   2026 redesign — calm, flat auth pages (sign in, register, reset password).
+   Overrides the earlier rules above; markup classes are unchanged.
+   ========================================================================== */
+
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #F5F7FA;
+}
+
+.auth-topbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.auth-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.auth-topbar-brand img {
+  height: 38px;
+  max-width: 200px;
+  object-fit: contain;
+}
+
+.auth-topbar-name {
+  border-left: 1px solid var(--color-border);
+  padding-left: 12px;
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: #13294B;
+}
+
+.auth-topbar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.auth-topbar-link:hover {
+  background: #EEF2F7;
+  color: #13294B;
+}
+
+.auth-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px 24px;
+}
+
+.auth-footer-line {
+  margin: 28px 0 0;
+  font-size: 0.75rem;
+  color: #7A8496;
+  text-align: center;
+}
+
+/* One card, two columns */
+.login-page-container {
+  max-width: 1040px;
+  padding: 0;
+  animation: authIn 420ms var(--ease-out, ease-out) both;
+}
+
+@keyframes authIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.login-split-layout {
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 20px 40px -24px rgba(16, 24, 40, 0.18);
+}
+
+.login-brand-panel {
+  background: #13294B;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 44px 44px 32px;
+  gap: 32px;
+}
+
+/* Faint emblem watermark instead of the old glow */
+.login-brand-panel::before {
+  top: auto;
+  right: -70px;
+  bottom: -70px;
+  width: 300px;
+  height: 300px;
+  border-radius: 0;
+  background: url('/images/kpriet-emblem.png') center / contain no-repeat;
+  opacity: 0.06;
+}
+
+.login-brand-top { position: relative; z-index: 1; }
+
+.login-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #E2E8F2;
+  margin-bottom: 28px;
+}
+
+.login-brand-mark img {
+  background: #FFFFFF;
+  border-radius: 50%;
+  padding: 3px;
+}
+
+.login-brand-title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  margin: 0 0 12px;
+}
+
+.login-brand-desc {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: #C5D0E0;
+  margin: 0 0 28px;
+  max-width: 360px;
+}
+
+.login-brand-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-brand-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #E2E8F2;
+  line-height: 1.45;
+}
+
+.login-brand-points i {
+  color: #7FCB9B;
+  font-size: 1.05rem;
+  margin-top: 1px;
+}
+
+.login-brand-foot {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 0.75rem;
+  color: #8E9BB2;
+}
+
+.login-auth-panel {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 48px 48px 36px;
+}
+
+.login-panel-header { margin-bottom: 28px; }
+
+.login-panel-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #13294B;
+  letter-spacing: -0.02em;
+}
+
+.login-panel-desc { font-size: 0.9rem; }
+
+.login-form { gap: 4px; }
+
+.login-utilities-row { margin: 2px 0 18px; }
+
+.login-forgot-btn {
+  color: #2457C5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-forgot-btn:hover { text-decoration: underline; color: #1B3F94; }
+
+.login-submit-btn {
+  background: #1B345F;
+  border: 1px solid #1B345F;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+  padding: 12px;
+  font-weight: 600;
+  transition: background-color var(--transition-fast), transform 80ms ease;
+}
+
+.login-submit-btn:hover:not(:disabled) {
+  background: #142849;
+  transform: none;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+}
+
+.login-submit-btn:active:not(:disabled) { transform: scale(0.99); }
+
+.login-register-cta {
+  margin-top: 18px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.login-register-cta a { color: #2457C5; font-weight: 600; text-decoration: none; }
+.login-register-cta a:hover { text-decoration: underline; }
+
+.login-help {
+  margin: 22px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.login-help a { color: #2457C5; text-decoration: none; font-weight: 500; }
+
+/* Register keeps its wider two-column layout inside the same card style */
+.register-layout { grid-template-columns: 0.9fr 1.1fr; }
+.register-brand-badge { background: rgba(255, 255, 255, 0.08); color: #E2E8F2; box-shadow: none; border: 1px solid rgba(255, 255, 255, 0.12); }
+
+/* Reset password: single card */
+.reset-password-panel {
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px -24px rgba(16, 24, 40, 0.18);
+}
+
+@media (max-width: 900px) {
+  .login-split-layout,
+  .register-layout { grid-template-columns: 1fr; }
+  .login-brand-panel { padding: 28px 24px; gap: 18px; }
+  .login-brand-title { font-size: 1.5rem; }
+  .login-brand-desc { margin-bottom: 0; }
+  .login-brand-points,
+  .login-brand-foot { display: none; }
+  .login-auth-panel { padding: 28px 22px; }
+  .auth-topbar-name { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page-container { animation: none; }
+}
+
+.register-brand-badge img { background: #FFFFFF; border-radius: 50%; padding: 2px; }
