@@ -21,6 +21,7 @@ import {
   MentoringDetailModal,
 } from '../components';
 import type { StudentMentoring, MentoringStatus } from '../types/mentoring';
+import { AiMentoringInsights } from '../components/AiMentoringInsights';
 import {
   MENTORING_STATUS,
   MENTORING_STATUS_BADGES,
@@ -197,6 +198,10 @@ export const StudentMentoringPage: React.FC = () => {
           ) : undefined
         }
       />
+
+      <div style={{ marginBottom: 'var(--space-4)' }}>
+        <AiMentoringInsights academicYear={selectedYear !== 'ALL' ? selectedYear : undefined} />
+      </div>
 
       {/* Metrics Row */}
       <div

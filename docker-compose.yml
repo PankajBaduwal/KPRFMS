@@ -41,6 +41,10 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
       MAIL_FROM: ${MAIL_FROM:-KPRIET FMS <no-reply@kpriet.ac.in>}
+      # AI assistant (empty = AI features hidden)
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}
+      GEMINI_FALLBACK_MODEL: ${GEMINI_FALLBACK_MODEL:-gemini-flash-lite-latest}
     volumes:
       # Uploaded certificates/evidence and the secure document vault (back these up!)
       - uploads:/app/uploads

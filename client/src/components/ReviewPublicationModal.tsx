@@ -5,6 +5,7 @@ import { Select } from './Select';
 import { Alert } from './Alert';
 import type { Publication, PublicationVerificationStatus } from '../types/publication';
 import { fileUrl } from '../utils/fileUrl';
+import { AiVerifyPanel } from './AiVerifyPanel';
 
 interface ReviewPublicationModalProps {
   isOpen: boolean;
@@ -115,6 +116,8 @@ export const ReviewPublicationModal: React.FC<ReviewPublicationModalProps> = ({
             </div>
           )}
         </div>
+
+        <AiVerifyPanel key={publication._id} type="publication" recordId={publication._id} />
 
         <Select
           label="Verification Decision *"

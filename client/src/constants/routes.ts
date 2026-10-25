@@ -30,6 +30,7 @@ export const ROUTES = {
   ADMIN_CONSOLE: '/portal/admin-console',
   AUDIT_LOGS: '/portal/audit-logs',
   REPORTS: '/portal/reports',
+  AI_ASSISTANT: '/portal/ai-assistant',
   NOTIFICATIONS: '/portal/notifications',
   DOCUMENTS: '/portal/documents',
   DESIGN_SYSTEM: '/portal/design-system',

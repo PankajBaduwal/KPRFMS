@@ -18,6 +18,11 @@ const envSchema = z.object({
   PUBLIC_API_URL: z.string().optional(),
   // Encrypts two-factor secrets at rest. Keep it stable: changing it turns off everyone's two-factor
   TWO_FACTOR_KEY: z.string().optional(),
+  // Google Gemini for the AI assistant features (disabled when the key is missing)
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default('gemini-flash-latest'),
+  // Used when the main model is overloaded or slow
+  GEMINI_FALLBACK_MODEL: z.string().default('gemini-flash-lite-latest'),
   // Outgoing email. Without SMTP_HOST, emails are written to MAIL_OUTBOX_DIR instead of being sent
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.string().default('587').transform(Number),

@@ -16,6 +16,7 @@ Institutional ERP for **KPR Institute of Engineering and Technology (KPRIET)**: 
 | Performance | Appraisal cycles, self-appraisal, evidence, multi-level evaluation |
 | Governance | Approval queue, HOD / Dean / Principal consoles, institution analytics, faculty comparison, accreditation reports |
 | Administration | Users & roles, Excel bulk import, departments, academic years, institution settings, audit logs, notifications, global search |
+| AI assistant | Certificate reading, proof checks for HODs, appraisal drafts and summaries, NAAC Criterion III draft, plain-English questions, mentoring risk flags (Google Gemini) |
 | Accounts | Email password reset, email-confirmed self-registration, two-factor sign-in, signed-in devices, live notifications + email, calendar sync, installable on phones |
 
 ### Roles
@@ -69,6 +70,7 @@ cp client/.env.example client/.env
 | `JWT_EXPIRES_IN` | Session lifetime (default `12h`) |
 | `COOKIE_SECRET` | Signs cookies |
 | `CLIENT_URL` | Allowed browser origin for CORS; also the base of links in emails |
+| `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL` | Google Gemini for the AI assistant (empty key = AI features hidden). Defaults `gemini-flash-latest`, falling back to `gemini-flash-lite-latest` when busy |
 | `TWO_FACTOR_KEY` | Encrypts two-factor secrets (random, 32+ characters; required in production; keep stable) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Outgoing email. Without `SMTP_HOST`, every email is written to `server/mail-outbox/` as a JSON file instead (handy in development) |
 | `PUBLIC_API_URL` | Public API address used in calendar-feed links (default `http://localhost:PORT/api`, or `CLIENT_URL/api` in production) |
@@ -214,6 +216,29 @@ It logs in to the mail server, sends a test message and tells you exactly what i
 ## Calendar Sync on the Hosted Server
 
 The calendar link is built from `PUBLIC_API_URL`. Google Calendar and Outlook fetch it from their own servers, so it must be a public **https** address — a `localhost` link only works for calendar apps on the same computer. When the portal is deployed (e.g. `https://fms.kpriet.ac.in`), set `PUBLIC_API_URL=https://fms.kpriet.ac.in/api` (the Docker stack defaults to `CLIENT_URL/api`, so usually nothing extra is needed). Users then press **Get a new link** once so their link uses the public address.
+
+---
+
+## AI Assistant
+
+Powered by Google Gemini (key from [Google AI Studio](https://aistudio.google.com/apikey) in `GEMINI_API_KEY`). Every AI result is a suggestion shown to the user — nothing is saved or approved automatically.
+
+| Feature | Who | Where |
+|---|---|---|
+| **Read a certificate** | Everyone | Academic Activities → Add → "Upload certificate": attaches the file and fills title, organizer, dates, duration, mode and role; warns if the name on it differs or the activity already exists |
+| **Check against proof** | HOD (own department), Dean, Principal, Admin | Review dialog for activities and publications → "Run check": compares the entered details with the uploaded certificate/paper and lists possible duplicates (same DOI or near-identical title) |
+| **Draft my remarks** | The teacher | Appraisals → My Appraisal → "Draft remarks": writes first-person remarks per category from verified records only |
+| **Appraisal summary** | Reviewers | Appraisal evaluation dialog → "Summarise": strengths, claims without evidence, questions to ask |
+| **NAAC Criterion III draft** | HOD (own department), leadership | AI Assistant → NAAC Criterion III: sections 3.1–3.5 with real figures, [placeholders] and a list of missing data; copy or download |
+| **Ask the data** | HOD (own department), leadership | AI Assistant → Ask the data, e.g. "How many Q1 papers did ECE publish this year?" — answers with the filters used and a table when useful |
+| **Mentoring insights** | Mentor (own mentees), HOD (department), leadership | Student Mentoring → "Analyse mentoring notes": flags students needing help with reasons and next steps |
+
+How it is kept safe:
+- "Ask the data" and the NAAC draft only see **aggregated counts** (grouped by department, year, type), scoped to the user's department for HODs — the AI cannot run database queries.
+- Certificate and proof checks send that one file plus the record being checked; mentoring insights send the notes of at most 40 active mentees.
+- Data sent to Gemini includes faculty names and record details, so use a key from the institution's own Google account and review Google's data-use terms for it (paid-tier keys are not used for training).
+- Calls are limited to 60 per user per hour in production and every call is written to the audit log (`AI_ASSIST`).
+- The automated tests never call Gemini (`npm test` runs with the key switched off).
 
 ---
 

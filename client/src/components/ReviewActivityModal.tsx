@@ -11,6 +11,7 @@ import {
   ACTIVITY_STATUS,
 } from '../types/activity';
 import { fileUrl } from '../utils/fileUrl';
+import { AiVerifyPanel } from './AiVerifyPanel';
 
 interface ReviewActivityModalProps {
   isOpen: boolean;
@@ -122,6 +123,8 @@ export const ReviewActivityModal: React.FC<ReviewActivityModalProps> = ({
             </div>
           )}
         </div>
+
+        <AiVerifyPanel key={activity._id} type="activity" recordId={activity._id} />
 
         {/* Decision Select */}
         <Select

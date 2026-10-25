@@ -5,6 +5,7 @@ import type { IFacultyAppraisal, IReviewPayload, IAppraisalCycle } from '../type
 import { AppraisalStatusBadge } from './AppraisalStatusBadge';
 import { useAuthStore } from '../stores/authStore';
 import { fileUrl } from '../utils/fileUrl';
+import { AiAppraisalSummary } from './AiAppraisalTools';
 
 interface Props {
   isOpen: boolean;
@@ -159,6 +160,8 @@ export const AppraisalEvaluationModal: React.FC<Props> = ({
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+        {!isSelf && <AiAppraisalSummary key={appraisal._id} appraisalId={appraisal._id} />}
+
         {/* Appraisal Metadata Sub-Header */}
         <div
           style={{

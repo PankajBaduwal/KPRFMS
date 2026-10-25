@@ -25,6 +25,7 @@ import {
   SkeletonTable,
 } from '../components';
 import { fileUrl } from '../utils/fileUrl';
+import { AiAppraisalDraft } from '../components/AiAppraisalTools';
 
 export const AppraisalManagementPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -761,6 +762,19 @@ export const AppraisalManagementPage: React.FC = () => {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {canEdit && (
+                <AiAppraisalDraft
+                  appraisalId={myAppraisal?._id}
+                  onDraft={(drafts) =>
+                    setCategoriesData((prev) =>
+                      prev.map((c) => {
+                        const d = drafts.find((x) => x.categoryKey === c.categoryKey);
+                        return d ? { ...c, facultyRemarks: d.remarks } : c;
+                      })
+                    )
+                  }
+                />
+              )}
               {categoriesData.map((cat, idx) => (
                 <div
                   key={cat.categoryKey}

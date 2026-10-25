@@ -40,6 +40,8 @@ const testEnv: NodeJS.ProcessEnv = {
   // Emails go to a separate outbox folder that phase 60 reads
   MAIL_OUTBOX_DIR: 'mail-outbox-test',
   SMTP_HOST: '',
+  // Tests never call the paid AI service; phase 61 checks the AI routes with AI switched off
+  GEMINI_API_KEY: '',
 };
 
 interface SuiteResult {

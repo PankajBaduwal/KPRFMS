@@ -11,6 +11,7 @@ import { FEATURES } from '../constants/features';
 const HomePage = React.lazy(() => import('../pages/HomePage').then((m) => ({ default: m.HomePage })));
 const LoginPage = React.lazy(() => import('../pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const ResetPasswordPage = React.lazy(() => import('../pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })));
+const AiAssistantPage = React.lazy(() => import('../pages/AiAssistantPage').then((m) => ({ default: m.AiAssistantPage })));
 const AccountSecurityPage = React.lazy(() => import('../pages/AccountSecurityPage').then((m) => ({ default: m.AccountSecurityPage })));
 const RegisterPage = React.lazy(() => import('../pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const UnauthorizedPage = React.lazy(() => import('../pages/UnauthorizedPage').then((m) => ({ default: m.UnauthorizedPage })));
@@ -253,6 +254,12 @@ export const router = createBrowserRouter([
       {
         path: 'reports',
         element: lazyRoute(ReportsPage),
+      },
+      {
+        path: 'ai-assistant',
+        element: (
+          <ProtectedRoute allowedRoles={['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD']}>{lazyRoute(AiAssistantPage)}</ProtectedRoute>
+        ),
       },
       {
         path: 'security',

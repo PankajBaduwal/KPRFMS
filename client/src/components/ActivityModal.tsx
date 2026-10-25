@@ -19,6 +19,8 @@ import {
   ACTIVITY_TYPE_LABELS,
   ACTIVITY_MODES,
 } from '../types/activity';
+import { aiService, type CertificateFields } from '../services/ai.service';
+import { useAiEnabled } from '../hooks/useAiEnabled';
 
 interface ActivityModalProps {
   isOpen: boolean;
@@ -75,6 +77,9 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
 
   const [formError, setFormError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const aiEnabled = useAiEnabled();
+  const [aiReading, setAiReading] = useState(false);
+  const [aiResult, setAiResult] = useState<{ filled: string[]; warnings: string[]; notes?: string | null } | null>(null);
 
   useEffect(() => {
     if (activity) {
@@ -133,6 +138,7 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
       setRemarks('');
     }
     setFormError(null);
+    setAiResult(null);
   }, [activity, defaultType, isOpen]);
 
   // Default a new record to the current academic year once it has loaded
@@ -140,9 +146,58 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
     if (!activity && isOpen && currentYear) setAcademicYear((prev) => prev || currentYear);
   }, [activity, isOpen, currentYear]);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  /** Fills empty (or, for a new record, all) form fields from what the AI read on the certificate. */
+  const applyCertificate = (f: CertificateFields) => {
+    const filled: string[] = [];
+    const set = (label: string, value: string | null | undefined, setter: (v: string) => void, current: string) => {
+      if (!value) return;
+      if (activity && current.trim()) return; // never overwrite what the teacher already typed on an existing record
+      setter(value);
+      filled.push(label);
+    };
+    if (f.activityType && !activity && Object.values(ACTIVITY_TYPES).includes(f.activityType as ActivityType)) {
+      setActivityType(f.activityType as ActivityType);
+      filled.push('Type');
+    }
+    set('Title', f.title, setTitle, title);
+    set('Organizer', f.organizer, setOrganizer, organizer);
+    set('Start date', f.startDate, setStartDate, startDate);
+    set('End date', f.endDate ?? f.startDate, setEndDate, endDate);
+    set('Date', f.startDate, setDate, date);
+    set('Duration', f.duration, setDuration, duration);
+    set('Location', f.location, setLocation, location);
+    set('Country', f.country, setCountry, activity ? country : '');
+    set('Participation', f.participationType, setParticipationType, activity ? participationType : '');
+    set('Topic', f.topic, setTopic, topic);
+    if (f.presentationTitle) {
+      setPaperPresented(true);
+      set('Presentation title', f.presentationTitle, setPresentationTitle, presentationTitle);
+    }
+    if (f.mode && Object.values(ACTIVITY_MODES).includes(f.mode as ActivityMode)) {
+      setMode(f.mode as ActivityMode);
+      filled.push('Mode');
+    }
+    return filled;
+  };
+
+  const readCertificateWithAi = async (file: File) => {
+    setAiReading(true);
+    setAiResult(null);
+    try {
+      const { fields, warnings } = await aiService.readCertificate(file);
+      const filled = applyCertificate(fields);
+      setAiResult({ filled, warnings, notes: fields.notes });
+    } catch (err: any) {
+      setAiResult({ filled: [], warnings: [err?.message || 'The AI could not read this certificate. Fill the form manually.'] });
+    } finally {
+      setAiReading(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, withAi = false) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (withAi) void readCertificateWithAi(file);
 
     if (file.size > 10 * 1024 * 1024) {
       setFormError('Certificate file must be under 10MB.');
@@ -262,6 +317,53 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+        {aiEnabled && (
+          <div className="ai-box">
+            <div className="ai-box-head">
+              <span className="ai-box-title">
+                <i className="bi bi-stars" aria-hidden="true" /> Fill this form from your certificate
+              </span>
+              <label className="btn-secondary-custom btn-sm" style={{ cursor: aiReading || uploading || saving ? 'wait' : 'pointer', margin: 0 }}>
+                <input
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg"
+                  hidden
+                  disabled={aiReading || uploading || saving}
+                  onChange={(e) => {
+                    void handleFileUpload(e, true);
+                    e.target.value = '';
+                  }}
+                />
+                {aiReading ? (
+                  <>
+                    <span className="spinner spinner-sm" aria-hidden="true" /> Reading certificate…
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-upload" aria-hidden="true" /> Upload certificate
+                  </>
+                )}
+              </label>
+            </div>
+            <span className="ai-box-note">
+              The certificate is attached and AI fills in the title, organizer, dates and duration. Check every field before saving.
+            </span>
+            {aiResult && aiResult.filled.length > 0 && (
+              <span style={{ color: 'var(--color-success)' }}>
+                <i className="bi bi-check-circle-fill me-1" aria-hidden="true" />
+                Filled: {aiResult.filled.join(', ')}
+              </span>
+            )}
+            {aiResult?.warnings.map((w) => (
+              <div key={w} className="ai-warning">
+                <i className="bi bi-exclamation-triangle me-1" aria-hidden="true" />
+                {w}
+              </div>
+            ))}
+            {aiResult?.notes && <span className="ai-box-note">AI note: {aiResult.notes}</span>}
+          </div>
+        )}
+
         {formError && <Alert variant="danger">{formError}</Alert>}
 
         {/* Activity Type Selection */}

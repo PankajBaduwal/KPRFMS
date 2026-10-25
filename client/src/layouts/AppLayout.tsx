@@ -260,6 +260,16 @@ export const AppLayout: React.FC = () => {
           ],
         },
         {
+          id: 'ai_assistant',
+          label: 'AI Assistant',
+          icon: 'bi-stars',
+          roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'],
+          subItems: [
+            { to: `${ROUTES.AI_ASSISTANT}?tab=ask`, label: 'Ask the data', icon: 'bi-chat-square-text' },
+            { to: `${ROUTES.AI_ASSISTANT}?tab=naac`, label: 'NAAC Criterion III', icon: 'bi-file-earmark-richtext' },
+          ],
+        },
+        {
           id: 'reports',
           label: 'Reports',
           icon: 'bi-file-earmark-text',
@@ -369,6 +379,7 @@ export const AppLayout: React.FC = () => {
     if (p.includes('/faculty-comparison')) return { section: 'Governance', page: 'Faculty Comparison' };
     if (p.includes('/reports')) return { section: 'Governance', page: 'Reports' };
     if (p.includes('/notifications')) return { section: 'Overview', page: 'Notifications' };
+    if (p.includes('/ai-assistant')) return { section: 'Governance', page: 'AI Assistant' };
     if (p.includes('/security')) return { section: 'Overview', page: 'Account & Security' };
     if (p.includes('/documents')) return { section: 'Operations', page: 'Documents' };
     if (p.includes('/admin-console')) return { section: 'Administration', page: 'System Console' };
