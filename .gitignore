@@ -47,7 +47,7 @@ uploads/
 
 # Private faculty documents (certificates, evidence, reports) — never commit
 server/storage/
-storage/
+/storage/
 
 # Keep example env files
 !.env.example
