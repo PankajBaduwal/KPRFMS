@@ -7,6 +7,7 @@ import { FEATURES } from '../../constants/features';
 import { deanConsoleService } from '../../services/dean-console.service';
 import type { DeanPrimaryMetrics } from '../../types/dean-console';
 import { InstitutionInsights } from './insights/DashboardInsights';
+import { Leaderboards } from './insights/Leaderboards';
 
 interface DeanDashboardViewProps {
   data: DeanDashboardData;
@@ -238,6 +239,11 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
       <section className="insights-section" aria-label="Institution insights">
         <h2 className="insights-section-title">Research and faculty development</h2>
         <InstitutionInsights charts={data.charts} variant="dean" />
+      </section>
+
+      <section className="insights-section" aria-label="Leaderboards">
+        <h2 className="insights-section-title">Leaderboards</h2>
+        <Leaderboards />
       </section>
 
       {/* Segmented Focus Navigation - Calms the screen, keeping all sections accessible */}

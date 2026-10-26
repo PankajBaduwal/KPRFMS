@@ -15,7 +15,16 @@ export interface SettingsTabProps {
   settingsSubTab: "appraisal" | "all" | "general" | "security";
 }
 
+const DEFAULT_WEIGHTS = { publications: 3, projects: 4, patents: 5, activities: 1 };
+const LEADERBOARD_WEIGHT_FIELDS = [
+  ['publications', 'Per verified publication'],
+  ['projects', 'Per funded project'],
+  ['patents', 'Per verified patent'],
+  ['activities', 'Per verified FDP / activity'],
+] as const;
+
 export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, setActiveTab, setMasterCategory, setSettingsForm, setSettingsSubTab, settingsForm, settingsSaving, settingsSubTab }) => {
+  const weights = { ...DEFAULT_WEIGHTS, ...settingsForm.leaderboardWeights };
   return (
     <form onSubmit={handleSaveSettings} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* Sub Navigation */}
@@ -306,6 +315,49 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
               </div>
             )}
   
+            {/* Group 3b: Leaderboard weights ("department of the year") */}
+            {(settingsSubTab === 'appraisal' || settingsSubTab === 'all') && (
+              <div
+                style={{
+                  backgroundColor: '#fff',
+                  padding: '1.5rem',
+                  borderRadius: '10px',
+                  border: '1px solid #e2e8f0',
+                }}
+              >
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, color: '#0f172a' }}>
+                  <i className="bi bi-trophy me-2 text-warning" />
+                  Department of the Year — Score Weights
+                </h3>
+                <p style={{ margin: '0 0 1.25rem', fontSize: '0.8rem', color: '#64748b' }}>
+                  Points each verified record earns a department on the Principal and Dean leaderboards. Only verified
+                  publications, patents and activities, and sanctioned projects, are counted.
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+                  {LEADERBOARD_WEIGHT_FIELDS.map(([key, label]) => (
+                    <div key={key}>
+                      <label className="form-label font-semibold text-sm" htmlFor={`weight-${key}`}>{label}</label>
+                      <input
+                        id={`weight-${key}`}
+                        type="number"
+                        className="form-control form-control-sm"
+                        min={0}
+                        max={20}
+                        step={1}
+                        value={weights[key]}
+                        onChange={(e) =>
+                          setSettingsForm({
+                            ...settingsForm,
+                            leaderboardWeights: { ...weights, [key]: Math.max(0, Math.min(20, Number(e.target.value) || 0)) },
+                          })
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Group 4: Security & System Policies */}
             {(settingsSubTab === 'security' || settingsSubTab === 'all') && (
               <div

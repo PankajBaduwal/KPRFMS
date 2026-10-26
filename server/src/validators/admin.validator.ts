@@ -131,6 +131,14 @@ export const institutionSettingsSchema = z.object({
   maintenanceMode: z.boolean().optional().default(false),
   sessionTimeoutMinutes: z.coerce.number().min(15).max(1440).default(60),
   maxUploadSizeMb: z.coerce.number().min(1).max(100).default(10),
+  leaderboardWeights: z
+    .object({
+      publications: z.coerce.number().min(0).max(20),
+      projects: z.coerce.number().min(0).max(20),
+      patents: z.coerce.number().min(0).max(20),
+      activities: z.coerce.number().min(0).max(20),
+    })
+    .optional(),
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;

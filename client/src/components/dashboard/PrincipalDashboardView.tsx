@@ -5,6 +5,7 @@ import { ActionItemsBanner } from './ActionItemsBanner';
 import { ROUTES } from '../../constants/routes';
 import { FEATURES } from '../../constants/features';
 import { InstitutionInsights } from './insights/DashboardInsights';
+import { Leaderboards } from './insights/Leaderboards';
 import { AnimatedNumber } from '../charts';
 
 interface PrincipalDashboardViewProps {
@@ -337,6 +338,11 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
       <section className="insights-section" aria-label="Institution insights">
         <h2 className="insights-section-title">Institution at a glance</h2>
         <InstitutionInsights charts={data.charts} variant="principal" />
+      </section>
+
+      <section className="insights-section" aria-label="Leaderboards">
+        <h2 className="insights-section-title">Leaderboards</h2>
+        <Leaderboards />
       </section>
 
       {/* Segmented Focus Navigation - Calms the screen, keeping all sections accessible */}

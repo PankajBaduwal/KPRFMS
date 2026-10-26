@@ -155,6 +155,7 @@ export interface IAdminInstitutionSettings {
   maintenanceMode: boolean;
   sessionTimeoutMinutes: number;
   maxUploadSizeMb: number;
+  leaderboardWeights?: { publications: number; projects: number; patents: number; activities: number };
   updatedBy?: string;
   createdAt: string;
   updatedAt: string;

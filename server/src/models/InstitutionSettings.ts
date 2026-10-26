@@ -1,6 +1,16 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
 import { computeAcademicYearForDate } from '../utils/academicYear.js';
 
+/** Points per verified record when ranking departments ("department of the year"). */
+export interface LeaderboardWeights {
+  publications: number;
+  projects: number;
+  patents: number;
+  activities: number;
+}
+
+export const DEFAULT_LEADERBOARD_WEIGHTS: LeaderboardWeights = { publications: 3, projects: 4, patents: 5, activities: 1 };
+
 export interface IInstitutionSettings extends Document {
   _id: Types.ObjectId;
   name: string;
@@ -23,6 +33,7 @@ export interface IInstitutionSettings extends Document {
   maintenanceMode: boolean;
   sessionTimeoutMinutes: number;
   maxUploadSizeMb: number;
+  leaderboardWeights: LeaderboardWeights;
   updatedBy?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -132,6 +143,12 @@ const institutionSettingsSchema = new Schema<IInstitutionSettings>(
       default: 10,
       min: 1,
       max: 100,
+    },
+    leaderboardWeights: {
+      publications: { type: Number, default: DEFAULT_LEADERBOARD_WEIGHTS.publications, min: 0, max: 20 },
+      projects: { type: Number, default: DEFAULT_LEADERBOARD_WEIGHTS.projects, min: 0, max: 20 },
+      patents: { type: Number, default: DEFAULT_LEADERBOARD_WEIGHTS.patents, min: 0, max: 20 },
+      activities: { type: Number, default: DEFAULT_LEADERBOARD_WEIGHTS.activities, min: 0, max: 20 },
     },
     updatedBy: {
       type: Schema.Types.ObjectId,

@@ -2,6 +2,48 @@ import { apiClient } from '../api/client';
 
 import type { AdminCharts, FacultyCharts, HodCharts, InstitutionCharts } from '../components/dashboard/insights/DashboardInsights';
 
+export type LeaderboardMetric = 'publications' | 'projects' | 'patents' | 'activities';
+
+export interface LeaderboardFacultyRow {
+  rank: number;
+  facultyId: string;
+  name: string;
+  designation: string;
+  department: string;
+  count: number;
+  details: Record<string, number>;
+}
+
+export interface LeaderboardDepartmentRow {
+  rank: number;
+  departmentId: string;
+  code: string;
+  name: string;
+  counts: Record<LeaderboardMetric, number>;
+  score: number;
+}
+
+export interface LeaderboardData {
+  academicYear: string;
+  previousAcademicYear: string;
+  departmentId: string | null;
+  weights: Record<LeaderboardMetric, number>;
+  faculty: Record<LeaderboardMetric, LeaderboardFacultyRow[]>;
+  departments: LeaderboardDepartmentRow[];
+  departmentOfTheYear: LeaderboardDepartmentRow | null;
+  rising: Array<{
+    rank: number;
+    facultyId: string;
+    name: string;
+    designation: string;
+    department: string;
+    current: number;
+    previous: number;
+    change: number;
+  }>;
+  departmentOptions: Array<{ id: string; code: string; name: string }>;
+}
+
 export interface ActionItem {
   id: string;
   type: 'CRITICAL' | 'WARNING' | 'INFO';
@@ -330,6 +372,13 @@ export const dashboardService = {
     const params: Record<string, string> = {};
     if (departmentId) params.departmentId = departmentId;
     const res = await apiClient.get('/dashboard/hod', { params });
+    return res.data.data;
+  },
+
+  async getLeaderboards(params: { academicYear?: string; departmentId?: string }): Promise<LeaderboardData> {
+    const res = await apiClient.get('/dashboard/leaderboards', {
+      params: { academicYear: params.academicYear || undefined, departmentId: params.departmentId || undefined },
+    });
     return res.data.data;
   },
 

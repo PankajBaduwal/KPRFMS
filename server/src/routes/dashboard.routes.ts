@@ -29,6 +29,12 @@ router.get(
 );
 
 router.get(
+  '/leaderboards',
+  requireRole(ROLES.ADMIN, ROLES.PRINCIPAL, ROLES.DEAN),
+  (req, res, next) => dashboardController.getLeaderboards(req, res, next)
+);
+
+router.get(
   '/principal',
   requireRole(ROLES.ADMIN, ROLES.PRINCIPAL),
   (req, res, next) => dashboardController.getPrincipalDashboard(req, res, next)

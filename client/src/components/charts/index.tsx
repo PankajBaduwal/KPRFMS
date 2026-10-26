@@ -78,7 +78,8 @@ export const ChartCard: React.FC<{
   action?: React.ReactNode;
   empty?: boolean;
   emptyText?: string;
-  height?: number;
+  /** Body height in px, or 'auto' to fit the content (lists). */
+  height?: number | 'auto';
   className?: string;
   children: React.ReactNode;
 }> = ({ title, subtitle, action, empty, emptyText = 'No data yet.', height = 240, className = '', children }) => (
@@ -90,7 +91,7 @@ export const ChartCard: React.FC<{
       </div>
       {action}
     </header>
-    <div className="chart-card-body" style={{ height }}>
+    <div className="chart-card-body" style={{ height: height === 'auto' ? undefined : height }}>
       {empty ? (
         <div className="chart-card-empty">
           <i className="bi bi-bar-chart" aria-hidden="true" />

@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types/index.js';
 import { dashboardService } from '../services/dashboard.service.js';
+import { leaderboardService } from '../services/leaderboard.service.js';
 import { sendSuccess } from '../utils/apiResponse.js';
 import { AppError } from '../utils/AppError.js';
 import { ROLES } from '../permissions/roles.js';
@@ -75,6 +76,19 @@ export class DashboardController {
       }
       const data = await dashboardService.getDeanDashboard(user.id);
       sendSuccess(res, data, 'Dean Dashboard loaded.');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /** Top faculty, department ranking and "rising" list — Principal, Dean and Admin only. */
+  async getLeaderboards(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const data = await leaderboardService.get({
+        academicYear: (req.query.academicYear as string) || undefined,
+        departmentId: (req.query.departmentId as string) || undefined,
+      });
+      sendSuccess(res, data, 'Leaderboards loaded.');
     } catch (error) {
       next(error);
     }

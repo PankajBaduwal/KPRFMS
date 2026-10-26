@@ -289,3 +289,72 @@
   .chart-card { animation: none; }
   .progress-row-fill { transition: none; }
 }
+
+/* ---------------------------------------------------------------- Leaderboards */
+.lb { display: flex; flex-direction: column; gap: 14px; }
+.lb-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.lb-filters label { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: var(--color-text-secondary); min-width: 160px; }
+.lb-fair { margin-left: auto; font-size: 0.78rem; color: #1E7A47; display: inline-flex; align-items: center; gap: 6px; }
+.lb-note { margin: 0; padding: 12px 0; font-size: 0.85rem; color: var(--color-text-secondary); }
+
+.lb-hero {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 20px; border-radius: var(--radius-lg);
+  background: linear-gradient(120deg, #13294B 0%, #1B345F 60%, #24467C 100%);
+  color: #fff; box-shadow: var(--shadow-md);
+  animation: insightIn 520ms var(--ease-out, ease-out) both;
+}
+.lb-hero-icon { font-size: 2rem; color: #F2C14E; }
+.lb-hero-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.lb-hero-kicker { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: #C9D6EA; }
+.lb-hero-text strong { font-size: 1.15rem; font-weight: 650; }
+.lb-hero-meta { font-size: 0.8rem; color: #DCE5F2; }
+.lb-hero-score { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
+.lb-hero-score span { font-size: 1.8rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.lb-hero-score small { font-size: 0.72rem; color: #C9D6EA; }
+
+.lb-card .chart-card-head { flex-wrap: wrap; }
+.lb-tabs { display: inline-flex; flex-wrap: nowrap; white-space: nowrap; gap: 2px; padding: 3px; background: #EEF1F5; border-radius: 999px; max-width: 100%; overflow-x: auto; }
+.lb-tabs button {
+  border: 0; background: transparent; padding: 4px 11px; border-radius: 999px;
+  font-size: 0.75rem; font-weight: 600; color: #475467; cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base);
+}
+.lb-tabs button:hover { color: #13294B; }
+.lb-tabs button.is-active { background: #fff; color: #13294B; box-shadow: var(--shadow-xs); }
+
+.lb-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.lb-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.lb-row {
+  display: flex; align-items: center; gap: 12px; padding: 8px;
+  border-radius: var(--radius-md, 8px); color: inherit; text-decoration: none;
+  transition: background var(--transition-base);
+}
+a.lb-row:hover { background: #F4F7FB; }
+a.lb-row:hover .lb-name { color: #1B345F; text-decoration: underline; }
+.lb-list-compact .lb-row { padding: 6px; }
+.lb-rank {
+  flex: none; width: 26px; height: 26px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700; background: #EEF1F5; color: #475467;
+}
+.lb-rank-1 { background: #F7E3A6; color: #7A5A00; }
+.lb-rank-2 { background: #E3E7EE; color: #3C4757; }
+.lb-rank-3 { background: #F1D3BC; color: #7A3F12; }
+.lb-person { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.lb-name { font-size: 0.86rem; font-weight: 600; color: #13294B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-sub { font-size: 0.74rem; color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-bar { display: block; height: 6px; background: #EEF1F5; border-radius: 999px; overflow: hidden; }
+.lb-bar > span { display: block; height: 100%; background: #1B345F; border-radius: 999px; transition: width 700ms var(--ease-out, ease-out); }
+.lb-count { flex: none; display: flex; flex-direction: column; align-items: flex-end; font-weight: 700; font-size: 1rem; color: #13294B; font-variant-numeric: tabular-nums; }
+.lb-count small { font-size: 0.68rem; font-weight: 500; color: var(--color-text-secondary); }
+.lb-weights { margin: 8px 0 0; font-size: 0.72rem; color: var(--color-text-secondary); }
+
+@media (max-width: 640px) {
+  .lb-fair { margin-left: 0; }
+  .lb-hero { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lb-hero { animation: none; }
+  .lb-bar > span { transition: none; }
+}
