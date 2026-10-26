@@ -60,17 +60,17 @@ const institutionSettingsSchema = new Schema<IInstitutionSettings>(
     },
     affiliation: {
       type: String,
-      default: 'Anna University, Chennai',
+      default: '',
       trim: true,
     },
     approval: {
       type: String,
-      default: 'AICTE, New Delhi',
+      default: '',
       trim: true,
     },
     accreditations: {
       type: [String],
-      default: ['NAAC A++', 'NBA Accredited Programs', 'Autonomous Status'],
+      default: [],
     },
     contactEmail: {
       type: String,
@@ -80,7 +80,7 @@ const institutionSettingsSchema = new Schema<IInstitutionSettings>(
     },
     contactPhone: {
       type: String,
-      default: '+91 422 2635600',
+      default: '',
       trim: true,
     },
     websiteUrl: {
