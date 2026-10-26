@@ -567,6 +567,11 @@ export class ApprovalQueueService {
       approved: allRecords.filter((r) => r.status === 'APPROVED').length,
       returned: allRecords.filter((r) => r.status === 'RETURNED_FOR_CORRECTION').length,
       rejected: allRecords.filter((r) => r.status === 'REJECTED').length,
+      // Pending items per record type, for the filter chips on the HOD dashboard
+      pendingByType: allRecords.reduce<Record<string, number>>((acc, r) => {
+        if (r.status === 'PENDING') acc[r.recordType] = (acc[r.recordType] ?? 0) + 1;
+        return acc;
+      }, {}),
     };
 
     // Apply Status Tab Filter

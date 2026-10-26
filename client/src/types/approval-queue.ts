@@ -55,6 +55,8 @@ export interface ApprovalQueueCounts {
   approved: number;
   returned: number;
   rejected: number;
+  /** Pending items per record type (e.g. { LEAVE: 3, PUBLICATION: 2 }) */
+  pendingByType?: Record<string, number>;
 }
 
 export interface ApprovalQueuePagination {

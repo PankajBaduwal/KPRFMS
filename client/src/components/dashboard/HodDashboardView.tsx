@@ -11,6 +11,7 @@ import { activityService } from '../../services/activity.service';
 import type { IDepartmentFacultyMember } from '../../types/hod-console';
 import type { AcademicActivity } from '../../types/activity';
 import { HodInsights } from './insights/DashboardInsights';
+import { HodInlineApprovals } from './HodInlineApprovals';
 
 interface HodDashboardViewProps {
   data: HodDashboardData;
@@ -31,9 +32,6 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
   const [verificationFilter, setVerificationFilter] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'workload' | 'publications' | 'pending'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-
-  // Approvals Filter Tab
-  const [approvalsFilter, setApprovalsFilter] = useState<'ALL' | 'Leave' | 'Publication' | 'Correction' | 'Project' | 'Appraisal'>('ALL');
 
   // Focus Navigation Tab
   const [activeHodTab, setActiveHodTab] = useState<'APPROVALS' | 'ROSTER' | 'WORKLOAD' | 'RESEARCH' | 'ALL'>('APPROVALS');
@@ -142,15 +140,6 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
     return result;
   }, [facultyList, searchQuery, designationFilter, workloadFilter, verificationFilter, sortBy, sortOrder]);
 
-  // Filtered pending approvals
-  const filteredPendingItems = useMemo(() => {
-    if (approvalsFilter === 'ALL') {
-      return data.pendingApprovals.items;
-    }
-    return data.pendingApprovals.items.filter((item) =>
-      item.type.toLowerCase().includes(approvalsFilter.toLowerCase())
-    );
-  }, [data.pendingApprovals.items, approvalsFilter]);
 
   // Helper for workload badge
   const renderWorkloadBadge = (status: string, hours: number) => {
@@ -510,189 +499,7 @@ export const HodDashboardView: React.FC<HodDashboardViewProps> = ({ data }) => {
       {/* ========================================== */}
       {/* 3. PENDING APPROVALS                       */}
       {/* ========================================== */}
-      {(activeHodTab === 'APPROVALS' || activeHodTab === 'ALL') && (
-      <section aria-label="Pending Approvals">
-        <div className="card-custom">
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: 'var(--space-3)',
-              marginBottom: 'var(--space-3)',
-              paddingBottom: 'var(--space-3)',
-              borderBottom: '1px solid var(--color-border)',
-            }}
-          >
-            <div>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: 700,
-                  margin: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  color: 'var(--color-text)',
-                }}
-              >
-                <i className="bi bi-check2-circle" style={{ color: 'var(--color-warning)' }} />
-                Pending Approvals &amp; Endorsements
-                <span
-                  style={{
-                    fontSize: '0.75rem',
-                    padding: '2px 8px',
-                    borderRadius: 9999,
-                    backgroundColor: data.pendingApprovals.total > 0 ? 'rgba(234, 88, 12, 0.12)' : 'rgba(16, 185, 129, 0.12)',
-                    color: data.pendingApprovals.total > 0 ? 'var(--color-warning)' : 'var(--color-success)',
-                    fontWeight: 700,
-                  }}
-                >
-                  {data.pendingApprovals.total} Pending
-                </span>
-              </h3>
-              <p style={{ margin: '4px 0 0', fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
-                Department faculty requests awaiting HOD recommendation, verification, or approval.
-              </p>
-            </div>
-
-            <Link
-              to={`${ROUTES.APPROVALS}?status=PENDING`}
-              className="btn-primary-custom btn-sm"
-              style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}
-            >
-              <span>Launch Approval Queue</span>
-              <i className="bi bi-arrow-right" />
-            </Link>
-          </div>
-
-          {/* Breakdown category filter chips */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-              flexWrap: 'wrap',
-              marginBottom: 'var(--space-4)',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setApprovalsFilter('ALL')}
-              className={`btn btn-sm ${approvalsFilter === 'ALL' ? 'btn-primary' : 'btn-ghost'}`}
-              style={{ fontSize: '0.75rem', padding: '3px 10px' }}
-            >
-              All ({data.pendingApprovals.total})
-            </button>
-            <button
-              type="button"
-              onClick={() => setApprovalsFilter('Leave')}
-              className={`btn btn-sm ${approvalsFilter === 'Leave' ? 'btn-primary' : 'btn-ghost'}`}
-              style={{ fontSize: '0.75rem', padding: '3px 10px' }}
-            >
-              Leaves ({data.pendingApprovals.leaves})
-            </button>
-            <button
-              type="button"
-              onClick={() => setApprovalsFilter('Publication')}
-              className={`btn btn-sm ${approvalsFilter === 'Publication' ? 'btn-primary' : 'btn-ghost'}`}
-              style={{ fontSize: '0.75rem', padding: '3px 10px' }}
-            >
-              Publications ({data.pendingApprovals.publications})
-            </button>
-            <button
-              type="button"
-              onClick={() => setApprovalsFilter('Correction')}
-              className={`btn btn-sm ${approvalsFilter === 'Correction' ? 'btn-primary' : 'btn-ghost'}`}
-              style={{ fontSize: '0.75rem', padding: '3px 10px' }}
-            >
-              Attendance ({data.pendingApprovals.corrections})
-            </button>
-            <button
-              type="button"
-              onClick={() => setApprovalsFilter('Project')}
-              className={`btn btn-sm ${approvalsFilter === 'Project' ? 'btn-primary' : 'btn-ghost'}`}
-              style={{ fontSize: '0.75rem', padding: '3px 10px' }}
-            >
-              Projects ({data.pendingApprovals.projects})
-            </button>
-            <button
-              type="button"
-              onClick={() => setApprovalsFilter('Appraisal')}
-              className={`btn btn-sm ${approvalsFilter === 'Appraisal' ? 'btn-primary' : 'btn-ghost'}`}
-              style={{ fontSize: '0.75rem', padding: '3px 10px' }}
-            >
-              Appraisals ({data.pendingApprovals.appraisals})
-            </button>
-          </div>
-
-          {/* Pending items list */}
-          {filteredPendingItems.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 'var(--space-6)', color: 'var(--color-text-muted)' }}>
-              <i className="bi bi-patch-check" style={{ fontSize: '2rem', display: 'block', marginBottom: 8, color: 'var(--color-success)' }} />
-              <div style={{ fontWeight: 600, color: 'var(--color-text)', fontSize: '0.95rem' }}>
-                All Submissions Cleared
-              </div>
-              <div style={{ fontSize: '0.8125rem', marginTop: 4 }}>
-                There are no pending submissions awaiting HOD review in this category.
-              </div>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-              {filteredPendingItems.map((item) => (
-                <div
-                  key={item.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: 'var(--space-3) var(--space-4)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-md)',
-                    backgroundColor: 'var(--color-surface)',
-                    gap: 'var(--space-3)',
-                  }}
-                >
-                  <div style={{ minWidth: 0, flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                      <span
-                        style={{
-                          fontSize: '0.72rem',
-                          padding: '1px 6px',
-                          borderRadius: 4,
-                          backgroundColor: 'rgba(30, 64, 175, 0.08)',
-                          color: 'var(--color-primary)',
-                          fontWeight: 700,
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {item.type}
-                      </span>
-                      <span style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--color-text)' }}>
-                        {item.title}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
-                      Requested by <strong>{item.applicant || 'Faculty Member'}</strong> &bull; Submitted on{' '}
-                      {new Date(item.submittedDate).toLocaleDateString()}
-                    </div>
-                  </div>
-
-                  <Link
-                    to={item.link || ROUTES.APPROVALS}
-                    className="btn-outline-primary btn-sm"
-                    style={{ textDecoration: 'none', whiteSpace: 'nowrap', fontSize: '0.78rem', padding: '4px 12px' }}
-                  >
-                    Review &amp; Endorse
-                  </Link>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-      )}
+      {(activeHodTab === 'APPROVALS' || activeHodTab === 'ALL') && <HodInlineApprovals />}
 
       {/* ========================================== */}
       {/* 4. WORKLOAD & 5. ATTENDANCE DUAL GRID      */}

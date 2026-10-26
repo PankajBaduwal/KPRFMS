@@ -9,7 +9,7 @@
  * private API server on TEST_API_PORT (default 5099) connected to it, runs the suites, and
  * stops the server. Your development database is never touched.
  */
-import { spawn, ChildProcess } from 'child_process';
+import { spawn, spawnSync, ChildProcess } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import mongoose from 'mongoose';
@@ -92,6 +92,15 @@ const API_LOG = path.resolve(process.cwd(), 'test-api.log');
 let apiExited: string | null = null;
 
 async function startTestApi(): Promise<ChildProcess> {
+  // A server already on the port (e.g. left over from an interrupted run) would be tested
+  // instead of the current code, so refuse to start rather than test the wrong thing.
+  const existing = await fetch(`${TEST_API_URL}/health`).then(() => true, () => false);
+  if (existing) {
+    throw new Error(
+      `Port ${TEST_API_PORT} is already in use, probably by a test API left over from an earlier run. ` +
+        'Stop that process (or set TEST_API_PORT) and run the tests again.'
+    );
+  }
   const child = spawn('npx', ['tsx', 'src/server.ts'], { cwd: process.cwd(), shell: process.platform === 'win32', env: testEnv });
   let log = '';
   const logFile = fs.createWriteStream(API_LOG);
@@ -117,7 +126,8 @@ async function startTestApi(): Promise<ChildProcess> {
 
 function stopProcessTree(child: ChildProcess) {
   if (!child.pid) return;
-  if (process.platform === 'win32') spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { shell: true });
+  // Wait for taskkill: the runner exits right after this, and an async kill could leave the API running
+  if (process.platform === 'win32') spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { shell: true, stdio: 'ignore' });
   else child.kill('SIGTERM');
 }
 

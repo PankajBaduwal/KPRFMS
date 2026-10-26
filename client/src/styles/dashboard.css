@@ -358,3 +358,87 @@ a.lb-row:hover .lb-name { color: #1B345F; text-decoration: underline; }
   .lb-hero { animation: none; }
   .lb-bar > span { transition: none; }
 }
+
+/* ---------------------------------------------------------------- HOD inline approvals */
+.hia { display: flex; flex-direction: column; gap: 12px; }
+.hia-head {
+  display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--color-border);
+}
+.hia-head h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--color-text); display: flex; align-items: center; gap: 8px; }
+.hia-head h3 > i { color: var(--color-warning); }
+.hia-head p { margin: 4px 0 0; font-size: 0.8125rem; color: var(--color-text-secondary); }
+.hia-total { font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; font-weight: 700; }
+.hia-total.is-pending { background: rgba(234, 88, 12, 0.12); color: var(--color-warning); }
+.hia-total.is-clear { background: rgba(16, 185, 129, 0.12); color: var(--color-success); }
+.hia-queue-link { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+.hia-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.hia-chips button {
+  border: 1px solid var(--color-border); background: var(--color-surface); color: #475467;
+  border-radius: 999px; padding: 3px 11px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+.hia-chips button:hover { border-color: #B8C4D6; color: #13294B; }
+.hia-chips button.is-active { background: #13294B; border-color: #13294B; color: #fff; }
+
+.hia-note { margin: 0; padding: 12px 0; font-size: 0.85rem; color: var(--color-text-secondary); }
+.hia-empty { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 24px 0; font-size: 0.8125rem; color: var(--color-text-secondary); }
+.hia-empty i { font-size: 2rem; color: var(--color-success); }
+.hia-empty strong { color: var(--color-text); font-size: 0.95rem; }
+
+.hia-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.hia-row {
+  border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+.hia-row:hover { border-color: #C9D3E1; box-shadow: var(--shadow-xs); }
+.hia-row.is-open { border-color: #9FB0C8; box-shadow: var(--shadow-sm, var(--shadow-xs)); }
+.hia-main { display: flex; align-items: center; gap: 12px; padding: 10px 14px; flex-wrap: wrap; }
+.hia-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 320px; }
+.hia-type {
+  align-self: flex-start; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+  padding: 1px 6px; border-radius: 4px; background: rgba(30, 64, 175, 0.08); color: var(--color-primary);
+}
+.hia-title { font-weight: 600; font-size: 0.875rem; color: var(--color-text); overflow-wrap: anywhere; }
+.hia-meta { font-size: 0.75rem; color: var(--color-text-muted); }
+.hia-summary { font-size: 0.75rem; color: var(--color-text-secondary); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+
+.hia-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.hia-btn {
+  display: inline-flex; align-items: center; gap: 5px; border-radius: 6px; padding: 4px 10px;
+  font-size: 0.78rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; background: transparent;
+  transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+.hia-btn:disabled { opacity: 0.6; cursor: default; }
+.hia-btn.is-approve { color: #1E7A47; border-color: #BFE3CD; }
+.hia-btn.is-approve:hover:not(:disabled) { background: #E8F5EE; }
+.hia-btn.is-return { color: #9A5B00; border-color: #F0D9A8; }
+.hia-btn.is-return:hover:not(:disabled) { background: #FDF5E3; }
+.hia-btn.is-reject { color: #A23B4A; border-color: #F0C9CF; }
+.hia-btn.is-reject:hover:not(:disabled) { background: #FBEDEF; }
+.hia-btn.is-solid { color: #fff; }
+.hia-btn.is-solid.is-approve { background: #1E7A47; border-color: #1E7A47; }
+.hia-btn.is-solid.is-return { background: #9A5B00; border-color: #9A5B00; }
+.hia-btn.is-solid.is-reject { background: #A23B4A; border-color: #A23B4A; }
+.hia-btn.is-solid:hover:not(:disabled) { filter: brightness(1.08); }
+
+.hia-confirm {
+  display: flex; flex-direction: column; gap: 6px; padding: 10px 14px 12px;
+  border-top: 1px dashed var(--color-border); border-left: 3px solid transparent;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  animation: insightIn 240ms var(--ease-out, ease-out) both;
+}
+.hia-confirm.is-approve { border-left-color: #1E7A47; background: #F6FBF8; }
+.hia-confirm.is-return { border-left-color: #C98A1A; background: #FFFBF2; }
+.hia-confirm.is-reject { border-left-color: #A23B4A; background: #FDF6F7; }
+.hia-confirm label { font-size: 0.75rem; font-weight: 600; color: #344054; }
+.hia-error { margin: 0; font-size: 0.75rem; color: var(--color-danger); }
+.hia-confirm-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+.hia-more { align-self: flex-start; font-size: 0.8125rem; font-weight: 600; color: var(--color-primary); text-decoration: none; }
+.hia-more:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hia-confirm { animation: none; }
+}
