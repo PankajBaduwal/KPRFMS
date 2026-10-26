@@ -33,9 +33,9 @@ async function runPhase14Tests() {
     await connectDatabase();
 
     // 0. Locate test actors
-    const adminUser = await User.findOne({ email: 'admin@kpriet.ac.in' });
-    const hodUser = await User.findOne({ email: 'hod.cse@kpriet.ac.in' });
-    const facultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' });
+    const adminUser = await User.findOne({ email: 'admin@college.edu' });
+    const hodUser = await User.findOne({ email: 'hod.cse@college.edu' });
+    const facultyUser = await User.findOne({ email: 'faculty.cse@college.edu' });
     const cseDept = await Department.findOne({ code: 'CSE' });
     const facultyProfile = await Faculty.findOne({ userId: facultyUser?._id });
 

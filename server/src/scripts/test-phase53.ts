@@ -119,11 +119,11 @@ async function runSecurityAudit() {
   // 2. Setup Users & Faculty profiles
   // Faculty A (Dept A)
   const userFacA = await User.findOneAndUpdate(
-    { email: `fac.a.${nonce}@kpriet.ac.in` },
+    { email: `fac.a.${nonce}@college.edu` },
     {
       employeeId: `FA${nonce.toString().slice(-4)}`,
       name: 'Faculty Alpha',
-      email: `fac.a.${nonce}@kpriet.ac.in`,
+      email: `fac.a.${nonce}@college.edu`,
       role: ROLES.FACULTY,
       departmentId: deptA._id,
       status: 'ACTIVE',
@@ -155,11 +155,11 @@ async function runSecurityAudit() {
 
   // Faculty B (Dept A - peer in same department)
   const userFacB = await User.findOneAndUpdate(
-    { email: `fac.b.${nonce}@kpriet.ac.in` },
+    { email: `fac.b.${nonce}@college.edu` },
     {
       employeeId: `FB${nonce.toString().slice(-4)}`,
       name: 'Faculty Beta',
-      email: `fac.b.${nonce}@kpriet.ac.in`,
+      email: `fac.b.${nonce}@college.edu`,
       role: ROLES.FACULTY,
       departmentId: deptA._id,
       status: 'ACTIVE',
@@ -189,11 +189,11 @@ async function runSecurityAudit() {
 
   // Faculty C (Dept B - foreign department faculty)
   const userFacC = await User.findOneAndUpdate(
-    { email: `fac.c.${nonce}@kpriet.ac.in` },
+    { email: `fac.c.${nonce}@college.edu` },
     {
       employeeId: `FC${nonce.toString().slice(-4)}`,
       name: 'Faculty Charlie',
-      email: `fac.c.${nonce}@kpriet.ac.in`,
+      email: `fac.c.${nonce}@college.edu`,
       role: ROLES.FACULTY,
       departmentId: deptB._id,
       status: 'ACTIVE',
@@ -221,11 +221,11 @@ async function runSecurityAudit() {
 
   // HOD Dept A
   const userHodA = await User.findOneAndUpdate(
-    { email: `hod.a.${nonce}@kpriet.ac.in` },
+    { email: `hod.a.${nonce}@college.edu` },
     {
       employeeId: `HA${nonce.toString().slice(-4)}`,
       name: 'HOD Department A',
-      email: `hod.a.${nonce}@kpriet.ac.in`,
+      email: `hod.a.${nonce}@college.edu`,
       role: ROLES.HOD,
       departmentId: deptA._id,
       status: 'ACTIVE',
@@ -251,11 +251,11 @@ async function runSecurityAudit() {
 
   // HOD Dept B
   const userHodB = await User.findOneAndUpdate(
-    { email: `hod.b.${nonce}@kpriet.ac.in` },
+    { email: `hod.b.${nonce}@college.edu` },
     {
       employeeId: `HB${nonce.toString().slice(-4)}`,
       name: 'HOD Department B',
-      email: `hod.b.${nonce}@kpriet.ac.in`,
+      email: `hod.b.${nonce}@college.edu`,
       role: ROLES.HOD,
       departmentId: deptB._id,
       status: 'ACTIVE',
@@ -285,7 +285,7 @@ async function runSecurityAudit() {
     userDean = await User.create({
       employeeId: `DN${nonce.toString().slice(-4)}`,
       name: 'Dean Academics',
-      email: `dean.${nonce}@kpriet.ac.in`,
+      email: `dean.${nonce}@college.edu`,
       role: ROLES.DEAN,
       status: 'ACTIVE',
       passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz123456',
@@ -298,7 +298,7 @@ async function runSecurityAudit() {
     userPrincipal = await User.create({
       employeeId: `PR${nonce.toString().slice(-4)}`,
       name: 'Principal Office',
-      email: `principal.${nonce}@kpriet.ac.in`,
+      email: `principal.${nonce}@college.edu`,
       role: ROLES.PRINCIPAL,
       status: 'ACTIVE',
       passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz123456',
@@ -311,7 +311,7 @@ async function runSecurityAudit() {
     userAdmin = await User.create({
       employeeId: `AD${nonce.toString().slice(-4)}`,
       name: 'System Admin',
-      email: `admin.${nonce}@kpriet.ac.in`,
+      email: `admin.${nonce}@college.edu`,
       role: ROLES.ADMIN,
       status: 'ACTIVE',
       passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz123456',

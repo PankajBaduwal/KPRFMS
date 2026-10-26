@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import nodemailer, { type Transporter } from 'nodemailer';
 import { env } from '../config/env.js';
 import { logger } from '../utils/logger.js';
+import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
 
 export interface MailMessage {
   to: string;
@@ -50,9 +51,9 @@ function renderHtml(msg: MailMessage): string {
     : '';
   return `<!doctype html><html><body style="margin:0;background:#f3f5f9;font-family:Segoe UI,Arial,sans-serif;color:#1d2433">
   <div style="max-width:560px;margin:24px auto;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e2e6ee">
-    <div style="background:#0b3d91;color:#fff;padding:16px 22px;font-weight:700">KPRIET Faculty Management System</div>
+    <div style="background:#0b3d91;color:#fff;padding:16px 22px;font-weight:700">${escapeHtml(PRODUCT_FULL_NAME)}</div>
     <div style="padding:22px">${paragraphs}${code}${action}</div>
-    <div style="padding:12px 22px;font-size:12px;color:#778;border-top:1px solid #eef0f4">This is an automated message from the KPRIET FMS portal. Please do not reply.</div>
+    <div style="padding:12px 22px;font-size:12px;color:#778;border-top:1px solid #eef0f4">This is an automated message from ${escapeHtml(PRODUCT_NAME)}. Please do not reply.</div>
   </div></body></html>`;
 }
 
@@ -62,7 +63,7 @@ function renderText(msg: MailMessage): string {
     ...(msg.code ? ['', msg.code, ''] : []),
     ...(msg.action ? [`${msg.action.label}: ${msg.action.url}`] : []),
     '',
-    '— KPRIET Faculty Management System (automated message)',
+    `— ${PRODUCT_FULL_NAME} (automated message)`,
   ].join('\n');
 }
 

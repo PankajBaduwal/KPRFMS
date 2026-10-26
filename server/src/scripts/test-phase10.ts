@@ -36,10 +36,10 @@ async function runTests() {
 
   try {
     const cseDept = await Department.findOne({ code: 'CSE' });
-    const facultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' });
-    const hodUser = await User.findOne({ email: 'hod.cse@kpriet.ac.in' });
-    const principalUser = await User.findOne({ email: 'principal@kpriet.ac.in' });
-    const otherFacultyUser = await User.findOne({ email: 'faculty.ece.test@kpriet.ac.in' });
+    const facultyUser = await User.findOne({ email: 'faculty.cse@college.edu' });
+    const hodUser = await User.findOne({ email: 'hod.cse@college.edu' });
+    const principalUser = await User.findOne({ email: 'principal@college.edu' });
+    const otherFacultyUser = await User.findOne({ email: 'faculty.ece.test@college.edu' });
 
     if (!facultyUser || !hodUser || !principalUser || !cseDept) {
       throw new Error('Seed data missing. Ensure database is seeded.');
@@ -71,7 +71,7 @@ async function runTests() {
 
     const otherFacultyAuth: AuthenticatedUser = {
       id: otherFacultyUser?._id.toString() || '651234567890123456789012',
-      email: otherFacultyUser?.email || 'other@kpriet.ac.in',
+      email: otherFacultyUser?.email || 'other@college.edu',
       role: ROLES.FACULTY,
       departmentId: otherFacultyUser?.departmentId?.toString() || '651234567890123456789013',
     };

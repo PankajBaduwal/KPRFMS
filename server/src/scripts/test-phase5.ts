@@ -38,9 +38,9 @@ async function runPhase5Tests() {
   await mongoose.connect(env.MONGODB_URI);
   console.log('Connected to MongoDB.');
 
-  const facultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' });
-  const hodUser = await User.findOne({ email: 'hod.cse@kpriet.ac.in' });
-  const principalUser = await User.findOne({ email: 'principal@kpriet.ac.in' });
+  const facultyUser = await User.findOne({ email: 'faculty.cse@college.edu' });
+  const hodUser = await User.findOne({ email: 'hod.cse@college.edu' });
+  const principalUser = await User.findOne({ email: 'principal@college.edu' });
 
   if (!facultyUser || !hodUser || !principalUser) {
     console.error('Test users not found! Ensure database is seeded.');
@@ -55,12 +55,12 @@ async function runPhase5Tests() {
     });
   }
 
-  let eceHod = await User.findOne({ email: 'hod.ece@kpriet.ac.in' });
+  let eceHod = await User.findOne({ email: 'hod.ece@college.edu' });
   if (!eceHod) {
     eceHod = await User.create({
       employeeId: 'EMP009',
       name: 'Dr. ECE HOD',
-      email: 'hod.ece@kpriet.ac.in',
+      email: 'hod.ece@college.edu',
       phone: '+91 9876543219',
       passwordHash: 'dummyhash',
       role: ROLES.HOD,
@@ -72,7 +72,7 @@ async function runPhase5Tests() {
 
   const facultyProfile = await Faculty.findOne({ userId: facultyUser._id });
   if (!facultyProfile) {
-    console.error('Faculty profile not found for faculty.cse@kpriet.ac.in');
+    console.error('Faculty profile not found for faculty.cse@college.edu');
     process.exit(1);
   }
 
@@ -135,7 +135,7 @@ async function runPhase5Tests() {
       authorPosition: AUTHOR_POSITIONS.FIRST_AUTHOR,
       numberOfAuthors: 3,
       coAuthors: ['Dr. A. Karthik', 'Dr. S. Ramkumar', 'Dr. K. Suresh'],
-      affiliation: 'KPR Institute of Engineering and Technology',
+      affiliation: 'Demo Institute of Technology',
       correspondingAuthor: true,
       publicationStatus: PUBLICATION_LIFECYCLE_STATUS.PUBLISHED,
       pdfUrl: '/uploads/documents/federated_iot.pdf',
@@ -279,7 +279,7 @@ async function runPhase5Tests() {
       authorPosition: AUTHOR_POSITIONS.CORRESPONDING_AUTHOR,
       numberOfAuthors: 2,
       coAuthors: ['Dr. A. Karthik', 'R. Anitha'],
-      affiliation: 'KPR Institute of Engineering and Technology',
+      affiliation: 'Demo Institute of Technology',
       correspondingAuthor: true,
       publicationStatus: PUBLICATION_LIFECYCLE_STATUS.PUBLISHED,
     });
@@ -306,7 +306,7 @@ async function runPhase5Tests() {
       authorPosition: AUTHOR_POSITIONS.CO_AUTHOR,
       numberOfAuthors: 4,
       coAuthors: ['Dr. A. Karthik', 'Fake Author'],
-      affiliation: 'KPR Institute of Engineering and Technology',
+      affiliation: 'Demo Institute of Technology',
       correspondingAuthor: false,
       publicationStatus: PUBLICATION_LIFECYCLE_STATUS.PUBLISHED,
     });

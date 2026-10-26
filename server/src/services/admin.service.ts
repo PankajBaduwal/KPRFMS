@@ -38,6 +38,8 @@ import {
 } from '../validators/admin.validator.js';
 import { computeAcademicYearForDate } from '../utils/academicYear.js';
 import { Notification } from '../models/Notification.js';
+import { clearInstitutionProfileCache } from '../utils/institution.js';
+import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
 
 export class AdminService {
   /**
@@ -440,10 +442,10 @@ export class AdminService {
 
     mailService.queue({
       to: user.email,
-      subject: 'Your KPRIET FMS registration was not approved',
+      subject: `Your ${PRODUCT_NAME} registration was not approved`,
       lines: [
         `Dear ${user.name},`,
-        'Your registration on the KPRIET Faculty Management System was not approved.',
+        `Your registration on ${PRODUCT_FULL_NAME} was not approved.`,
         ...(reason ? [`Reason: ${reason}`] : []),
         'If you think this is a mistake, contact the institution administrator.',
       ],
@@ -1465,19 +1467,9 @@ export class AdminService {
     let settings = await InstitutionSettings.findOne();
     if (!settings) {
       settings = await InstitutionSettings.create({
-        name: 'KPR Institute of Engineering and Technology',
-        shortCode: 'KPRIET',
-        tagline: 'Autonomous Institution Affiliated to Anna University',
-        affiliation: 'Anna University, Chennai',
-        approval: 'AICTE, New Delhi',
-        accreditations: ['NAAC A++', 'NBA Accredited Programs', 'Autonomous Status'],
-        contactEmail: 'admin@kpriet.ac.in',
-        contactPhone: '+91 422 2635600',
-        websiteUrl: 'https://kpriet.ac.in',
-        address: 'Avinashi Road, Arasur',
-        city: 'Coimbatore',
-        state: 'Tamil Nadu',
-        pincode: '641407',
+        name: 'Your Institution',
+        shortCode: 'INST',
+        contactEmail: 'admin@college.edu',
         currentAcademicYear: computeAcademicYearForDate(),
         currentSemesterType: 'ODD',
         allowSelfRegistration: false,
@@ -1498,6 +1490,7 @@ export class AdminService {
     Object.assign(settings, input);
     settings.updatedBy = new Types.ObjectId(adminId);
     await settings.save();
+    clearInstitutionProfileCache();
 
     await recordAudit({
       action: AUDIT_ACTIONS.INSTITUTION_SETTINGS_UPDATED,

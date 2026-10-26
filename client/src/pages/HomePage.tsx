@@ -4,6 +4,9 @@ import { ROUTES } from '../constants/routes';
 import { FEATURES } from '../constants/features';
 import { apiGet } from '../api/client';
 import { AnimatedNumber, usePrefersReducedMotion } from '../components/charts';
+import { PRODUCT_NAME } from '../config/brand';
+import { InstitutionName } from '../components/InstitutionName';
+import { BrandMark } from '../components/BrandMark';
 
 const MODULES = [
   {
@@ -182,7 +185,7 @@ const LiveStats: React.FC = () => {
         </div>
       ))}
       <span className="pub-stats-live">
-        <span className="pub-live-dot" /> Live from FMS
+        <span className="pub-live-dot" /> Live figures
       </span>
     </div>
   );
@@ -224,12 +227,12 @@ export const HomePage: React.FC = () => {
         <div className="pub-container pub-hero-grid">
           <div className="pub-hero-copy">
             <span className="pub-hero-badge">
-              <img src="/images/kpriet-emblem.png" alt="" width={20} height={20} />
-              KPR Institute of Engineering and Technology
+              <BrandMark size={20} />
+              <InstitutionName fallback={PRODUCT_NAME} />
             </span>
             <RevealHeading text="Faculty records, research and approvals in one place" />
             <p className="pub-hero-lead">
-              The Faculty Management System replaces scattered forms and spreadsheets. Faculty keep their profile and research up to date,
+              {PRODUCT_NAME} replaces scattered forms and spreadsheets. Faculty keep their profile and research up to date,
               HODs verify it online, and the same records feed appraisals and accreditation reports.
             </p>
             <div className="pub-hero-actions">
@@ -253,7 +256,7 @@ export const HomePage: React.FC = () => {
                 <span />
                 <span />
                 <div className="pub-browser-url">
-                  <i className="bi bi-lock-fill" /> fms.kpriet.ac.in/portal
+                  <i className="bi bi-lock-fill" /> {PRODUCT_NAME.toLowerCase()}.app/portal
                 </div>
               </div>
               <img src="/images/portal-preview.jpg" alt="" width={1200} height={925} />
@@ -364,7 +367,7 @@ export const HomePage: React.FC = () => {
         tone="tint"
         eyebrow="Security"
         title="Built for staff records"
-        intro="Faculty data stays inside KPRIET and every action is accountable."
+        intro="Faculty data stays inside your institution and every action is accountable."
       >
         <div ref={security.ref} className={`pub-security-grid ${security.inView ? 'is-visible' : ''}`} onPointerMove={trackPointer}>
           {SECURITY.map((s, i) => (
@@ -387,7 +390,7 @@ export const HomePage: React.FC = () => {
         <div className="pub-container pub-cta-inner">
           <div>
             <h2>Ready to get started?</h2>
-            <p>Sign in with your college account, or register if you have just joined KPRIET.</p>
+            <p>Sign in with your college account, or register if you have just joined <InstitutionName />.</p>
           </div>
           <div className="pub-hero-actions">
             <Link to={ROUTES.LOGIN} className="pub-btn pub-btn-light pub-btn-shine">

@@ -22,6 +22,7 @@ import {
   publicationFilterQuerySchema,
 } from '../validators/publication.validator.js';
 import { appCache } from '../utils/cache.js';
+import { getInstitutionProfile } from '../utils/institution.js';
 
 export class PublicationService {
   async createPublication(
@@ -36,6 +37,8 @@ export class PublicationService {
 
     const newPublication = await Publication.create({
       ...data,
+      // Default affiliation is this college, as named in Admin > Settings
+      affiliation: data.affiliation || (await getInstitutionProfile()).name,
       facultyId: faculty._id,
       userId: new Types.ObjectId(user.id),
       departmentId: faculty.departmentId,

@@ -9,15 +9,16 @@ import { AppError } from '../utils/AppError.js';
 import { adminService } from './admin.service.js';
 import { collegeEmailDomain, sendWelcomeEmail } from './auth.service.js';
 import { REGISTRATION_DESIGNATIONS } from '../validators/auth.validator.js';
+import { PRODUCT_NAME } from '../config/brand.js';
 
 const MAX_ROWS = 1000;
 const IMPORTABLE_ROLES = [ROLES.FACULTY, ROLES.HOD, ROLES.DEAN, ROLES.PRINCIPAL] as const;
 
 /** Spreadsheet columns, in template order. Header matching is case/space-insensitive. */
 const COLUMNS = [
-  { key: 'employeeId', header: 'Employee ID', required: true, example: 'KPR3001', width: 14 },
+  { key: 'employeeId', header: 'Employee ID', required: true, example: 'DIT3001', width: 14 },
   { key: 'name', header: 'Full Name', required: true, example: 'Dr. Anitha R', width: 26 },
-  { key: 'email', header: 'College Email', required: true, example: 'anitha.r.cse@kpriet.ac.in', width: 32 },
+  { key: 'email', header: 'College Email', required: true, example: 'anitha.r.cse@college.edu', width: 32 },
   { key: 'department', header: 'Department Code', required: true, example: 'CSE', width: 16 },
   { key: 'designation', header: 'Designation', required: false, example: 'Assistant Professor', width: 30 },
   { key: 'phone', header: 'Mobile', required: false, example: '9876543210', width: 14 },
@@ -75,7 +76,7 @@ export const facultyImportService = {
   async buildTemplate(): Promise<Buffer> {
     const departments = await Department.find({ isActive: true }).select('code name').sort({ code: 1 }).lean();
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'KPRIET FMS';
+    workbook.creator = PRODUCT_NAME;
 
     const sheet = workbook.addWorksheet('Faculty');
     sheet.columns = COLUMNS.map((c) => ({ header: c.header + (c.required ? ' *' : ''), key: c.key, width: c.width }));

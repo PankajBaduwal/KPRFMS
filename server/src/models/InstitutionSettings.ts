@@ -44,18 +44,18 @@ const institutionSettingsSchema = new Schema<IInstitutionSettings>(
     name: {
       type: String,
       required: true,
-      default: 'KPR Institute of Engineering and Technology',
+      default: 'Your Institution',
       trim: true,
     },
     shortCode: {
       type: String,
       required: true,
-      default: 'KPRIET',
+      default: 'INST',
       trim: true,
     },
     tagline: {
       type: String,
-      default: 'Autonomous Institution Affiliated to Anna University',
+      default: '',
       trim: true,
     },
     affiliation: {
@@ -75,7 +75,7 @@ const institutionSettingsSchema = new Schema<IInstitutionSettings>(
     contactEmail: {
       type: String,
       required: true,
-      default: 'admin@kpriet.ac.in',
+      default: 'admin@college.edu',
       trim: true,
     },
     contactPhone: {
@@ -85,32 +85,32 @@ const institutionSettingsSchema = new Schema<IInstitutionSettings>(
     },
     websiteUrl: {
       type: String,
-      default: 'https://kpriet.ac.in',
+      default: '',
       trim: true,
     },
     address: {
       type: String,
-      default: 'Avinashi Road, Arasur',
+      default: '',
       trim: true,
     },
     city: {
       type: String,
-      default: 'Coimbatore',
+      default: '',
       trim: true,
     },
     state: {
       type: String,
-      default: 'Tamil Nadu',
+      default: '',
       trim: true,
     },
     pincode: {
       type: String,
-      default: '641407',
+      default: '',
       trim: true,
     },
     logoUrl: {
       type: String,
-      default: '/assets/kpriet-logo.png',
+      default: '',
       trim: true,
     },
     currentAcademicYear: {

@@ -1,7 +1,7 @@
 {
-  "name": "KPRIET Faculty Management System",
-  "short_name": "KPRIET FMS",
-  "description": "Faculty records, attendance, leave, research and approvals for KPR Institute of Engineering and Technology.",
+  "name": "FacultyCore Faculty Management System",
+  "short_name": "FacultyCore",
+  "description": "Faculty records, attendance, leave, research and approvals for colleges.",
   "id": "/portal",
   "start_url": "/portal",
   "scope": "/",

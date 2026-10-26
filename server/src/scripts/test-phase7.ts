@@ -33,9 +33,9 @@ async function runTests() {
   await AcademicActivity.deleteMany({ title: /\[TEST-PHASE-7\]/ });
 
   // Retrieve test users
-  const cseFacultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' });
-  const cseHodUser = await User.findOne({ email: 'hod.cse@kpriet.ac.in' });
-  const adminUser = await User.findOne({ email: 'admin@kpriet.ac.in' });
+  const cseFacultyUser = await User.findOne({ email: 'faculty.cse@college.edu' });
+  const cseHodUser = await User.findOne({ email: 'hod.cse@college.edu' });
+  const adminUser = await User.findOne({ email: 'admin@college.edu' });
   const eceDept = await Department.findOne({ code: 'ECE' });
 
   if (!cseFacultyUser || !cseHodUser || !adminUser || !eceDept) {
@@ -43,12 +43,12 @@ async function runTests() {
   }
 
   // Create mock ECE HOD user
-  let eceHodUser = await User.findOne({ email: 'hod.ece@kpriet.ac.in' });
+  let eceHodUser = await User.findOne({ email: 'hod.ece@college.edu' });
   if (!eceHodUser) {
     eceHodUser = await User.create({
       employeeId: 'EMP_ECE_HOD',
       name: 'Dr. ECE HOD',
-      email: 'hod.ece@kpriet.ac.in',
+      email: 'hod.ece@college.edu',
       passwordHash: 'dummy',
       role: ROLES.HOD,
       departmentId: eceDept._id,

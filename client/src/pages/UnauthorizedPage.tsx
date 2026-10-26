@@ -4,8 +4,11 @@ import { Button, Badge, Modal } from '../components';
 import { ROUTES } from '../constants/routes';
 import { useAuthStore } from '../stores/authStore';
 import { ROLE_LABELS } from '../constants/roles';
+import { useInstitution } from '../hooks/useInstitution';
+import { InstitutionContact } from '../components/InstitutionName';
 
 export const UnauthorizedPage: React.FC = () => {
+  const inst = useInstitution();
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const [supportModalOpen, setSupportModalOpen] = useState(false);
@@ -17,7 +20,8 @@ export const UnauthorizedPage: React.FC = () => {
   };
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText('helpdesk@kpriet.ac.in').then(() => {
+    if (!inst.contactEmail) return;
+    navigator.clipboard.writeText(inst.contactEmail).then(() => {
       setCopiedEmail(true);
       setTimeout(() => setCopiedEmail(false), 2000);
     });
@@ -239,7 +243,7 @@ export const UnauthorizedPage: React.FC = () => {
           </div>
 
           <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
-            <strong>Central Support:</strong> helpdesk@kpriet.ac.in &bull; Ext: 4101
+            <strong>Central Support:</strong> <InstitutionContact />
           </div>
         </div>
       </Modal>

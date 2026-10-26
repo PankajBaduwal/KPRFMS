@@ -12,6 +12,7 @@ import { useAuthStore } from '../stores/authStore';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
 import { formatErrorMessage } from '../utils/errorHandler';
 import '../styles/account-security.css';
+import { PRODUCT_NAME } from '../config/brand';
 
 const timeAgo = (iso: string) => {
   const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60_000);
@@ -65,7 +66,7 @@ const RecoveryCodes: React.FC<{ codes: string[]; onDone: () => void }> = ({ code
           variant="outline"
           size="sm"
           icon={<i className="bi bi-download" />}
-          onClick={() => downloadText('kpriet-fms-recovery-codes.txt', `KPRIET FMS recovery codes\n\n${codes.join('\n')}\n`)}
+          onClick={() => downloadText(`${PRODUCT_NAME.toLowerCase()}-recovery-codes.txt`, `${PRODUCT_NAME} recovery codes\n\n${codes.join('\n')}\n`)}
         >
           Download
         </Button>
@@ -418,7 +419,7 @@ export const AccountSecurityPage: React.FC = () => {
               </a>
               <a
                 className="btn-secondary-custom btn-sm"
-                href={`https://outlook.office.com/calendar/0/addfromweb?url=${encodeURIComponent(calendar.url)}&name=${encodeURIComponent('KPRIET FMS')}`}
+                href={`https://outlook.office.com/calendar/0/addfromweb?url=${encodeURIComponent(calendar.url)}&name=${encodeURIComponent(PRODUCT_NAME)}`}
                 target="_blank"
                 rel="noreferrer"
               >

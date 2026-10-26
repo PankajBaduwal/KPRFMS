@@ -1,9 +1,9 @@
-/* KPRIET FMS service worker: makes the portal installable and opens it instantly.
+/* FacultyCore service worker: makes the portal installable and opens it instantly.
  * - Pages: network first, falling back to the cached app shell when offline.
  * - Built assets (/assets/*, fingerprinted): cache first.
  * - API calls and uploaded files are never cached (they are private and must be fresh).
  */
-const CACHE = 'kpriet-fms-v1';
+const CACHE = 'facultycore-v2';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/favicon.png', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {

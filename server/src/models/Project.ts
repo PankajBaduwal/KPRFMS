@@ -86,7 +86,7 @@ const coInvestigatorSchema = new Schema<ICoInvestigator>(
   {
     name: { type: String, required: true, trim: true },
     facultyId: { type: Schema.Types.ObjectId, ref: 'Faculty' },
-    institution: { type: String, trim: true, default: 'KPR Institute of Engineering and Technology' },
+    institution: { type: String, trim: true, default: '' },
     role: { type: String, trim: true, default: 'Co-Investigator' },
   },
   { _id: false }

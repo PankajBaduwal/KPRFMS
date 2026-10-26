@@ -1,6 +1,6 @@
-# KPRIET FMS — Web Client
+# FacultyCore — Web Client
 
-React 19 + TypeScript + Vite front end for the KPRIET Faculty Management System. See the [project README](../README.md) for setup, seed logins and the full feature list.
+React 19 + TypeScript + Vite front end for FacultyCore, the Faculty Management System. See the [project README](../README.md) for setup, seed logins and the full feature list.
 
 ## Commands
 

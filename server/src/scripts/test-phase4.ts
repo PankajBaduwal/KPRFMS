@@ -30,9 +30,9 @@ async function runTests() {
   console.log('Connected to MongoDB for testing.');
 
   // Retrieve test users seeded in Phase 2
-  const facultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' });
-  const hodUser = await User.findOne({ email: 'hod.cse@kpriet.ac.in' });
-  const principalUser = await User.findOne({ email: 'principal@kpriet.ac.in' });
+  const facultyUser = await User.findOne({ email: 'faculty.cse@college.edu' });
+  const hodUser = await User.findOne({ email: 'hod.cse@college.edu' });
+  const principalUser = await User.findOne({ email: 'principal@college.edu' });
 
   if (!facultyUser || !hodUser || !principalUser) {
     console.error('Test users not found! Please ensure database is seeded.');
@@ -48,12 +48,12 @@ async function runTests() {
     });
   }
 
-  let eceHod = await User.findOne({ email: 'hod.ece@kpriet.ac.in' });
+  let eceHod = await User.findOne({ email: 'hod.ece@college.edu' });
   if (!eceHod) {
     eceHod = await User.create({
       employeeId: 'EMP009',
       name: 'Dr. ECE HOD',
-      email: 'hod.ece@kpriet.ac.in',
+      email: 'hod.ece@college.edu',
       phone: '+91 9876543219',
       passwordHash: 'dummyhash',
       role: ROLES.HOD,
@@ -85,7 +85,7 @@ async function runTests() {
 
   const facultyProfile = await Faculty.findOne({ userId: facultyUser._id });
   if (!facultyProfile) {
-    console.error('Faculty profile not found for faculty@kpriet.ac.in');
+    console.error('Faculty profile not found for faculty@college.edu');
     process.exit(1);
   }
 

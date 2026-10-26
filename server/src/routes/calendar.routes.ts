@@ -12,7 +12,7 @@ router.get('/feed/:file', async (req, res, next) => {
     const token = String(req.params.file).replace(/\.ics$/i, '');
     const body = await calendarService.renderFeed(token);
     res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
-    res.setHeader('Content-Disposition', 'inline; filename="kpriet-fms.ics"');
+    res.setHeader('Content-Disposition', 'inline; filename="facultycore.ics"');
     res.setHeader('Cache-Control', 'private, max-age=300');
     res.setHeader('X-Robots-Tag', 'noindex');
     res.send(body);

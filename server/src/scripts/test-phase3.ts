@@ -30,9 +30,9 @@ async function runTests() {
   async function loginAs(identifier: string, password: string) {
     const res = await axios.post(`${API_URL}/auth/login`, { identifier, password });
     const setCookie = res.headers['set-cookie'];
-    const authCookie = setCookie?.find((c: string) => c.startsWith('kpriet_fms_token='));
+    const authCookie = setCookie?.find((c: string) => c.startsWith('fms_token='));
     // Pair the session with a known CSRF token (double-submit cookie) for mutating requests
-    const cookie = authCookie ? `${authCookie.split(';')[0]}; kpriet_csrf_token=${TEST_CSRF_TOKEN}` : '';
+    const cookie = authCookie ? `${authCookie.split(';')[0]}; fms_csrf_token=${TEST_CSRF_TOKEN}` : '';
     return { res, cookie };
   }
 

@@ -1,4 +1,4 @@
-# KPRIET FMS API — production image
+# FacultyCore API — production image
 FROM node:22-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./

@@ -38,7 +38,7 @@ export const PhdScholarModal: React.FC<PhdScholarModalProps> = ({
   const [title, setTitle] = useState('');
   const [supervisor, setSupervisor] = useState('');
   const [coSupervisor, setCoSupervisor] = useState('');
-  const [university, setUniversity] = useState('Anna University, Chennai');
+  const [university, setUniversity] = useState('');
   const [registrationDate, setRegistrationDate] = useState('');
   const [researchArea, setResearchArea] = useState('');
   const [stage, setStage] = useState<PhdStage>(PHD_STAGES.REGISTERED);
@@ -61,7 +61,7 @@ export const PhdScholarModal: React.FC<PhdScholarModalProps> = ({
       setTitle(scholar.title || '');
       setSupervisor(scholar.supervisor || '');
       setCoSupervisor(scholar.coSupervisor || '');
-      setUniversity(scholar.university || 'Anna University, Chennai');
+      setUniversity(scholar.university || '');
       setRegistrationDate(scholar.registrationDate ? scholar.registrationDate.split('T')[0] : '');
       setResearchArea(scholar.researchArea || '');
       setStage(scholar.stage || PHD_STAGES.REGISTERED);
@@ -79,7 +79,7 @@ export const PhdScholarModal: React.FC<PhdScholarModalProps> = ({
       setTitle('');
       setSupervisor('');
       setCoSupervisor('');
-      setUniversity('Anna University, Chennai');
+      setUniversity('');
       setRegistrationDate(new Date().toISOString().split('T')[0]);
       setResearchArea('');
       setStage(PHD_STAGES.REGISTERED);
@@ -332,7 +332,7 @@ export const PhdScholarModal: React.FC<PhdScholarModalProps> = ({
               type="email"
               value={scholarEmail}
               onChange={(e) => setScholarEmail(e.target.value)}
-              placeholder="e.g. senthil.res@kpriet.ac.in"
+              placeholder="e.g. senthil.res@college.edu"
             />
 
             <Input

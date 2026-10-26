@@ -107,7 +107,7 @@ export const PublicationModal: React.FC<PublicationModalProps> = ({
     authorPosition: 'FIRST_AUTHOR' as AuthorPosition,
     numberOfAuthors: '1',
     coAuthorsText: '',
-    affiliation: 'KPR Institute of Engineering and Technology',
+    affiliation: '',
     correspondingAuthor: false,
     publicationStatus: 'PUBLISHED' as PublicationLifecycleStatus,
     pdfUrl: '',
@@ -147,7 +147,7 @@ export const PublicationModal: React.FC<PublicationModalProps> = ({
         authorPosition: publication.authorPosition || 'FIRST_AUTHOR',
         numberOfAuthors: String(publication.numberOfAuthors || 1),
         coAuthorsText: (publication.coAuthors || []).join(', '),
-        affiliation: publication.affiliation || 'KPR Institute of Engineering and Technology',
+        affiliation: publication.affiliation || '',
         correspondingAuthor: publication.correspondingAuthor ?? false,
         publicationStatus: publication.publicationStatus || 'PUBLISHED',
         pdfUrl: publication.pdfUrl || '',
@@ -174,7 +174,7 @@ export const PublicationModal: React.FC<PublicationModalProps> = ({
         authorPosition: 'FIRST_AUTHOR',
         numberOfAuthors: '1',
         coAuthorsText: '',
-        affiliation: 'KPR Institute of Engineering and Technology',
+        affiliation: '',
         correspondingAuthor: false,
         publicationStatus: 'PUBLISHED',
         pdfUrl: '',
@@ -312,7 +312,7 @@ export const PublicationModal: React.FC<PublicationModalProps> = ({
       authorPosition: formData.authorPosition,
       numberOfAuthors: Math.max(1, Number(formData.numberOfAuthors) || 1),
       coAuthors,
-      affiliation: formData.affiliation.trim() || 'KPR Institute of Engineering and Technology',
+      affiliation: formData.affiliation.trim() || undefined,
       correspondingAuthor: formData.correspondingAuthor,
       publicationStatus: formData.publicationStatus,
       volume: formData.volume.trim() || undefined,
@@ -615,7 +615,7 @@ export const PublicationModal: React.FC<PublicationModalProps> = ({
               label="Affiliation"
               value={formData.affiliation}
               onChange={(e) => handleChange('affiliation', e.target.value)}
-              hint="Defaults to KPR Institute of Engineering and Technology"
+              hint="Leave blank to use your college name"
             />
           </div>
 

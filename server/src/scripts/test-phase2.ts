@@ -43,7 +43,7 @@ async function runTests() {
   // 2. Test invalid credentials
   try {
     const res = await axios.post(`${API_URL}/auth/login`, {
-      identifier: 'admin@kpriet.ac.in',
+      identifier: 'admin@college.edu',
       password: 'WrongPassword123!',
     }, { validateStatus: () => true });
     assert(res.status === 401, 'Invalid password returns 401', `Got status ${res.status}`);
@@ -55,7 +55,7 @@ async function runTests() {
   // 3. Test non-existent user
   try {
     const res = await axios.post(`${API_URL}/auth/login`, {
-      identifier: 'nonexistent@kpriet.ac.in',
+      identifier: 'nonexistent@college.edu',
       password: 'SomePassword123!',
     }, { validateStatus: () => true });
     assert(res.status === 401, 'Non-existent identifier returns 401', `Got status ${res.status}`);
@@ -66,7 +66,7 @@ async function runTests() {
   // 4. Test inactive account login rejection
   try {
     const res = await axios.post(`${API_URL}/auth/login`, {
-      identifier: 'inactive@kpriet.ac.in',
+      identifier: 'inactive@college.edu',
       password: 'Inactive@12345',
     }, { validateStatus: () => true });
     assert(res.status === 403, 'Inactive account returns 403 Forbidden', `Got status ${res.status}`);
@@ -78,9 +78,9 @@ async function runTests() {
   async function loginAs(identifier: string, password: string) {
     const res = await axios.post(`${API_URL}/auth/login`, { identifier, password });
     const setCookie = res.headers['set-cookie'];
-    const authCookie = setCookie?.find((c: string) => c.startsWith('kpriet_fms_token='));
+    const authCookie = setCookie?.find((c: string) => c.startsWith('fms_token='));
     // Pair the session with a known CSRF token (double-submit cookie) for mutating requests
-    const cookie = authCookie ? `${authCookie.split(';')[0]}; kpriet_csrf_token=${TEST_CSRF_TOKEN}` : '';
+    const cookie = authCookie ? `${authCookie.split(';')[0]}; fms_csrf_token=${TEST_CSRF_TOKEN}` : '';
     return { res, cookie };
   }
 
@@ -88,12 +88,12 @@ async function runTests() {
   let adminCookie = '';
   let adminUserId = '';
   try {
-    const { res, cookie } = await loginAs('admin@kpriet.ac.in', 'Admin@12345');
+    const { res, cookie } = await loginAs('admin@college.edu', 'Admin@12345');
     adminCookie = cookie;
     adminUserId = res.data.data.id;
     assert(res.status === 200, 'Admin login with email returns 200 OK');
     assert(res.data.data.role === 'ADMIN', 'Admin user profile has role ADMIN');
-    assert(cookie.includes('kpriet_fms_token'), 'HTTP-only cookie is issued in response headers');
+    assert(cookie.includes('fms_token'), 'HTTP-only cookie is issued in response headers');
   } catch (err: unknown) {
     assert(false, 'Admin login failed', String(err));
   }
@@ -145,7 +145,7 @@ async function runTests() {
       headers: { Cookie: adminCookie },
     });
     assert(res.status === 200, 'GET /api/auth/me returns active session for admin');
-    assert(res.data.data.email === 'admin@kpriet.ac.in', 'Session returns correct email');
+    assert(res.data.data.email === 'admin@college.edu', 'Session returns correct email');
   } catch (err: unknown) {
     assert(false, 'Session check failed', String(err));
   }
@@ -290,7 +290,7 @@ async function runTests() {
     assert(logoutRes.status === 200, 'POST /api/auth/logout succeeds with 200 OK');
 
     const setCookie = logoutRes.headers['set-cookie'];
-    const cleared = !!setCookie?.some((c: string) => c.startsWith('kpriet_fms_token=') && (c.includes('Expires=') || c.includes('Max-Age=0')));
+    const cleared = !!setCookie?.some((c: string) => c.startsWith('fms_token=') && (c.includes('Expires=') || c.includes('Max-Age=0')));
     assert(cleared, 'Logout cleared the HTTP-only cookie');
   } catch (err: unknown) {
     assert(false, 'Logout test', String(err));

@@ -220,7 +220,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
       name: 'Institution System Settings',
       category: 'Governance & Security',
       path: `${ROUTES.ADMIN_CONSOLE}?tab=settings`,
-      metric: 'KPR Institute Profile',
+      metric: 'Institution Profile',
       status: 'Configured',
       statusVariant: 'neutral',
       icon: 'bi-gear-wide-connected',

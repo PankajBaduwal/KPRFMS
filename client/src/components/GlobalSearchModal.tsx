@@ -9,6 +9,7 @@ import type {
 } from '../types/search';
 import { SEARCH_ENTITY_TYPES } from '../types/search';
 import { FEATURES, isHiddenPath } from '../constants/features';
+import { STORAGE_PREFIX } from '../config/brand';
 
 // Canonical Groups mandated by Phase 15
 export type CanonicalGroupId =
@@ -121,8 +122,8 @@ interface IRecentItem {
   timestamp: number;
 }
 
-const STORAGE_RECENT_SEARCHES = 'kpriet_fms_recent_searches';
-const STORAGE_RECENT_VISITED = 'kpriet_fms_recent_visited';
+const STORAGE_RECENT_SEARCHES = `${STORAGE_PREFIX}recent_searches`;
+const STORAGE_RECENT_VISITED = `${STORAGE_PREFIX}recent_visited`;
 
 // Sample quick suggestion prompts
 const SUGGESTED_PROMPTS = [

@@ -3,6 +3,9 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import '../styles/public.css';
 import '../styles/public-motion.css';
+import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand';
+import { BrandMark } from '../components/BrandMark';
+import { useInstitution } from '../hooks/useInstitution';
 
 const NAV = [
   { href: '#features', label: 'Features' },
@@ -13,6 +16,7 @@ const NAV = [
 
 /** Public shell (home page and public status pages): slim header, content, simple footer. */
 export const PublicLayout: React.FC = () => {
+  const inst = useInstitution();
   const isHome = useLocation().pathname === ROUTES.HOME;
   const [menuOpen, setMenuOpen] = useState(false);
   const [scroll, setScroll] = useState(0);
@@ -37,9 +41,9 @@ export const PublicLayout: React.FC = () => {
       <header className={`pub-header ${scroll > 0.005 ? 'is-scrolled' : ''}`}>
         <span className="pub-progress" style={{ transform: `scaleX(${scroll})` }} aria-hidden="true" />
         <div className="pub-container pub-header-inner">
-          <Link to={ROUTES.HOME} className="pub-brand" title="KPRIET Faculty Management System">
-            <img src="/images/kpriet-logo.png" alt="KPR Institute of Engineering and Technology" />
-            <span className="pub-brand-name">Faculty Management System</span>
+          <Link to={ROUTES.HOME} className="pub-brand" title={PRODUCT_FULL_NAME}>
+            <BrandMark size={34} />
+            <span className="pub-brand-name">{inst.name || PRODUCT_FULL_NAME}</span>
           </Link>
 
           {isHome && (
@@ -90,13 +94,19 @@ export const PublicLayout: React.FC = () => {
       <footer className="pub-footer" role="contentinfo">
         <div className="pub-container pub-footer-grid">
           <div>
-            <img className="pub-footer-logo" src="/images/kpriet-logo.png" alt="KPR Institute of Engineering and Technology" />
+            <BrandMark size={44} className="pub-footer-logo" />
             <p>
-              KPR Institute of Engineering and Technology
-              <br />
-              Arasur, Coimbatore – 641 407, Tamil Nadu
+              {inst.name || PRODUCT_FULL_NAME}
+              {(inst.city || inst.state) && (
+                <>
+                  <br />
+                  {[inst.city, inst.state].filter(Boolean).join(', ')}
+                </>
+              )}
             </p>
-            <p className="pub-footer-muted">Autonomous · Affiliated to Anna University · Approved by AICTE · NAAC &lsquo;A+&rsquo; &amp; NBA accredited</p>
+            {(inst.tagline || inst.affiliation) && (
+              <p className="pub-footer-muted">{[inst.tagline, inst.affiliation].filter(Boolean).join(' · ')}</p>
+            )}
           </div>
           <div>
             <h2>Portal</h2>
@@ -115,16 +125,18 @@ export const PublicLayout: React.FC = () => {
           <div>
             <h2>Help</h2>
             <ul>
-              <li>
-                <a href="mailto:helpdesk@kpriet.ac.in">helpdesk@kpriet.ac.in</a>
-              </li>
-              <li>IT Services, ext. 4101</li>
+              {inst.contactEmail && (
+                <li>
+                  <a href={`mailto:${inst.contactEmail}`}>{inst.contactEmail}</a>
+                </li>
+              )}
+              {inst.contactPhone && <li>{inst.contactPhone}</li>}
             </ul>
           </div>
         </div>
         <div className="pub-container pub-footer-bottom">
-          <span>&copy; {new Date().getFullYear()} KPR Institute of Engineering and Technology</span>
-          <span>For KPRIET staff only</span>
+          <span>&copy; {new Date().getFullYear()} {inst.name || PRODUCT_NAME}</span>
+          <span>Powered by {PRODUCT_NAME}</span>
         </div>
       </footer>
     </div>

@@ -20,6 +20,7 @@ import {
   type IFrameworkConfig,
   type ISourceTrace,
 } from '../types/report';
+import { InstitutionName } from '../components/InstitutionName';
 
 // Report types that belong to the Teaching module (see constants/features.ts)
 const TEACHING_REPORT_TYPES: string[] = [REPORT_TYPES.WORKLOAD, REPORT_TYPES.SUBJECT_ALLOCATION];
@@ -197,7 +198,7 @@ export const ReportsPage: React.FC = () => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
               <h1 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary)' }}>
-                KPR Institute of Engineering and Technology
+                <InstitutionName />
               </h1>
             </div>
             <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: 'var(--color-text-secondary)' }}>

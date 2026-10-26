@@ -113,7 +113,7 @@ async function startTestApi(): Promise<ChildProcess> {
     try {
       const res = await fetch(`${TEST_API_URL}/health`);
       const body = (await res.json()) as { message?: string };
-      if (body.message?.includes('KPRIET')) return child;
+      if (body.message?.includes('API is running')) return child;
       throw new Error(`Port ${TEST_API_PORT} is used by another application (set TEST_API_PORT).`);
     } catch (err) {
       if (err instanceof Error && err.message.startsWith('Port')) throw err;

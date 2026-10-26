@@ -107,7 +107,7 @@ async function runPhase41DataConsistencyAudit() {
     const adminUser = await User.create({
       employeeId: `AD${rand}`,
       name: 'System Admin Audit',
-      email: `audit.admin.${rand}@kpriet.ac.in`,
+      email: `audit.admin.${rand}@college.edu`,
       role: ROLES.ADMIN,
       passwordHash: 'dummy_hash',
       status: USER_STATUS.ACTIVE,
@@ -118,7 +118,7 @@ async function runPhase41DataConsistencyAudit() {
     const hodUser = await User.create({
       employeeId: `HD${rand}`,
       name: 'HOD Alpha Audit',
-      email: `audit.hod.${rand}@kpriet.ac.in`,
+      email: `audit.hod.${rand}@college.edu`,
       role: ROLES.HOD,
       departmentId: testDeptA._id,
       passwordHash: 'dummy_hash',
@@ -130,7 +130,7 @@ async function runPhase41DataConsistencyAudit() {
     const facultyUser = await User.create({
       employeeId: `FC${rand}`,
       name: 'Dr. Consistency Faculty',
-      email: `audit.faculty.${rand}@kpriet.ac.in`,
+      email: `audit.faculty.${rand}@college.edu`,
       role: ROLES.FACULTY,
       departmentId: testDeptA._id,
       designation: 'Associate Professor',

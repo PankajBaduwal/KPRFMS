@@ -41,8 +41,8 @@ async function run() {
   console.log('================================================================');
   await mongoose.connect(MONGODB_URI);
 
-  const admin = await User.findOne({ email: 'admin@kpriet.ac.in' }).lean();
-  const faculty = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' }).lean();
+  const admin = await User.findOne({ email: 'admin@college.edu' }).lean();
+  const faculty = await User.findOne({ email: 'faculty.cse@college.edu' }).lean();
   const hodEce = faculty
     ? await User.findOne({ role: 'HOD', status: 'ACTIVE', departmentId: { $ne: faculty.departmentId, $exists: true } }).lean()
     : null;

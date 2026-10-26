@@ -118,11 +118,11 @@ async function runWorkflowAudit() {
   // 2. Setup Users & Faculty profiles
   // Faculty A (Dept A)
   const userFacA = await User.findOneAndUpdate(
-    { email: `fac.a.${nonce}@kpriet.ac.in` },
+    { email: `fac.a.${nonce}@college.edu` },
     {
       employeeId: `FA${nonce.toString().slice(-4)}`,
       name: 'Faculty Alpha',
-      email: `fac.a.${nonce}@kpriet.ac.in`,
+      email: `fac.a.${nonce}@college.edu`,
       role: ROLES.FACULTY,
       departmentId: deptA._id,
       status: 'ACTIVE',
@@ -150,11 +150,11 @@ async function runWorkflowAudit() {
 
   // Faculty B (Dept A)
   const userFacB = await User.findOneAndUpdate(
-    { email: `fac.b.${nonce}@kpriet.ac.in` },
+    { email: `fac.b.${nonce}@college.edu` },
     {
       employeeId: `FB${nonce.toString().slice(-4)}`,
       name: 'Faculty Bravo',
-      email: `fac.b.${nonce}@kpriet.ac.in`,
+      email: `fac.b.${nonce}@college.edu`,
       role: ROLES.FACULTY,
       departmentId: deptA._id,
       status: 'ACTIVE',
@@ -182,11 +182,11 @@ async function runWorkflowAudit() {
 
   // HOD Dept A
   const userHodA = await User.findOneAndUpdate(
-    { email: `hod.a.${nonce}@kpriet.ac.in` },
+    { email: `hod.a.${nonce}@college.edu` },
     {
       employeeId: `HA${nonce.toString().slice(-4)}`,
       name: 'HOD Department A',
-      email: `hod.a.${nonce}@kpriet.ac.in`,
+      email: `hod.a.${nonce}@college.edu`,
       role: ROLES.HOD,
       departmentId: deptA._id,
       status: 'ACTIVE',
@@ -212,11 +212,11 @@ async function runWorkflowAudit() {
 
   // HOD Dept B
   const userHodB = await User.findOneAndUpdate(
-    { email: `hod.b.${nonce}@kpriet.ac.in` },
+    { email: `hod.b.${nonce}@college.edu` },
     {
       employeeId: `HB${nonce.toString().slice(-4)}`,
       name: 'HOD Department B',
-      email: `hod.b.${nonce}@kpriet.ac.in`,
+      email: `hod.b.${nonce}@college.edu`,
       role: ROLES.HOD,
       departmentId: deptB._id,
       status: 'ACTIVE',
@@ -246,7 +246,7 @@ async function runWorkflowAudit() {
     userDean = await User.create({
       employeeId: `DN${nonce.toString().slice(-4)}`,
       name: 'Dean Academics',
-      email: `dean.${nonce}@kpriet.ac.in`,
+      email: `dean.${nonce}@college.edu`,
       role: ROLES.DEAN,
       departmentId: deptA._id,
       status: 'ACTIVE',
@@ -260,7 +260,7 @@ async function runWorkflowAudit() {
     userPrincipal = await User.create({
       employeeId: `PR${nonce.toString().slice(-4)}`,
       name: 'Dr. Principal',
-      email: `principal.${nonce}@kpriet.ac.in`,
+      email: `principal.${nonce}@college.edu`,
       role: ROLES.PRINCIPAL,
       status: 'ACTIVE',
       passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz123456',
@@ -273,7 +273,7 @@ async function runWorkflowAudit() {
     userAdmin = await User.create({
       employeeId: `AD${nonce.toString().slice(-4)}`,
       name: 'System Administrator',
-      email: `admin.${nonce}@kpriet.ac.in`,
+      email: `admin.${nonce}@college.edu`,
       role: ROLES.ADMIN,
       status: 'ACTIVE',
       passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz123456',

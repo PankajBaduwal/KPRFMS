@@ -40,7 +40,7 @@ services:
       SMTP_SECURE: ${SMTP_SECURE:-false}
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
-      MAIL_FROM: ${MAIL_FROM:-KPRIET FMS <no-reply@kpriet.ac.in>}
+      MAIL_FROM: ${MAIL_FROM:-FacultyCore <no-reply@your-college.edu>}
       # AI assistant (empty = AI features hidden)
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}

@@ -178,7 +178,7 @@ export const ExperienceModal: React.FC<ExperienceModalProps> = ({
             label="Organization / Institute *"
             value={organization}
             onChange={(e) => setOrganization(e.target.value)}
-            placeholder="e.g. PSG Tech / Infosys / KPRIET"
+            placeholder="e.g. Previous college / Infosys"
             required
           />
           <Input

@@ -36,10 +36,10 @@ async function runTests() {
 
   try {
     const cseDept = await Department.findOne({ code: 'CSE' });
-    const facultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' });
-    const hodUser = await User.findOne({ email: 'hod.cse@kpriet.ac.in' });
-    const principalUser = await User.findOne({ email: 'principal@kpriet.ac.in' });
-    const otherFacultyUser = await User.findOne({ email: 'faculty.ece.test@kpriet.ac.in' });
+    const facultyUser = await User.findOne({ email: 'faculty.cse@college.edu' });
+    const hodUser = await User.findOne({ email: 'hod.cse@college.edu' });
+    const principalUser = await User.findOne({ email: 'principal@college.edu' });
+    const otherFacultyUser = await User.findOne({ email: 'faculty.ece.test@college.edu' });
 
     if (!facultyUser || !hodUser || !principalUser || !cseDept) {
       throw new Error('Seed data missing. Ensure database is seeded.');
@@ -49,7 +49,7 @@ async function runTests() {
 
     const facultyAuth: AuthenticatedUser = {
       id: facultyUser._id.toString(),
-      employeeId: facultyUser.employeeId || 'KPR-CSE-001',
+      employeeId: facultyUser.employeeId || 'DIT-CSE-001',
       name: facultyUser.name || 'Dr. A. Karthik',
       email: facultyUser.email,
       role: facultyUser.role as any,
@@ -60,7 +60,7 @@ async function runTests() {
 
     const hodAuth: AuthenticatedUser = {
       id: hodUser._id.toString(),
-      employeeId: hodUser.employeeId || 'KPR-HOD-001',
+      employeeId: hodUser.employeeId || 'DIT-HOD-001',
       name: hodUser.name || 'Dr. HOD CSE',
       email: hodUser.email,
       role: hodUser.role as any,
@@ -71,7 +71,7 @@ async function runTests() {
 
     const principalAuth: AuthenticatedUser = {
       id: principalUser._id.toString(),
-      employeeId: principalUser.employeeId || 'KPR-PRIN-001',
+      employeeId: principalUser.employeeId || 'DIT-PRIN-001',
       name: principalUser.name || 'Dr. Principal',
       email: principalUser.email,
       role: principalUser.role as any,
@@ -82,9 +82,9 @@ async function runTests() {
 
     const otherFacultyAuth: AuthenticatedUser = {
       id: otherFacultyUser?._id.toString() || '651234567890123456789012',
-      employeeId: otherFacultyUser?.employeeId || 'KPR-ECE-099',
+      employeeId: otherFacultyUser?.employeeId || 'DIT-ECE-099',
       name: otherFacultyUser?.name || 'Dr. Other Faculty',
-      email: otherFacultyUser?.email || 'other@kpriet.ac.in',
+      email: otherFacultyUser?.email || 'other@college.edu',
       role: ROLES.FACULTY,
       departmentId: otherFacultyUser?.departmentId?.toString() || '651234567890123456789013',
       status: 'ACTIVE' as any,

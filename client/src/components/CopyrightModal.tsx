@@ -177,7 +177,7 @@ export const CopyrightModal: React.FC<CopyrightModalProps> = ({
           label="Applicants / Authors (comma-separated) *"
           value={applicants}
           onChange={(e) => setApplicants(e.target.value)}
-          placeholder="e.g. Dr. A. Karthik, KPR Institute of Engineering and Technology"
+          placeholder="e.g. Dr. A. Karthik, Your College"
           required
         />
 

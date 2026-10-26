@@ -71,7 +71,7 @@ export class AuditController {
       };
 
       const csvData = await auditService.exportAuditLogsCsv(query);
-      const filename = `kpriet-audit-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+      const filename = `audit-logs-${new Date().toISOString().slice(0, 10)}.csv`;
 
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

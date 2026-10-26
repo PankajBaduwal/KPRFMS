@@ -35,10 +35,10 @@ async function runPhase6Tests() {
   await mongoose.connect(env.MONGODB_URI);
   console.log('Connected to MongoDB.');
 
-  const facultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' });
-  const hodUser = await User.findOne({ email: 'hod.cse@kpriet.ac.in' });
-  const principalUser = await User.findOne({ email: 'principal@kpriet.ac.in' });
-  const adminUser = await User.findOne({ email: 'admin@kpriet.ac.in' });
+  const facultyUser = await User.findOne({ email: 'faculty.cse@college.edu' });
+  const hodUser = await User.findOne({ email: 'hod.cse@college.edu' });
+  const principalUser = await User.findOne({ email: 'principal@college.edu' });
+  const adminUser = await User.findOne({ email: 'admin@college.edu' });
 
   if (!facultyUser || !hodUser || !principalUser || !adminUser) {
     console.error('Test users not found! Ensure database is seeded.');
@@ -53,12 +53,12 @@ async function runPhase6Tests() {
     });
   }
 
-  let eceHod = await User.findOne({ email: 'hod.ece@kpriet.ac.in' });
+  let eceHod = await User.findOne({ email: 'hod.ece@college.edu' });
   if (!eceHod) {
     eceHod = await User.create({
       employeeId: 'EMP009',
       name: 'Dr. ECE HOD',
-      email: 'hod.ece@kpriet.ac.in',
+      email: 'hod.ece@college.edu',
       phone: '+91 9876543219',
       passwordHash: 'dummyhash',
       role: ROLES.HOD,
@@ -70,7 +70,7 @@ async function runPhase6Tests() {
 
   const facultyProfile = await Faculty.findOne({ userId: facultyUser._id });
   if (!facultyProfile) {
-    console.error('Faculty profile not found for faculty.cse@kpriet.ac.in');
+    console.error('Faculty profile not found for faculty.cse@college.edu');
     process.exit(1);
   }
 
@@ -128,7 +128,7 @@ async function runPhase6Tests() {
       coInvestigators: [
         {
           name: 'Dr. V. Seetha',
-          institution: 'KPR Institute of Engineering and Technology',
+          institution: 'Demo Institute of Technology',
           role: 'Co-PI',
         },
       ],
@@ -295,9 +295,9 @@ async function runPhase6Tests() {
     // Project 3: Institutional Seed Grant (Submitted / Under Review)
     const proj3 = await projectService.createProject(mockFacultyUser, {
       title: 'Edge Computing Node Prototyping for Agricultural IoT',
-      fundingAgency: 'KPR Institute Research Seed Fund',
+      fundingAgency: 'Institute Research Seed Fund',
       fundingType: FUNDING_TYPES.INSTITUTIONAL,
-      proposalNumber: 'KPRIET/SEED/2024/04',
+      proposalNumber: 'DIT/SEED/2024/04',
       requestedAmount: 250000,
       sanctionedAmount: 0,
       receivedAmount: 0,

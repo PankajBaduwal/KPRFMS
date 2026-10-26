@@ -1,8 +1,8 @@
 /* ============================================================================
-   KPRIET FMS theme — calm, flat, institutional.
+   FacultyCore theme — calm, flat, institutional.
    Loaded last (see main.tsx): refines the design tokens and the shared component
    classes without touching page logic. Principles:
-   - one brand colour (KPRIET navy) + one interactive blue; green/amber/red only for status
+   - one brand colour (navy) + one interactive blue; green/amber/red only for status
    - flat surfaces: thin borders, no gradients on cards, shadows only to show elevation
    - one radius scale; numbers use tabular figures so columns line up
    ============================================================================ */

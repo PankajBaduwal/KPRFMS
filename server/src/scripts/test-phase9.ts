@@ -44,9 +44,9 @@ async function runTests() {
       status: 'ACTIVE',
     });
 
-    const facultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' });
-    const hodUser = await User.findOne({ email: 'hod.cse@kpriet.ac.in' });
-    const principalUser = await User.findOne({ email: 'principal@kpriet.ac.in' });
+    const facultyUser = await User.findOne({ email: 'faculty.cse@college.edu' });
+    const hodUser = await User.findOne({ email: 'hod.cse@college.edu' });
+    const principalUser = await User.findOne({ email: 'principal@college.edu' });
     const facultyDoc = await Faculty.findOne({ userId: facultyUser?._id });
 
     if (!facultyUser || !hodUser || !principalUser || !facultyDoc || !cseDept) {
@@ -54,12 +54,12 @@ async function runTests() {
     }
 
     // Create a dummy faculty in another department (ECE) to test privacy isolation
-    let otherDeptUser = await User.findOne({ email: 'faculty.ece.test@kpriet.ac.in' });
+    let otherDeptUser = await User.findOne({ email: 'faculty.ece.test@college.edu' });
     if (!otherDeptUser) {
       otherDeptUser = await User.create({
-        employeeId: 'KPR-ECE-TEST-01',
+        employeeId: 'DIT-ECE-TEST-01',
         name: 'Dr. Test ECE Faculty',
-        email: 'faculty.ece.test@kpriet.ac.in',
+        email: 'faculty.ece.test@college.edu',
         passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz012345678901234567890123456',
         role: ROLES.FACULTY,
         departmentId: eceDept._id,
@@ -68,14 +68,14 @@ async function runTests() {
       await Faculty.create({
         userId: otherDeptUser._id,
         name: 'Dr. Test ECE Faculty',
-        employeeId: 'KPR-ECE-TEST-01',
+        employeeId: 'DIT-ECE-TEST-01',
         departmentId: eceDept._id,
         designation: 'Assistant Professor (Sr.G)',
         status: 'ACTIVE',
         basicInfo: {
           firstName: 'Dr. Test',
           lastName: 'ECE Faculty',
-          email: 'faculty.ece.test@kpriet.ac.in',
+          email: 'faculty.ece.test@college.edu',
         },
       });
     }

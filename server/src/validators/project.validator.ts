@@ -4,7 +4,7 @@ import { PROJECT_STATUS, FUNDING_TYPES, UTILIZATION_STATUS } from '../models/Pro
 export const coInvestigatorInputSchema = z.object({
   name: z.string().trim().min(1, 'Co-investigator name is required'),
   facultyId: z.string().optional(),
-  institution: z.string().trim().default('KPR Institute of Engineering and Technology'),
+  institution: z.string().trim().optional(),
   role: z.string().trim().default('Co-Investigator'),
 });
 
@@ -32,7 +32,7 @@ export const projectSchema = z.object({
         if (!val) return [];
         return val.split(',').map((s) => ({
           name: s.trim(),
-          institution: 'KPR Institute of Engineering and Technology',
+          institution: '',
           role: 'Co-Investigator',
         })).filter((c) => c.name.length > 0);
       })

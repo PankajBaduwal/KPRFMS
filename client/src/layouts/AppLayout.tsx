@@ -10,8 +10,12 @@ import { ROUTES } from '../constants/routes';
 import { FEATURES, isHiddenPath } from '../constants/features';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { useAcademicYears } from '../hooks/useAcademicYears';
+import { PRODUCT_NAME, PRODUCT_TAGLINE, PRODUCT_FULL_NAME } from '../config/brand';
+import { BrandMark } from '../components/BrandMark';
+import { useInstitution } from '../hooks/useInstitution';
 
 export const AppLayout: React.FC = () => {
+  const inst = useInstitution();
   const { sidebarOpen, sidebarCollapsed, toggleSidebar, setSidebarOpen, toggleSidebarCollapsed } = useUIStore();
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
@@ -423,16 +427,16 @@ export const AppLayout: React.FC = () => {
           <Link
             to={ROUTES.PORTAL}
             className={`sidebar-brand ${sidebarCollapsed ? 'is-collapsed' : ''}`}
-            aria-label="KPRIET Faculty Management System — go to dashboard"
-            title="KPR Institute of Engineering and Technology"
+            aria-label={`${PRODUCT_FULL_NAME} — go to dashboard`}
+            title={inst.name || PRODUCT_FULL_NAME}
           >
             <span className="sidebar-brand-emblem">
-              <img src="/images/kpriet-emblem.png" alt="" width={36} height={36} />
+              <BrandMark size={36} />
             </span>
             {!sidebarCollapsed && (
               <span className="sidebar-brand-text">
-                <span className="sidebar-brand-name">KPRIET</span>
-                <span className="sidebar-brand-sub">Faculty Management System</span>
+                <span className="sidebar-brand-name">{inst.shortCode || PRODUCT_NAME}</span>
+                <span className="sidebar-brand-sub">{inst.shortCode ? PRODUCT_NAME : PRODUCT_TAGLINE}</span>
               </span>
             )}
           </Link>
@@ -867,10 +871,10 @@ export const AppLayout: React.FC = () => {
         <footer className="app-footer" role="contentinfo">
           <div className="app-footer-inner">
             <div className="app-footer-brand">
-              <span className="app-footer-college">KPR Institute of Engineering and Technology</span>
-              <span className="app-footer-accreditation">
-                Autonomous Institution &bull; Affiliated to Anna University &bull; Approved by AICTE &bull; Accredited by NAAC &apos;A+&apos; &amp; NBA
-              </span>
+              <span className="app-footer-college">{inst.name || PRODUCT_FULL_NAME}</span>
+              {(inst.tagline || inst.affiliation) && (
+                <span className="app-footer-accreditation">{[inst.tagline, inst.affiliation].filter(Boolean).join(' • ')}</span>
+              )}
             </div>
             <div className="app-footer-meta">
               <span>Academic Year: <strong>{currentYear || '2026-2027'}</strong></span>

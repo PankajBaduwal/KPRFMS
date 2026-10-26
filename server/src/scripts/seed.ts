@@ -85,7 +85,7 @@ async function seed() {
     {
       employeeId: 'EMP001',
       name: 'Dr. K. Admin',
-      email: 'admin@kpriet.ac.in',
+      email: 'admin@college.edu',
       password: 'Admin@12345',
       role: ROLES.ADMIN,
       designation: 'Chief Information Officer & Administrator',
@@ -94,7 +94,7 @@ async function seed() {
     {
       employeeId: 'EMP002',
       name: 'Dr. M. Akila',
-      email: 'principal@kpriet.ac.in',
+      email: 'principal@college.edu',
       password: 'Principal@12345',
       role: ROLES.PRINCIPAL,
       designation: 'Principal & Professor',
@@ -103,7 +103,7 @@ async function seed() {
     {
       employeeId: 'EMP003',
       name: 'Dr. S. Ramkumar',
-      email: 'dean.acad@kpriet.ac.in',
+      email: 'dean.acad@college.edu',
       password: 'Dean@12345',
       role: ROLES.DEAN,
       designation: 'Dean (Academic Affairs)',
@@ -112,7 +112,7 @@ async function seed() {
     {
       employeeId: 'EMP004',
       name: 'Dr. V. Seetha',
-      email: 'hod.cse@kpriet.ac.in',
+      email: 'hod.cse@college.edu',
       password: 'Hod@12345',
       role: ROLES.HOD,
       departmentId: deptCse._id,
@@ -122,7 +122,7 @@ async function seed() {
     {
       employeeId: 'EMP005',
       name: 'Dr. A. Karthik',
-      email: 'faculty.cse@kpriet.ac.in',
+      email: 'faculty.cse@college.edu',
       password: 'Faculty@12345',
       role: ROLES.FACULTY,
       departmentId: deptCse._id,
@@ -132,7 +132,7 @@ async function seed() {
     {
       employeeId: 'EMP099',
       name: 'Test Inactive Faculty',
-      email: 'inactive@kpriet.ac.in',
+      email: 'inactive@college.edu',
       password: 'Inactive@12345',
       role: ROLES.FACULTY,
       departmentId: deptEce._id,
@@ -207,7 +207,7 @@ async function seed() {
         contactNumber: '+91 98421 12345',
         emergencyContact: '+91 94432 54321 (Spouse)',
         permanentAddress: '14/B, Avinashi Road, Peelamedu, Coimbatore - 641004',
-        communicationAddress: 'Staff Quarters Type-B, KPRIET Campus, Arasur, Coimbatore - 641407',
+        communicationAddress: 'Staff Quarters Type-B, DIT Campus, Arasur, Coimbatore - 641407',
       },
 
       employment: {
@@ -246,7 +246,7 @@ async function seed() {
         {
           degree: 'B.Tech',
           specialization: 'Information Technology',
-          institution: 'KPR Institute of Engineering and Technology',
+          institution: 'Demo Institute of Technology',
           university: 'Anna University',
           startYear: 2008,
           completionYear: 2012,
@@ -284,7 +284,7 @@ async function seed() {
 
       experience: [
         {
-          organization: 'KPR Institute of Engineering and Technology',
+          organization: 'Demo Institute of Technology',
           designation: 'Assistant Professor (Senior Grade)',
           employmentType: 'FULL_TIME',
           roleType: 'TEACHING',
@@ -414,11 +414,11 @@ async function seed() {
       seminars: [
         {
           title: 'Recent Breakthroughs in Large Language Models for Academic Workflow',
-          organizer: 'KPRIET Research Council',
+          organizer: 'DIT Research Council',
           fromDate: new Date('2024-02-15'),
           toDate: new Date('2024-02-15'),
           durationDays: 1,
-          venue: 'Thanam Hall, KPRIET',
+          venue: 'Thanam Hall, DIT',
           role: 'Session Speaker',
         },
       ],
@@ -449,11 +449,11 @@ async function seed() {
       facultyDevelopment: [
         {
           title: 'Faculty Pedagogical Enhancement and Gamified Learning Strategies',
-          organizer: 'KPRIET Center for Teaching & Learning (CTL)',
+          organizer: 'DIT Center for Teaching & Learning (CTL)',
           fromDate: new Date('2023-06-18'),
           toDate: new Date('2023-06-20'),
           durationDays: 3,
-          venue: 'KPRIET Seminar Hall',
+          venue: 'DIT Seminar Hall',
         },
       ],
 
@@ -567,7 +567,7 @@ async function seed() {
       awards: [
         {
           title: 'Best Faculty Researcher Award (Engineering)',
-          awardingBody: 'KPR Institute of Engineering and Technology',
+          awardingBody: 'Demo Institute of Technology',
           year: 2023,
           description: 'Recognized for top citations and high-impact Q1 journal publications in 2023.',
         },
@@ -703,7 +703,7 @@ async function seed() {
         dateOfBirth: new Date('1979-04-20'),
         bloodGroup: 'B+ve',
         contactNumber: '+91 94433 99887',
-        communicationAddress: 'HOD Quarters, KPRIET Campus, Coimbatore',
+        communicationAddress: 'HOD Quarters, DIT Campus, Coimbatore',
       },
       employment: {
         joiningDate: new Date('2015-06-01'),
@@ -768,8 +768,8 @@ async function seed() {
   await purgeSeeded(Publication);
   {
     logger.info('Seeding Phase 5 Research Publications...');
-    const facultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' });
-    const hodUser = await User.findOne({ email: 'hod.cse@kpriet.ac.in' });
+    const facultyUser = await User.findOne({ email: 'faculty.cse@college.edu' });
+    const hodUser = await User.findOne({ email: 'hod.cse@college.edu' });
     const facultyRecord = facultyUser ? await Faculty.findOne({ userId: facultyUser._id }) : null;
 
     if (facultyRecord && facultyUser && deptCse) {
@@ -797,7 +797,7 @@ async function seed() {
           authorPosition: 'FIRST_AUTHOR',
           numberOfAuthors: 3,
           coAuthors: ['Dr. V. Seetha', 'Dr. S. Ramkumar'],
-          affiliation: 'KPR Institute of Engineering and Technology',
+          affiliation: 'Demo Institute of Technology',
           correspondingAuthor: true,
           publicationStatus: 'PUBLISHED',
           verificationStatus: 'VERIFIED',
@@ -822,7 +822,7 @@ async function seed() {
           authorPosition: 'CORRESPONDING_AUTHOR',
           numberOfAuthors: 2,
           coAuthors: ['Dr. V. Seetha'],
-          affiliation: 'KPR Institute of Engineering and Technology',
+          affiliation: 'Demo Institute of Technology',
           correspondingAuthor: true,
           publicationStatus: 'PUBLISHED',
           verificationStatus: 'VERIFIED',
@@ -851,7 +851,7 @@ async function seed() {
           authorPosition: 'SECOND_AUTHOR',
           numberOfAuthors: 3,
           coAuthors: ['Dr. P. Suresh', 'Dr. V. Seetha'],
-          affiliation: 'KPR Institute of Engineering and Technology',
+          affiliation: 'Demo Institute of Technology',
           correspondingAuthor: false,
           publicationStatus: 'PUBLISHED',
           verificationStatus: 'SUBMITTED',
@@ -874,7 +874,7 @@ async function seed() {
           authorPosition: 'FIRST_AUTHOR',
           numberOfAuthors: 1,
           coAuthors: [],
-          affiliation: 'KPR Institute of Engineering and Technology',
+          affiliation: 'Demo Institute of Technology',
           correspondingAuthor: true,
           publicationStatus: 'DRAFT',
           verificationStatus: 'DRAFT',
@@ -901,12 +901,12 @@ async function seed() {
         coInvestigators: [
           {
             name: 'Dr. V. Seetha',
-            institution: 'KPR Institute of Engineering and Technology',
+            institution: 'Demo Institute of Technology',
             role: 'Co-Investigator',
           },
           {
             name: 'Dr. S. Ramkumar',
-            institution: 'KPR Institute of Engineering and Technology',
+            institution: 'Demo Institute of Technology',
             role: 'Co-Investigator',
           },
         ],
@@ -1006,7 +1006,7 @@ async function seed() {
         coInvestigators: [
           {
             name: 'Dr. P. Suresh',
-            institution: 'KPR Institute of Engineering and Technology',
+            institution: 'Demo Institute of Technology',
             role: 'Co-Investigator',
           },
         ],
@@ -1076,11 +1076,11 @@ async function seed() {
         piName: 'Dr. A. Karthik',
         piEmployeeId: 'EMP005',
         coInvestigators: [],
-        fundingAgency: 'KPRIET Institutional Research Seed Grant',
+        fundingAgency: 'DIT Institutional Research Seed Grant',
         fundingType: 'Institutional',
-        projectNumber: 'KPRIET-SEED-2024-03',
+        projectNumber: 'DIT-SEED-2024-03',
         grantNumber: 'SEED-2024-03',
-        sanctionNumber: 'KPR/RES/SEED/2024/03',
+        sanctionNumber: 'DIT/RES/SEED/2024/03',
         proposalNumber: 'PROP-2024-SEED-003',
         requestedAmount: 300000,
         sanctionedAmount: 300000,
@@ -1169,7 +1169,7 @@ async function seed() {
         certificateFileName: 'mobihoc_cert.pdf',
         academicYear: '2023-2024',
         status: 'VERIFIED',
-        remarks: 'International conference travel grant supported by KPRIET.',
+        remarks: 'International conference travel grant supported by DIT.',
         reviewedAt: new Date('2023-11-05'),
         submittedAt: new Date('2023-10-30'),
       },
@@ -1426,7 +1426,7 @@ async function seed() {
         departmentId: deptCse._id,
         title: 'DeepEdgeVision: Embedded Tensor Inference Framework for Jetson Nano',
         registrationNumber: 'SW-16789/2023',
-        applicants: ['Dr. A. Karthik', 'KPR Institute of Engineering and Technology'],
+        applicants: ['Dr. A. Karthik', 'Demo Institute of Technology'],
         registrationDate: new Date('2023-06-15'),
         category: 'Software Code / Computer Program',
         documentUrl: '/uploads/copyrights/sw_deepedge.pdf',
@@ -1458,7 +1458,7 @@ async function seed() {
         departmentId: deptCse._id,
         title: 'Decentralized Smart Campus Asset Audit and Traceability Engine (SCAATE)',
         registrationNumber: 'SW-20145/2024',
-        applicants: ['Dr. A. Karthik', 'KPRIET Research Foundation'],
+        applicants: ['Dr. A. Karthik', 'DIT Research Foundation'],
         registrationDate: new Date('2024-07-18'),
         category: 'Software Code / Computer Program',
         verificationStatus: 'SUBMITTED',
@@ -1952,7 +1952,7 @@ async function seed() {
         thesisStatus: THESIS_STATUS.AWARDED,
         expectedCompletion: new Date('2024-03-31'),
         actualCompletion: new Date('2024-03-15'),
-        scholarEmail: 'priya.phd@kpriet.ac.in',
+        scholarEmail: 'priya.phd@college.edu',
         scholarPhone: '+91 98421 98112',
         publications: [
           {
@@ -2019,7 +2019,7 @@ async function seed() {
         progress: 90,
         thesisStatus: THESIS_STATUS.UNDER_EVALUATION,
         expectedCompletion: new Date('2025-05-30'),
-        scholarEmail: 'vignesh.phd@kpriet.ac.in',
+        scholarEmail: 'vignesh.phd@college.edu',
         scholarPhone: '+91 94432 11099',
         publications: [
           {
@@ -2072,7 +2072,7 @@ async function seed() {
         progress: 75,
         thesisStatus: THESIS_STATUS.IN_PREPARATION,
         expectedCompletion: new Date('2025-11-30'),
-        scholarEmail: 'keerthana.phd@kpriet.ac.in',
+        scholarEmail: 'keerthana.phd@college.edu',
         scholarPhone: '+91 97890 23411',
         publications: [
           {
@@ -2123,7 +2123,7 @@ async function seed() {
         progress: 60,
         thesisStatus: THESIS_STATUS.NOT_STARTED,
         expectedCompletion: new Date('2026-06-30'),
-        scholarEmail: 'arvind.phd@kpriet.ac.in',
+        scholarEmail: 'arvind.phd@college.edu',
         scholarPhone: '+91 99441 55670',
         publications: [
           {
@@ -2159,7 +2159,7 @@ async function seed() {
         progress: 40,
         thesisStatus: THESIS_STATUS.NOT_STARTED,
         expectedCompletion: new Date('2027-02-28'),
-        scholarEmail: 'shalini.phd@kpriet.ac.in',
+        scholarEmail: 'shalini.phd@college.edu',
         scholarPhone: '+91 94876 12390',
         publications: [],
         stageHistory: [
@@ -2186,7 +2186,7 @@ async function seed() {
         progress: 15,
         thesisStatus: THESIS_STATUS.NOT_STARTED,
         expectedCompletion: new Date('2028-01-31'),
-        scholarEmail: 'manoj.phd@kpriet.ac.in',
+        scholarEmail: 'manoj.phd@college.edu',
         scholarPhone: '+91 97899 44321',
         publications: [],
         stageHistory: [

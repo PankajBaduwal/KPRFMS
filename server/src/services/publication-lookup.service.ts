@@ -1,5 +1,6 @@
 import { Publication, PUBLICATION_TYPES, AUTHOR_POSITIONS, type PublicationType, type AuthorPosition } from '../models/Publication.js';
 import { AppError } from '../utils/AppError.js';
+import { PRODUCT_NAME } from '../config/brand.js';
 
 /**
  * Fills publication details from public scholarly registries instead of typing them:
@@ -9,7 +10,7 @@ import { AppError } from '../utils/AppError.js';
  */
 
 const TIMEOUT_MS = 10_000;
-const USER_AGENT = 'KPRIET-FMS/1.0 (Faculty Management System; https://kpriet.ac.in)';
+const USER_AGENT = `${PRODUCT_NAME}/1.0 (Faculty Management System)`;
 
 export interface DoiLookupResult {
   doi: string;

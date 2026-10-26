@@ -55,13 +55,13 @@ class Client {
   header(): Record<string, string> {
     const h: Record<string, string> = {};
     if (this.cookies.size) h.Cookie = [...this.cookies].map(([k, v]) => `${k}=${v}`).join('; ');
-    const csrf = this.cookies.get('kpriet_csrf_token');
+    const csrf = this.cookies.get('fms_csrf_token');
     if (csrf) h['x-csrf-token'] = decodeURIComponent(csrf);
     return h;
   }
 
   async request(method: string, endpoint: string, body?: unknown, extra: Record<string, string> = {}) {
-    if (!this.cookies.has('kpriet_csrf_token') && method !== 'GET') await this.request('GET', '/health');
+    if (!this.cookies.has('fms_csrf_token') && method !== 'GET') await this.request('GET', '/health');
     const isForm = body instanceof FormData;
     const res = await fetch(`${API_BASE}${endpoint}`, {
       method,
@@ -123,7 +123,7 @@ async function run() {
   const dept = await Department.findOne({ code: 'CSE' });
   if (!dept) throw new Error('CSE department missing — run the seed first');
   const settings = await InstitutionSettings.findOne();
-  const domain = settings?.contactEmail?.split('@')[1] || 'kpriet.ac.in';
+  const domain = settings?.contactEmail?.split('@')[1] || 'college.edu';
   const originalSelfReg = Boolean(settings?.allowSelfRegistration);
 
   // Clean leftovers from earlier runs
@@ -247,7 +247,7 @@ async function run() {
   assert((await Notification.countDocuments({ relatedEntityId: String(regUser!._id) })) === 0, 'Reviewers are not alerted before the email is confirmed');
 
   const admin = new Client();
-  assert((await admin.login('admin@kpriet.ac.in', 'Admin@12345')).status === 200, 'Admin signs in');
+  assert((await admin.login('admin@college.edu', 'Admin@12345')).status === 200, 'Admin signs in');
   const early = await admin.request('POST', `/admin/users/${regUser!._id}/approve-registration`);
   assert(early.status === 400, 'Approval blocked until the email is confirmed', early.data);
 
@@ -276,7 +276,7 @@ async function run() {
   assert(streamText.includes('"unreadCount"'), 'Live event carries the new unread count');
   await reader.cancel().catch(() => null);
   assert(
-    Boolean(await waitForMail((m) => m.to === 'admin@kpriet.ac.in' && /registration awaiting approval/i.test(m.subject))),
+    Boolean(await waitForMail((m) => m.to === 'admin@college.edu' && /registration awaiting approval/i.test(m.subject))),
     'Approval-request notification also emailed to the admin'
   );
 
@@ -304,7 +304,7 @@ async function run() {
   const recoveryCodes: string[] = enable.data.data.recoveryCodes;
 
   const step1 = await new Client().login(facultyEmail, password);
-  assert(step1.status === 200 && step1.data.data.twoFactorRequired === true && !step1.headers.getSetCookie().some((c) => c.startsWith('kpriet_fms_token=')), 'Password alone no longer signs in', step1.data);
+  assert(step1.status === 200 && step1.data.data.twoFactorRequired === true && !step1.headers.getSetCookie().some((c) => c.startsWith('fms_token=')), 'Password alone no longer signs in', step1.data);
   const two = new Client();
   const s1 = await two.login(facultyEmail, password);
   const badCode = await two.request('POST', '/auth/login/2fa', { challengeToken: s1.data.data.challengeToken, code: '123456' });

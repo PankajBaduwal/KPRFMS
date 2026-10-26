@@ -36,7 +36,7 @@ async function runTests() {
     // 1. Setup test actors
     const adminUser = await User.findOne({ role: ROLES.ADMIN }).lean();
     const hodUser = await User.findOne({ role: ROLES.HOD }).lean();
-    const facultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' }).lean();
+    const facultyUser = await User.findOne({ email: 'faculty.cse@college.edu' }).lean();
     const facultyRecord = await Faculty.findOne({ userId: facultyUser!._id }).lean();
     const deptCse = await Department.findOne({ code: 'CSE' }).lean();
 

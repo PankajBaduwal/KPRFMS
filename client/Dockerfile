@@ -1,4 +1,4 @@
-# KPRIET FMS web app — built once, served by nginx (which also proxies /api and /uploads)
+# FacultyCore web app — built once, served by nginx (which also proxies /api and /uploads)
 FROM node:22-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./

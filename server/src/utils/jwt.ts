@@ -4,7 +4,7 @@ import { env } from '../config/env.js';
 import { Role } from '../permissions/roles.js';
 import { Session } from '../models/Session.js';
 
-export const AUTH_COOKIE_NAME = 'kpriet_fms_token';
+export const AUTH_COOKIE_NAME = 'fms_token';
 
 export interface JwtPayload {
   id: string;

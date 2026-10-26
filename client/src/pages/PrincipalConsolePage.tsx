@@ -22,6 +22,7 @@ import type {
   IPrincipalDepartmentOverview,
 } from '../types/principal-console';
 import { ResponsiveChart as ResponsiveContainer } from '../components/charts';
+import { InstitutionName } from '../components/InstitutionName';
 
 export const PrincipalConsolePage: React.FC = () => {
   const navigate = useNavigate();
@@ -180,7 +181,7 @@ export const PrincipalConsolePage: React.FC = () => {
               Office of the Principal
             </span>
             <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-              KPR Institute of Engineering and Technology • Institutional Governance
+              <InstitutionName /> • Institutional Governance
             </span>
           </div>
 

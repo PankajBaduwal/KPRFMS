@@ -170,7 +170,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ activeSubjects, batche
                     <span style={{ color: 'var(--color-text)' }}>
                       {profile.basicInfo?.communicationAddress ||
                         profile.basicInfo?.permanentAddress ||
-                        'Campus Staff Quarters, Coimbatore'}
+                        'Not provided'}
                     </span>
                   </div>
                 </div>

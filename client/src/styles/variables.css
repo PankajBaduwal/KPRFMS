@@ -1,13 +1,13 @@
 :root {
-  /* ===== KPRIET Official Brand Colors (from kpriet.ac.in) ===== */
-  --kpr-blue: #1B345F;        /* KPRIET Signature Navy Blue */
-  --kpr-dark-blue: #112547;   /* KPRIET Deep Header/Sidebar Blue */
-  --kpr-green: #1B924B;       /* KPRIET Iconic Green Accent */
-  --kpr-light-green: #85B050; /* KPRIET Academic Leaf Accent */
-  --kpr-gold: #C9A24B;        /* KPRIET Gold Accent */
-  --kpr-vibrant-blue: #2165DA;/* KPRIET Vibrant Interactive Blue */
+  /* ===== Brand colours ===== */
+  --kpr-blue: #1B345F;        /* Signature Navy Blue */
+  --kpr-dark-blue: #112547;   /* Deep Header/Sidebar Blue */
+  --kpr-green: #1B924B;       /* Iconic Green Accent */
+  --kpr-light-green: #85B050; /* Academic Leaf Accent */
+  --kpr-gold: #C9A24B;        /* Gold Accent */
+  --kpr-vibrant-blue: #2165DA;/* Vibrant Interactive Blue */
 
-  /* ===== Master Color System Mapped to KPRIET Branding ===== */
+  /* ===== Master Color System Mapped to Branding ===== */
   --color-deep-navy: #112547;
   --color-royal-blue: #1B345F;
   --color-blue: #2165DA;
@@ -62,7 +62,7 @@
   --color-purple-bg: #F5F3FF;
   --color-purple-border: #DDD6FE;
 
-  /* ===== Gradient System (KPRIET Brand) ===== */
+  /* ===== Gradient System (Brand) ===== */
   --gradient-primary: linear-gradient(135deg, #1B345F 0%, #2165DA 100%);
   --gradient-kpr: linear-gradient(135deg, #112547 0%, #1B345F 55%, #1B924B 100%);
   --gradient-blue: linear-gradient(135deg, #1B345F 0%, #2165DA 100%);

@@ -1,8 +1,8 @@
 {
-  "name": "kpriet-fms",
+  "name": "facultycore",
   "version": "1.0.0",
   "private": true,
-  "description": "KPRIET Faculty Management System - Centralized Institutional ERP",
+  "description": "FacultyCore - Faculty Management System for colleges",
   "scripts": {
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
@@ -19,11 +19,11 @@
     "mail:test": "npm --prefix server run mail:test --"
   },
   "keywords": [
-    "kpriet",
+    "faculty-management",
     "faculty-management-system",
     "erp",
     "institutional-management"
   ],
-  "author": "KPRIET",
+  "author": "FacultyCore",
   "license": "UNLICENSED"
 }

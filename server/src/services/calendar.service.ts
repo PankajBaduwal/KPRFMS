@@ -5,6 +5,7 @@ import { TimetableSlot, DAYS_OF_WEEK } from '../models/TimetableSlot.js';
 import { Semester } from '../models/Semester.js';
 import { AppError } from '../utils/AppError.js';
 import { randomToken, sha256 } from '../utils/secureToken.js';
+import { PRODUCT_NAME, PRODUCT_SLUG } from '../config/brand.js';
 
 /**
  * Private iCalendar (.ics) feed per user: leave (approved and pending) and weekly timetable.
@@ -109,10 +110,10 @@ export const calendarService = {
     const lines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//KPRIET//Faculty Management System//EN',
+      `PRODID:-//${PRODUCT_NAME}//Faculty Management System//EN`,
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
-      `X-WR-CALNAME:${esc(`KPRIET FMS — ${user.name}`)}`,
+      `X-WR-CALNAME:${esc(`${PRODUCT_NAME} — ${user.name}`)}`,
       `X-WR-TIMEZONE:${TZID}`,
       'REFRESH-INTERVAL;VALUE=DURATION:PT6H',
       'X-PUBLISHED-TTL:PT6H',
@@ -134,7 +135,7 @@ export const calendarService = {
       const pending = leave.status === LEAVE_STATUS.PENDING;
       lines.push(
         'BEGIN:VEVENT',
-        `UID:leave-${leave._id}@kpriet-fms`,
+        `UID:leave-${leave._id}@${PRODUCT_SLUG}`,
         `DTSTAMP:${stamp(new Date(leave.updatedAt ?? now))}`,
         `DTSTART;VALUE=DATE:${ymd(new Date(leave.startDate))}`,
         `DTEND;VALUE=DATE:${ymd(end)}`,
@@ -163,7 +164,7 @@ export const calendarService = {
 
       lines.push(
         'BEGIN:VEVENT',
-        `UID:slot-${slot._id}@kpriet-fms`,
+        `UID:slot-${slot._id}@${PRODUCT_SLUG}`,
         `DTSTAMP:${stamp(new Date(slot.updatedAt ?? now))}`,
         `DTSTART;TZID=${TZID}:${ymd(first)}T${times[0]}00`,
         `DTEND;TZID=${TZID}:${ymd(first)}T${times[1]}00`,

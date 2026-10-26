@@ -235,7 +235,7 @@ const FUNDING_AGENCIES = [
   ['MEITY', 'Ministry of Electronics and Information Technology', 'Government'],
   ['TNSCST', 'Tamil Nadu State Council for Science and Technology', 'Government'],
   ['UGC', 'University Grants Commission', 'Government'],
-  ['KPRIET-SEED', 'KPRIET Seed Money for Research', 'Institutional'],
+  ['DIT-SEED', 'DIT Seed Money for Research', 'Institutional'],
 ] as const;
 
 const PUB_VENUES = [
@@ -292,7 +292,25 @@ async function main() {
     if (existing) await Semester.updateOne({ _id: existing._id }, { $set: { isCurrent: s.isCurrent } });
     else await create(Semester, [{ ...s, academicYear: CURRENT_AY, status: 'ACTIVE' }]);
   }
-  await InstitutionSettings.updateOne({}, { $set: { currentAcademicYear: CURRENT_AY, currentSemesterType: 'ODD', allowSelfRegistration: true } });
+  await InstitutionSettings.updateOne(
+    {},
+    {
+      $set: {
+        // Demo college for the sample data; a real college sets its own in Admin > Settings
+        name: 'Demo Institute of Technology',
+        shortCode: 'DIT',
+        tagline: 'Autonomous Institution',
+        affiliation: 'Affiliated to State Technical University',
+        contactEmail: 'admin@college.edu',
+        city: 'Chennai',
+        state: 'Tamil Nadu',
+        currentAcademicYear: CURRENT_AY,
+        currentSemesterType: 'ODD',
+        allowSelfRegistration: true,
+      },
+    },
+    { upsert: true }
+  );
 
   const deptByCode: Record<string, any> = {};
   for (const def of DEPARTMENTS) {
@@ -351,9 +369,9 @@ async function main() {
         : idx === 1 ? 'Associate Professor'
         : idx === 2 ? 'Assistant Professor (Senior Grade)'
         : 'Assistant Professor';
-      const employeeId = `KPR${empNo++}`;
+      const employeeId = `DIT${empNo++}`;
       const slug = initials(name).toLowerCase().replace(/[^a-z]+/g, '.').replace(/^\.|\.$/g, '');
-      const email = isHod ? `hod.${def.code.toLowerCase()}@kpriet.ac.in` : `${slug}.${def.code.toLowerCase()}@kpriet.ac.in`;
+      const email = isHod ? `hod.${def.code.toLowerCase()}@college.edu` : `${slug}.${def.code.toLowerCase()}@college.edu`;
       const [user] = await create(User, [{
         employeeId, name, email, phone: `+91 9${int(100000000, 999999999)}`,
         passwordHash: isHod ? hodHash : facultyHash,
@@ -380,7 +398,7 @@ async function main() {
     const prevYears = senior ? int(2, 4) : int(1, 2);
     const experience = [
       { organization: pick(['Sri Krishna College of Engineering', 'Bannari Amman Institute of Technology', 'SNS College of Technology', 'Karpagam College of Engineering']), designation: 'Assistant Professor', roleType: 'TEACHING', startDate: d(`${joinYear - prevYears}-06-15`), endDate: d(`${joinYear}-05-31`), totalYears: prevYears, verificationStatus: 'VERIFIED', responsibilities: 'Theory and laboratory courses, project guidance' },
-      { organization: 'KPR Institute of Engineering and Technology', designation: p.designation, roleType: 'TEACHING', startDate: d(`${joinYear}-06-01`), isCurrent: true, totalYears: 2026 - joinYear, verificationStatus: 'VERIFIED', responsibilities: 'Teaching, research supervision, department coordination' },
+      { organization: 'Demo Institute of Technology', designation: p.designation, roleType: 'TEACHING', startDate: d(`${joinYear}-06-01`), isCurrent: true, totalYears: 2026 - joinYear, verificationStatus: 'VERIFIED', responsibilities: 'Teaching, research supervision, department coordination' },
       ...(chance(0.35) ? [{ organization: pick(profile[p.deptCode].companies), designation: 'Engineer', roleType: 'INDUSTRY', startDate: d(`${joinYear - prevYears - 2}-07-01`), endDate: d(`${joinYear - prevYears}-05-31`), totalYears: 2, verificationStatus: chance(0.5) ? 'VERIFIED' : 'SUBMITTED' }] : []),
     ];
     return {
@@ -412,7 +430,7 @@ async function main() {
       researchInterests: areas,
       certifications: [{ title: `NPTEL: ${areas[1]}`, issuingOrganization: 'NPTEL / IIT Madras', issueDate: d(`${int(2021, 2025)}-11-15`), credentialId: `NPTEL${int(10000, 99999)}` }],
       professionalMemberships: [{ organization: pick(['ISTE', 'IEEE', 'IE (India)', 'CSI', 'IETE']), membershipId: `LM-${int(10000, 99999)}`, membershipType: pick(['LIFE', 'ANNUAL']), year: int(2012, 2024) }],
-      awards: chance(0.4) ? [{ title: pick(['Best Teacher Award', 'Best Paper Award', 'Research Excellence Award']), awardingBody: pick(['KPRIET', 'IEEE Madras Section', 'ISTE Tamil Nadu Section']), year: int(2022, 2026) }] : [],
+      awards: chance(0.4) ? [{ title: pick(['Best Teacher Award', 'Best Paper Award', 'Research Excellence Award']), awardingBody: pick(['DIT', 'IEEE Madras Section', 'ISTE Tamil Nadu Section']), year: int(2022, 2026) }] : [],
       academicResponsibilities: [{ responsibility: pick(['Class Advisor', 'NBA Criterion Coordinator', 'Project Coordinator', 'Timetable In-charge', 'Lab In-charge']), academicYear: CURRENT_AY, level: 'DEPARTMENT' }],
       administrativeResponsibilities: p.isHod ? [{ responsibility: 'Head of the Department', academicYear: CURRENT_AY, level: 'INSTITUTE' }] : [],
       subjectsTaught: profile[p.deptCode].subjects.slice(0, 2).map(([code, sname, sem]) => ({ subjectCode: code, subjectName: sname, semester: String(sem), academicYear: '2025-2026', degreeProgram: 'B.E.', feedbackRating: Number((3.8 + rand() * 1.1).toFixed(1)) })),
@@ -542,7 +560,7 @@ async function main() {
         ...base(p), facultyName: p.user.name, facultyEmployeeId: p.user.employeeId,
         activityType: type,
         title: `${{ CONFERENCE: 'International Conference on', WORKSHOP: 'Hands-on Workshop on', SEMINAR: 'National Seminar on', FDP: 'AICTE ATAL FDP on', STTP: 'STTP on' }[type]} ${pick(profile[p.deptCode].areas)}`,
-        organizer: pick(['IIT Madras', 'NIT Tiruchirappalli', 'Anna University', 'PSG Tech', 'KPRIET', 'AICTE Training and Learning Academy']),
+        organizer: pick(['IIT Madras', 'NIT Tiruchirappalli', 'Anna University', 'PSG Tech', 'DIT', 'AICTE Training and Learning Academy']),
         academicYear: ay, status,
         date: start, startDate: start, endDate: addDays(start, days - 1), duration: `${days} day${days > 1 ? 's' : ''}`,
         location: pick(['Chennai', 'Coimbatore', 'Tiruchirappalli', 'Online']),
@@ -681,7 +699,7 @@ async function main() {
         const s = student(p.deptCode, regYear);
         phdDocs.push({
           scholarName: `${pick(['Mr.', 'Ms.'])} ${s.name}`,
-          scholarId: `KPR-PHD-${scholarNo++}`,
+          scholarId: `DIT-PHD-${scholarNo++}`,
           registrationNumber: `${regYear}${int(1000, 9999)}${p.deptCode}`,
           title: `${pick(['Investigations on', 'Design of', 'Performance Enhancement of', 'Intelligent'])} ${pick(profile[p.deptCode].areas)} ${pick(['Techniques for Resource Constrained Environments', 'Systems using Hybrid Optimization', 'for Sustainable Development', 'Models for Real-Time Applications'])}`,
           supervisor: p.user.name, supervisorFacultyId: p.faculty._id, supervisorUserId: p.user._id,
@@ -692,7 +710,7 @@ async function main() {
           thesisStatus: stage === 'COMPLETED' ? 'AWARDED' : stage === 'VIVA' ? 'ACCEPTED' : stage === 'SUBMITTED' ? 'UNDER_EVALUATION' : stage === 'THESIS_PREPARATION' ? 'IN_PREPARATION' : 'NOT_STARTED',
           expectedCompletion: d(`${regYear + 4}-06-30`),
           actualCompletion: stage === 'COMPLETED' ? d('2026-03-20') : undefined,
-          scholarEmail: `${s.name.split(' ')[0].toLowerCase()}.phd@kpriet.ac.in`,
+          scholarEmail: `${s.name.split(' ')[0].toLowerCase()}.phd@college.edu`,
           publications: stageIdx >= 4 ? [{ title: `Paper on ${pick(profile[p.deptCode].areas)}`, venue: pick(PUB_VENUES)[0], year: 2025, indexing: 'SCIE' }] : [],
           stageHistory: stages.slice(0, stageIdx + 1).map((st, k) => ({ stage: st, changedAt: d(`${regYear + Math.floor(k / 2)}-0${int(1, 9)}-10`), changedBy: p.user._id, remarks: 'Doctoral committee review completed' })),
         });
@@ -1033,7 +1051,7 @@ async function main() {
   // =========================================================================
   const storageRoot = path.resolve(process.cwd(), 'storage', 'secure_documents');
   const makePdf = (title: string, owner: string) => {
-    const text = `${title} - ${owner} - KPRIET sample document`.replace(/[()\\]/g, '');
+    const text = `${title} - ${owner} - DIT sample document`.replace(/[()\\]/g, '');
     const stream = `BT /F1 14 Tf 60 760 Td (${text}) Tj ET`;
     const objs = [
       '<< /Type /Catalog /Pages 2 0 R >>',
@@ -1095,7 +1113,7 @@ async function main() {
   ];
   leadershipNotes.forEach((n, i) => notifications.push({ ...n, senderId: admin._id, isRead: i % 3 === 0, createdAt: addDays(TODAY, -i) }));
   for (const p of people) {
-    notifications.push({ recipientId: p.user._id, senderId: admin._id, title: 'Welcome to the KPRIET Faculty Management System', message: 'Complete your profile, qualifications and experience for verification.', type: 'SYSTEM_NOTIFICATION', isRead: true, createdAt: d('2026-07-01') });
+    notifications.push({ recipientId: p.user._id, senderId: admin._id, title: 'Welcome to the DIT Faculty Management System', message: 'Complete your profile, qualifications and experience for verification.', type: 'SYSTEM_NOTIFICATION', isRead: true, createdAt: d('2026-07-01') });
     notifications.push({ recipientId: p.user._id, senderId: hodCache[p.deptCode]._id, title: 'Workload allocated for Odd Semester', message: 'Your course allocation for the 2026-27 odd semester has been published.', type: 'WORKLOAD_UPDATE', isRead: chance(0.6), createdAt: d('2026-07-05') });
   }
   const created = await create(Notification, notifications.map((n) => ({ ...n, readAt: n.isRead ? addDays((n.createdAt as Date) || TODAY, 1) : undefined })));
@@ -1122,7 +1140,7 @@ async function main() {
     counts.push(`${model.collection.collectionName}=${n}`);
   }
   logger.info(`Sample data complete. ${counts.join(', ')}`);
-  logger.info(`Sample logins: any new faculty with password ${SAMPLE_PASSWORD}, new HODs (hod.mech@kpriet.ac.in, hod.eee@..., hod.it@..., hod.aids@..., hod.civil@...) with ${SAMPLE_HOD_PASSWORD}`);
+  logger.info(`Sample logins: any new faculty with password ${SAMPLE_PASSWORD}, new HODs (hod.mech@college.edu, hod.eee@..., hod.it@..., hod.aids@..., hod.civil@...) with ${SAMPLE_HOD_PASSWORD}`);
 }
 
 main()

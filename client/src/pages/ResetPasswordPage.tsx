@@ -7,6 +7,8 @@ import { authService } from '../services/auth.service';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { ROUTES } from '../constants/routes';
 import '../styles/login.css';
+import { PRODUCT_FULL_NAME } from '../config/brand';
+import { BrandMark } from '../components/BrandMark';
 
 /** Landing page for emailed links: "Forgot password" and "Set my password" for new accounts. */
 export const ResetPasswordPage: React.FC = () => {
@@ -35,12 +37,12 @@ export const ResetPasswordPage: React.FC = () => {
         <div className="login-panel-header">
           <div className="login-panel-logo" style={{ marginBottom: '1.25rem' }}>
             <Link to={ROUTES.HOME} style={{ display: 'inline-block' }}>
-              <img src="/images/kpriet-logo.png" alt="KPR Institute of Engineering and Technology" style={{ height: 46, maxWidth: 220, objectFit: 'contain' }} />
+              <BrandMark size={46} />
             </Link>
           </div>
           <h2 className="login-panel-title">{done ? 'Password updated' : 'Choose a new password'}</h2>
           <p className="login-panel-desc">
-            {done ? 'You can now sign in with your new password.' : 'For your KPRIET Faculty Management System account.'}
+            {done ? 'You can now sign in with your new password.' : `For your ${PRODUCT_FULL_NAME} account.`}
           </p>
         </div>
 

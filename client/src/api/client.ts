@@ -14,7 +14,7 @@ export const apiClient = axios.create({
 
 // Request interceptor: read CSRF cookie and set X-CSRF-Token header
 apiClient.interceptors.request.use((config) => {
-  const match = document.cookie.match(/(^| )kpriet_csrf_token=([^;]+)/);
+  const match = document.cookie.match(/(^| )fms_csrf_token=([^;]+)/);
   if (match) {
     config.headers['x-csrf-token'] = match[2];
   }

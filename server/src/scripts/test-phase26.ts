@@ -13,7 +13,6 @@ import {
 import {
   FRAMEWORK_CONFIGS,
   REPORT_DIRECTORY,
-  INSTITUTION_NAME,
   STATUTORY_DISCLAIMER,
   generateReport,
   validateReportAccess,
@@ -24,6 +23,7 @@ import {
   type IRequestingUser,
 } from '../services/report.service.js';
 import { ROLES } from '../permissions/roles.js';
+import { getInstitutionProfile } from '../utils/institution.js';
 
 let passCount = 0;
 let failCount = 0;
@@ -197,12 +197,13 @@ async function runPhase26Tests() {
     // 4. Report Header Mandates
     // -------------------------------------------------------------
     console.log('\n--- 4. Report Header Mandates Verification ---');
+    const INSTITUTION_NAME = (await getInstitutionProfile()).name;
     const sampleReport = await generateReport(adminActor, {
       reportType: REPORT_TYPES.FACULTY_PROFILE,
       academicYear: '2024-2025',
     });
 
-    assert(sampleReport.header.institutionName === INSTITUTION_NAME, 'Header: Institution is KPR Institute of Engineering and Technology');
+    assert(sampleReport.header.institutionName === INSTITUTION_NAME, 'Header: institution name comes from settings');
     assert(!!sampleReport.header.department, 'Header: Department specified');
     assert(sampleReport.header.academicYear === '2024-2025', 'Header: Academic Year specified');
     assert(!!sampleReport.header.generatedDate, 'Header: Generated Date recorded');

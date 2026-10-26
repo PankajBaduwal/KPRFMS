@@ -111,7 +111,7 @@ async function runPhase24Tests() {
 
     const testDept = await Department.findOne();
     const testEmpId = `TEST_ADM_${Date.now() % 100000}`;
-    const testEmail = `test_${testEmpId.toLowerCase()}@kpriet.ac.in`;
+    const testEmail = `test_${testEmpId.toLowerCase()}@college.edu`;
     const created = await adminService.createUser(
       {
         employeeId: testEmpId,

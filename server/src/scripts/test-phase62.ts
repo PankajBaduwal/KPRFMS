@@ -46,11 +46,11 @@ async function run() {
 
   const find = (q: Record<string, unknown>) => User.findOne({ status: 'ACTIVE', ...q }).lean();
   const [admin, principal, dean, hod, faculty] = await Promise.all([
-    find({ email: 'admin@kpriet.ac.in' }),
+    find({ email: 'admin@college.edu' }),
     find({ role: 'PRINCIPAL' }),
     find({ role: 'DEAN' }),
     find({ role: 'HOD' }),
-    find({ email: 'faculty.cse@kpriet.ac.in' }),
+    find({ email: 'faculty.cse@college.edu' }),
   ]);
   if (!admin || !principal || !dean || !hod || !faculty) throw new Error('Seed data missing (run the seed first)');
 

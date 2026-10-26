@@ -216,7 +216,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
       .filter(Boolean)
       .map((name) => ({
         name,
-        institution: 'KPR Institute of Engineering and Technology',
+        institution: '',
         role: 'Co-Investigator',
       }));
 

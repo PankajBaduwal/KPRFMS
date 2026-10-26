@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KPRIET FACULTY MANAGEMENT SYSTEM — MASTER REDESIGN LOGIN PAGE
+   FACULTY MANAGEMENT SYSTEM — MASTER REDESIGN LOGIN PAGE
    Sophisticated Institutional ERP Two-Part Layout with Royal Blue / Indigo Theme
    ========================================================================== */
 
@@ -847,7 +847,7 @@
   width: 300px;
   height: 300px;
   border-radius: 0;
-  background: url('/images/kpriet-emblem.png') center / contain no-repeat;
+  background: url('/images/facultycore-mark.svg') center / contain no-repeat;
   opacity: 0.06;
 }
 

@@ -224,7 +224,7 @@ const publicationSchema = new Schema<IPublicationDoc>(
     ],
     affiliation: {
       type: String,
-      default: 'KPR Institute of Engineering and Technology',
+      default: '',
       trim: true,
     },
     correspondingAuthor: {

@@ -308,7 +308,7 @@ export function getDefaultCategories(): ICategoryConfig[] {
       evidenceRequirements: 'Award citation, certificate, trophy photograph, cash prize sanction',
       criteria: [
         { key: 'EXT_AWARDS', label: 'External National / International Recognitions', description: 'Awards from IEEE, ACM, CSI, Govt bodies', maxPoints: 60, requiresEvidence: true },
-        { key: 'INST_AWARDS', label: 'KPRIET Institutional Excellence Awards', description: 'Best Teacher, Outstanding Researcher, 100% Result', maxPoints: 40, requiresEvidence: true },
+        { key: 'INST_AWARDS', label: 'Institutional Excellence Awards', description: 'Best Teacher, Outstanding Researcher, 100% Result', maxPoints: 40, requiresEvidence: true },
       ],
     },
     {

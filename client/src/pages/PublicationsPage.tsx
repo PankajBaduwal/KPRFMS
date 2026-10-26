@@ -471,7 +471,7 @@ export const PublicationsPage: React.FC = () => {
       {/* 27. PageHeader */}
       <PageHeader
         title="Research Publications"
-        subtitle="Journal papers, conference papers and books by KPRIET faculty"
+        subtitle="Journal papers, conference papers and books by your faculty"
         badge={<Badge variant="primary" dot size="md">{hasLoadedList ? totalCount : '…'} Publications</Badge>}
         actions={
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

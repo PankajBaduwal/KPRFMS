@@ -2,13 +2,14 @@ import app from './app.js';
 import { env } from './config/env.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 import { logger } from './utils/logger.js';
+import { PRODUCT_NAME } from './config/brand.js';
 
 async function startServer(): Promise<void> {
   // Connect to MongoDB before starting the server
   await connectDatabase();
 
   const server = app.listen(env.PORT, () => {
-    logger.info(`KPRIET FMS API server running on port ${env.PORT}`);
+    logger.info(`${PRODUCT_NAME} API server running on port ${env.PORT}`);
     logger.info(`Environment: ${env.NODE_ENV}`);
   });
 

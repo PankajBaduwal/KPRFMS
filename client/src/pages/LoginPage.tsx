@@ -10,8 +10,11 @@ import { DEV_SEED_ACCOUNTS, SHOW_DEV_SEED_HELPERS } from '../dev/devSeedAccounts
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { authService, isTwoFactorChallenge } from '../services/auth.service';
 import '../styles/login.css';
+import { PRODUCT_NAME, STORAGE_PREFIX } from '../config/brand';
+import { InstitutionName, InstitutionContact, InstitutionDetails } from '../components/InstitutionName';
+import { BrandMark } from '../components/BrandMark';
 
-const REMEMBERED_ID_KEY = 'kpriet_fms_remembered_id';
+const REMEMBERED_ID_KEY = `${STORAGE_PREFIX}remembered_id`;
 
 const loginSchema = z.object({
   identifier: z
@@ -183,8 +186,8 @@ export const LoginPage: React.FC = () => {
           <span className="login-aurora login-aurora-b" aria-hidden="true" />
           <div className="login-brand-top">
             <div className="login-brand-mark">
-              <img src="/images/kpriet-emblem.png" alt="" width={28} height={28} />
-              <span>KPR Institute of Engineering and Technology</span>
+              <BrandMark size={28} />
+              <span><InstitutionName fallback={PRODUCT_NAME} /></span>
             </div>
             <h1 className="login-brand-title">Faculty Management System</h1>
             <p className="login-brand-desc">
@@ -205,7 +208,7 @@ export const LoginPage: React.FC = () => {
               </li>
             </ul>
           </div>
-          <p className="login-brand-foot">Autonomous · Affiliated to Anna University · NAAC &lsquo;A+&rsquo; &amp; NBA accredited</p>
+          <p className="login-brand-foot"><InstitutionDetails /></p>
         </aside>
 
         {/* ========================================================
@@ -218,7 +221,7 @@ export const LoginPage: React.FC = () => {
               {challengeToken
                 ? useRecoveryCode
                   ? 'Enter one of the recovery codes you saved when you turned on two-factor sign-in.'
-                  : 'Open your authenticator app and enter the 6-digit code for KPRIET FMS.'
+                  : `Open your authenticator app and enter the 6-digit code for ${PRODUCT_NAME}.`
                 : 'Use your college email or employee ID.'}
             </p>
           </div>
@@ -330,7 +333,7 @@ export const LoginPage: React.FC = () => {
             <Input
               label="Email or employee ID"
               type="text"
-              placeholder="e.g. employee.name@kpriet.ac.in or EMP1024"
+              placeholder="e.g. name@college.edu or EMP1024"
               autoComplete="username"
               prefixIcon={<i className="bi bi-person-badge" aria-hidden="true" />}
               error={errors.identifier?.message}
@@ -420,7 +423,7 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <p className="login-help">
-            Trouble signing in? Email <a href="mailto:helpdesk@kpriet.ac.in">helpdesk@kpriet.ac.in</a> or call ext. 4101.
+            Trouble signing in? Contact <InstitutionContact />.
           </p>
 
           {/* DEVELOPMENT SEED ACCOUNTS — Rendered only in local vite dev mode */}
@@ -526,7 +529,7 @@ export const LoginPage: React.FC = () => {
                 type="text"
                 autoComplete="username"
                 autoFocus
-                placeholder="e.g. employee.name@kpriet.ac.in or EMP1024"
+                placeholder="e.g. name@college.edu or EMP1024"
                 prefixIcon={<i className="bi bi-envelope" aria-hidden="true" />}
                 value={forgotIdentifier}
                 onChange={(e) => setForgotIdentifier(e.target.value)}
@@ -535,7 +538,7 @@ export const LoginPage: React.FC = () => {
             </form>
           )}
           <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: 'var(--space-3) 0 0' }}>
-            No access to your college email? Contact IT Services (helpdesk@kpriet.ac.in, ext. 4101) or your HOD. An
+            No access to your college email? Contact <InstitutionContact fallback="IT services" /> or your HOD. An
             administrator can reset the password from the admin console.
           </p>
         </div>

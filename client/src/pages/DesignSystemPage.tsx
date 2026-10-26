@@ -30,6 +30,7 @@ import {
   PageHeader,
   useToast,
 } from '../components';
+import { PRODUCT_NAME } from '../config/brand';
 
 export const DesignSystemPage: React.FC = () => {
   const { addToast } = useToast();
@@ -71,7 +72,7 @@ export const DesignSystemPage: React.FC = () => {
       {/* 27. PageHeader */}
       <PageHeader
         title="Institutional Design System"
-        subtitle="Complete reusable component library for KPR Institute of Engineering and Technology"
+        subtitle={`Complete reusable component library for ${PRODUCT_NAME}`}
         breadcrumbs={
           // 16. Breadcrumb
           <Breadcrumb
@@ -140,7 +141,7 @@ export const DesignSystemPage: React.FC = () => {
               </Button>
             }
           >
-            All 27 components adhere to KPRIET institutional tokens, accessible WCAG 2.1 AA standards, and consistent border-spaced aesthetics.
+            All 27 components adhere to the institutional design tokens, accessible WCAG 2.1 AA standards, and consistent border-spaced aesthetics.
           </Alert>
         </div>
       )}

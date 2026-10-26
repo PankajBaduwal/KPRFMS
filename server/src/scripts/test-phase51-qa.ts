@@ -120,7 +120,7 @@ async function runSystemQASuite() {
     adminUser = await User.create({
       employeeId: 'ADM001',
       name: 'System Admin',
-      email: 'admin.qa@kpriet.ac.in',
+      email: 'admin.qa@college.edu',
       role: ROLES.ADMIN,
       departmentId: dept._id,
       status: 'ACTIVE',
@@ -132,7 +132,7 @@ async function runSystemQASuite() {
     hodUser = await User.create({
       employeeId: 'HOD001',
       name: 'CSE HOD',
-      email: 'hod.cse.qa@kpriet.ac.in',
+      email: 'hod.cse.qa@college.edu',
       role: ROLES.HOD,
       departmentId: dept._id,
       status: 'ACTIVE',
@@ -144,7 +144,7 @@ async function runSystemQASuite() {
     facultyUser = await User.create({
       employeeId: 'FAC001',
       name: 'Faculty Member',
-      email: 'faculty.qa@kpriet.ac.in',
+      email: 'faculty.qa@college.edu',
       role: ROLES.FACULTY,
       departmentId: dept._id,
       status: 'ACTIVE',
@@ -156,7 +156,7 @@ async function runSystemQASuite() {
     principalUser = await User.create({
       employeeId: 'PRN001',
       name: 'Principal',
-      email: 'principal.qa@kpriet.ac.in',
+      email: 'principal.qa@college.edu',
       role: ROLES.PRINCIPAL,
       status: 'ACTIVE',
       passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz123456',
@@ -167,7 +167,7 @@ async function runSystemQASuite() {
     deanUser = await User.create({
       employeeId: 'DEN001',
       name: 'Dean Academic',
-      email: 'dean.qa@kpriet.ac.in',
+      email: 'dean.qa@college.edu',
       role: ROLES.DEAN,
       status: 'ACTIVE',
       passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz123456',
@@ -268,7 +268,7 @@ async function runSystemQASuite() {
   // Add Qualification
   const qualAdd = await apiRequest('POST', `/faculty/qualifications`, ctx.facultyToken, {
     degree: 'Ph.D in AI',
-    institution: 'KPRIET',
+    institution: 'DIT',
     university: 'Anna University',
     completionYear: 2024,
     specialization: 'Artificial Intelligence',
@@ -383,7 +383,7 @@ async function runSystemQASuite() {
     academicYear: ctx.academicYearStr,
     departmentId: ctx.departmentId,
     inventors: ['Dr. Faculty Member'],
-    applicant: 'KPRIET',
+    applicant: 'DIT',
     status: 'FILED',
   });
   assert(patCreate.status === 200 || patCreate.status === 201, 'Patent Create (POST /patents)', undefined, patCreate);
@@ -437,7 +437,7 @@ async function runSystemQASuite() {
   const actCreate = await apiRequest('POST', '/activities', ctx.facultyToken, {
     title: 'International Workshop on Generative AI and Foundation Models ' + nonce,
     activityType: 'WORKSHOP',
-    organizer: 'IEEE Computer Society & KPRIET',
+    organizer: 'IEEE Computer Society & DIT',
     role: 'PARTICIPANT',
     startDate: '2025-09-10',
     endDate: '2025-09-12',

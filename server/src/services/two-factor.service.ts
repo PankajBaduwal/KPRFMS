@@ -16,6 +16,7 @@ import {
 import { recordAudit } from '../audit/auditLogger.js';
 import { AUDIT_ACTIONS } from '../models/AuditLog.js';
 import { mailService } from './mail.service.js';
+import { PRODUCT_NAME } from '../config/brand.js';
 
 async function loadUser(userId: string) {
   const user = await User.findById(userId).select('+twoFactor +passwordHash');
@@ -85,7 +86,7 @@ export const twoFactorService = {
       subject: 'Two-factor sign-in turned on',
       lines: [
         `Dear ${user.name},`,
-        'Two-factor sign-in is now on for your KPRIET FMS account. You will be asked for a code from your authenticator app each time you sign in.',
+        `Two-factor sign-in is now on for your ${PRODUCT_NAME} account. You will be asked for a code from your authenticator app each time you sign in.`,
         'If this was not you, contact the institution administrator immediately.',
       ],
     });
@@ -121,7 +122,7 @@ export const twoFactorService = {
       subject: 'Two-factor sign-in turned off',
       lines: [
         `Dear ${user.name},`,
-        'Two-factor sign-in was turned off for your KPRIET FMS account.',
+        `Two-factor sign-in was turned off for your ${PRODUCT_NAME} account.`,
         'If this was not you, change your password and contact the institution administrator.',
       ],
     });
@@ -145,7 +146,7 @@ export const twoFactorService = {
       subject: 'Two-factor sign-in was reset',
       lines: [
         `Dear ${user.name},`,
-        'An administrator turned off two-factor sign-in for your KPRIET FMS account. You can set it up again from Account Security.',
+        `An administrator turned off two-factor sign-in for your ${PRODUCT_NAME} account. You can set it up again from Account Security.`,
       ],
     });
     return { message: `Two-factor sign-in reset for ${user.name}.` };

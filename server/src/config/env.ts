@@ -29,7 +29,7 @@ const envSchema = z.object({
   SMTP_SECURE: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
-  MAIL_FROM: z.string().default('KPRIET FMS <no-reply@kpriet.ac.in>'),
+  MAIL_FROM: z.string().default('FacultyCore <no-reply@college.edu>'),
   MAIL_OUTBOX_DIR: z.string().default('mail-outbox'),
 });
 

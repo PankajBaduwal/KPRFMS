@@ -62,7 +62,7 @@ export const publicationSchema = z.object({
   coAuthors: z.array(z.string().trim()).default([]).or(
     z.string().transform((val) => val.split(',').map((s) => s.trim()).filter(Boolean))
   ),
-  affiliation: z.string().trim().default('KPR Institute of Engineering and Technology'),
+  affiliation: z.string().trim().optional(),
   correspondingAuthor: z.coerce.boolean().default(false),
   publicationStatus: z.enum([
     PUBLICATION_LIFECYCLE_STATUS.DRAFT,

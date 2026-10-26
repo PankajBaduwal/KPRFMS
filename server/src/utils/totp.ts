@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { env } from '../config/env.js';
+import { PRODUCT_NAME } from '../config/brand.js';
 
 /**
  * Time-based one-time passwords (RFC 6238: 30 s steps, 6 digits, HMAC-SHA1) — the codes shown
@@ -75,7 +76,7 @@ export function verifyTotp(secret: string, code: string, lastUsedStep?: number, 
   return null;
 }
 
-export function otpauthUrl(secret: string, accountName: string, issuer = 'KPRIET FMS'): string {
+export function otpauthUrl(secret: string, accountName: string, issuer = PRODUCT_NAME): string {
   const label = encodeURIComponent(`${issuer}:${accountName}`);
   return `otpauth://totp/${label}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=${DIGITS}&period=${STEP_SECONDS}`;
 }

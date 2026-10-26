@@ -10,6 +10,9 @@ import { ROUTES } from '../constants/routes';
 import { PasswordChecklist } from '../components/PasswordChecklist';
 import { PASSWORD_POLICY } from '../utils/passwordPolicy';
 import '../styles/login.css';
+import { PRODUCT_NAME } from '../config/brand';
+import { InstitutionName, InstitutionContact } from '../components/InstitutionName';
+import { BrandMark } from '../components/BrandMark';
 
 const buildSchema = (emailDomain: string) =>
   z
@@ -75,7 +78,7 @@ export const RegisterPage: React.FC = () => {
       .catch((err) => setLoadError(err?.message || 'Unable to load the registration form.'));
   }, []);
 
-  const emailDomain = options?.emailDomain || 'kpriet.ac.in';
+  const emailDomain = options?.emailDomain || 'college.edu';
   const schema = useMemo(() => buildSchema(emailDomain), [emailDomain]);
 
   const {
@@ -277,8 +280,8 @@ export const RegisterPage: React.FC = () => {
         <aside className="login-brand-panel register-brand" aria-label="How registration works">
           <div>
             <div className="register-brand-badge">
-              <img src="/images/kpriet-emblem.png" alt="" width={22} height={22} />
-              <span>KPR Institute of Engineering and Technology</span>
+              <BrandMark size={22} />
+              <span><InstitutionName fallback={PRODUCT_NAME} /></span>
             </div>
             <h1 className="login-brand-title">Join the Faculty Management System</h1>
             <p className="login-brand-desc">
@@ -310,7 +313,7 @@ export const RegisterPage: React.FC = () => {
               <span><i className="bi bi-building" aria-hidden="true" /> Department</span>
             </div>
             <div className="register-brand-help">
-              Need help? <a href="mailto:helpdesk@kpriet.ac.in">helpdesk@kpriet.ac.in</a> · Ext. 4101
+              Need help? Contact <InstitutionContact />
             </div>
           </div>
         </aside>
@@ -323,7 +326,7 @@ export const RegisterPage: React.FC = () => {
             </h2>
             <p className="login-panel-desc">
               {!submitted
-                ? 'Faculty of KPRIET only — takes about two minutes.'
+                ? 'For staff with a college email address — takes about two minutes.'
                 : submitted.verified
                   ? 'Your account is waiting for administrator approval.'
                   : `We sent a 6-digit code to ${submitted.email}.`}

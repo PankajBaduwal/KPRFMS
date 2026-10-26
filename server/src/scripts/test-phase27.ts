@@ -227,7 +227,7 @@ async function runPhase27Tests() {
       projDoc.documents.push({
         title: 'Confidential Sanction Order Specification Document',
         documentType: 'SANCTION_ORDER',
-        fileUrl: 'https://kpriet.ac.in/docs/sanction-7741.pdf',
+        fileUrl: 'https://college.edu/docs/sanction-7741.pdf',
         fileName: 'Sanction_Order_7741.pdf',
         uploadedAt: new Date(),
       } as any);

@@ -31,10 +31,11 @@ import { ROLES } from '../permissions/roles.js';
 import { notificationService } from './notification.service.js';
 import { sessionService } from './session.service.js';
 import { mailService, clientUrl } from './mail.service.js';
+import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
 
-const DEFAULT_COLLEGE_DOMAIN = 'kpriet.ac.in';
+const DEFAULT_COLLEGE_DOMAIN = 'college.edu';
 
-/** College email domain, derived from the institution's contact email (e.g. admin@kpriet.ac.in). */
+/** College email domain, derived from the institution's contact email (e.g. admin@college.edu). */
 export function collegeEmailDomain(contactEmail?: string | null): string {
   const domain = contactEmail?.split('@')[1]?.trim().toLowerCase();
   return domain || DEFAULT_COLLEGE_DOMAIN;
@@ -81,10 +82,10 @@ export async function sendWelcomeEmail(user: { _id: unknown; name: string; email
   const link = await createPasswordLink(String(user._id), WELCOME_LINK_TTL_MS);
   return mailService.send({
     to: user.email,
-    subject: 'Your KPRIET FMS account is ready',
+    subject: `Your ${PRODUCT_NAME} account is ready`,
     lines: [
       `Dear ${user.name},`,
-      `An account has been created for you on the KPRIET Faculty Management System (employee ID ${user.employeeId}).`,
+      `An account has been created for you on ${PRODUCT_FULL_NAME} (employee ID ${user.employeeId}).`,
       'Choose your password with the button below. The link works once and expires in 7 days.',
     ],
     action: { label: 'Set my password', url: link },
@@ -370,7 +371,7 @@ export class AuthService {
     );
     await mailService.send({
       to: email,
-      subject: `${code} is your KPRIET FMS verification code`,
+      subject: `${code} is your ${PRODUCT_NAME} verification code`,
       lines: [
         `Dear ${name},`,
         'Enter this code on the registration page to confirm your college email address. It expires in 15 minutes.',
@@ -455,10 +456,10 @@ export class AuthService {
       const link = await createPasswordLink(user._id.toString());
       await mailService.send({
         to: user.email,
-        subject: 'Reset your KPRIET FMS password',
+        subject: `Reset your ${PRODUCT_NAME} password`,
         lines: [
           `Dear ${user.name},`,
-          'We received a request to reset the password for your KPRIET Faculty Management System account.',
+          `We received a request to reset the password for your ${PRODUCT_FULL_NAME} account.`,
           'Use the button below within 30 minutes. If you did not ask for this, ignore this email and your password stays the same.',
         ],
         action: { label: 'Reset password', url: link },
@@ -506,7 +507,7 @@ export class AuthService {
     });
     mailService.queue({
       to: user.email,
-      subject: 'Your KPRIET FMS password was changed',
+      subject: `Your ${PRODUCT_NAME} password was changed`,
       lines: [
         `Dear ${user.name},`,
         'The password for your account was just set using an emailed link, and every signed-in device was signed out.',

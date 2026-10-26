@@ -33,8 +33,9 @@ import {
   LeaveApplication,
 } from '../models/index.js';
 import { FacultyAppraisal } from '../models/FacultyAppraisal.js';
+import { PRODUCT_FULL_NAME } from '../config/brand.js';
+import { getInstitutionProfile } from '../utils/institution.js';
 
-export const INSTITUTION_NAME = 'KPR Institute of Engineering and Technology';
 
 export const STATUTORY_DISCLAIMER =
   'IMPORTANT DISCLAIMER: This report is compiled exclusively from institutional records for academic quality assurance, audit preparation, and institutional performance tracking. Generating, viewing, or exporting this report does NOT constitute official compliance, accreditation, ranking, or certification by NAAC, NBA, NIRF, AACSB, or any statutory authority. All metrics must be verified through official regulatory submissions.';
@@ -626,7 +627,7 @@ export async function generateReport(
   );
 
   const header: IReportHeader = {
-    institutionName: INSTITUTION_NAME,
+    institutionName: (await getInstitutionProfile()).name,
     department: departmentName,
     departmentId: filters.departmentId,
     academicYear: filters.academicYear || 'All Academic Years',
@@ -2678,7 +2679,7 @@ export function exportReportAsPdfHtml(report: IReportResult): string {
 
     <!-- FOOTER WITH RECORD AUDIT TRAIL -->
     <div class="report-footer">
-      <div>KPRIET Faculty Management System &bull; Total Traceable Records: ${report.rows.length}</div>
+      <div>${PRODUCT_FULL_NAME} &bull; Total Traceable Records: ${report.rows.length}</div>
       <div>Page 1 of 1 &bull; Document Authenticated for Quality Audit Preparation</div>
     </div>
   </div>

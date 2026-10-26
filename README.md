@@ -1,6 +1,8 @@
-# KPRIET Faculty Management System (FMS)
+# FacultyCore — Faculty Management System
 
-Institutional ERP for **KPR Institute of Engineering and Technology (KPRIET)**: faculty records, teaching, research, attendance and leave, appraisals, approvals, analytics and administration — in one role-aware web portal.
+Institutional ERP for colleges and universities: faculty records, teaching, research, attendance and leave, appraisals, approvals, analytics and administration — in one role-aware web portal.
+
+FacultyCore is not tied to any one college. Each installation sets its own college name, short code, logo, address and email domain in **Admin → Settings**; the product name lives in `server/src/config/brand.ts` and `client/src/config/brand.ts`.
 
 ---
 
@@ -97,16 +99,16 @@ npm run dev:client   # Web  → http://localhost:5180
 
 ### Development logins
 
-Created by `npm run seed` (development databases only):
+Created by `npm run seed` (development databases only). The sample data uses a made-up college, *Demo Institute of Technology* (`@college.edu`). A database seeded before the rename keeps its old addresses until you seed it again.
 
 | Role | Email | Employee ID | Password |
 |---|---|---|---|
-| Admin | admin@kpriet.ac.in | EMP001 | `Admin@12345` |
-| Principal | principal@kpriet.ac.in | EMP002 | `Principal@12345` |
-| Dean | dean.acad@kpriet.ac.in | EMP003 | `Dean@12345` |
-| HOD (CSE) | hod.cse@kpriet.ac.in | EMP004 | `Hod@12345` |
-| Faculty (CSE) | faculty.cse@kpriet.ac.in | EMP005 | `Faculty@12345` |
-| Inactive (login is rejected) | inactive@kpriet.ac.in | EMP099 | `Inactive@12345` |
+| Admin | admin@college.edu | EMP001 | `Admin@12345` |
+| Principal | principal@college.edu | EMP002 | `Principal@12345` |
+| Dean | dean.acad@college.edu | EMP003 | `Dean@12345` |
+| HOD (CSE) | hod.cse@college.edu | EMP004 | `Hod@12345` |
+| Faculty (CSE) | faculty.cse@college.edu | EMP005 | `Faculty@12345` |
+| Inactive (login is rejected) | inactive@college.edu | EMP099 | `Inactive@12345` |
 
 Sign in with either the email or the employee ID. These accounts only exist in seeded dev databases — never create them in production.
 
@@ -131,9 +133,9 @@ It also sets 2026-2027 as the current academic year.
 
 | Sample account | Login | Password |
 |---|---|---|
-| HOD — Mechanical | hod.mech@kpriet.ac.in | `Hod@12345` |
-| HOD — EEE / IT / AI&DS / Civil | hod.eee@ / hod.it@ / hod.aids@ / hod.civil@kpriet.ac.in | `Hod@12345` |
-| Faculty — CSE | k.divya.cse@kpriet.ac.in | `Faculty@12345` |
+| HOD — Mechanical | hod.mech@college.edu | `Hod@12345` |
+| HOD — EEE / IT / AI&DS / Civil | hod.eee@ / hod.it@ / hod.aids@ / hod.civil@college.edu | `Hod@12345` |
+| Faculty — CSE | k.divya.cse@college.edu | `Faculty@12345` |
 | Any sample faculty | see the Faculty Directory (employee IDs KPR2101–KPR2134) | `Faculty@12345` |
 
 ---
@@ -205,17 +207,17 @@ Without SMTP settings nothing is sent: every email is saved as a JSON file in `s
 | Google Workspace / Gmail | `smtp.gmail.com` | `465` / `true` | the address / a 16-character **App Password** (needs 2-Step Verification on that account) |
 | Institutional mail server | ask IT | usually `587` / `false` | as provided |
 
-Set `MAIL_FROM` to the sending address, e.g. `KPRIET FMS <no-reply@kpriet.ac.in>` (most providers require it to match `SMTP_USER`). Then check it:
+Set `MAIL_FROM` to the sending address, e.g. `FacultyCore <no-reply@your-college.edu>` (most providers require it to match `SMTP_USER`). Then check it:
 
 ```bash
-npm run mail:test -- your.name@kpriet.ac.in
+npm run mail:test -- your.name@your-college.edu
 ```
 
 It logs in to the mail server, sends a test message and tells you exactly what is wrong if it fails. In production the API prints a warning at startup while `SMTP_HOST` is empty.
 
 ## Calendar Sync on the Hosted Server
 
-The calendar link is built from `PUBLIC_API_URL`. Google Calendar and Outlook fetch it from their own servers, so it must be a public **https** address — a `localhost` link only works for calendar apps on the same computer. When the portal is deployed (e.g. `https://fms.kpriet.ac.in`), set `PUBLIC_API_URL=https://fms.kpriet.ac.in/api` (the Docker stack defaults to `CLIENT_URL/api`, so usually nothing extra is needed). Users then press **Get a new link** once so their link uses the public address.
+The calendar link is built from `PUBLIC_API_URL`. Google Calendar and Outlook fetch it from their own servers, so it must be a public **https** address — a `localhost` link only works for calendar apps on the same computer. When the portal is deployed (e.g. `https://fms.your-college.edu`), set `PUBLIC_API_URL=https://fms.your-college.edu/api` (the Docker stack defaults to `CLIENT_URL/api`, so usually nothing extra is needed). Users then press **Get a new link** once so their link uses the public address.
 
 ---
 
@@ -267,7 +269,7 @@ Live notifications keep their connections in the API process; if you ever run se
 - Login rate limiting and account lockout (5 failed attempts → 15 min)
 - Every sign-in is a tracked session (device, IP, last activity) that can be revoked; changing or resetting a password signs the user out of every other session
 - Optional two-factor sign-in (TOTP); secrets are encrypted at rest with AES-256-GCM using `TWO_FACTOR_KEY` (required in production, separate from `JWT_SECRET` so that can be rotated freely). Never change `TWO_FACTOR_KEY` after go-live — it would turn off everyone's two-factor. Secrets created before the key existed are moved onto it automatically at the user's next sign-in
-- Faculty can **self-register** at `/register` with a college email (domain taken from the institution contact email, e.g. `@kpriet.ac.in`). New accounts stay **PENDING** and cannot sign in until an admin approves them under Admin → Users (the HOD is notified too); approval creates the faculty profile for HOD verification. Switch it on/off in Admin → Settings → "Allow faculty self-registration"
+- Faculty can **self-register** at `/register` with a college email (domain taken from the institution contact email, e.g. `@college.edu`). New accounts stay **PENDING** and cannot sign in until an admin approves them under Admin → Users (the HOD is notified too); approval creates the faculty profile for HOD verification. Switch it on/off in Admin → Settings → "Allow faculty self-registration"
 - Users change their own password from the profile menu → **Change Password** (policy: 8+ chars, upper, lower, digit, one of `@$!%*?&`)
 - Request sanitisation against NoSQL operator injection and XSS payloads; Helmet security headers; strict CORS in production
 - Uploaded files require an authenticated session; private documents are stored outside the web root in `server/storage/` and served through `/api/documents` with access checks

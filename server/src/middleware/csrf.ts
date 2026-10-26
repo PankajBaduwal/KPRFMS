@@ -4,7 +4,7 @@ import { AUTH_COOKIE_NAME } from '../utils/jwt.js';
 import { AppError } from '../utils/AppError.js';
 import { env } from '../config/env.js';
 
-export const CSRF_COOKIE_NAME = 'kpriet_csrf_token';
+export const CSRF_COOKIE_NAME = 'fms_csrf_token';
 export const CSRF_HEADER_NAME = 'x-csrf-token';
 
 /**

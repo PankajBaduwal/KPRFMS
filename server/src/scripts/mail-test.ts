@@ -1,6 +1,6 @@
 /**
  * Checks the email settings and sends one test message.
- *   npm run mail:test -- you@kpriet.ac.in
+ *   npm run mail:test -- you@college.edu
  */
 import nodemailer from 'nodemailer';
 import { env } from '../config/env.js';
@@ -9,7 +9,7 @@ import { mailService } from '../services/mail.service.js';
 async function main() {
   const to = process.argv[2];
   if (!to || !to.includes('@')) {
-    console.error('Usage: npm run mail:test -- you@kpriet.ac.in');
+    console.error('Usage: npm run mail:test -- you@college.edu');
     process.exit(1);
   }
 
@@ -38,8 +38,8 @@ async function main() {
 
   const ok = await mailService.send({
     to,
-    subject: 'KPRIET FMS test email',
-    lines: ['This is a test message from the KPRIET Faculty Management System.', 'If you can read this, email delivery is working.'],
+    subject: 'FacultyCore test email',
+    lines: ['This is a test message from FacultyCore.', 'If you can read this, email delivery is working.'],
   });
   if (!ok) {
     console.error('✗ The message was not accepted (see the warning above).');

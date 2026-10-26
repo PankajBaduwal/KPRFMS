@@ -38,21 +38,21 @@ async function runTests() {
   await Consultancy.deleteMany({ projectTitle: /\[TEST-PHASE-8\]/ });
 
   // Retrieve test users
-  const cseFacultyUser = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' });
-  const cseHodUser = await User.findOne({ email: 'hod.cse@kpriet.ac.in' });
-  const adminUser = await User.findOne({ email: 'admin@kpriet.ac.in' });
+  const cseFacultyUser = await User.findOne({ email: 'faculty.cse@college.edu' });
+  const cseHodUser = await User.findOne({ email: 'hod.cse@college.edu' });
+  const adminUser = await User.findOne({ email: 'admin@college.edu' });
   const eceDept = await Department.findOne({ code: 'ECE' });
 
   if (!cseFacultyUser || !cseHodUser || !adminUser || !eceDept) {
     throw new Error('Seed data missing for tests.');
   }
 
-  let eceHodUser = await User.findOne({ email: 'hod.ece@kpriet.ac.in' });
+  let eceHodUser = await User.findOne({ email: 'hod.ece@college.edu' });
   if (!eceHodUser) {
     eceHodUser = await User.create({
       employeeId: 'EMP_ECE_HOD',
       name: 'Dr. ECE HOD',
-      email: 'hod.ece@kpriet.ac.in',
+      email: 'hod.ece@college.edu',
       passwordHash: 'dummy',
       role: ROLES.HOD,
       departmentId: eceDept._id,
@@ -174,7 +174,7 @@ async function runTests() {
   const copyright = await copyrightService.createCopyright(facultyAuth, {
     title: '[TEST-PHASE-8] Autonomous Drone Swarm Fleet Management Software',
     registrationNumber: 'SW-19876/2024',
-    applicants: ['Dr. A. Karthik', 'KPRIET Research Cell'],
+    applicants: ['Dr. A. Karthik', 'DIT Research Cell'],
     registrationDate: new Date('2024-05-10'),
     category: 'Software Code / Computer Program',
     academicYear: '2024-2025',

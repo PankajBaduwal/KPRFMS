@@ -58,7 +58,7 @@ async function runPhase36PerformanceTests() {
   console.log('\n--- 3. Testing Global Search Projections & Caching ---');
   const mockAdminUser = {
     id: new mongoose.Types.ObjectId().toString(),
-    email: 'admin@kpriet.ac.in',
+    email: 'admin@college.edu',
     role: ROLES.ADMIN,
     name: 'Admin Test',
   } as any;

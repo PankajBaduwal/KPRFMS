@@ -44,8 +44,8 @@ async function run() {
   console.log('================================================================');
   await mongoose.connect(MONGODB_URI);
 
-  const hod = await User.findOne({ email: 'hod.cse@kpriet.ac.in' }).lean();
-  const faculty = await User.findOne({ email: 'faculty.cse@kpriet.ac.in' }).lean();
+  const hod = await User.findOne({ email: 'hod.cse@college.edu' }).lean();
+  const faculty = await User.findOne({ email: 'faculty.cse@college.edu' }).lean();
   const otherDept = await Department.findOne({ _id: { $ne: hod?.departmentId }, isActive: true }).lean();
   const cseTemplate = await Publication.findOne({ userId: faculty?._id }).lean();
   if (!hod || !faculty || !otherDept || !cseTemplate) throw new Error('Seed data missing (run the seed first)');

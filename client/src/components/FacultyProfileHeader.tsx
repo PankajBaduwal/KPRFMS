@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FacultyProfile } from '../types/faculty';
 import { Badge } from './Badge';
+import { InstitutionName } from './InstitutionName';
 
 interface FacultyProfileHeaderProps {
   profile: FacultyProfile;
@@ -55,7 +56,7 @@ export const FacultyProfileHeader: React.FC<FacultyProfileHeaderProps> = ({ prof
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
         <div className="dossier-meta-stamp">
           <i className="bi bi-shield-check" aria-hidden="true" />
-          <span>KPRIET Faculty Dossier &bull; Official Employee Record</span>
+          <span><InstitutionName short fallback="Faculty" /> Faculty Dossier &bull; Official Employee Record</span>
         </div>
         <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
           Record Status: <strong style={{ color: 'var(--color-text)' }}>{profile.employment?.employmentType || 'REGULAR'}</strong>

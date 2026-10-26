@@ -1,7 +1,7 @@
 {
-  "name": "kpriet-fms-server",
+  "name": "facultycore-server",
   "version": "1.0.0",
-  "description": "KPRIET Faculty Management System - Backend API",
+  "description": "FacultyCore - Faculty Management System backend API",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

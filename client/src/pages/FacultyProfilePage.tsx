@@ -903,7 +903,7 @@ export const FacultyProfilePage: React.FC = () => {
             label="Communication Address"
             value={basicForm.communicationAddress}
             onChange={(e) => setBasicForm({ ...basicForm, communicationAddress: e.target.value })}
-            placeholder="Staff Quarters, KPRIET Campus"
+            placeholder="Staff Quarters, College Campus"
           />
         </div>
       </Modal>

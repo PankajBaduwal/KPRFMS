@@ -5,8 +5,9 @@ import { Input } from './Input';
 import { Alert } from './Alert';
 import { Badge } from './Badge';
 import { publicationService, type OrcidWork } from '../services/publication.service';
+import { STORAGE_PREFIX } from '../config/brand';
 
-const ORCID_KEY = 'kpriet_fms_orcid';
+const ORCID_KEY = `${STORAGE_PREFIX}orcid`;
 
 interface OrcidImportModalProps {
   isOpen: boolean;

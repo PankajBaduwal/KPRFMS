@@ -160,7 +160,7 @@ export const workloadService = {
           },
         ],
         isDefault: true,
-        description: 'Standard AICTE-aligned workload limits for KPRIET academic faculty',
+        description: 'Standard AICTE-aligned workload limits for academic faculty',
       });
     }
 
@@ -268,7 +268,7 @@ export const workloadService = {
           overloadMin: 21,
         },
       ],
-      description: 'Standard AICTE-aligned workload limits for KPRIET academic faculty',
+      description: 'Standard AICTE-aligned workload limits for academic faculty',
     };
 
     const deptId = departmentId && Types.ObjectId.isValid(departmentId)

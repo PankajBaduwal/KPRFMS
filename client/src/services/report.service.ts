@@ -65,7 +65,7 @@ export const reportService = {
     const link = document.createElement('a');
     link.href = url;
     const safeYear = (params.academicYear || 'all').replace(/[^a-zA-Z0-9_-]/g, '_');
-    link.setAttribute('download', `kpriet_${params.reportType.toLowerCase()}_${safeYear}.${extension}`);
+    link.setAttribute('download', `report_${params.reportType.toLowerCase()}_${safeYear}.${extension}`);
     document.body.appendChild(link);
     link.click();
     link.remove();

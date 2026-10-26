@@ -59,7 +59,7 @@ export class AppraisalService {
         submissionDeadline: new Date(`${currentYear}-06-30`),
         reviewDeadline: new Date(`${currentYear}-07-31`),
         status: CYCLE_STATUSES.ACTIVE,
-        description: 'Institutional performance appraisal covering all academic, research, and service domains for KPRIET accreditation.',
+        description: 'Institutional performance appraisal covering all academic, research, and service domains for accreditation.',
         requirePrincipalApproval: true,
         categories: getDefaultCategories(),
         createdBy: adminId,
