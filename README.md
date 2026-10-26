@@ -92,7 +92,7 @@ In two terminals, from the project root:
 
 ```bash
 npm run dev:server   # API  → http://localhost:5055/api
-npm run dev:client   # Web  → http://localhost:5173
+npm run dev:client   # Web  → http://localhost:5180
 ```
 
 ### Development logins

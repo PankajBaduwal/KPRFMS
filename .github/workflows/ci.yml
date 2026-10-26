@@ -42,7 +42,7 @@ jobs:
       TEST_MONGODB_URI: mongodb://localhost:27017/kpriet-fms-test
       JWT_SECRET: ci-only-jwt-secret-not-used-anywhere-else-000000
       COOKIE_SECRET: ci-only-cookie-secret-not-used-anywhere-else-00
-      CLIENT_URL: http://localhost:5173
+      CLIENT_URL: http://localhost:5180
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -6,7 +6,7 @@ React 19 + TypeScript + Vite front end for the KPRIET Faculty Management System.
 
 ```bash
 npm install
-npm run dev       # http://localhost:5173 (API expected at VITE_API_URL)
+npm run dev       # http://localhost:5180 (API expected at VITE_API_URL)
 npm run build     # type-check + production bundle in dist/
 npm run lint      # oxlint
 npm run preview   # serve the production build locally
