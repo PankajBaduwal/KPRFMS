@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AUTH_COOKIE_NAME } from '../utils/jwt.js';
 import { AppError } from '../utils/AppError.js';
 import { env } from '../config/env.js';
+import { PLATFORM_COOKIE_NAME } from '../platform/services/platformAuth.service.js';
 
 export const CSRF_COOKIE_NAME = 'fms_csrf_token';
 export const CSRF_HEADER_NAME = 'x-csrf-token';
@@ -55,7 +56,8 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
 
   // 4. If request is NOT using cookie authentication (e.g. pure Bearer token API call),
   // ambient cookie CSRF is not a vulnerability vector.
-  const hasAuthCookie = !!req.cookies?.[AUTH_COOKIE_NAME];
+  // Either session cookie (institution or platform console) makes the request CSRF-relevant
+  const hasAuthCookie = !!req.cookies?.[AUTH_COOKIE_NAME] || !!req.cookies?.[PLATFORM_COOKIE_NAME];
   if (!hasAuthCookie) {
     return next();
   }

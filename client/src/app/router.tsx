@@ -11,6 +11,14 @@ import { FEATURES } from '../constants/features';
 const HomePage = React.lazy(() => import('../pages/HomePage').then((m) => ({ default: m.HomePage })));
 const LoginPage = React.lazy(() => import('../pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const InstitutionLinkPage = React.lazy(() => import('../pages/InstitutionLinkPage').then((m) => ({ default: m.InstitutionLinkPage })));
+// Platform console (operators only): separate session and layout
+const PlatformLayout = React.lazy(() => import('../platform/PlatformLayout').then((m) => ({ default: m.PlatformLayout })));
+const PlatformLoginPage = React.lazy(() => import('../platform/PlatformAuthPages').then((m) => ({ default: m.PlatformLoginPage })));
+const PlatformActivatePage = React.lazy(() => import('../platform/PlatformAuthPages').then((m) => ({ default: m.PlatformActivatePage })));
+const PlatformDashboardPage = React.lazy(() => import('../platform/PlatformDashboardPage').then((m) => ({ default: m.PlatformDashboardPage })));
+const PlatformInstitutionPage = React.lazy(() => import('../platform/PlatformInstitutionPage').then((m) => ({ default: m.PlatformInstitutionPage })));
+const PlatformNewInstitutionPage = React.lazy(() => import('../platform/PlatformNewInstitutionPage').then((m) => ({ default: m.PlatformNewInstitutionPage })));
+const PlatformAuditPage = React.lazy(() => import('../platform/PlatformAuditPage').then((m) => ({ default: m.PlatformAuditPage })));
 const ResetPasswordPage = React.lazy(() => import('../pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })));
 const AiAssistantPage = React.lazy(() => import('../pages/AiAssistantPage').then((m) => ({ default: m.AiAssistantPage })));
 const AccountSecurityPage = React.lazy(() => import('../pages/AccountSecurityPage').then((m) => ({ default: m.AccountSecurityPage })));
@@ -83,6 +91,18 @@ export const router = createBrowserRouter([
         path: ROUTES.NOT_FOUND,
         element: lazyRoute(NotFoundPage),
       },
+    ],
+  },
+  { path: '/platform/login', element: lazyRoute(PlatformLoginPage) },
+  { path: '/platform/activate', element: lazyRoute(PlatformActivatePage) },
+  {
+    path: '/platform',
+    element: lazyRoute(PlatformLayout),
+    children: [
+      { index: true, element: lazyRoute(PlatformDashboardPage) },
+      { path: 'new', element: lazyRoute(PlatformNewInstitutionPage) },
+      { path: 'institutions/:code', element: lazyRoute(PlatformInstitutionPage) },
+      { path: 'audit', element: lazyRoute(PlatformAuditPage) },
     ],
   },
   {

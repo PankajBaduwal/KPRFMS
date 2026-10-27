@@ -64,7 +64,9 @@ apiClient.interceptors.response.use(
           fallbackCode = 'SESSION_EXPIRED';
           fallbackMessage = 'Your session has expired. Please sign in again.';
           // Notify any session listeners if not currently logging in or checking self
-          if (!error.config?.url?.includes('/auth/login') && !error.config?.url?.includes('/auth/me')) {
+          // (platform console calls manage their own separate session)
+          const url = error.config?.url ?? '';
+          if (!url.startsWith('/platform/') && !url.includes('/auth/login') && !url.includes('/auth/me')) {
             window.dispatchEvent(new CustomEvent('fms:session-expired'));
           }
           break;

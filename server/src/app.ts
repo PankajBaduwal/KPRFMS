@@ -18,6 +18,8 @@ import platformPublicRoutes from './platform/routes/public.routes.js';
 import { resolveSlugTenant } from './tenancy/resolveSlugTenant.js';
 import { requireTenant } from './tenancy/context.js';
 import { tenantUploadsRoot } from './tenancy/files.js';
+import platformAuthRoutes from './platform/routes/auth.routes.js';
+import platformAdminRoutes from './platform/routes/admin.routes.js';
 
 const app = express();
 
@@ -106,6 +108,9 @@ app.use('/uploads', requireAuth, (req, res, next) => {
 
 // 10. API Routes
 // Platform routes (institution finder) run outside any institution
+// Platform console (operator) sign-in and administration: separate session, no institution
+app.use('/api/platform/auth', platformAuthRoutes);
+app.use('/api/platform/admin', platformAdminRoutes);
 app.use('/api/platform', platformPublicRoutes);
 // Institution-scoped entry: /api/t/<code>/... resolves the institution from the registry first.
 // Signed-in requests may also use /api/...: their institution comes from the session token.

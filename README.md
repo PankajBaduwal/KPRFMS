@@ -113,6 +113,25 @@ npm run tenant:copy -- --from kpriet-fms --to demo
 npm run tenant:register -- --code demo --name "Demo Institute of Technology" --adopt-existing-data
 ```
 
+### Platform console (FacultyCore operators)
+
+The Super Admin console at `/platform` manages institutions; it is separate from every
+institution (own accounts, own session cookie, own sign-in) and only shows registry data and
+counts, never academic records. Create the first operator account once from the command line;
+it prints a single-use activation link (24 hours) where the operator chooses the password:
+
+```bash
+npm run platform:create-admin -- --email you@example.com --name "Your Name"
+npm run platform:create-admin -- --email you@example.com --reissue   # new link if it expired
+```
+
+From the console: **New institution** runs the setup wizard (details, departments, initial
+administrator/principal/dean/HODs, branding, review). Provisioning is a recorded, resumable
+sequence (registry, database and indexes, settings, structure, accounts, activation emails,
+final checks); the institution becomes usable only after the last check passes, and a failed
+setup can be retried from the failed step. Institutions can be suspended (all sessions stop on
+their next request), reactivated or archived, and activation links re-sent.
+
 Files: each institution's uploads and document vault live in
 `server/storage/tenants/<code>/uploads` and `server/storage/tenants/<code>/secure_documents`,
 and are only served to signed-in users of that institution. The old shared `server/uploads/`
