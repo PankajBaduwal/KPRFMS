@@ -1,0 +1,206 @@
+# FacultyCore multi-tenant transformation — Phase 1: audit and plan
+
+Status: **audit complete, no application code changed.** Baseline commit `3266dfd`, 2026-10-27.
+
+---
+
+## 1. Current architecture (as inspected)
+
+| Area | Finding |
+|---|---|
+| Server entry | `server/src/server.ts` → `connectDatabase()` → `app.listen(PORT)` (5055). Middleware chain in `server/src/app.ts`: helmet, CORS, rate limit, cookies, XSS clean, CSRF (double-submit), `/uploads` static (auth only), `/api` routes. |
+| Web entry | `client/src/main.tsx` → `app/App.tsx` (QueryClientProvider, Toast, Auth) → `app/router.tsx` (30 portal routes + public/auth). Vite on 5180, API base from `VITE_API_URL`. |
+| Database | **One global connection**: `mongoose.connect(env.MONGODB_URI)` in `config/database.ts`. All 35 models are registered on that global connection with `mongoose.model(...)`. |
+| Model coupling | **512 model import statements across 75 server files** (services, controllers, middleware, routes). No code passes a connection around. |
+| Transactions | None used. Local MongoDB 8.0.6 is a **standalone server (no replica set)**, so multi-document transactions are unavailable locally. |
+| Authentication | JWT in an httpOnly cookie (`fms_token`) or Bearer header; `requireAuth` verifies the token, the `Session` record (revocation, last seen), password-change time and user status, then sets `req.user`. Token payload: `id, email, role, departmentId, sid`, **no institution**. |
+| Authorisation | `requireRole(...)` per route plus service-level checks (HOD department match, self-approval block in the approval queue). |
+| Roles | `FACULTY, HOD, DEAN, PRINCIPAL, ADMIN` in `permissions/roles.ts`, with a numeric hierarchy. There is no platform role. |
+| Login | Email or employee ID (`auth.service.login`), lockout after 5 failures, 2FA (TOTP + recovery codes), sessions list/revoke, password reset by email. |
+| Registration | Self-registration with a college email domain derived from `InstitutionSettings.contactEmail`; account pending admin approval. |
+| Bulk import | `faculty-import.service.ts`: Excel/CSV, validate-then-create, roles FACULTY/HOD/DEAN/PRINCIPAL, existing departments only, create-only mode, welcome email per account. |
+| Branding/settings | `InstitutionSettings` is a **singleton** (`findOne()` in 9 places) plus a module-level cache in `utils/institution.ts`. The product name is in `config/brand.ts` (server and client). |
+| Dashboards, rankings, approvals | Role dashboards (`dashboard.service`), leaderboards (`leaderboard.service`, verified-only, weights in settings), unified approval queue (10 record types, reason required, self-approval blocked, HOD department check before save). |
+| Files | Legacy uploads in `server/uploads/{documents,certificates}` served at `/uploads` to **any signed-in user**; secure vault in `server/storage/secure_documents` via `/api/documents`. |
+| Live notifications | Server-Sent Events; in-memory `Map<userId, streams>`. |
+| Calendar | Unauthenticated `.ics` feed looked up by token hash across the single `users` collection. |
+| AI | Gemini; prompts built from an institution snapshot; can be switched off. |
+| Tests | 38 suites, `npm test` drops and reseeds `kpriet-fms-test`, private API on 5099. |
+| CI / Docker | `.github/workflows/ci.yml`, `docker-compose.yml`, server and client Dockerfiles. |
+| Env vars | `PORT NODE_ENV MONGODB_URI JWT_SECRET JWT_EXPIRES_IN COOKIE_SECRET CLIENT_URL TRUST_PROXY PUBLIC_API_URL TWO_FACTOR_KEY GEMINI_API_KEY GEMINI_MODEL GEMINI_FALLBACK_MODEL SMTP_HOST SMTP_PORT SMTP_SECURE SMTP_USER SMTP_PASS MAIL_FROM MAIL_OUTBOX_DIR` |
+
+### Baseline test result
+
+`npm test` at `3266dfd`: **38/38 suites passed** (phases 2–14, 19–30, 36, 41, 42, 44, 50, 51, 51-qa, 53, 54, 60–63).
+
+---
+
+## 2. Single-institution assumptions (everything that must change)
+
+1. Global `mongoose.connect` and global model registration (all 35 models).
+2. `InstitutionSettings.findOne()` singleton (9 call sites) and the module-level cache in `utils/institution.ts`.
+3. Module-level caches: `public.routes.ts` overview cache. **Any cache must be keyed by tenant.**
+4. JWT and `Session` have no tenant; `requireAuth` loads the user from the single database.
+5. Unauthenticated endpoints with no tenant: `/public/overview`, `/public/institution`, registration options, login, forgot/reset password, email verification, calendar feed.
+6. SSE streams keyed by `userId` only. ObjectIds from different databases are unlikely to collide, but isolation must not depend on that.
+7. File storage paths are shared (`uploads/…`, `storage/secure_documents`), and `/uploads` has **no ownership check**. This is an existing gap that would become a cross-tenant leak.
+8. AI: institution snapshot and the `uploads` root are read from the single database and folder.
+9. Seeds, test runner and dev scripts target one database.
+10. Client: `useInstitution` and every TanStack Query key are not tenant-scoped; browser storage keys (`facultycore_*`) are not tenant-scoped; there is no institution selector.
+11. Email templates name the product but not the tenant consistently.
+12. Rate limiting by IP only (acceptable; keep it, and add per-tenant keys for login).
+
+## 3. Hardcoded KPRIET
+
+The product rebrand (`2d99fe6`, `3266dfd`) already removed KPRIET from all user-facing code, emails, seeds and tests. What remains is internal and deliberate:
+
+- the folder `kpriet-fms`
+- database names `kpriet-fms` and `kpriet-fms-test`
+- the 2FA HKDF salt `'kpriet-fms'` in `utils/totp.ts`; changing it breaks enrolled authenticators, so it stays
+- a few README backup commands
+
+There are no KPRIET-specific queries.
+
+## 4. Unfinished or mocked functionality found
+
+- **Admin → Settings → Appraisal**: deadlines, increment benchmark, CAS threshold and the peer-feedback switch are uncontrolled inputs (`defaultValue`) that are **never saved**.
+- **HOD dashboard counts** come from queries with `.limit(10)` per type, so totals undercount above 10. The inline approvals panel uses the accurate queue counts.
+- **Reports**: `report.service` throws "not implemented" for unhandled report types. Each of the 25 declared types (including NAAC, NBA, NIRF, AACSB, INTERNAL) must be verified in Phase 11.
+- **Funding**: `Project` has `requestedAmount`, `sanctionedAmount`, `receivedAmount`, proposal/grant/sanction numbers and documents, but statuses are only `IDEA, DRAFT, SUBMITTED, UNDER_REVIEW, SANCTIONED, ONGOING, COMPLETED, REJECTED`. Missing: `APPLIED, PENDING, CLARIFICATION_REQUIRED, APPROVED, WITHDRAWN`, `scheme`, `applicationDate`, `expectedDecisionDate`, `decisionDate` and structured reviewer comments.
+- **Logo upload**: Settings has `logoUrl` text only; there is no upload or validation.
+
+## 5. Data that must be preserved
+
+| Database | Contents | Note |
+|---|---|---|
+| `kpriet-fms-backup-20261026` | **The KPRIET data** (35 collections, 12,005 documents), copied before the dev reseed on 2026-10-26 | This is the Phase 20 migration source. It has never been deployed to production. |
+| `kpriet-fms` | Current development data (Demo Institute of Technology) | Becomes the "demo" tenant. |
+| `kpriet-fms-test` | Disposable; recreated by every test run | |
+| `server/uploads`, `server/storage/secure_documents` | Files referenced by the records above | Must move to per-tenant folders with references preserved. |
+
+**The same MongoDB server hosts about 35 unrelated databases, including the separate KPRIET project's `eduverse*`.** Provisioning must use a reserved name prefix and refuse to touch any database it did not create.
+
+---
+
+## 6. Target architecture
+
+```
+                       ┌──────────────────────────── one MongoDB cluster ───────────────────────────┐
+ browser ── /api ──►   │  fc_platform             fc_t_kpriet            fc_t_demo           fc_t_…   │
+   │                   │  institutions            users, faculty …       users, faculty …            │
+   │  login:           │  platform_users          (all 35 existing       (all 35 existing             │
+   │  institution +    │  provisioning_runs        collections)           collections)                │
+   │  credentials      │  platform_audit                                                              │
+   │                   └──────────────────────────────────────────────────────────────────────────────┘
+   ▼
+ requireAuth ─► token {tenantId, uid, sid} ─► registry lookup (status ACTIVE?) ─► AsyncLocalStorage
+                                                                                  { tenantId, dbName }
+ existing services ─► existing model imports ─► tenant model proxy ─► connection.useDb(dbName) ─► model
+```
+
+### Core mechanism (validated by a spike on this machine)
+
+- **Tenant context** in `AsyncLocalStorage`, set only by trusted middleware after authentication, or by the public slug resolver for unauthenticated routes. It is never taken from the request body, query, header or local storage.
+- **Tenant model proxy**: each existing model file keeps its export name, but the export becomes a proxy that resolves `mongoose.connection.useDb(ctx.dbName, { useCache: true }).model(name)` at call time. **The 512 import sites do not change.** All schemas are registered on each tenant connection on first use, so `populate()` refs resolve inside the same tenant.
+- **Fail closed**: using a tenant model with no context throws. There is no default database.
+- **One shared pool**: `useDb` reuses the root connection's sockets; no per-request connections.
+- Platform models (`Institution`, `PlatformUser`, `ProvisioningRun`, `PlatformAuditLog`, `PlatformConfig`) are bound explicitly to `fc_platform`.
+
+Spike results (throwaway databases, since deleted): each college saw only its own users; `populate` resolved within the college; pre-save hooks ran; unique indexes were per college; the same email could exist in two colleges; no-context access failed closed; 200 concurrent mixed requests never crossed; one shared pool.
+
+### Database naming and safety
+
+- Tenant databases are named `fc_t_<institutionCode lowercased>`, generated server-side from a validated code (`^[a-z0-9]{2,20}$`). They are never accepted from input.
+- Provisioning refuses an existing database unless the registry says this run created it (a resumable run).
+
+### No transactions locally
+
+The local MongoDB is standalone, so provisioning is a **resumable state machine**. A `ProvisioningRun` records steps (`REGISTRY → DATABASE → INDEXES → MIGRATIONS → SETTINGS → ACCOUNTS → INVITES → VERIFY`), and each step is idempotent. An institution becomes `ACTIVE` only after `VERIFY` passes; a failure leaves it `PROVISIONING_FAILED` with a retry. Production should use a replica set (e.g. MongoDB Atlas) so transactions are available, but the design does not depend on them.
+
+### Identity and sessions
+
+- Users stay in their tenant's `users` collection (email and employee ID unique per tenant).
+- Token payload gains `tid` (tenant id). `requireAuth` resolves `tid` through the registry, checks the tenant is `ACTIVE`, sets the context, then loads the user from that tenant. A **suspended tenant is rejected on the next request** (short registry cache, invalidated on status change).
+- Platform Super Admin: a separate `platform_users` collection, separate login route (`/api/platform/auth`), a separate cookie name and a separate console (`/platform`). The `PLATFORM_SUPER_ADMIN` role is not added to the institutional role enum.
+- Exceptional support access: a time-limited, justified, audited grant (Phase 2 design, built later).
+
+### Unauthenticated routes
+
+These resolve the tenant from a validated **slug** in the path (`/api/t/:slug/public/...`, `/api/t/:slug/auth/login`, etc.):
+- public overview and institution branding
+- registration options
+- login, forgot/reset password and verification
+
+The calendar feed token embeds the tenant id (`<tid>.<token>`) and is verified against that tenant only.
+
+### Files
+
+Files are stored under `storage/<tenantId>/…` and `uploads/<tenantId>/…`. Downloads go through an authorised route that checks the tenant and record ownership; the open `/uploads` static route is retired.
+
+---
+
+## 7. Delivery plan (milestones with a test checkpoint after each)
+
+| # | Milestone | Prompt phases | Main changes |
+|---|---|---|---|
+| **M1** | Tenant foundation | 3, 4, 5 (server core) | `fc_platform` connection and platform models; `Institution` registry; tenant context; tenant model proxy for all 35 models; `requireAuth` binds tenant; test runner provisions **two** tenants (A, B); existing 38 suites run inside tenant A unchanged. |
+| **M2** | Tenant-aware login and public routes | 5, 7 | Institution selector and slug routes; tenant in the token; registration per tenant; tenant-keyed caches; SSE keyed by tenant; client query keys and storage scoped by tenant. |
+| **M3** | KPRIET and demo migration | 20 | Verified backup → `fc_t_kpriet`; demo → `fc_t_demo`; count and reference checks; file moves; rollback script; old databases kept. |
+| **M4** | Super Admin console and provisioning wizard | 2, 6, 8, 17 | Platform login; dashboard with real metrics; 6-step wizard; resumable provisioning; activation invites (hashed, single-use, short expiry); suspend/archive; platform audit and exports. |
+| **M5** | Bulk import and assignments | 9, 10 | Import modes (create/update/skip/reject), department matching or creation, ADMIN role, downloadable errors, background jobs for large files; HOD/Dean/Principal assignment rules with audit. |
+| **M6** | Funding lifecycle | 13 | New statuses and fields (backward-compatible mapping of old statuses), transition rules and audit, faculty/HOD/Dean/Principal funding views. |
+| **M7** | Rankings, analytics and branding | 14, 15, 16 | Ranking configuration with history and methodology display, funded-research category, logo upload and validation, accent colour, timezone, enabled modules; Settings appraisal fields actually saved. |
+| **M8** | Notifications, AI and security audit | 18, 19, 21 | Tenant-branded emails; AI retrieval authorised per user and tenant before the prompt; full cross-tenant attack suite (identifiers, search, exports, documents, AI, SSE, calendar). |
+| **M9** | Tests, CI/Docker, docs, UI | 22, 23, 24, 25 | Remaining tests from the list of 30; CI with two tenants; Docker; production, backup and rollback docs; Super Admin visual identity; acceptance checklist. |
+
+Phase 11 (preserve every module) and Phase 12 (approval workflow) are verified at **every** checkpoint: the 38 existing suites must stay green, run inside a tenant.
+
+### Files to modify (M1)
+
+- `server/src/config/database.ts` — root connection, plus the platform connection helper.
+- `server/src/models/*.ts` (35) — replace `mongoose.model(name, schema)` with `tenantModel(name, schema)`. This is a one-line change per model.
+- `server/src/middleware/requireAuth.ts`, `utils/jwt.ts`, `models/Session.ts` usage — tenant claim and context.
+- `server/src/utils/institution.ts`, `routes/public.routes.ts` — tenant-keyed caches.
+- `server/src/scripts/run-tests.ts`, `seed.ts`, `seed-sample.ts` — seed into a tenant context.
+
+### New files (M1)
+
+- `server/src/tenancy/context.ts` (AsyncLocalStorage, `runInTenant`, `currentTenant`)
+- `server/src/tenancy/tenantModel.ts` (proxy and schema registry)
+- `server/src/tenancy/connectionManager.ts` (root connection, `useDb` cache, health, index sync)
+- `server/src/platform/models/{Institution,PlatformUser,ProvisioningRun,PlatformAuditLog}.ts`
+- `server/src/tenancy/resolveTenant.ts` (slug and token resolution, status checks, short cache)
+- `server/src/scripts/test-phase64-tenancy.ts` (isolation, fail-closed and concurrency tests)
+
+---
+
+## 8. Migration risks
+
+| Risk | Mitigation |
+|---|---|
+| Proxy misses a Mongoose feature used somewhere (static `Model.prototype` checks, `instanceof Model`, discriminators) | The full 38-suite run after M1; grep for `instanceof` and discriminators before the switch; spike already covers create/save/find/populate/hooks/indexes. |
+| Code running outside a request (seeds, scripts, SSE heartbeats, background work) has no context and fails closed | Every script and job wraps work in `runInTenant(...)`; the failure is loud by design. |
+| Index builds per new tenant | `Model.syncIndexes()` per tenant during provisioning (an INDEXES step). |
+| Existing sessions are invalidated (the token gains a tenant claim) | Expected; users sign in once. |
+| Migrating the wrong database | The migration script takes explicit source and target, refuses non-`fc_t_` targets and non-empty targets, writes a manifest with counts, and never deletes the source. |
+| Shared MongoDB server with unrelated projects | Reserved prefixes `fc_platform` and `fc_t_*`; an allow-list check in the connection manager. |
+| No local transactions | Resumable provisioning; production on a replica set. |
+
+## 9. Compatibility requirements
+
+- All 38 existing suites pass unchanged in behaviour, run inside a tenant.
+- Every existing API path keeps working for signed-in users (the tenant comes from the token, so the URLs do not change).
+- Only unauthenticated routes gain a slug variant; the old paths return a clear "choose your institution" error instead of guessing.
+- No module is removed or simplified.
+
+## 10. Test requirements
+
+- **M1**: new `test-phase64-tenancy` covering fail-closed, isolation between tenants A and B, 200 concurrent mixed requests, a suspended tenant being rejected, and a forged token tenant being rejected.
+- **Every milestone**: the full `npm test` run.
+- Plus the remaining items from the prompt's 30-item test list, each in the milestone that introduces the feature.
+
+## 11. Decisions needed from the product owner before M1
+
+1. **KPRIET migration source**: migrate `kpriet-fms-backup-20261026` as the KPRIET tenant (recommended; it is the only copy of the KPRIET data).
+2. **Super Admin bootstrap**: create the first platform account with a one-time CLI command (`npm run platform:create-admin`) that prints a single-use activation link. No default password.
+3. **Local development**: keep the standalone MongoDB (no change to your other projects).
