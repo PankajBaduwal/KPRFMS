@@ -204,3 +204,15 @@ Phase 11 (preserve every module) and Phase 12 (approval workflow) are verified a
 1. **KPRIET migration source**: migrate `kpriet-fms-backup-20261026` as the KPRIET tenant (recommended; it is the only copy of the KPRIET data).
 2. **Super Admin bootstrap**: create the first platform account with a one-time CLI command (`npm run platform:create-admin`) that prints a single-use activation link. No default password.
 3. **Local development**: keep the standalone MongoDB (no change to your other projects).
+
+---
+
+## Progress log
+
+### M1 — Tenant foundation: done (commit `3c10cdf`, 2026-10-28)
+
+- Registry `fc_platform.institutions`; tenant context; tenant-model proxies for all 34 models plus seed bookkeeping; `tid` session claim; `/api/t/:slug` discovery routes; per-tenant caches, notification streams, calendar URLs and email links; `--tenant` for scripts; `tenant:register` and `tenant:copy`; per-tenant backup/restore; two-institution test runner; phase 64 isolation suite; web institution finder.
+- Tests: 39/39 (38 existing, now running inside tenant A, plus phase 64).
+- Data: `kpriet-fms` copied unchanged into `fc_t_demo` (35 collections, 7,627 documents, counts verified) and registered as `demo`. `kpriet-fms` and `kpriet-fms-backup-20261026` are untouched.
+- Rollback: check out `3266dfd`; the old `kpriet-fms` database still holds the demo data.
+- **Still shared between tenants (planned):** uploaded files (`uploads/`, `storage/`) and the AI uploads root (M3 file move, M8 authorised downloads); there is no Super Admin console yet (M4); institutions are created with the CLI only.
