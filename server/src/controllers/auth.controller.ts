@@ -18,6 +18,7 @@ import {
 } from '../validators/auth.validator.js';
 import { twoFactorService } from '../services/two-factor.service.js';
 import { sessionService } from '../services/session.service.js';
+import { requireTenant } from '../tenancy/context.js';
 
 export class AuthController {
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -64,7 +65,8 @@ export class AuthController {
   async getCurrentUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { sessionId: _sessionId, ...user } = req.user!;
-      sendSuccess(res, user, 'Active institutional session retrieved.');
+      // The institution this session is bound to (from the signed token), so the web app can follow it
+      sendSuccess(res, { ...user, institutionCode: requireTenant().code }, 'Active institutional session retrieved.');
     } catch (error) {
       next(error);
     }

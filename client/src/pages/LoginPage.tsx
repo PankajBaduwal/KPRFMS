@@ -10,12 +10,14 @@ import { DEV_SEED_ACCOUNTS, SHOW_DEV_SEED_HELPERS } from '../dev/devSeedAccounts
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { authService, isTwoFactorChallenge } from '../services/auth.service';
 import '../styles/login.css';
-import { PRODUCT_NAME, STORAGE_PREFIX } from '../config/brand';
+import { PRODUCT_NAME } from '../config/brand';
 import { InstitutionName, InstitutionContact, InstitutionDetails } from '../components/InstitutionName';
 import { BrandMark } from '../components/BrandMark';
 import { InstitutionPicker } from '../components/InstitutionPicker';
+import { institutionStorageKey, useInstitutionCode } from '../lib/institution';
 
-const REMEMBERED_ID_KEY = `${STORAGE_PREFIX}remembered_id`;
+// The remembered ID belongs to the institution it was used in
+const rememberedIdKey = () => institutionStorageKey('remembered_id');
 
 const loginSchema = z.object({
   identifier: z
@@ -92,18 +94,17 @@ export const LoginPage: React.FC = () => {
     setTimeout(() => navigate(from, { replace: true }), 450);
   };
 
-  // Restore remembered identifier if present
+  // Restore the identifier remembered for the chosen institution
+  const institution = useInstitutionCode();
   useEffect(() => {
     try {
-      const savedId = localStorage.getItem(REMEMBERED_ID_KEY);
-      if (savedId) {
-        setValue('identifier', savedId);
-        setRememberMe(true);
-      }
+      const savedId = localStorage.getItem(rememberedIdKey());
+      setValue('identifier', savedId || '');
+      setRememberMe(Boolean(savedId));
     } catch {
       // Storage unavailable, ignore
     }
-  }, [setValue]);
+  }, [setValue, institution]);
 
   // Ref-locked sign-in action to prevent duplicate submissions
   const signIn = useAsyncAction(async (data: LoginFormData) => {
@@ -111,13 +112,13 @@ export const LoginPage: React.FC = () => {
     try {
       if (rememberMe) {
         try {
-          localStorage.setItem(REMEMBERED_ID_KEY, data.identifier.trim());
+          localStorage.setItem(rememberedIdKey(), data.identifier.trim());
         } catch {
           // ignore
         }
       } else {
         try {
-          localStorage.removeItem(REMEMBERED_ID_KEY);
+          localStorage.removeItem(rememberedIdKey());
         } catch {
           // ignore
         }

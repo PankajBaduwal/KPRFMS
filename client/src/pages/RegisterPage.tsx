@@ -85,7 +85,10 @@ export const RegisterPage: React.FC = () => {
       .catch((err) => setLoadError(err?.message || 'Unable to load the registration form.'));
   }, [institution]);
 
-  const emailDomain = options?.emailDomain || 'college.edu';
+  // An institution may accept several email domains; the first is the default choice
+  const emailDomains = options?.emailDomains?.length ? options.emailDomains : [options?.emailDomain || 'college.edu'];
+  const [chosenDomain, setChosenDomain] = useState('');
+  const emailDomain = emailDomains.includes(chosenDomain) ? chosenDomain : emailDomains[0];
   const schema = useMemo(() => buildSchema(emailDomain), [emailDomain]);
 
   const {
@@ -233,7 +236,24 @@ export const RegisterPage: React.FC = () => {
             autoCapitalize="none"
             spellCheck={false}
             prefixIcon={<i className="bi bi-envelope" aria-hidden="true" />}
-            suffixAction={<span className="register-email-domain">@{emailDomain}</span>}
+            suffixAction={
+              emailDomains.length > 1 ? (
+                <select
+                  className="register-email-domain"
+                  aria-label="Email domain"
+                  value={emailDomain}
+                  onChange={(e) => setChosenDomain(e.target.value)}
+                >
+                  {emailDomains.map((d) => (
+                    <option key={d} value={d}>
+                      @{d}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className="register-email-domain">@{emailDomain}</span>
+              )
+            }
             hint="You'll sign in with this email"
             error={errors.emailUser?.message}
             {...register('emailUser')}

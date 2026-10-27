@@ -9,7 +9,7 @@ import type {
 } from '../types/search';
 import { SEARCH_ENTITY_TYPES } from '../types/search';
 import { FEATURES, isHiddenPath } from '../constants/features';
-import { STORAGE_PREFIX } from '../config/brand';
+import { institutionStorageKey } from '../lib/institution';
 
 // Canonical Groups mandated by Phase 15
 export type CanonicalGroupId =
@@ -122,8 +122,9 @@ interface IRecentItem {
   timestamp: number;
 }
 
-const STORAGE_RECENT_SEARCHES = `${STORAGE_PREFIX}recent_searches`;
-const STORAGE_RECENT_VISITED = `${STORAGE_PREFIX}recent_visited`;
+// Per institution: recent searches from one institution never appear in another
+const recentSearchesKey = () => institutionStorageKey('recent_searches');
+const recentVisitedKey = () => institutionStorageKey('recent_visited');
 
 // Sample quick suggestion prompts
 const SUGGESTED_PROMPTS = [
@@ -173,11 +174,11 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
   // Load recent history from localStorage
   useEffect(() => {
     try {
-      const savedSearches = localStorage.getItem(STORAGE_RECENT_SEARCHES);
+      const savedSearches = localStorage.getItem(recentSearchesKey());
       if (savedSearches) {
         setRecentSearches(JSON.parse(savedSearches).slice(0, 5));
       }
-      const savedVisited = localStorage.getItem(STORAGE_RECENT_VISITED);
+      const savedVisited = localStorage.getItem(recentVisitedKey());
       if (savedVisited) {
         setRecentVisited(JSON.parse(savedVisited).slice(0, 5));
       }
@@ -193,7 +194,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
     try {
       setRecentSearches((prev) => {
         const updated = [trimmed, ...prev.filter((item) => item.toLowerCase() !== trimmed.toLowerCase())].slice(0, 5);
-        localStorage.setItem(STORAGE_RECENT_SEARCHES, JSON.stringify(updated));
+        localStorage.setItem(recentSearchesKey(), JSON.stringify(updated));
         return updated;
       });
     } catch {
@@ -216,7 +217,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
       };
       setRecentVisited((prev) => {
         const updated = [entry, ...prev.filter((i) => i.id !== item.id && i.url !== item.url)].slice(0, 6);
-        localStorage.setItem(STORAGE_RECENT_VISITED, JSON.stringify(updated));
+        localStorage.setItem(recentVisitedKey(), JSON.stringify(updated));
         return updated;
       });
     } catch {
@@ -225,8 +226,8 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
   }, []);
 
   const clearHistory = useCallback(() => {
-    localStorage.removeItem(STORAGE_RECENT_SEARCHES);
-    localStorage.removeItem(STORAGE_RECENT_VISITED);
+    localStorage.removeItem(recentSearchesKey());
+    localStorage.removeItem(recentVisitedKey());
     setRecentSearches([]);
     setRecentVisited([]);
   }, []);

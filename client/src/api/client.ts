@@ -13,14 +13,25 @@ export const apiClient = axios.create({
   timeout: 15000,
 });
 
+const PRE_SIGN_IN_ROUTES = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/registration-options',
+  '/auth/verify-email',
+  '/auth/resend-verification',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/public/',
+];
+const isPreSignInRoute = (url: string) => PRE_SIGN_IN_ROUTES.some((r) => url === r || url.startsWith(r.endsWith('/') ? r : `${r}/`) || url.startsWith(`${r}?`));
+
 // Request interceptor: route through the chosen institution, read CSRF cookie and set X-CSRF-Token header
 apiClient.interceptors.request.use((config) => {
-  // Sign-in, registration and public pages need the institution in the URL. For signed-in
-  // requests the server takes the institution from the session and rejects a mismatch.
+  // Routes used before signing in (sign-in, registration, password reset, public pages) name the
+  // institution in the URL. Everything else uses the plain /api path: the server takes the
+  // institution from the signed session, so a stale choice in this browser can never interfere.
   const code = getInstitutionCode();
-  // Platform routes (e.g. the institution finder) are never institution-scoped
-  const isPlatformRoute = (config.url ?? '').startsWith('/platform/');
-  if (code && !isPlatformRoute && (config.baseURL ?? API_BASE_URL) === API_BASE_URL) {
+  if (code && isPreSignInRoute(config.url ?? '') && (config.baseURL ?? API_BASE_URL) === API_BASE_URL) {
     config.baseURL = `${API_BASE_URL}/t/${code}`;
   }
   const match = document.cookie.match(/(^| )fms_csrf_token=([^;]+)/);

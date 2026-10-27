@@ -32,16 +32,22 @@ import { notificationService } from './notification.service.js';
 import { sessionService } from './session.service.js';
 import { mailService, clientUrl } from './mail.service.js';
 import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
+import { allowedEmailDomains, emailInDomains } from './institution-domains.js';
 
-const DEFAULT_COLLEGE_DOMAIN = 'college.edu';
-
-/** College email domain, derived from the institution's contact email (e.g. admin@college.edu). */
-export function collegeEmailDomain(contactEmail?: string | null): string {
-  const domain = contactEmail?.split('@')[1]?.trim().toLowerCase();
-  return domain || DEFAULT_COLLEGE_DOMAIN;
-}
 
 const MAX_FAILED_ATTEMPTS = 5;
+/**
+ * One answer for every failed sign-in (unknown account, wrong password, locked account), so an
+ * anonymous caller cannot tell whether an email or employee ID exists in this institution.
+ */
+const SIGN_IN_FAILED = 'Incorrect email/employee ID or password. After 5 failed attempts an account is locked for 15 minutes.';
+const signInFailed = () => AppError.unauthorized(SIGN_IN_FAILED);
+// A real bcrypt hash compared when no account matches, so both paths take about as long
+let dummyHash: Promise<string> | null = null;
+const timingSafeMiss = async (password: string) => {
+  dummyHash ??= hashPassword('facultycore-timing-equaliser');
+  await comparePassword(password, await dummyHash);
+};
 const LOCK_TIME_MS = 15 * 60 * 1000; // 15 minutes
 const RESET_LINK_TTL_MS = 30 * 60 * 1000;
 const WELCOME_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -104,30 +110,28 @@ export class AuthService {
     const user = await User.findOne(query).select('+passwordHash +twoFactor');
 
     if (!user) {
+      await timingSafeMiss(input.password);
       await recordAudit({
         action: AUDIT_ACTIONS.FAILED_LOGIN,
         req,
         details: { identifier: rawIdentifier, reason: 'User not found' },
       });
-      throw AppError.unauthorized('Invalid institutional credentials.');
+      throw signInFailed();
     }
 
-    // Check if account is temporarily locked
+    // Verify password (always, so a locked account answers in the same time and the same way)
+    const isPasswordValid = await comparePassword(input.password, user.passwordHash);
+
+    // A locked account refuses even the right password until the lock expires
     if (user.lockUntil && user.lockUntil.getTime() > Date.now()) {
-      const remainingMinutes = Math.ceil((user.lockUntil.getTime() - Date.now()) / (60 * 1000));
       await recordAudit({
         userId: user._id,
         action: AUDIT_ACTIONS.FAILED_LOGIN,
         req,
         details: { identifier: rawIdentifier, reason: 'Account locked due to excessive failed attempts' },
       });
-      throw AppError.forbidden(
-        `Account is temporarily locked due to multiple failed login attempts. Please try again in ${remainingMinutes} minute(s).`
-      );
+      throw signInFailed();
     }
-
-    // Verify password
-    const isPasswordValid = await comparePassword(input.password, user.passwordHash);
 
     if (!isPasswordValid) {
       user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
@@ -149,14 +153,7 @@ export class AuthService {
         },
       });
 
-      if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
-        throw AppError.forbidden(
-          'Account locked for 15 minutes due to 5 consecutive failed login attempts.'
-        );
-      }
-
-      const remaining = MAX_FAILED_ATTEMPTS - user.failedLoginAttempts;
-      throw AppError.unauthorized(`Invalid credentials. ${remaining} attempt(s) remaining before lock.`);
+      throw signInFailed();
     }
 
     // Check account status
@@ -279,13 +276,15 @@ export class AuthService {
     return { message: 'Signed out successfully.' };
   }
 
-  /** Public info the registration form needs; the email domain comes from the institution's contact email. */
+  /** Public info the registration form needs; email domains come from the institution's registry entry. */
   async getRegistrationOptions() {
-    const settings = await InstitutionSettings.findOne().select('allowSelfRegistration contactEmail').lean();
+    const settings = await InstitutionSettings.findOne().select('allowSelfRegistration').lean();
     const departments = await Department.find({ isActive: true }).select('name code').sort({ name: 1 }).lean();
+    const emailDomains = await allowedEmailDomains();
     return {
       enabled: Boolean(settings?.allowSelfRegistration),
-      emailDomain: collegeEmailDomain(settings?.contactEmail),
+      emailDomain: emailDomains[0],
+      emailDomains,
       departments: departments.map((d) => ({ _id: String(d._id), name: d.name, code: d.code })),
       designations: [...REGISTRATION_DESIGNATIONS],
     };
@@ -297,15 +296,16 @@ export class AuthService {
    * it (the faculty profile is created on approval).
    */
   async register(input: RegisterInput, req: Request) {
-    const settings = await InstitutionSettings.findOne().select('allowSelfRegistration contactEmail').lean();
+    const settings = await InstitutionSettings.findOne().select('allowSelfRegistration').lean();
     if (!settings?.allowSelfRegistration) {
       throw AppError.forbidden('Self-registration is currently disabled. Please contact the administrator.');
     }
 
-    const domain = collegeEmailDomain(settings.contactEmail);
-    if (!input.email.endsWith(`@${domain}`)) {
-      throw new AppError(`Use your college email address ending in @${domain}.`, 422, 'VALIDATION_ERROR', [
-        { field: 'email', message: `Must be a @${domain} address` },
+    const domains = await allowedEmailDomains();
+    if (!emailInDomains(input.email, domains)) {
+      const list = domains.map((d) => `@${d}`).join(' or ');
+      throw new AppError(`Use your college email address ending in ${list}.`, 422, 'VALIDATION_ERROR', [
+        { field: 'email', message: `Must be a ${list} address` },
       ]);
     }
 
@@ -316,17 +316,34 @@ export class AuthService {
       ]);
     }
 
-    const existing = await User.findOne({ $or: [{ email: input.email }, { employeeId: input.employeeId }] }).select('email').lean();
+    // An existing email or employee ID gets the same answer as a new registration, so the form
+    // cannot be used to discover accounts. The mailbox owner is told what happened instead.
+    const pendingAnswer = { email: input.email, employeeId: input.employeeId, status: USER_STATUS.PENDING, emailVerificationRequired: true };
+    const existing = await User.findOne({ $or: [{ email: input.email }, { employeeId: input.employeeId }] }).select('email name').lean();
     if (existing) {
-      const field = existing.email === input.email ? 'email' : 'employeeId';
-      throw new AppError(
-        field === 'email'
-          ? 'An account with this email already exists. Sign in instead, or contact the administrator.'
-          : 'An account with this employee ID already exists. Contact the administrator if this is your ID.',
-        409,
-        'CONFLICT',
-        [{ field, message: 'Already registered' }]
-      );
+      const sameEmail = existing.email === input.email;
+      await recordAudit({
+        action: AUDIT_ACTIONS.FAILED_LOGIN,
+        req,
+        details: { selfRegistration: 'duplicate', field: sameEmail ? 'email' : 'employeeId', email: input.email },
+      });
+      await mailService.send({
+        to: input.email,
+        subject: `About your ${PRODUCT_NAME} registration`,
+        lines: sameEmail
+          ? [
+              `Dear ${existing.name},`,
+              'Someone tried to register a new account with this email address, but you already have one.',
+              'If that was you, sign in instead, or use "Forgot password" to set a new password. If it was not you, no action is needed.',
+            ]
+          : [
+              `Dear ${input.name},`,
+              'We could not complete your registration because the employee ID you entered already belongs to an account.',
+              'Please check the ID, or contact your institution administrator.',
+            ],
+        action: { label: sameEmail ? 'Sign in' : 'Open FacultyCore', url: clientUrl('/login') },
+      });
+      return pendingAnswer;
     }
 
     const user = await User.create({
@@ -386,7 +403,7 @@ export class AuthService {
       new AppError('That code is incorrect or has expired. Request a new code and try again.', 400, 'INVALID_CODE');
     const user = await User.findOne({ email: input.email, status: USER_STATUS.PENDING }).select('+emailVerification');
     if (!user) throw invalid();
-    if (user.emailVerifiedAt) return { email: user.email, emailVerified: true };
+    if (user.emailVerifiedAt) throw invalid();
 
     const pending = user.emailVerification;
     if (

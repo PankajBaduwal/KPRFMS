@@ -3,13 +3,13 @@ import { Readable } from 'stream';
 import ExcelJS from 'exceljs';
 import { User } from '../models/User.js';
 import { Department } from '../models/Department.js';
-import { InstitutionSettings } from '../models/InstitutionSettings.js';
 import { ROLES } from '../permissions/roles.js';
 import { AppError } from '../utils/AppError.js';
 import { adminService } from './admin.service.js';
-import { collegeEmailDomain, sendWelcomeEmail } from './auth.service.js';
+import { sendWelcomeEmail } from './auth.service.js';
 import { REGISTRATION_DESIGNATIONS } from '../validators/auth.validator.js';
 import { PRODUCT_NAME } from '../config/brand.js';
+import { allowedEmailDomains, emailInDomains } from './institution-domains.js';
 
 const MAX_ROWS = 1000;
 const IMPORTABLE_ROLES = [ROLES.FACULTY, ROLES.HOD, ROLES.DEAN, ROLES.PRINCIPAL] as const;
@@ -142,8 +142,8 @@ export const facultyImportService = {
     if (raw.length === 0) throw AppError.badRequest('No faculty rows found below the header row.');
     if (raw.length > MAX_ROWS) throw AppError.badRequest(`Too many rows (${raw.length}). Split the file into batches of ${MAX_ROWS}.`);
 
-    const settings = await InstitutionSettings.findOne().select('contactEmail').lean();
-    const domain = collegeEmailDomain(settings?.contactEmail);
+    const domains = await allowedEmailDomains();
+    const domainList = domains.map((d) => `@${d}`).join(' or ');
     const departments = await Department.find({ isActive: true }).select('code name').lean();
     const deptByCode = new Map(departments.map((d) => [d.code.toUpperCase(), d]));
     const existing = await User.find({
@@ -166,7 +166,7 @@ export const facultyImportService = {
 
       if (!r.email) r.errors.push('College email is missing');
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email)) r.errors.push('Email is not valid');
-      else if (!r.email.endsWith(`@${domain}`)) r.errors.push(`Email must end in @${domain}`);
+      else if (!emailInDomains(r.email, domains)) r.errors.push(`Email must end in ${domainList}`);
       else if (takenEmails.has(r.email)) r.errors.push('Email already has an account');
       else if (seenEmails.has(r.email)) r.errors.push(`Same email as row ${seenEmails.get(r.email)}`);
 

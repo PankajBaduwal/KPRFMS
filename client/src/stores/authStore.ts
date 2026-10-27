@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import type { User } from '../types';
 import { authService, isTwoFactorChallenge, type LoginCredentials, type TwoFactorChallenge } from '../services/auth.service';
+import { setInstitutionCode } from '../lib/institution';
+import { queryClient } from '../app/queryClient';
 
 interface AuthState {
   user: User | null;
@@ -21,6 +23,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   initAuth: async () => {
     try {
       const user = await authService.getMe();
+      // The session decides the institution; keep this browser's choice in step with it
+      if (user.institutionCode) setInstitutionCode(user.institutionCode);
       set({ user, isAuthenticated: true, isLoading: false });
     } catch {
       set({ user: null, isAuthenticated: false, isLoading: false });
@@ -31,6 +35,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true });
     try {
       const result = await authService.login(credentials);
+      if (!isTwoFactorChallenge(result)) queryClient.clear();
       if (isTwoFactorChallenge(result)) {
         set({ isLoading: false });
       } else {
@@ -45,6 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   loginTwoFactor: async (challengeToken: string, code: string) => {
     const user = await authService.loginTwoFactor(challengeToken, code);
+    queryClient.clear();
     set({ user, isAuthenticated: true, isLoading: false });
     return user;
   },
@@ -54,6 +60,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await authService.logout();
     } finally {
+      // Nothing from this session may be shown to the next person or institution
+      queryClient.clear();
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },

@@ -5,9 +5,9 @@ import { Input } from './Input';
 import { Alert } from './Alert';
 import { Badge } from './Badge';
 import { publicationService, type OrcidWork } from '../services/publication.service';
-import { STORAGE_PREFIX } from '../config/brand';
+import { institutionStorageKey } from '../lib/institution';
 
-const ORCID_KEY = `${STORAGE_PREFIX}orcid`;
+const orcidKey = () => institutionStorageKey('orcid');
 
 interface OrcidImportModalProps {
   isOpen: boolean;
@@ -20,7 +20,7 @@ interface OrcidImportModalProps {
 export const OrcidImportModal: React.FC<OrcidImportModalProps> = ({ isOpen, onClose, onPick }) => {
   const [orcid, setOrcid] = useState(() => {
     try {
-      return localStorage.getItem(ORCID_KEY) || '';
+      return localStorage.getItem(orcidKey()) || '';
     } catch {
       return '';
     }
@@ -36,7 +36,7 @@ export const OrcidImportModal: React.FC<OrcidImportModalProps> = ({ isOpen, onCl
       const result = await publicationService.lookupOrcid(orcid);
       setWorks(result.works);
       try {
-        localStorage.setItem(ORCID_KEY, result.orcid);
+        localStorage.setItem(orcidKey(), result.orcid);
       } catch {
         // ignore
       }

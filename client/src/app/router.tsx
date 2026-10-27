@@ -10,6 +10,7 @@ import { FEATURES } from '../constants/features';
 // Lazy-loaded route components for maximum code-splitting performance
 const HomePage = React.lazy(() => import('../pages/HomePage').then((m) => ({ default: m.HomePage })));
 const LoginPage = React.lazy(() => import('../pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const InstitutionLinkPage = React.lazy(() => import('../pages/InstitutionLinkPage').then((m) => ({ default: m.InstitutionLinkPage })));
 const ResetPasswordPage = React.lazy(() => import('../pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })));
 const AiAssistantPage = React.lazy(() => import('../pages/AiAssistantPage').then((m) => ({ default: m.AiAssistantPage })));
 const AccountSecurityPage = React.lazy(() => import('../pages/AccountSecurityPage').then((m) => ({ default: m.AccountSecurityPage })));
@@ -83,6 +84,12 @@ export const router = createBrowserRouter([
         element: lazyRoute(NotFoundPage),
       },
     ],
+  },
+  {
+    // Shareable per-institution sign-in link, e.g. /i/demo
+    path: '/i/:code',
+    element: <AuthLayout />,
+    children: [{ index: true, element: lazyRoute(InstitutionLinkPage) }],
   },
   {
     path: ROUTES.LOGIN,

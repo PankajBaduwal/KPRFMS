@@ -4,6 +4,8 @@ export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
 
 export interface User {
   id: string;
+  /** Institution the session belongs to (from /auth/me). */
+  institutionCode?: string;
   employeeId: string;
   name: string;
   email: string;

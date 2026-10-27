@@ -5,9 +5,9 @@ import { Publication } from '../models/Publication.js';
 import { AcademicActivity } from '../models/AcademicActivity.js';
 import { InstitutionSettings } from '../models/InstitutionSettings.js';
 import { sendSuccess } from '../utils/apiResponse.js';
-import { collegeEmailDomain } from '../services/auth.service.js';
 import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
 import { requireTenant } from '../tenancy/context.js';
+import { allowedEmailDomains } from '../services/institution-domains.js';
 
 const router = Router();
 
@@ -62,7 +62,7 @@ router.get('/institution', async (_req, res, next) => {
         state: s?.state || '',
         contactEmail: s?.contactEmail || '',
         contactPhone: s?.contactPhone || '',
-        emailDomain: collegeEmailDomain(s?.contactEmail),
+        emailDomain: (await allowedEmailDomains())[0],
       },
       'Institution branding.'
     );

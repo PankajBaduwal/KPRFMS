@@ -216,3 +216,13 @@ Phase 11 (preserve every module) and Phase 12 (approval workflow) are verified a
 - Data: `kpriet-fms` copied unchanged into `fc_t_demo` (35 collections, 7,627 documents, counts verified) and registered as `demo`. `kpriet-fms` and `kpriet-fms-backup-20261026` are untouched.
 - Rollback: check out `3266dfd`; the old `kpriet-fms` database still holds the demo data.
 - **Still shared between tenants (planned):** uploaded files (`uploads/`, `storage/`) and the AI uploads root (M3 file move, M8 authorised downloads); there is no Super Admin console yet (M4); institutions are created with the CLI only.
+
+### M2 — Institution-aware sign-in and public routes: done (2026-10-28)
+
+- No account enumeration: one 401 message for unknown account, wrong password and locked account; unknown accounts also run a bcrypt comparison so timing matches; a locked account refuses even the right password with the same message.
+- Registration: an existing email or employee ID gets the same 201 answer as a new registration; the mailbox owner is emailed instead; no account is created. `verify-email` no longer confirms that an address is already verified. Roles cannot be self-assigned (always pending FACULTY).
+- Email domains come from the registry's `officialEmailDomains` (several allowed) for registration, bulk import and public branding; fallback is the settings contact email's domain.
+- `/auth/me` returns `institutionCode`; the web app follows the session's institution.
+- Web app: only pre-sign-in calls use `/api/t/<code>`; signed-in calls use `/api` (institution from the token), so a stale browser choice cannot interfere. Query cache cleared on sign-in, two-step sign-in and sign-out. Remembered ID, recent searches and ORCID are stored per institution. Shareable sign-in links `/i/<code>`. Registration form offers every registered domain.
+- Tests: new phase 65 (enumeration, timing, per-institution lockout, tenant-bound 2FA, duplicate registration, role escalation, registry domains, email links).
+- Not in M2 (later milestones): Super Admin sign-in (M4); subdomain/custom-domain resolution (optional, later).

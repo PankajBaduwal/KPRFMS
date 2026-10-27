@@ -1048,3 +1048,11 @@
 .inst-picker-name { font-size: 0.88rem; font-weight: 600; color: #13294B; }
 .inst-picker-meta { font-size: 0.75rem; color: var(--color-text-secondary, #64748b); }
 .inst-picker-empty { padding: 10px; font-size: 0.8rem; color: var(--color-text-secondary, #64748b); }
+select.register-email-domain {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  padding-right: 4px;
+}

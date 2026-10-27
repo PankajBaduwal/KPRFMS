@@ -38,6 +38,11 @@ export function setInstitutionCode(code: string): void {
   listeners.forEach((l) => l());
 }
 
+/** Browser-storage key scoped to the current institution (remembered ID, recent searches...). */
+export function institutionStorageKey(name: string): string {
+  return `${STORAGE_PREFIX}${current || 'none'}_${name}`;
+}
+
 export function useInstitutionCode(): string {
   return useSyncExternalStore(
     (cb) => {

@@ -9,6 +9,8 @@ export interface LoginCredentials {
 export interface RegistrationOptions {
   enabled: boolean;
   emailDomain: string;
+  /** Every accepted domain (first is the main one) */
+  emailDomains?: string[];
   departments: { _id: string; name: string; code: string }[];
   designations: string[];
 }
