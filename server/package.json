@@ -17,7 +17,9 @@
     "restore": "tsx src/scripts/restore.ts",
     "seed:reset": "tsx src/scripts/seed.ts --reset-legacy",
     "tenant:register": "tsx src/scripts/tenant-register.ts",
-    "tenant:copy": "tsx src/scripts/tenant-copy-db.ts"
+    "tenant:copy": "tsx src/scripts/tenant-copy-db.ts",
+    "tenant:files": "tsx src/scripts/tenant-files-copy.ts",
+    "tenant:migrate": "tsx src/scripts/tenant-migrate.ts"
   },
   "keywords": [],
   "license": "ISC",

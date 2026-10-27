@@ -57,6 +57,7 @@ import { ApprovalHistory } from '../models/ApprovalHistory.js';
 import { WorkloadConfig } from '../models/WorkloadConfig.js';
 import { hashPassword } from '../utils/password.js';
 import { logger } from '../utils/logger.js';
+import { tenantSecureRoot } from '../tenancy/files.js';
 
 const BATCH_ID = 'sample-data';
 const CURRENT_AY = '2026-2027';
@@ -137,7 +138,7 @@ async function purgePreviousBatch() {
     removed += res.deletedCount ?? 0;
   }
   await DevSeedRecord.deleteMany({ batchId: BATCH_ID });
-  const storageRoot = path.resolve(process.cwd(), 'storage', 'secure_documents');
+  const storageRoot = tenantSecureRoot();
   if (fs.existsSync(storageRoot)) {
     for (const dir of fs.readdirSync(storageRoot)) {
       if (dir.startsWith(SAMPLE_DOC_FOLDER_PREFIX)) fs.rmSync(path.join(storageRoot, dir), { recursive: true, force: true });
@@ -1052,7 +1053,7 @@ async function main() {
   // =========================================================================
   // 8. DOCUMENT VAULT (real PDF files so downloads work)
   // =========================================================================
-  const storageRoot = path.resolve(process.cwd(), 'storage', 'secure_documents');
+  const storageRoot = tenantSecureRoot();
   const makePdf = (title: string, owner: string) => {
     const text = `${title} - ${owner} - DIT sample document`.replace(/[()\\]/g, '');
     const stream = `BT /F1 14 Tf 60 760 Td (${text}) Tj ET`;

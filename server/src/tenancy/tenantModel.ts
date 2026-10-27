@@ -75,6 +75,11 @@ export function tenantModel<T, M extends Model<any> = Model<T>>(name: string, sc
   });
 }
 
+/** All tenant schemas by model name (migration tools check references with them). */
+export function tenantSchemaEntries(): Array<[string, Schema]> {
+  return [...tenantSchemas.entries()];
+}
+
 /** Names of all tenant models (used to build indexes when a tenant is provisioned). */
 export function tenantModelNames(): string[] {
   return [...tenantSchemas.keys()];

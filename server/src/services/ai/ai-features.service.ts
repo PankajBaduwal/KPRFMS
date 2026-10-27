@@ -21,6 +21,7 @@ import { Department } from '../../models/Department.js';
 import { gemini, GeminiSchema, isAiEnabled } from './gemini.client.js';
 import { buildInstitutionSnapshot } from './institution-data.js';
 import { getInstitutionProfile } from '../../utils/institution.js';
+import { resolveUploadUrl } from '../../tenancy/files.js';
 
 const LEADERSHIP: string[] = [ROLES.DEAN, ROLES.PRINCIPAL, ROLES.ADMIN];
 const MAX_PROOF_BYTES = 15 * 1024 * 1024;
@@ -51,10 +52,9 @@ function assertReviewerScope(user: AuthenticatedUser, departmentId?: unknown) {
 
 /** Reads a stored "/uploads/..." file (certificate / paper PDF) for the AI, safely. */
 async function readStoredFile(url?: string): Promise<{ mimeType: string; data: string } | null> {
-  if (!url || !url.startsWith('/uploads/')) return null;
-  const root = path.resolve(process.cwd(), 'uploads');
-  const filePath = path.resolve(root, decodeURIComponent(url.slice('/uploads/'.length)));
-  if (!filePath.startsWith(root + path.sep)) return null;
+  // Only files inside the current institution's folder can ever be read
+  const filePath = resolveUploadUrl(url);
+  if (!filePath) return null;
   const ext = path.extname(filePath).toLowerCase();
   const mimeType = { '.pdf': 'application/pdf', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' }[ext];
   if (!mimeType) return null;

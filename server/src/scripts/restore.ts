@@ -16,6 +16,7 @@ import { connectDatabase, disconnectDatabase } from '../config/database.js';
 import { logger } from '../utils/logger.js';
 import { requireTenant } from '../tenancy/context.js';
 import { tenantConnection } from '../tenancy/tenantModel.js';
+import { institutionFilesRoot } from '../tenancy/files.js';
 
 const { EJSON } = mongoose.mongo.BSON;
 
@@ -67,12 +68,12 @@ async function main() {
   }
   await disconnectDatabase();
 
-  for (const dir of flags.includes('--db-only') ? [] : manifest.fileDirs || []) {
-    const src = path.join(folder, 'files', dir);
-    if (!fs.existsSync(src)) continue;
-    const dest = path.join(process.cwd(), dir);
+  // Replaces only this institution's files; other institutions' folders are never touched
+  const filesSrc = path.join(folder, 'files', 'institution');
+  if (!flags.includes('--db-only') && fs.existsSync(filesSrc)) {
+    const dest = institutionFilesRoot(code);
     fs.rmSync(dest, { recursive: true, force: true });
-    fs.cpSync(src, dest, { recursive: true });
+    fs.cpSync(filesSrc, dest, { recursive: true });
   }
   logger.info('Restore complete. Restart the API server.');
 }

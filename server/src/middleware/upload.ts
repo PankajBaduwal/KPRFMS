@@ -4,12 +4,10 @@ import fs from 'fs';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { AppError } from '../utils/AppError.js';
 import { validateUploadedFile } from '../utils/fileSecurity.js';
+import { ensureDir, tenantUploadsRoot } from '../tenancy/files.js';
 
-export const UPLOAD_DIR = path.resolve(process.cwd(), 'uploads', 'documents');
-
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
+/** The current institution's upload folder (served back at /uploads/documents/<name>). */
+const uploadDir = () => ensureDir(path.join(tenantUploadsRoot(), 'documents'));
 
 const LEGACY_ALLOWED_MIMES = ['application/pdf', 'image/jpeg', 'image/png'];
 const LEGACY_MAX_BYTES = 10 * 1024 * 1024; // 10MB
@@ -35,13 +33,14 @@ function persistValidatedUpload(req: Request, _res: Response, next: NextFunction
     }
 
     const validated = validateUploadedFile(file.buffer, file.originalname, mime, LEGACY_MAX_BYTES);
-    fs.writeFileSync(path.join(UPLOAD_DIR, validated.safeStoredFilename), file.buffer, { flag: 'wx' });
+    const dir = uploadDir();
+    fs.writeFileSync(path.join(dir, validated.safeStoredFilename), file.buffer, { flag: 'wx' });
 
     // Controllers read these fields to build the public /uploads URL
     file.filename = validated.safeStoredFilename;
     file.originalname = validated.originalFilename;
-    file.destination = UPLOAD_DIR;
-    file.path = path.join(UPLOAD_DIR, validated.safeStoredFilename);
+    file.destination = dir;
+    file.path = path.join(dir, validated.safeStoredFilename);
     file.size = validated.sizeBytes;
     next();
   } catch (err) {

@@ -17,11 +17,11 @@ import { connectDatabase, disconnectDatabase } from '../config/database.js';
 import { logger } from '../utils/logger.js';
 import { requireTenant } from '../tenancy/context.js';
 import { tenantConnection } from '../tenancy/tenantModel.js';
+import { institutionFilesRoot } from '../tenancy/files.js';
 
 const { EJSON } = mongoose.mongo.BSON;
 const BACKUP_ROOT = path.resolve(process.env.BACKUP_DIR || path.join(process.cwd(), 'backups'));
 const KEEP = Math.max(1, Number(process.env.BACKUP_KEEP || 14));
-const FILE_DIRS = ['uploads', 'storage'];
 
 async function main() {
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -53,14 +53,13 @@ async function main() {
   }
   await disconnectDatabase();
 
-  for (const dir of FILE_DIRS) {
-    const src = path.join(process.cwd(), dir);
-    if (fs.existsSync(src)) fs.cpSync(src, path.join(target, 'files', dir), { recursive: true });
-  }
+  // This institution's files only (storage/tenants/<code>)
+  const filesSrc = institutionFilesRoot(code);
+  if (fs.existsSync(filesSrc)) fs.cpSync(filesSrc, path.join(target, 'files', 'institution'), { recursive: true });
 
   fs.writeFileSync(
     path.join(target, 'manifest.json'),
-    JSON.stringify({ createdAt: new Date().toISOString(), database: db.databaseName, collections: summary, fileDirs: FILE_DIRS }, null, 2)
+    JSON.stringify({ createdAt: new Date().toISOString(), database: db.databaseName, collections: summary, institution: code, files: 'institution' }, null, 2)
   );
 
   // Retention: keep the newest KEEP backups

@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import path from 'path';
 import './models/index.js';
 import { corsOptions } from './config/cors.js';
 import { env } from './config/env.js';
@@ -17,6 +16,8 @@ import routes from './routes/index.js';
 import { registerNotificationDispatch } from './services/notification-dispatch.js';
 import platformPublicRoutes from './platform/routes/public.routes.js';
 import { resolveSlugTenant } from './tenancy/resolveSlugTenant.js';
+import { requireTenant } from './tenancy/context.js';
+import { tenantUploadsRoot } from './tenancy/files.js';
 
 const app = express();
 
@@ -79,22 +80,29 @@ app.use(csrfProtection);
 
 // 9. Legacy uploaded files (faculty certificates, evidence) — authenticated users only.
 // Secure private documents are handled in /api/documents
-app.use(
-  '/uploads',
-  requireAuth,
-  express.static(path.resolve(process.cwd(), 'uploads'), {
-    dotfiles: 'deny',
-    index: false,
-    setHeaders: (res, filePath) => {
-      // Defense in depth: even if a non-document slipped in, it can never run as a page
-      res.setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox");
-      res.setHeader('X-Content-Type-Options', 'nosniff');
-      if (!/\.(pdf|png|jpe?g)$/i.test(filePath)) {
-        res.setHeader('Content-Disposition', 'attachment');
-      }
-    },
-  })
-);
+// Each institution's files are served only from its own folder (institution from the session)
+const uploadServers = new Map<string, express.RequestHandler>();
+const uploadsStaticOptions: Parameters<typeof express.static>[1] = {
+  dotfiles: 'deny',
+  index: false,
+  setHeaders: (res, filePath) => {
+    // Defense in depth: even if a non-document slipped in, it can never run as a page
+    res.setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox");
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    if (!/\.(pdf|png|jpe?g)$/i.test(filePath)) {
+      res.setHeader('Content-Disposition', 'attachment');
+    }
+  },
+};
+app.use('/uploads', requireAuth, (req, res, next) => {
+  const { code } = requireTenant();
+  let serve = uploadServers.get(code);
+  if (!serve) {
+    serve = express.static(tenantUploadsRoot(code), uploadsStaticOptions);
+    uploadServers.set(code, serve);
+  }
+  serve(req, res, next);
+});
 
 // 10. API Routes
 // Platform routes (institution finder) run outside any institution

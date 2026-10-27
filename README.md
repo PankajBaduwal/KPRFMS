@@ -97,10 +97,26 @@ In the web app, choose the institution on the sign-in page (the choice is rememb
 To move an existing single-institution database into its own institution database, copy it first
 (the source is never changed), then register it:
 
+For a real institution use the verified migration instead. It archives the source to disk,
+proves the archive restores, copies, checks every collection (count and SHA-256 of every
+document) and every schema reference, then registers the institution. The source is never changed:
+
+```bash
+npm run tenant:migrate -- --from <old-database> --code kpriet --name "KPR Institute of Engineering and Technology" --domain kpriet.ac.in
+npm run tenant:files -- --tenant kpriet      # copies the files its records point to, verified by SHA-256
+```
+
+Quick copy for development data only (no archive or proof):
+
 ```bash
 npm run tenant:copy -- --from kpriet-fms --to demo
 npm run tenant:register -- --code demo --name "Demo Institute of Technology" --adopt-existing-data
 ```
+
+Files: each institution's uploads and document vault live in
+`server/storage/tenants/<code>/uploads` and `server/storage/tenants/<code>/secure_documents`,
+and are only served to signed-in users of that institution. The old shared `server/uploads/`
+and `server/storage/secure_documents/` folders are only read by `tenant:files`.
 
 ### 4. Run
 

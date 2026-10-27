@@ -4,18 +4,18 @@ import crypto from 'crypto';
 import { Readable } from 'stream';
 import { IStorageProvider, StorageSaveResult } from './IStorageProvider.js';
 import { AppError } from '../utils/AppError.js';
+import { ensureDir, tenantSecureRoot } from '../tenancy/files.js';
 
 export class LocalStorageProvider implements IStorageProvider {
-  private readonly rootDir: string;
+  private readonly customRoot?: string;
 
+  /** Without a custom path, files live in the current institution's vault folder. */
   constructor(customPath?: string) {
-    this.rootDir = customPath
-      ? path.resolve(customPath)
-      : path.resolve(process.cwd(), 'storage', 'secure_documents');
+    this.customRoot = customPath ? path.resolve(customPath) : undefined;
+  }
 
-    if (!fs.existsSync(this.rootDir)) {
-      fs.mkdirSync(this.rootDir, { recursive: true });
-    }
+  private get rootDir(): string {
+    return ensureDir(this.customRoot ?? tenantSecureRoot());
   }
 
   /**

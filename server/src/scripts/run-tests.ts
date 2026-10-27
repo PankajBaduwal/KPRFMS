@@ -21,6 +21,7 @@ const TEST_API_URL = `http://localhost:${TEST_API_PORT}/api`;
 const SUITE_TIMEOUT_MS = 180_000;
 // Every multi-institution test database starts with this; only these are ever dropped
 const TEST_DB_PREFIX = 'fctest_';
+const TEST_FILE_ROOT = path.resolve(process.cwd(), 'test-files');
 
 // Suites report results in a few different formats; any of these means a failure
 const FAILURE_PATTERNS = [
@@ -52,6 +53,9 @@ const testEnv: NodeJS.ProcessEnv = {
   TENANT_DB_PREFIX: `${TEST_DB_PREFIX}t_`,
   FC_TENANT: 'testa',
   TENANT_STATUS_CACHE_MS: '0',
+  // Files written by tests and seeds go to a throwaway folder, never the real institution folders
+  FILE_STORAGE_ROOT: TEST_FILE_ROOT,
+  BACKUP_DIR: path.join(TEST_FILE_ROOT, 'backups'),
 };
 
 interface SuiteResult {
@@ -108,6 +112,7 @@ async function prepareDatabase() {
     if (name.startsWith(TEST_DB_PREFIX)) await client.db(name).dropDatabase();
   }
   await mongoose.disconnect();
+  fs.rmSync(TEST_FILE_ROOT, { recursive: true, force: true });
 
   const step = async (script: string, args: string[] = [], env: NodeJS.ProcessEnv = {}) => {
     const { code, output } = await runTsx(script, 300_000, args, env);
