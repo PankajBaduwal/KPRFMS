@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 /** One signed-in browser/device. The session cookie's JWT carries `sid`; revoking the row signs that device out. */
 export interface ISession extends Document {
@@ -30,4 +31,4 @@ const sessionSchema = new Schema<ISession>(
 // MongoDB removes rows once they expire
 sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-export const Session = mongoose.model<ISession>('Session', sessionSchema);
+export const Session = tenantModel<ISession>('Session', sessionSchema);

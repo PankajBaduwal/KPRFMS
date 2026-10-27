@@ -1,7 +1,8 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 import './Department.js';
 import './User.js';
 import './Faculty.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const ACTIVITY_TYPES = {
   CONFERENCE: 'CONFERENCE',
@@ -204,7 +205,7 @@ academicActivitySchema.index({
   facultyName: 'text',
 });
 
-export const AcademicActivity = mongoose.model<IAcademicActivityDoc>(
+export const AcademicActivity = tenantModel<IAcademicActivityDoc>(
   'AcademicActivity',
   academicActivitySchema
 );

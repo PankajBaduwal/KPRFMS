@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 // =============================================
 // ATTENDANCE STATUSES
@@ -193,7 +194,7 @@ facultyAttendanceSchema.pre('save', function () {
   }
 });
 
-export const FacultyAttendance = mongoose.model<IFacultyAttendance>(
+export const FacultyAttendance = tenantModel<IFacultyAttendance>(
   'FacultyAttendance',
   facultyAttendanceSchema
 );

@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 // =============================================
 // PHASE 28 — INTERNAL NOTIFICATION EVENTS
@@ -115,4 +116,4 @@ notificationSchema.post('save', function (doc) {
   }
 });
 
-export const Notification = mongoose.model<INotification>('Notification', notificationSchema);
+export const Notification = tenantModel<INotification>('Notification', notificationSchema);

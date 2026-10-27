@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const SEMESTER_TYPES = {
   ODD: 'ODD',
@@ -78,4 +79,4 @@ const semesterSchema = new Schema<ISemester>(
 
 semesterSchema.index({ academicYear: 1, semesterNumber: 1 }, { unique: true });
 
-export const Semester = mongoose.model<ISemester>('Semester', semesterSchema);
+export const Semester = tenantModel<ISemester>('Semester', semesterSchema);

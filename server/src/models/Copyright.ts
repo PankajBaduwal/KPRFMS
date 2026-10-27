@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const COPYRIGHT_VERIFICATION = {
   DRAFT: 'DRAFT',
@@ -132,4 +133,4 @@ copyrightSchema.index(
   }
 );
 
-export const Copyright = mongoose.model<ICopyrightDocument>('Copyright', copyrightSchema);
+export const Copyright = tenantModel<ICopyrightDocument>('Copyright', copyrightSchema);

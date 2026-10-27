@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export interface IDepartment extends Document {
   name: string;
@@ -43,4 +44,4 @@ const departmentSchema = new Schema<IDepartment>(
   }
 );
 
-export const Department = mongoose.model<IDepartment>('Department', departmentSchema);
+export const Department = tenantModel<IDepartment>('Department', departmentSchema);

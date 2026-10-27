@@ -3,6 +3,7 @@ import { CookieOptions, Response } from 'express';
 import { env } from '../config/env.js';
 import { Role } from '../permissions/roles.js';
 import { Session } from '../models/Session.js';
+import { requireTenant } from '../tenancy/context.js';
 
 export const AUTH_COOKIE_NAME = 'fms_token';
 
@@ -13,6 +14,8 @@ export interface JwtPayload {
   departmentId?: string;
   /** Session id (see models/Session.ts); present on every browser session cookie */
   sid?: string;
+  /** Institution code the session belongs to (see tenancy/). Filled from the trusted context. */
+  tid?: string;
 }
 
 const UNIT_MS: Record<string, number> = { s: 1000, m: 60_000, h: 3_600_000, d: 86_400_000 };
@@ -26,6 +29,10 @@ export function getSessionLifetimeMs(): number {
 }
 
 export function generateToken(payload: JwtPayload): string {
+  // A session is always bound to the institution it was issued in
+  const tid = requireTenant().code;
+  if (payload.tid && payload.tid !== tid) throw new Error('Token tenant does not match the current institution');
+  payload = { ...payload, tid };
   const options: SignOptions = {
     expiresIn: Math.floor(getSessionLifetimeMs() / 1000),
   };
@@ -55,8 +62,8 @@ export function refreshSessionIfStale(res: Response, payload: JwtPayload & { iat
   if (!payload.iat) return;
   const ageMs = Date.now() - payload.iat * 1000;
   if (ageMs < getSessionLifetimeMs() / 2) return;
-  const { id, email, role, departmentId, sid } = payload;
-  res.cookie(AUTH_COOKIE_NAME, generateToken({ id, email, role, departmentId, sid }), getAuthCookieOptions());
+  const { id, email, role, departmentId, sid, tid } = payload;
+  res.cookie(AUTH_COOKIE_NAME, generateToken({ id, email, role, departmentId, sid, tid }), getAuthCookieOptions());
   if (sid) {
     void Session.updateOne({ sid }, { $set: { expiresAt: new Date(Date.now() + getSessionLifetimeMs()) } }).catch(() => null);
   }
@@ -66,11 +73,14 @@ const CHALLENGE_PURPOSE = 'two-factor-login';
 
 /** Short-lived token proving the password step of a two-factor login succeeded. */
 export function generateTwoFactorChallenge(userId: string): string {
-  return jwt.sign({ id: userId, purpose: CHALLENGE_PURPOSE }, `${env.JWT_SECRET}:2fa`, { expiresIn: 300 });
+  const tid = requireTenant().code;
+  return jwt.sign({ id: userId, tid, purpose: CHALLENGE_PURPOSE }, `${env.JWT_SECRET}:2fa`, { expiresIn: 300 });
 }
 
 export function verifyTwoFactorChallenge(token: string): string {
-  const payload = jwt.verify(token, `${env.JWT_SECRET}:2fa`) as { id?: string; purpose?: string };
+  const payload = jwt.verify(token, `${env.JWT_SECRET}:2fa`) as { id?: string; tid?: string; purpose?: string };
   if (payload.purpose !== CHALLENGE_PURPOSE || !payload.id) throw new Error('Invalid challenge');
+  // The code step must happen in the same institution as the password step
+  if (payload.tid !== requireTenant().code) throw new Error('Invalid challenge');
   return payload.id;
 }

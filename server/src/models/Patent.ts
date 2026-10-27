@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const PATENT_STATUS = {
   FILED: 'FILED',
@@ -166,4 +167,4 @@ patentSchema.index(
   }
 );
 
-export const Patent = mongoose.model<IPatentDocument>('Patent', patentSchema);
+export const Patent = tenantModel<IPatentDocument>('Patent', patentSchema);

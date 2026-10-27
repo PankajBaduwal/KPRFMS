@@ -1,5 +1,6 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 import { AppraisalCategoryKey } from './AppraisalCycle.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const APPRAISAL_STATUSES = {
   DRAFT: 'DRAFT',
@@ -314,7 +315,7 @@ export function calculateGrade(score: number): string {
   return 'Satisfactory / Needs Improvement (C)';
 }
 
-export const FacultyAppraisal = mongoose.model<IFacultyAppraisal>(
+export const FacultyAppraisal = tenantModel<IFacultyAppraisal>(
   'FacultyAppraisal',
   facultyAppraisalSchema
 );

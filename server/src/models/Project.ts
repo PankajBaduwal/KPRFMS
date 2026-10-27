@@ -1,7 +1,8 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 import './Department.js';
 import './User.js';
 import './Faculty.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const PROJECT_STATUS = {
   IDEA: 'IDEA',
@@ -259,4 +260,4 @@ projectSchema.index({
   piName: 'text',
 });
 
-export const Project = mongoose.model<IProjectDoc>('Project', projectSchema);
+export const Project = tenantModel<IProjectDoc>('Project', projectSchema);

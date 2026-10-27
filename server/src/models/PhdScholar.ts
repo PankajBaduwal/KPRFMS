@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 /**
  * Ordered PhD lifecycle stages. Order matters: it drives the progress
@@ -170,4 +171,4 @@ const phdScholarSchema = new Schema<IPhdScholarDoc>(
 phdScholarSchema.index({ departmentId: 1, stage: 1 });
 phdScholarSchema.index({ supervisorFacultyId: 1, stage: 1 });
 
-export const PhdScholar = mongoose.model<IPhdScholarDoc>('PhdScholar', phdScholarSchema);
+export const PhdScholar = tenantModel<IPhdScholarDoc>('PhdScholar', phdScholarSchema);

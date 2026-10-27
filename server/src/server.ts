@@ -3,8 +3,11 @@ import { env } from './config/env.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 import { logger } from './utils/logger.js';
 import { PRODUCT_NAME } from './config/brand.js';
+import { enableServerMode } from './tenancy/context.js';
 
 async function startServer(): Promise<void> {
+  // Only per-request institution context from here on (no process-wide tenant)
+  enableServerMode();
   // Connect to MongoDB before starting the server
   await connectDatabase();
 

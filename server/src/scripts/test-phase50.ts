@@ -1,3 +1,4 @@
+import './tenant-cli.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();

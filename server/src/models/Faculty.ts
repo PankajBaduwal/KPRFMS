@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 import './Department.js';
 import './User.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export type VerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
 
@@ -790,4 +791,4 @@ facultySchema.index({ departmentId: 1, createdAt: -1 });
 facultySchema.index({ verificationStatus: 1, createdAt: -1 });
 facultySchema.index({ name: 'text', employeeId: 'text' });
 
-export const Faculty = mongoose.model<IFaculty>('Faculty', facultySchema);
+export const Faculty = tenantModel<IFaculty>('Faculty', facultySchema);

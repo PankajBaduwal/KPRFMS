@@ -19,6 +19,8 @@ const TEST_DB_URI = process.env.TEST_MONGODB_URI || 'mongodb://localhost:27017/k
 const TEST_API_PORT = Number(process.env.TEST_API_PORT || 5099);
 const TEST_API_URL = `http://localhost:${TEST_API_PORT}/api`;
 const SUITE_TIMEOUT_MS = 180_000;
+// Every multi-institution test database starts with this; only these are ever dropped
+const TEST_DB_PREFIX = 'fctest_';
 
 // Suites report results in a few different formats; any of these means a failure
 const FAILURE_PATTERNS = [
@@ -34,7 +36,9 @@ const FAILURE_PATTERNS = [
 const testEnv: NodeJS.ProcessEnv = {
   ...process.env,
   MONGODB_URI: TEST_DB_URI,
-  TEST_API_URL,
+  // HTTP calls go through institution A's URL; TEST_API_ROOT is the bare API for cross-institution tests
+  TEST_API_URL: `${TEST_API_URL}/t/testa`,
+  TEST_API_ROOT: TEST_API_URL,
   PORT: String(TEST_API_PORT),
   NODE_ENV: 'development',
   // Emails go to a separate outbox folder that phase 60 reads
@@ -42,6 +46,12 @@ const testEnv: NodeJS.ProcessEnv = {
   SMTP_HOST: '',
   // Tests never call the paid AI service; phase 61 checks the AI routes with AI switched off
   GEMINI_API_KEY: '',
+  // Multi-institution: a separate platform registry and test-only institution databases.
+  // Suites run as institution A ("testa"); institution B ("testb") exists for isolation tests.
+  PLATFORM_DB_NAME: `${TEST_DB_PREFIX}platform`,
+  TENANT_DB_PREFIX: `${TEST_DB_PREFIX}t_`,
+  FC_TENANT: 'testa',
+  TENANT_STATUS_CACHE_MS: '0',
 };
 
 interface SuiteResult {
@@ -61,9 +71,20 @@ function discoverSuites(filter: string[]): string[] {
     .sort((a, b) => phaseNumber(a) - phaseNumber(b) || a.localeCompare(b));
 }
 
-function runTsx(script: string, timeoutMs = SUITE_TIMEOUT_MS): Promise<{ code: number | null; output: string }> {
+function runTsx(
+  script: string,
+  timeoutMs = SUITE_TIMEOUT_MS,
+  args: string[] = [],
+  env: NodeJS.ProcessEnv = {}
+): Promise<{ code: number | null; output: string }> {
   return new Promise((resolve) => {
-    const child = spawn('npx', ['tsx', script], { cwd: process.cwd(), shell: process.platform === 'win32', env: testEnv });
+    // Quote arguments with spaces: on Windows the command goes through a shell
+    const quoted = args.map((a) => (/\s/.test(a) ? `"${a}"` : a));
+    const child = spawn('npx', ['tsx', script, ...quoted], {
+      cwd: process.cwd(),
+      shell: process.platform === 'win32',
+      env: { ...testEnv, ...env },
+    });
     let output = '';
     child.stdout.on('data', (d) => (output += d));
     child.stderr.on('data', (d) => (output += d));
@@ -81,11 +102,23 @@ async function prepareDatabase() {
   }
   await mongoose.connect(TEST_DB_URI);
   await mongoose.connection.dropDatabase();
-  await mongoose.disconnect();
-  for (const script of ['src/scripts/seed.ts', 'src/scripts/seed-sample.ts']) {
-    const { code, output } = await runTsx(script, 300_000);
-    if (code !== 0) throw new Error(`${script} failed:\n${output.slice(-2000)}`);
+  // Drop the previous run's platform registry and institution databases (test prefix only)
+  const client = mongoose.connection.getClient();
+  for (const { name } of (await client.db('admin').admin().listDatabases()).databases) {
+    if (name.startsWith(TEST_DB_PREFIX)) await client.db(name).dropDatabase();
   }
+  await mongoose.disconnect();
+
+  const step = async (script: string, args: string[] = [], env: NodeJS.ProcessEnv = {}) => {
+    const { code, output } = await runTsx(script, 300_000, args, env);
+    if (code !== 0) throw new Error(`${script} ${args.join(' ')} failed:\n${output.slice(-2000)}`);
+  };
+  // Two institutions: A gets the full sample data, B only the base seed (same account emails on purpose)
+  await step('src/scripts/tenant-register.ts', ['--code', 'testa', '--name', 'Test Institution A', '--domain', 'college.edu']);
+  await step('src/scripts/tenant-register.ts', ['--code', 'testb', '--name', 'Test Institution B', '--domain', 'college.edu']);
+  await step('src/scripts/seed.ts', [], { FC_TENANT: 'testa' });
+  await step('src/scripts/seed-sample.ts', [], { FC_TENANT: 'testa' });
+  await step('src/scripts/seed.ts', [], { FC_TENANT: 'testb' });
 }
 
 const API_LOG = path.resolve(process.cwd(), 'test-api.log');
@@ -170,7 +203,7 @@ async function main() {
   console.log(`\n${results.length - failed.length}/${results.length} suites passed (test database: ${TEST_DB_URI}).`);
   if (failed.length > 0) {
     console.log(`Failed: ${failed.map((r) => r.name).join(', ')}`);
-    console.log(`Re-run one with: MONGODB_URI=${TEST_DB_URI} TEST_API_URL=${TEST_API_URL} npx tsx src/scripts/<suite>`);
+    console.log(`Re-run one with: MONGODB_URI=${TEST_DB_URI} PLATFORM_DB_NAME=${TEST_DB_PREFIX}platform TENANT_DB_PREFIX=${TEST_DB_PREFIX}t_ FC_TENANT=testa TEST_API_URL=${TEST_API_URL}/t/testa npx tsx src/scripts/<suite>`);
     process.exit(1);
   }
 }

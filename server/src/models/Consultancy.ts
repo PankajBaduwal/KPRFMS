@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const CONSULTANCY_STATUS = {
   PROPOSED: 'PROPOSED',
@@ -161,4 +162,4 @@ consultancySchema.index(
   }
 );
 
-export const Consultancy = mongoose.model<IConsultancyDocument>('Consultancy', consultancySchema);
+export const Consultancy = tenantModel<IConsultancyDocument>('Consultancy', consultancySchema);

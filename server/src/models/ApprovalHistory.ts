@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const APPROVAL_ACTION = {
   SUBMIT: 'SUBMIT',
@@ -124,7 +125,7 @@ const approvalHistorySchema = new Schema<IApprovalHistory>(
 approvalHistorySchema.index({ recordType: 1, recordId: 1, createdAt: -1 });
 approvalHistorySchema.index({ departmentId: 1, action: 1, createdAt: -1 });
 
-export const ApprovalHistory = mongoose.model<IApprovalHistory>(
+export const ApprovalHistory = tenantModel<IApprovalHistory>(
   'ApprovalHistory',
   approvalHistorySchema
 );

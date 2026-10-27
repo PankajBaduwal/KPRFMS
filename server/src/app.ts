@@ -15,6 +15,8 @@ import { csrfProtection } from './middleware/csrf.js';
 import { requireAuth } from './middleware/requireAuth.js';
 import routes from './routes/index.js';
 import { registerNotificationDispatch } from './services/notification-dispatch.js';
+import platformPublicRoutes from './platform/routes/public.routes.js';
+import { resolveSlugTenant } from './tenancy/resolveSlugTenant.js';
 
 const app = express();
 
@@ -95,6 +97,11 @@ app.use(
 );
 
 // 10. API Routes
+// Platform routes (institution finder) run outside any institution
+app.use('/api/platform', platformPublicRoutes);
+// Institution-scoped entry: /api/t/<code>/... resolves the institution from the registry first.
+// Signed-in requests may also use /api/...: their institution comes from the session token.
+app.use('/api/t/:slug', resolveSlugTenant, routes);
 app.use('/api', routes);
 
 // 11. 404 Not Found Handler

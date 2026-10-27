@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const DAYS_OF_WEEK = [
   'MONDAY',
@@ -174,7 +175,7 @@ TimetableSlotSchema.index(
   { name: 'idx_timetable_section_conflict' }
 );
 
-export const TimetableSlot = mongoose.model<ITimetableSlot>(
+export const TimetableSlot = tenantModel<ITimetableSlot>(
   'TimetableSlot',
   TimetableSlotSchema
 );

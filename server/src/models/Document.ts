@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document as MongooseDocument, Types } from 'mongoose';
+import { Schema, Document as MongooseDocument, Types } from 'mongoose';
 import {
   DOCUMENT_TYPES,
   type DocumentType,
@@ -6,6 +6,7 @@ import {
   type AccessLevel,
   type IDocumentMetadata,
 } from '../types/document.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export interface IDocument extends MongooseDocument {
   _id: Types.ObjectId;
@@ -135,4 +136,4 @@ documentSchema.index({ ownerId: 1, isArchived: 1, createdAt: -1 });
 documentSchema.index({ departmentId: 1, accessLevel: 1, isArchived: 1 });
 documentSchema.index({ documentType: 1, isArchived: 1 });
 
-export const DocumentRecord = mongoose.model<IDocument>('DocumentRecord', documentSchema);
+export const DocumentRecord = tenantModel<IDocument>('DocumentRecord', documentSchema);

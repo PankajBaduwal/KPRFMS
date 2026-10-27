@@ -7,26 +7,31 @@ import { InstitutionSettings } from '../models/InstitutionSettings.js';
 import { sendSuccess } from '../utils/apiResponse.js';
 import { collegeEmailDomain } from '../services/auth.service.js';
 import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
+import { requireTenant } from '../tenancy/context.js';
 
 const router = Router();
 
 /** Totals only (no names or records) for the public home page; cached for 10 minutes. */
-let cache: { at: number; data: Record<string, number> } | null = null;
+// Per institution: totals of one college must never be served to another
+const cache = new Map<string, { at: number; data: Record<string, number> }>();
 const TTL_MS = 10 * 60 * 1000;
 
 router.get('/overview', async (_req, res, next) => {
   try {
-    if (!cache || Date.now() - cache.at > TTL_MS) {
+    const key = requireTenant().code;
+    let entry = cache.get(key);
+    if (!entry || Date.now() - entry.at > TTL_MS) {
       const [faculty, departments, publications, activities] = await Promise.all([
         Faculty.countDocuments(),
         Department.countDocuments({ isActive: true }),
         Publication.countDocuments({ verificationStatus: 'VERIFIED' }),
         AcademicActivity.countDocuments({ status: 'VERIFIED' }),
       ]);
-      cache = { at: Date.now(), data: { faculty, departments, publications, activities } };
+      entry = { at: Date.now(), data: { faculty, departments, publications, activities } };
+      cache.set(key, entry);
     }
     res.setHeader('Cache-Control', 'public, max-age=300');
-    sendSuccess(res, cache.data, 'Public overview.');
+    sendSuccess(res, entry.data, 'Public overview.');
   } catch (error) {
     next(error);
   }

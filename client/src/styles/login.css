@@ -1021,3 +1021,30 @@
 }
 
 .register-brand-badge img { background: #FFFFFF; border-radius: 50%; padding: 2px; }
+
+/* ---------------------------------------------------------------- Institution picker */
+.inst-picker { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; }
+.inst-picker-label { font-size: 0.8rem; font-weight: 600; color: #344054; }
+.inst-picker-chosen {
+  flex-direction: row; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 14px; border: 1px solid var(--color-border, #e2e8f0); border-radius: 10px; background: #F7F9FC;
+}
+.inst-picker-chosen > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.inst-picker-chosen strong { font-size: 0.92rem; color: #13294B; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inst-picker-change {
+  border: 0; background: none; padding: 4px 2px; font-size: 0.82rem; font-weight: 600;
+  color: var(--color-primary, #1B345F); cursor: pointer; align-self: flex-start;
+}
+.inst-picker-change:hover { text-decoration: underline; }
+.inst-picker-results {
+  list-style: none; margin: 0; padding: 4px; max-height: 240px; overflow-y: auto;
+  border: 1px solid var(--color-border, #e2e8f0); border-radius: 10px; background: #fff;
+}
+.inst-picker-results button {
+  width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; text-align: left; cursor: pointer;
+}
+.inst-picker-results button:hover, .inst-picker-results button:focus-visible { background: #F1F5FB; outline: none; }
+.inst-picker-name { font-size: 0.88rem; font-weight: 600; color: #13294B; }
+.inst-picker-meta { font-size: 0.75rem; color: var(--color-text-secondary, #64748b); }
+.inst-picker-empty { padding: 10px; font-size: 0.8rem; color: var(--color-text-secondary, #64748b); }

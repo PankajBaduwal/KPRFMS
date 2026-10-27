@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export interface INotificationPreference extends Document {
   userId: Types.ObjectId;
@@ -77,7 +78,7 @@ const notificationPreferenceSchema = new Schema<INotificationPreference>(
   }
 );
 
-export const NotificationPreference = mongoose.model<INotificationPreference>(
+export const NotificationPreference = tenantModel<INotificationPreference>(
   'NotificationPreference',
   notificationPreferenceSchema
 );

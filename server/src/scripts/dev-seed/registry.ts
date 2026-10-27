@@ -1,4 +1,5 @@
-import mongoose, { Schema, Model, Types } from 'mongoose';
+import { Schema, Model, Types } from 'mongoose';
+import { tenantConnection, tenantModel } from '../../tenancy/tenantModel.js';
 
 /**
  * DEVELOPMENT SEED REGISTRY
@@ -31,9 +32,8 @@ const devSeedRecordSchema = new Schema<IDevSeedRecord>(
 );
 devSeedRecordSchema.index({ collectionName: 1, documentId: 1 }, { unique: true });
 
-export const DevSeedRecord =
-  (mongoose.models.DevSeedRecord as Model<IDevSeedRecord>) ||
-  mongoose.model<IDevSeedRecord>('DevSeedRecord', devSeedRecordSchema);
+// Seed bookkeeping lives inside each institution's own database
+export const DevSeedRecord = tenantModel<IDevSeedRecord>('DevSeedRecord', devSeedRecordSchema);
 
 export const SEED_BATCH_ID = `dev-seed-${new Date().toISOString()}`;
 
@@ -91,7 +91,7 @@ export async function purgeSeeded(model: AnyModel): Promise<number> {
 
 /** Deletes every development seed document across all collections. */
 export async function purgeAllSeeded(): Promise<Record<string, number>> {
-  const db = mongoose.connection.db;
+  const db = tenantConnection().db;
   if (!db) throw new Error('Database not connected');
 
   const summary: Record<string, number> = {};

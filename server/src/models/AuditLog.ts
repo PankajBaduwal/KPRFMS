@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 // =============================================
 // PHASE 25 — STANDARDIZED AUDIT ACTIONS
@@ -356,4 +357,4 @@ auditLogSchema.index({
   'actorSnapshot.employeeId': 'text',
 });
 
-export const AuditLog = mongoose.model<IAuditLog>('AuditLog', auditLogSchema);
+export const AuditLog = tenantModel<IAuditLog>('AuditLog', auditLogSchema);

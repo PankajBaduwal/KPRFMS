@@ -7,6 +7,7 @@ import { AnimatedNumber, usePrefersReducedMotion } from '../components/charts';
 import { PRODUCT_NAME } from '../config/brand';
 import { InstitutionName } from '../components/InstitutionName';
 import { BrandMark } from '../components/BrandMark';
+import { useInstitutionCode } from '../lib/institution';
 
 const MODULES = [
   {
@@ -164,11 +165,15 @@ const RevealHeading: React.FC<{ text: string }> = ({ text }) => (
 const LiveStats: React.FC = () => {
   const { ref, inView } = useInView<HTMLDivElement>('0px');
   const [stats, setStats] = useState<{ faculty: number; departments: number; publications: number; activities: number } | null>(null);
+  // Figures belong to one institution; without a chosen institution there is nothing to show
+  const institution = useInstitutionCode();
   useEffect(() => {
+    setStats(null);
+    if (!institution) return;
     apiGet<{ faculty: number; departments: number; publications: number; activities: number }>('/public/overview')
       .then((r) => setStats(r.data))
       .catch(() => setStats(null));
-  }, []);
+  }, [institution]);
   if (!stats) return <div ref={ref} />;
   const items = [
     { value: stats.faculty, label: 'Faculty members' },

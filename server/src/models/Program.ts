@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const DEGREE_LEVELS = {
   UG: 'UG',
@@ -92,4 +93,4 @@ const programSchema = new Schema<IProgram>(
   }
 );
 
-export const Program = mongoose.model<IProgram>('Program', programSchema);
+export const Program = tenantModel<IProgram>('Program', programSchema);

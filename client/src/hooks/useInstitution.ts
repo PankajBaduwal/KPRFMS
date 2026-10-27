@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '../api/client';
+import { useInstitutionCode } from '../lib/institution';
 
 export interface InstitutionBranding {
   productName: string;
@@ -38,10 +39,13 @@ const FALLBACK: InstitutionBranding = {
  * also works on the sign-in and home pages). Fields are '' until loaded; render accordingly.
  */
 export function useInstitution(): InstitutionBranding {
+  const code = useInstitutionCode();
   const { data } = useQuery({
-    queryKey: ['institution-branding'],
+    // Per institution, so switching institutions never shows the previous one's branding
+    queryKey: ['institution-branding', code],
+    enabled: Boolean(code),
     queryFn: async () => (await apiGet<InstitutionBranding>('/public/institution')).data,
     staleTime: 5 * 60_000,
   });
-  return data ?? FALLBACK;
+  return (code && data) || FALLBACK;
 }

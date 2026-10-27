@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export interface ISubject extends Document {
   _id: Types.ObjectId;
@@ -141,4 +142,4 @@ subjectSchema.pre('save', function () {
 subjectSchema.index({ subjectCode: 1, academicYear: 1, department: 1, section: 1 });
 subjectSchema.index({ department: 1, academicYear: 1, semester: 1 });
 
-export const Subject = mongoose.model<ISubject>('Subject', subjectSchema);
+export const Subject = tenantModel<ISubject>('Subject', subjectSchema);

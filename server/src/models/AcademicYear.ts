@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export interface IAcademicYear extends Document {
   _id: Types.ObjectId;
@@ -56,4 +57,4 @@ const academicYearSchema = new Schema<IAcademicYear>(
   }
 );
 
-export const AcademicYear = mongoose.model<IAcademicYear>('AcademicYear', academicYearSchema);
+export const AcademicYear = tenantModel<IAcademicYear>('AcademicYear', academicYearSchema);

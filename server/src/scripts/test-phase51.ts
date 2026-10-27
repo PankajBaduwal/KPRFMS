@@ -8,6 +8,7 @@
  * 4. Route-level authorization guards on all sensitive routes.
  */
 
+import './tenant-cli.js';
 import mongoose, { Types } from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';

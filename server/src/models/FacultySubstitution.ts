@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export interface IFacultySubstitution extends Document {
   timetableSlotId?: Types.ObjectId;
@@ -164,7 +165,7 @@ FacultySubstitutionSchema.index(
   { name: 'idx_substitution_conflict' }
 );
 
-export const FacultySubstitution = mongoose.model<IFacultySubstitution>(
+export const FacultySubstitution = tenantModel<IFacultySubstitution>(
   'FacultySubstitution',
   FacultySubstitutionSchema
 );

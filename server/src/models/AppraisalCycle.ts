@@ -1,5 +1,6 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 import { Role, ROLES } from '../permissions/roles.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const APPRAISAL_CATEGORIES = {
   TEACHING: 'TEACHING',
@@ -353,7 +354,7 @@ export function getDefaultCategories(): ICategoryConfig[] {
   ];
 }
 
-export const AppraisalCycle = mongoose.model<IAppraisalCycle>(
+export const AppraisalCycle = tenantModel<IAppraisalCycle>(
   'AppraisalCycle',
   appraisalCycleSchema
 );

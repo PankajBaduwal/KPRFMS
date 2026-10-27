@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const MENTORING_STATUS = {
   ACTIVE: 'ACTIVE',
@@ -232,7 +233,7 @@ studentMentoringSchema.index({
   careerGuidance: 'text',
 });
 
-export const StudentMentoring = mongoose.model<IStudentMentoringDoc>(
+export const StudentMentoring = tenantModel<IStudentMentoringDoc>(
   'StudentMentoring',
   studentMentoringSchema
 );

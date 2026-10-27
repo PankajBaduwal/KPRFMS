@@ -5,6 +5,7 @@ import nodemailer, { type Transporter } from 'nodemailer';
 import { env } from '../config/env.js';
 import { logger } from '../utils/logger.js';
 import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
+import { currentTenant } from '../tenancy/context.js';
 
 export interface MailMessage {
   to: string;
@@ -111,5 +112,9 @@ export const mailService = {
 
 /** Absolute link into the web app, e.g. clientUrl('/reset-password?token=…'). */
 export function clientUrl(pathAndQuery: string): string {
-  return `${env.CLIENT_URL.replace(/\/$/, '')}${pathAndQuery}`;
+  const base = `${env.CLIENT_URL.replace(/\/$/, '')}${pathAndQuery}`;
+  // Links always name the institution, so they also work on a device that has not chosen one
+  const code = currentTenant()?.code;
+  if (!code) return base;
+  return `${base}${base.includes('?') ? '&' : '?'}institution=${encodeURIComponent(code)}`;
 }

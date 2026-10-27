@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const MASTER_CATEGORIES = {
   DESIGNATION: 'DESIGNATION',
@@ -99,7 +100,7 @@ const systemMasterItemSchema = new Schema<ISystemMasterItem>(
 
 systemMasterItemSchema.index({ category: 1, code: 1 }, { unique: true });
 
-export const SystemMasterItem = mongoose.model<ISystemMasterItem>(
+export const SystemMasterItem = tenantModel<ISystemMasterItem>(
   'SystemMasterItem',
   systemMasterItemSchema
 );

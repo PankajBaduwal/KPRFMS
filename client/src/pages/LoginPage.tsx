@@ -13,6 +13,7 @@ import '../styles/login.css';
 import { PRODUCT_NAME, STORAGE_PREFIX } from '../config/brand';
 import { InstitutionName, InstitutionContact, InstitutionDetails } from '../components/InstitutionName';
 import { BrandMark } from '../components/BrandMark';
+import { InstitutionPicker } from '../components/InstitutionPicker';
 
 const REMEMBERED_ID_KEY = `${STORAGE_PREFIX}remembered_id`;
 
@@ -322,6 +323,9 @@ export const LoginPage: React.FC = () => {
               </div>
             </form>
           )}
+
+          {/* Which institution's sign-in (chosen before credentials) */}
+          {!challengeToken && <InstitutionPicker />}
 
           {/* Authentication Form */}
           <form

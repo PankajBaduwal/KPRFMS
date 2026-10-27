@@ -1,5 +1,6 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 import { ROLES, Role } from '../permissions/roles.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const USER_STATUS = {
   ACTIVE: 'ACTIVE',
@@ -182,4 +183,4 @@ export function markPasswordChanged(user: IUser): void {
   user.passwordChangedAt = new Date(Date.now() - 1000);
 }
 
-export const User = mongoose.model<IUser>('User', userSchema);
+export const User = tenantModel<IUser>('User', userSchema);

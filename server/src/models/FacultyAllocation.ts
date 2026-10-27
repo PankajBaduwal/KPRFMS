@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export interface IFacultyAllocation extends Document {
   _id: Types.ObjectId;
@@ -160,7 +161,7 @@ facultyAllocationSchema.index({ facultyId: 1, academicYear: 1, semester: 1 });
 facultyAllocationSchema.index({ subjectId: 1, section: 1, academicYear: 1, status: 1 });
 facultyAllocationSchema.index({ department: 1, academicYear: 1 });
 
-export const FacultyAllocation = mongoose.model<IFacultyAllocation>(
+export const FacultyAllocation = tenantModel<IFacultyAllocation>(
   'FacultyAllocation',
   facultyAllocationSchema
 );

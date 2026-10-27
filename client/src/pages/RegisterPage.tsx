@@ -13,6 +13,8 @@ import '../styles/login.css';
 import { PRODUCT_NAME } from '../config/brand';
 import { InstitutionName, InstitutionContact } from '../components/InstitutionName';
 import { BrandMark } from '../components/BrandMark';
+import { useInstitutionCode } from '../lib/institution';
+import { InstitutionPicker } from '../components/InstitutionPicker';
 
 const buildSchema = (emailDomain: string) =>
   z
@@ -71,12 +73,17 @@ export const RegisterPage: React.FC = () => {
     return () => clearTimeout(t);
   }, [resendIn]);
 
+  // Departments and the email domain belong to the chosen institution
+  const institution = useInstitutionCode();
   useEffect(() => {
+    setOptions(null);
+    setLoadError(null);
+    if (!institution) return;
     authService
       .getRegistrationOptions()
       .then(setOptions)
       .catch((err) => setLoadError(err?.message || 'Unable to load the registration form.'));
-  }, []);
+  }, [institution]);
 
   const emailDomain = options?.emailDomain || 'college.edu';
   const schema = useMemo(() => buildSchema(emailDomain), [emailDomain]);
@@ -156,6 +163,7 @@ export const RegisterPage: React.FC = () => {
         </div>
       )}
 
+      <InstitutionPicker />
       <form onSubmit={handleSubmit((data) => submit.run(data))} noValidate className="register-form">
         <fieldset className="register-section">
           <legend className="register-section-title">

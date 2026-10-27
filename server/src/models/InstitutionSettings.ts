@@ -1,5 +1,6 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 import { computeAcademicYearForDate } from '../utils/academicYear.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 /** Points per verified record when ranking departments ("department of the year"). */
 export interface LeaderboardWeights {
@@ -166,7 +167,7 @@ const institutionSettingsSchema = new Schema<IInstitutionSettings>(
   }
 );
 
-export const InstitutionSettings = mongoose.model<IInstitutionSettings>(
+export const InstitutionSettings = tenantModel<IInstitutionSettings>(
   'InstitutionSettings',
   institutionSettingsSchema
 );

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { ApiErrorResponse, ApiSuccessResponse } from '../types';
+import { getInstitutionCode } from '../lib/institution';
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5055/api';
 
@@ -12,8 +13,16 @@ export const apiClient = axios.create({
   timeout: 15000,
 });
 
-// Request interceptor: read CSRF cookie and set X-CSRF-Token header
+// Request interceptor: route through the chosen institution, read CSRF cookie and set X-CSRF-Token header
 apiClient.interceptors.request.use((config) => {
+  // Sign-in, registration and public pages need the institution in the URL. For signed-in
+  // requests the server takes the institution from the session and rejects a mismatch.
+  const code = getInstitutionCode();
+  // Platform routes (e.g. the institution finder) are never institution-scoped
+  const isPlatformRoute = (config.url ?? '').startsWith('/platform/');
+  if (code && !isPlatformRoute && (config.baseURL ?? API_BASE_URL) === API_BASE_URL) {
+    config.baseURL = `${API_BASE_URL}/t/${code}`;
+  }
   const match = document.cookie.match(/(^| )fms_csrf_token=([^;]+)/);
   if (match) {
     config.headers['x-csrf-token'] = match[2];

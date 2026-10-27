@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 // =============================================
 // LEAVE TYPES & STATUSES
@@ -186,7 +187,7 @@ leaveApplicationSchema.index({ departmentId: 1, status: 1, workflowStage: 1 });
 leaveApplicationSchema.index({ academicYear: 1, status: 1 });
 leaveApplicationSchema.index({ facultyId: 1, status: 1, submittedDate: -1 });
 
-export const LeaveApplication = mongoose.model<ILeaveApplication>(
+export const LeaveApplication = tenantModel<ILeaveApplication>(
   'LeaveApplication',
   leaveApplicationSchema
 );

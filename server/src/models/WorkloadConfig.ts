@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export type WorkloadStatus = 'UNDERLOAD' | 'NORMAL' | 'HIGH' | 'OVERLOAD';
 
@@ -158,7 +159,7 @@ const WorkloadConfigSchema = new Schema<IWorkloadConfig>(
 WorkloadConfigSchema.index({ departmentId: 1, academicYear: 1 });
 WorkloadConfigSchema.index({ isDefault: 1 });
 
-export const WorkloadConfig = mongoose.model<IWorkloadConfig>(
+export const WorkloadConfig = tenantModel<IWorkloadConfig>(
   'WorkloadConfig',
   WorkloadConfigSchema
 );

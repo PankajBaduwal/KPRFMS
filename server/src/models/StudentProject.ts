@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const STUDENT_PROJECT_STATUS = {
   PROPOSED: 'PROPOSED',
@@ -194,7 +195,7 @@ studentProjectSchema.index({
   industryCollaboration: 'text',
 });
 
-export const StudentProject = mongoose.model<IStudentProjectDoc>(
+export const StudentProject = tenantModel<IStudentProjectDoc>(
   'StudentProject',
   studentProjectSchema
 );

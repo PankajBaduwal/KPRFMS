@@ -1,7 +1,8 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 import './Department.js';
 import './User.js';
 import './Faculty.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export const PUBLICATION_TYPES = {
   JOURNAL: 'JOURNAL',
@@ -293,4 +294,4 @@ publicationSchema.index({ facultyId: 1, verificationStatus: 1 });
 publicationSchema.index({ academicYear: 1, publicationDate: -1 });
 publicationSchema.index({ facultyId: 1, publicationDate: -1 });
 
-export const Publication = mongoose.model<IPublicationDoc>('Publication', publicationSchema);
+export const Publication = tenantModel<IPublicationDoc>('Publication', publicationSchema);

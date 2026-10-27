@@ -4,6 +4,7 @@ import { NotificationPreference } from '../models/NotificationPreference.js';
 import { User } from '../models/User.js';
 import { mailService, clientUrl } from './mail.service.js';
 import { logger } from '../utils/logger.js';
+import { requireTenant } from '../tenancy/context.js';
 
 // ----------------------------------------------------------------------------------------
 // Live push (Server-Sent Events). One process keeps the open connections in memory; with
@@ -14,7 +15,9 @@ const HEARTBEAT_MS = 25_000;
 /** Streams are closed periodically so the browser reconnects and the session is re-checked. */
 const MAX_STREAM_MS = 30 * 60_000;
 
+// Keyed by institution + user, so a stream only ever receives its own institution's events
 const streams = new Map<string, Set<Response>>();
+const streamKey = (userId: string) => `${requireTenant().code}:${userId}`;
 
 function write(res: Response, event: string, data: unknown) {
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
@@ -22,6 +25,7 @@ function write(res: Response, event: string, data: unknown) {
 
 export const notificationStream = {
   subscribe(userId: string, res: Response, onClose: (cb: () => void) => void) {
+    const key = streamKey(userId);
     res.status(200);
     res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache, no-transform');
@@ -30,8 +34,8 @@ export const notificationStream = {
     res.flushHeaders();
     res.write(`retry: 5000\n\n`);
 
-    let set = streams.get(userId);
-    if (!set) streams.set(userId, (set = new Set()));
+    let set = streams.get(key);
+    if (!set) streams.set(key, (set = new Set()));
     set.add(res);
 
     const heartbeat = setInterval(() => res.write(`: ping\n\n`), HEARTBEAT_MS);
@@ -40,7 +44,7 @@ export const notificationStream = {
       clearInterval(heartbeat);
       clearTimeout(maxAge);
       set!.delete(res);
-      if (set!.size === 0) streams.delete(userId);
+      if (set!.size === 0) streams.delete(key);
     });
 
     void Notification.countDocuments({ recipientId: userId, isRead: false }).then((unreadCount) =>
@@ -49,7 +53,7 @@ export const notificationStream = {
   },
 
   publish(userId: string, event: string, data: unknown) {
-    for (const res of streams.get(userId) ?? []) write(res, event, data);
+    for (const res of streams.get(streamKey(userId)) ?? []) write(res, event, data);
   },
 
   connectionCount(): number {
@@ -61,7 +65,7 @@ export const notificationStream = {
 
 /** Tells a user's other open tabs that their unread count changed (e.g. after "mark all read"). */
 export async function publishUnreadCount(userId: string) {
-  if (!streams.has(userId)) return;
+  if (!streams.has(streamKey(userId))) return;
   const unreadCount = await Notification.countDocuments({ recipientId: userId, isRead: false });
   notificationStream.publish(userId, 'unread', { unreadCount });
 }
@@ -111,7 +115,7 @@ export function registerNotificationDispatch() {
   registered = true;
   onNotificationCreated((doc) => {
     const userId = String(doc.recipientId);
-    if (streams.has(userId)) {
+    if (streams.has(streamKey(userId))) {
       void Notification.countDocuments({ recipientId: doc.recipientId, isRead: false }).then((unreadCount) =>
         notificationStream.publish(userId, 'notification', {
           notification: {

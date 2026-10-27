@@ -4,6 +4,8 @@ import { AppError } from '../utils/AppError.js';
 import { verifyToken, AUTH_COOKIE_NAME, refreshSessionIfStale } from '../utils/jwt.js';
 import { User, USER_STATUS } from '../models/User.js';
 import { Session } from '../models/Session.js';
+import { runInTenant } from '../tenancy/context.js';
+import { resolveActiveTenant } from '../tenancy/registry.js';
 
 export async function requireAuth(
   req: AuthenticatedRequest,
@@ -28,6 +30,31 @@ export async function requireAuth(
     } catch {
       throw AppError.unauthorized('Session has expired or is invalid. Please sign in again.');
     }
+
+    // The institution comes from the signed token only. A request made through an institution URL
+    // (/api/t/:slug/...) must name the same institution; it can never switch the session's tenant.
+    if (!payload.tid) {
+      throw AppError.unauthorized('Session has expired or is invalid. Please sign in again.');
+    }
+    const pathTenant = (req as AuthenticatedRequest & { tenantFromPath?: string }).tenantFromPath;
+    if (pathTenant && pathTenant !== payload.tid) {
+      throw AppError.forbidden('This session belongs to a different institution.');
+    }
+    const tenant = await resolveActiveTenant(payload.tid);
+    await runInTenant(tenant, () => continueInTenant(req, res, next, fromCookie, payload));
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function continueInTenant(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+  fromCookie: boolean,
+  payload: ReturnType<typeof verifyToken>
+): Promise<void> {
+  try {
 
     // Browser sessions are tracked per device so they can be listed and signed out remotely
     if (payload.sid) {

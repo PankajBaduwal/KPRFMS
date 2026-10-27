@@ -6,6 +6,7 @@ import { Semester } from '../models/Semester.js';
 import { AppError } from '../utils/AppError.js';
 import { randomToken, sha256 } from '../utils/secureToken.js';
 import { PRODUCT_NAME, PRODUCT_SLUG } from '../config/brand.js';
+import { requireTenant } from '../tenancy/context.js';
 
 /**
  * Private iCalendar (.ics) feed per user: leave (approved and pending) and weekly timetable.
@@ -23,7 +24,8 @@ export function publicApiBase(): string {
 }
 
 function feedUrls(token: string) {
-  const url = `${publicApiBase()}/calendar/feed/${token}.ics`;
+  // Calendar apps fetch without a session, so the URL names the institution
+  const url = `${publicApiBase()}/t/${requireTenant().code}/calendar/feed/${token}.ics`;
   return { url, webcalUrl: url.replace(/^https?:/, 'webcal:') };
 }
 

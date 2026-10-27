@@ -372,7 +372,8 @@ async function run() {
   console.log('\n--- 7. CALENDAR FEED ---');
   const cal = await tf.request('POST', '/calendar/feed');
   assert(cal.status === 200 && /\/calendar\/feed\/[\w-]+\.ics$/.test(cal.data.data.url) && cal.data.data.webcalUrl.startsWith('webcal:'), 'Private feed link created', cal.data);
-  const feedPath = new URL(cal.data.data.url).pathname.replace(/^\/api/, '');
+  // The feed link names the institution (/api/t/<code>/calendar/...); make it relative to this client's base
+  const feedPath = new URL(cal.data.data.url).pathname.replace(new URL(API_BASE).pathname, '');
   const feed = await new Client().request('GET', feedPath);
   assert(feed.status === 200 && (feed.headers.get('content-type') || '').includes('text/calendar') && String(feed.data).includes('BEGIN:VCALENDAR'), 'Calendar apps can read the feed without signing in');
   assert((await tf.request('GET', '/calendar')).data.data.enabled === true, 'Feed shows as on');
@@ -388,7 +389,7 @@ async function run() {
     const c = new Client();
     if ((await c.login(busy.email, 'Faculty@12345')).status === 200) {
       const link = await c.request('POST', '/calendar/feed');
-      const body = String((await new Client().request('GET', new URL(link.data.data.url).pathname.replace(/^\/api/, ''))).data);
+      const body = String((await new Client().request('GET', new URL(link.data.data.url).pathname.replace(new URL(API_BASE).pathname, ''))).data);
       assert(/BEGIN:VEVENT/.test(body) && /\r\n/.test(body), 'Feed for seeded faculty contains events with CRLF line endings');
       await c.request('DELETE', '/calendar/feed');
     }

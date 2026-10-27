@@ -82,10 +82,24 @@ cp client/.env.example client/.env
 > **Production:** the server refuses to start if `JWT_SECRET` / `COOKIE_SECRET` are shorter than 32 characters, still contain the `.env.example` placeholder, or are identical. Generate them with
 > `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`
 
-### 3. Seed development data
+### 3. Register an institution and seed development data
+
+FacultyCore keeps each institution in its own database (`fc_t_<code>`), listed in the platform
+registry (`fc_platform`). Scripts that touch institutional data name the institution with
+`--tenant <code>`; there is no default institution.
 
 ```bash
-npm run seed
+npm run tenant:register -- --code demo --name "Demo Institute of Technology" --city Chennai --domain college.edu
+npm run seed -- --tenant demo
+```
+
+In the web app, choose the institution on the sign-in page (the choice is remembered).
+To move an existing single-institution database into its own institution database, copy it first
+(the source is never changed), then register it:
+
+```bash
+npm run tenant:copy -- --from kpriet-fms --to demo
+npm run tenant:register -- --code demo --name "Demo Institute of Technology" --adopt-existing-data
 ```
 
 ### 4. Run
@@ -115,7 +129,7 @@ Sign in with either the email or the employee ID. These accounts only exist in s
 ### Full sample data (every module)
 
 ```bash
-npm run seed:sample
+npm run seed:sample -- --tenant demo
 ```
 
 Run after `npm run seed`. Adds a complete institution for demos and testing — re-runnable, and removed by `npm run seed:clean`:
@@ -149,16 +163,16 @@ From the project root:
 | `npm run dev:server` / `npm run dev:client` | Start API / web app in watch mode |
 | `npm run build` | Type-check and build server (`server/dist`) and client (`client/dist`) |
 | `npm start` | Run the built API (`node server/dist/server.js`) |
-| `npm test` | Run every backend test suite against an isolated test database (emails go to `server/mail-outbox-test/`) |
-| `npm run seed` | Create / refresh development seed data |
-| `npm run backup` | Back up the database + uploaded files to `server/backups/<timestamp>/` |
+| `npm test` | Run every backend test suite against isolated test institutions (emails go to `server/mail-outbox-test/`) |
+| `npm run seed -- --tenant demo` | Create / refresh development seed data in one institution |
+| `npm run backup -- --tenant demo` | Back up one institution's database + uploaded files to `server/backups/<code>-<timestamp>/` |
 | `npm run lint:server` / `npm run lint:client` | Type-check server / lint client |
 
 Run only some suites with `npm test -- 2 3 54` (phase numbers).
 
 ### Tests
 
-The backend suites live in `server/src/scripts/test-phase*.ts`. `npm test` never touches your development database: it resets a separate `kpriet-fms-test` database (override with `TEST_MONGODB_URI`), seeds it with the base + sample data, starts a private API on port 5099 (`TEST_API_PORT`), runs the suites and stops the API. No dev server needs to be running. CI runs the same on every push (`.github/workflows/ci.yml`).
+The backend suites live in `server/src/scripts/test-phase*.ts`. `npm test` never touches your development database: it drops and recreates test-only databases (`fctest_platform`, `fctest_t_testa`, `fctest_t_testb`), registers two test institutions, seeds A with the base + sample data and B with the base data, starts a private API on port 5099 (`TEST_API_PORT`), runs the suites and stops the API. No dev server needs to be running. CI runs the same on every push (`.github/workflows/ci.yml`).
 
 ---
 
@@ -179,9 +193,9 @@ docker compose --env-file .env.production up -d --build
 ### Backups
 
 ```bash
-npm run backup                                # -> server/backups/<timestamp>/
-BACKUP_DIR=D:\fms-backups BACKUP_KEEP=30 npm run backup
-npm run restore -- server/backups/<timestamp> --yes        # replaces DB + files
+npm run backup -- --tenant demo               # -> server/backups/demo-<timestamp>/
+BACKUP_DIR=D:\fms-backups BACKUP_KEEP=30 npm run backup -- --tenant demo
+npm run restore -- server/backups/demo-<timestamp> --tenant demo --yes   # same institution only; replaces DB + files
 ```
 
 Backups contain every collection (type-preserving, gzipped) plus `uploads/` and `storage/`, and the newest 14 are kept by default. No extra tools are needed. **Schedule it daily** (Windows Task Scheduler or cron) and copy the backup folder to another machine or cloud storage — a backup on the same disk does not survive a disk failure.

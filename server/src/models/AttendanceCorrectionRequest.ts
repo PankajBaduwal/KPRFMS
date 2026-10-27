@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 import type { AttendanceStatus } from './FacultyAttendance.js';
 import { ATTENDANCE_STATUS } from './FacultyAttendance.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 // =============================================
 // CORRECTION REQUEST STATUS
@@ -148,7 +149,7 @@ attendanceCorrectionRequestSchema.index({ facultyId: 1, status: 1 });
 attendanceCorrectionRequestSchema.index({ departmentId: 1, status: 1 });
 attendanceCorrectionRequestSchema.index({ attendanceId: 1, status: 1 });
 
-export const AttendanceCorrectionRequest = mongoose.model<IAttendanceCorrectionRequest>(
+export const AttendanceCorrectionRequest = tenantModel<IAttendanceCorrectionRequest>(
   'AttendanceCorrectionRequest',
   attendanceCorrectionRequestSchema
 );

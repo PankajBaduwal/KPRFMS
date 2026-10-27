@@ -1,5 +1,6 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 import { LEAVE_TYPE, type LeaveType } from './LeaveApplication.js';
+import { tenantModel } from '../tenancy/tenantModel.js';
 
 export interface ILeaveTypeBalance {
   total: number;
@@ -67,7 +68,7 @@ const leaveBalanceSchema = new Schema<ILeaveBalance>(
 
 leaveBalanceSchema.index({ facultyId: 1, academicYear: 1 }, { unique: true });
 
-export const LeaveBalance = mongoose.model<ILeaveBalance>(
+export const LeaveBalance = tenantModel<ILeaveBalance>(
   'LeaveBalance',
   leaveBalanceSchema
 );

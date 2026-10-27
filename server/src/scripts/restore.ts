@@ -1,11 +1,12 @@
 /**
  * Restore a backup created by `npm run backup`.
  *
- *   npm run restore -- backups/2026-10-25T12-00-00-000Z --yes [--db-only]
+ *   npm run restore -- backups/demo-2026-10-25T12-00-00-000Z --tenant demo --yes [--db-only]
  *
  * REPLACES every collection in the backup and the uploads/storage folders. Without --yes it
  * only prints what would be restored. Target database = MONGODB_URI.
  */
+import './tenant-cli.js';
 import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
@@ -13,6 +14,8 @@ import readline from 'readline';
 import mongoose from 'mongoose';
 import { connectDatabase, disconnectDatabase } from '../config/database.js';
 import { logger } from '../utils/logger.js';
+import { requireTenant } from '../tenancy/context.js';
+import { tenantConnection } from '../tenancy/tenantModel.js';
 
 const { EJSON } = mongoose.mongo.BSON;
 
@@ -32,7 +35,14 @@ async function main() {
   }
 
   await connectDatabase();
-  const db = mongoose.connection.db!;
+  const { code } = requireTenant();
+  // A backup may only be restored into the institution it was taken from
+  const tenantManifest = path.join(folder, 'tenant.json');
+  const source = fs.existsSync(tenantManifest) ? (JSON.parse(fs.readFileSync(tenantManifest, 'utf8')) as { code?: string }).code : undefined;
+  if (source !== code) {
+    throw new Error(`This backup belongs to institution "${source ?? 'unknown'}", not "${code}". Refusing to restore.`);
+  }
+  const db = tenantConnection().db!;
   for (const name of Object.keys(manifest.collections)) {
     const file = path.join(folder, 'db', `${name}.ejson.gz`);
     if (!fs.existsSync(file)) continue;
