@@ -1,13 +1,16 @@
-# Production-style stack: MongoDB + API + web (nginx) on one host.
+# Production-style stack: MongoDB + API + web (nginx) on one host. Every institution gets its
+# own database (fc_t_<code>) on the same MongoDB server; the registry lives in fc_platform.
 #
 #   cp .env.production.example .env.production   # then fill in the secrets
 #   docker compose --env-file .env.production up -d --build
+#   docker compose exec server node dist/scripts/platform-create-admin.js --email you@example.com --name "Your Name"
 #
 # The app is served on http://<host>:${WEB_PORT:-8080}. Put HTTPS in front of it (a reverse
 # proxy or load balancer) before going live: production cookies are marked Secure.
+# Full guide: docs/deployment/PRODUCTION.md
 services:
   mongo:
-    image: mongo:7
+    image: mongo:8.0
     restart: unless-stopped
     volumes:
       - mongo-data:/data/db
@@ -26,7 +29,14 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5000
-      MONGODB_URI: mongodb://mongo:27017/kpriet-fms
+      # Use a URI with credentials for a managed or authenticated MongoDB (see the deployment guide)
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/facultycore}
+      PLATFORM_DB_NAME: ${PLATFORM_DB_NAME:-fc_platform}
+      TENANT_DB_PREFIX: ${TENANT_DB_PREFIX:-fc_t_}
+      # How long another API instance may keep using a suspended institution's cached status
+      TENANT_STATUS_CACHE_MS: ${TENANT_STATUS_CACHE_MS:-15000}
+      BACKUP_DIR: /app/backups
+      BACKUP_KEEP: ${BACKUP_KEEP:-14}
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env.production}
       COOKIE_SECRET: ${COOKIE_SECRET:?set COOKIE_SECRET in .env.production}
       TWO_FACTOR_KEY: ${TWO_FACTOR_KEY:?set TWO_FACTOR_KEY in .env.production}
@@ -46,15 +56,19 @@ services:
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}
       GEMINI_FALLBACK_MODEL: ${GEMINI_FALLBACK_MODEL:-gemini-flash-lite-latest}
     volumes:
-      # Uploaded certificates/evidence and the secure document vault (back these up!)
-      - uploads:/app/uploads
+      # Each institution's uploads and document vault: storage/tenants/<code>/ (back these up!)
       - documents:/app/storage
+      # Files from before multi-tenancy (read only by the tenant:files migration)
+      - uploads:/app/uploads
+      # Output of `node dist/scripts/backup.js` — copy it off this host
+      - backups:/app/backups
 
   web:
     build: ./client
     restart: unless-stopped
     depends_on:
-      - server
+      server:
+        condition: service_healthy
     ports:
       - "${WEB_PORT:-8080}:80"
 
@@ -62,3 +76,4 @@ volumes:
   mongo-data:
   uploads:
   documents:
+  backups:

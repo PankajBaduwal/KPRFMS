@@ -2,6 +2,7 @@
  * Restore a backup created by `npm run backup`.
  *
  *   npm run restore -- backups/demo-2026-10-25T12-00-00-000Z --tenant demo --yes [--db-only]
+ *   npm run restore -- backups/platform-2026-10-25T12-00-00-000Z --platform --yes
  *
  * REPLACES every collection in the backup and the uploads/storage folders. Without --yes it
  * only prints what would be restored. Target database = MONGODB_URI.
@@ -15,7 +16,7 @@ import mongoose from 'mongoose';
 import { connectDatabase, disconnectDatabase } from '../config/database.js';
 import { logger } from '../utils/logger.js';
 import { requireTenant } from '../tenancy/context.js';
-import { tenantConnection } from '../tenancy/tenantModel.js';
+import { tenantConnection, platformConnection } from '../tenancy/tenantModel.js';
 import { institutionFilesRoot } from '../tenancy/files.js';
 
 const { EJSON } = mongoose.mongo.BSON;
@@ -36,14 +37,18 @@ async function main() {
   }
 
   await connectDatabase();
-  const { code } = requireTenant();
-  // A backup may only be restored into the institution it was taken from
   const tenantManifest = path.join(folder, 'tenant.json');
-  const source = fs.existsSync(tenantManifest) ? (JSON.parse(fs.readFileSync(tenantManifest, 'utf8')) as { code?: string }).code : undefined;
-  if (source !== code) {
-    throw new Error(`This backup belongs to institution "${source ?? 'unknown'}", not "${code}". Refusing to restore.`);
+  const origin = fs.existsSync(tenantManifest) ? (JSON.parse(fs.readFileSync(tenantManifest, 'utf8')) as { code?: string; platform?: boolean }) : {};
+  const platform = flags.includes('--platform');
+  // A backup may only be restored where it was taken from: the platform, or that institution
+  if (platform !== Boolean(origin.platform)) {
+    throw new Error(platform ? 'This is not a platform backup. Refusing to restore.' : 'This is a platform backup; restore it with --platform.');
   }
-  const db = tenantConnection().db!;
+  const code = platform ? null : requireTenant().code;
+  if (!platform && origin.code !== code) {
+    throw new Error(`This backup belongs to institution "${origin.code ?? 'unknown'}", not "${code}". Refusing to restore.`);
+  }
+  const db = platform ? platformConnection().db! : tenantConnection().db!;
   for (const name of Object.keys(manifest.collections)) {
     const file = path.join(folder, 'db', `${name}.ejson.gz`);
     if (!fs.existsSync(file)) continue;
@@ -70,7 +75,7 @@ async function main() {
 
   // Replaces only this institution's files; other institutions' folders are never touched
   const filesSrc = path.join(folder, 'files', 'institution');
-  if (!flags.includes('--db-only') && fs.existsSync(filesSrc)) {
+  if (code && !flags.includes('--db-only') && fs.existsSync(filesSrc)) {
     const dest = institutionFilesRoot(code);
     fs.rmSync(dest, { recursive: true, force: true });
     fs.cpSync(filesSrc, dest, { recursive: true });

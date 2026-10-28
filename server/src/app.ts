@@ -22,6 +22,7 @@ import platformAuthRoutes from './platform/routes/auth.routes.js';
 import platformAdminRoutes from './platform/routes/admin.routes.js';
 import { fileAccessService } from './services/file-access.service.js';
 import type { AuthenticatedRequest } from './types/index.js';
+import { requestContext } from './utils/requestContext.js';
 
 const app = express();
 
@@ -32,6 +33,9 @@ if (env.TRUST_PROXY) {
   // e.g. TRUST_PROXY=1 behind one nginx hop; required for correct rate limiting and secure cookies
   app.set('trust proxy', /^\d+$/.test(env.TRUST_PROXY) ? Number(env.TRUST_PROXY) : env.TRUST_PROXY);
 }
+
+// 0. Correlation id for every request (logs, X-Request-Id header, error responses)
+app.use(requestContext);
 
 // 1. Comprehensive Helmet Security Headers
 app.use(

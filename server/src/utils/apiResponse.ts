@@ -1,3 +1,4 @@
+import { currentRequestId } from './requestContext.js';
 import { Response } from 'express';
 
 export interface ApiSuccessResponse<T = unknown> {
@@ -11,6 +12,8 @@ export interface ApiErrorResponse {
   message: string;
   code: string;
   details: unknown[];
+  /** Correlation id, also in the X-Request-Id header and the server logs */
+  requestId?: string;
 }
 
 export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
@@ -35,11 +38,13 @@ export function sendError(
   statusCode = 500,
   details: unknown[] = []
 ): void {
+  const requestId = currentRequestId();
   res.status(statusCode).json({
     success: false,
     message,
     code,
     details: Array.isArray(details) ? details : details != null ? [details] : [],
+    ...(requestId ? { requestId } : {}),
   } satisfies ApiErrorResponse);
 }
 

@@ -123,7 +123,14 @@ export const errorHandler: ErrorRequestHandler = (
     return;
   }
 
-  // 10. Unexpected server errors - never expose stack traces, database internals, secrets
+  // 10. Database unreachable: tell the client to retry, without any connection details
+  if (/^Mongo(ServerSelection|NetworkTimeout|Network|NotConnected)Error$/.test(err.name) || /buffering timed out/i.test(err.message ?? '')) {
+    logger.error('Database unavailable', { name: err.name });
+    sendError(res, 'The service is temporarily unavailable. Please try again shortly.', 'SERVICE_UNAVAILABLE', 503);
+    return;
+  }
+
+  // 11. Unexpected server errors - never expose stack traces, database internals, secrets
   logger.error('Unhandled internal server error:', {
     name: err.name,
     message: err.message,

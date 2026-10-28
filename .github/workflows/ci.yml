@@ -20,29 +20,32 @@ jobs:
           cache-dependency-path: client/package-lock.json
       - run: npm ci
       - run: npm run build # tsc -b && vite build
-      - run: npx oxlint 
+      - run: npx oxlint
 
   server:
-    name: API — type-check, build, test suites
+    name: API — type-check, build, test suites (two isolated institutions)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: server
     services:
       mongo:
-        image: mongo:7
+        image: mongo:8.0
         ports:
           - 27017:27017
         options: >-
           --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok'"
           --health-interval 10s --health-timeout 5s --health-retries 5
     env:
+      # Throwaway values for this job only; the test runner never touches non-test databases
       NODE_ENV: development
-      MONGODB_URI: mongodb://localhost:27017/kpriet-fms
-      TEST_MONGODB_URI: mongodb://localhost:27017/kpriet-fms-test
+      MONGODB_URI: mongodb://localhost:27017/facultycore-ci
+      TEST_MONGODB_URI: mongodb://localhost:27017/facultycore-test
       JWT_SECRET: ci-only-jwt-secret-not-used-anywhere-else-000000
       COOKIE_SECRET: ci-only-cookie-secret-not-used-anywhere-else-00
       CLIENT_URL: http://localhost:5180
+      # Tests never call the paid AI service
+      GEMINI_API_KEY: ''
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -52,14 +55,41 @@ jobs:
           cache-dependency-path: server/package-lock.json
       - run: npm ci
       - run: npx tsc --noEmit
+      # API plus the operational tools shipped in the image (dist/scripts)
       - run: npm run build
-      # Seeds an isolated test database, starts a private API and runs every suite
+      # Registers institutions "testa" and "testb" in fctest_* databases, seeds them, starts a
+      # private API and runs every suite, including the cross-institution attack suites
       - run: npm test
+      - name: Keep the test API log when something fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-api-log
+          path: server/test-api.log
+          if-no-files-found: ignore
 
   docker:
-    name: Docker images build
+    name: Docker — build images and start the stack
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t kpriet-fms-server ./server
-      - run: docker build -t kpriet-fms-web ./client
+      - name: Build and start (throwaway secrets)
+        env:
+          JWT_SECRET: ci-only-jwt-secret-for-the-compose-smoke-test-0000
+          COOKIE_SECRET: ci-only-cookie-secret-for-the-compose-smoke-test-00
+          TWO_FACTOR_KEY: ci-only-two-factor-key-for-the-compose-smoke-test-0
+          CLIENT_URL: http://localhost:8080
+          WEB_PORT: '8080'
+        run: docker compose up -d --build --wait --wait-timeout 180
+      - name: Readiness through nginx (database, registry, institutions)
+        run: |
+          curl -fsS http://localhost:8080/api/health/ready
+          curl -fsS -o /dev/null -w '%{http_code}\n' http://localhost:8080/
+      - name: Operational tools are present in the image
+        run: docker compose exec -T server sh -c 'ls dist/scripts/platform-create-admin.js dist/scripts/backup.js dist/scripts/restore.js'
+      - name: Logs when something fails
+        if: failure()
+        run: docker compose logs --no-color --tail 200
+      - name: Stop
+        if: always()
+        run: docker compose down -v

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { apiClient } from '../api/client';
 import { useAuthStore } from '../stores/authStore';
@@ -142,12 +142,24 @@ export const FundingPage: React.FC = () => {
   const role = useAuthStore((s) => s.user?.role);
   const { years } = useAcademicYears();
   const queryClient = useQueryClient();
-  const [academicYear, setAcademicYear] = useState('');
-  const [departmentId, setDepartmentId] = useState('');
-  const [bucket, setBucket] = useState('');
+  const [academicYear, setYearState] = useState('');
+  const [departmentId, setDeptState] = useState('');
+  const [bucket, setBucketState] = useState('');
   const [page, setPage] = useState(1);
   const [editing, setEditing] = useState<Item | null>(null);
-  useEffect(() => setPage(1), [academicYear, departmentId, bucket]);
+  // Changing a filter goes back to the first page
+  const setAcademicYear = (v: string) => {
+    setYearState(v);
+    setPage(1);
+  };
+  const setDepartmentId = (v: string) => {
+    setDeptState(v);
+    setPage(1);
+  };
+  const setBucket = (v: string) => {
+    setBucketState(v);
+    setPage(1);
+  };
 
   const q = useQuery({
     queryKey: ['funding', academicYear, departmentId, bucket, page],

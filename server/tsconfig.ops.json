@@ -1,0 +1,17 @@
+{
+  // Operational command-line tools shipped in the production image (dist/scripts/*.js).
+  // Test suites and development seeds stay out of the build.
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/scripts/platform-create-admin.ts",
+    "src/scripts/tenant-register.ts",
+    "src/scripts/tenant-migrate.ts",
+    "src/scripts/tenant-migrate-funding.ts",
+    "src/scripts/tenant-normalize-hod.ts",
+    "src/scripts/tenant-copy-db.ts",
+    "src/scripts/tenant-files-copy.ts",
+    "src/scripts/backup.ts",
+    "src/scripts/restore.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

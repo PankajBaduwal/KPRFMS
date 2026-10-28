@@ -256,6 +256,11 @@ The backend suites live in `server/src/scripts/test-phase*.ts`. `npm test` never
 
 ## Deployment
 
+Production setup, backups, monitoring and rollback for the multi-institution platform:
+**[docs/deployment/PRODUCTION.md](docs/deployment/PRODUCTION.md)**. Acceptance status and known
+gaps: [docs/multi-tenant/ACCEPTANCE.md](docs/multi-tenant/ACCEPTANCE.md).
+
+
 A production-style stack (MongoDB + API + nginx serving the web app) is defined in `docker-compose.yml`:
 
 ```bash
@@ -265,27 +270,29 @@ docker compose --env-file .env.production up -d --build
 
 - The app is served on port `8080` (`WEB_PORT`); nginx proxies `/api` and `/uploads` to the API, so the browser talks to a single origin.
 - **Put HTTPS in front** (institutional reverse proxy / load balancer) — production cookies are `Secure`. `TRUST_PROXY=1` is set so rate limiting sees real client IPs.
-- Data lives in Docker volumes: `mongo-data` (database), `uploads` and `documents` (uploaded files and the secure document vault).
+- Data lives in Docker volumes: `mongo-data` (every database: `fc_platform` and one `fc_t_<code>` per institution), `documents` (each institution's files under `storage/tenants/<code>/`), `backups`, and `uploads` (pre-multi-tenant files, read only by the migration).
+- Create the first Super Admin with `docker compose exec server node dist/scripts/platform-create-admin.js --email … --name "…"`.
 - Sessions expire after `JWT_EXPIRES_IN` of inactivity (default `12h`); active users are renewed automatically.
 
 ### Backups
 
 ```bash
+npm run backup -- --all                       # platform registry + every institution, one folder each
 npm run backup -- --tenant demo               # -> server/backups/demo-<timestamp>/
 BACKUP_DIR=D:\fms-backups BACKUP_KEEP=30 npm run backup -- --tenant demo
 npm run restore -- server/backups/demo-<timestamp> --tenant demo --yes   # same institution only; replaces DB + files
 ```
 
-Backups contain every collection (type-preserving, gzipped) plus `uploads/` and `storage/`, and the newest 14 are kept by default. No extra tools are needed. **Schedule it daily** (Windows Task Scheduler or cron) and copy the backup folder to another machine or cloud storage — a backup on the same disk does not survive a disk failure.
+Each backup contains every collection of one institution's database (type-preserving, gzipped) plus that institution's files; `--platform` backs up the registry and console accounts. The newest 14 per institution are kept by default. No extra tools are needed. **Schedule it daily** (Windows Task Scheduler or cron) and copy the backup folder to another machine or cloud storage — a backup on the same disk does not survive a disk failure.
 
-With the Docker stack, back up the database with the `mongodump` built into the MongoDB image, and the file volumes with `tar`:
+With the Docker stack run the same tools inside the API container (no extra software needed):
 
 ```bash
-docker compose exec -T mongo mongodump --db kpriet-fms --archive --gzip > fms-db-$(date +%F).archive.gz
-docker run --rm -v kpriet-fms_uploads:/u -v kpriet-fms_documents:/d -v "$PWD":/out alpine \
-  tar czf /out/fms-files-$(date +%F).tgz -C / u d
-# restore the database: docker compose exec -T mongo mongorestore --archive --gzip --drop < fms-db-<date>.archive.gz
+docker compose exec server node dist/scripts/backup.js --all          # writes to the backups volume
+docker compose exec server node dist/scripts/restore.js backups/<code>-<time> --tenant <code> --yes
 ```
+
+Copy the `backups` volume off the host; see [docs/deployment/PRODUCTION.md](docs/deployment/PRODUCTION.md#7-backups-and-restore).
 
 ---
 

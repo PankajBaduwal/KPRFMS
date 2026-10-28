@@ -1,3 +1,6 @@
+import { currentRequestId } from './requestContext.js';
+import { currentTenant } from '../tenancy/context.js';
+
 const LOG_LEVELS = {
   ERROR: 'ERROR',
   WARN: 'WARN',
@@ -18,7 +21,11 @@ function formatTimestamp(): string {
 function formatMessage(level: LogLevel, message: string, meta?: string): string {
   const timestamp = formatTimestamp();
   const metaStr = meta ? ` | ${meta}` : '';
-  return `[${timestamp}] [${level}] ${message}${metaStr}`;
+  // Correlation: which request and which institution this line belongs to
+  const requestId = currentRequestId();
+  const tenant = currentTenant()?.code;
+  const ctx = `${requestId ? ` [req:${requestId}]` : ''}${tenant ? ` [inst:${tenant}]` : ''}`;
+  return `[${timestamp}] [${level}]${ctx} ${message}${metaStr}`;
 }
 
 function scrubValue(val: any, depth = 0): any {

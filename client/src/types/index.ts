@@ -37,6 +37,8 @@ export interface ApiErrorResponse {
   code: string;
   details: ApiErrorDetail[];
   status?: number;
+  /** Quote this when reporting a problem; it matches the server logs */
+  requestId?: string;
 }
 
 export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
