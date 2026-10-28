@@ -52,6 +52,10 @@ tokens, cookies and keys; error responses never include stack traces or connecti
 
 ## 3. MongoDB
 
+* **Check the host kernel.** MongoDB 8.0 refuses to start on Linux 6.19 and newer
+  ("known incompatibility", SERVER-121912) — this is what CI ran into on `ubuntu-latest`. Run the
+  database on a host with an older kernel (e.g. Ubuntu 24.04), on a managed cluster, or on a
+  MongoDB release that states support for your kernel.
 * **Use a replica set** (three members, or a managed cluster such as MongoDB Atlas) for durability
   and point-in-time recovery. The bundled single container is fine for evaluation only.
 * **Enable authentication.** Create one application user. It needs `readWrite` on `fc_platform`

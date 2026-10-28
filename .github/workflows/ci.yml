@@ -7,7 +7,8 @@ on:
 jobs:
   client:
     name: Web app — type-check, lint, build
-    runs-on: ubuntu-latest
+    # ubuntu-latest moved to Linux 6.19+, which MongoDB 8.0 refuses to run on (SERVER-121912)
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: client
@@ -24,7 +25,8 @@ jobs:
 
   server:
     name: API — type-check, build, test suites (two isolated institutions)
-    runs-on: ubuntu-latest
+    # ubuntu-latest moved to Linux 6.19+, which MongoDB 8.0 refuses to run on (SERVER-121912)
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: server
@@ -72,11 +74,13 @@ jobs:
           if-no-files-found: ignore
       - name: Show the end of the test API log
         if: failure()
-        run: test -f test-api.log && tail -40 test-api.log | sed 's/^/::error title=test-api::/' || true
+        working-directory: .
+        run: test -f server/test-api.log && tail -40 server/test-api.log | sed 's/^/::error title=test-api::/' || true
 
   docker:
     name: Docker — build images and start the stack
-    runs-on: ubuntu-latest
+    # ubuntu-latest moved to Linux 6.19+, which MongoDB 8.0 refuses to run on (SERVER-121912)
+    runs-on: ubuntu-24.04
     # Throwaway values; every compose command below needs them
     env:
       JWT_SECRET: ci-only-jwt-secret-for-the-compose-smoke-test-0000
