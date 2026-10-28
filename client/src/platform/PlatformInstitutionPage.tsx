@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { platformApi, STATUS_LABEL } from './api';
 import { formatErrorMessage } from '../utils/errorHandler';
+import { AccountImport } from '../components/import/AccountImport';
 
 const STEP_LABEL: Record<string, string> = {
   REGISTRY: 'Registry entry',
@@ -19,6 +20,7 @@ export const PlatformInstitutionPage: React.FC = () => {
   const { code = '' } = useParams();
   const queryClient = useQueryClient();
   const [reason, setReason] = useState('');
+  const [showImport, setShowImport] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
 
   const q = useQuery({
@@ -212,6 +214,22 @@ export const PlatformInstitutionPage: React.FC = () => {
           <p className="pc-muted pc-small">
             People set their own password from the emailed link (single use, 7 days). Faculty can then be added in bulk by the institution’s administrator.
           </p>
+        </section>
+      )}
+
+      {i.status === 'ACTIVE' && (
+        <section className="pc-card">
+          <div className="pc-row">
+            <h2>Import faculty and staff</h2>
+            <button type="button" className="pc-btn" onClick={() => setShowImport((v) => !v)}>
+              {showImport ? 'Close' : 'Open import'}
+            </button>
+          </div>
+          {showImport ? (
+            <AccountImport base={`/platform/admin/institutions/${i.code}/import`} templateName={`${i.code}-import-template.xlsx`} onFinished={refresh} />
+          ) : (
+            <p className="pc-muted pc-small">Add or update accounts in bulk from Excel/CSV, with every row previewed before anything changes.</p>
+          )}
         </section>
       )}
 

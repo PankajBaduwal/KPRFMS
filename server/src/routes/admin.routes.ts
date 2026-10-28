@@ -20,6 +20,10 @@ router.get('/roles', (req, res, next) => adminController.getRoles(req, res, next
 router.get('/users', (req, res, next) => adminController.getUsers(req, res, next));
 router.get('/users/import/template', (req, res, next) => adminController.downloadImportTemplate(req, res, next));
 router.post('/users/import', spreadsheetUpload.single('file'), (req, res, next) => adminController.importUsers(req, res, next));
+// Planned import: preview with options, then a background job with progress
+router.post('/users/import/preview', spreadsheetUpload.single('file'), (req, res, next) => adminController.previewImport(req, res, next));
+router.post('/users/import/commit', spreadsheetUpload.single('file'), (req, res, next) => adminController.commitImport(req, res, next));
+router.get('/users/import/jobs/:jobId', (req, res, next) => adminController.importJob(req, res, next));
 router.post('/users', (req, res, next) => adminController.createUser(req, res, next));
 router.get('/users/:id', (req, res, next) => adminController.getUserById(req, res, next));
 router.put('/users/:id', (req, res, next) => adminController.updateUser(req, res, next));

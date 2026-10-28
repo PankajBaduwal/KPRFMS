@@ -68,7 +68,8 @@ export class ApprovalQueueService {
         throw AppError.forbidden('HOD profile not found. Please contact administration.');
       }
 
-      let department = await Department.findOne({ hodId: faculty._id });
+      // hodId is the HOD's user id (older data may still hold the faculty profile id)
+      let department = await Department.findOne({ hodId: { $in: [new Types.ObjectId(String(userId)), faculty._id] } });
       if (!department && faculty.departmentId) {
         department = await Department.findById(faculty.departmentId);
       }

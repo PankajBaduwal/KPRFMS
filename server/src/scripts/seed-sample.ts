@@ -442,7 +442,7 @@ async function main() {
   });
   const faculties = await create(Faculty, facultyDocs);
   faculties.forEach((f: any, i) => (people[i].faculty = f));
-  for (const p of people.filter((x) => x.isHod)) await Department.updateOne({ _id: p.dept._id }, { $set: { hodId: p.faculty._id } });
+  for (const p of people.filter((x) => x.isHod)) await Department.updateOne({ _id: p.dept._id }, { $set: { hodId: p.user._id } });
   logger.info(`Created ${people.length} faculty members (${people.filter((p) => p.isHod).length} new HODs)`);
 
   const hodFor = async (deptCode: string) => {

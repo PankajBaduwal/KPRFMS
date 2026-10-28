@@ -6,6 +6,14 @@ import { platformAdminService } from '../services/platformAdmin.service.js';
 import { provisioningService } from '../services/provisioning.service.js';
 import { INSTITUTION_STATUS, INSTITUTION_TYPES } from '../models/Institution.js';
 import { INSTITUTION_CODE_PATTERN } from '../../tenancy/dbNames.js';
+import { parseImportOptions } from '../../validators/import.validator.js';
+import { facultyImportService } from '../../services/faculty-import.service.js';
+import { spreadsheetUpload } from '../../middleware/upload.js';
+import { AppError } from '../../utils/AppError.js';
+import { tenantDbName } from '../../tenancy/dbNames.js';
+import { runInTenant } from '../../tenancy/context.js';
+import { PLATFORM_AUDIT, recordPlatformAudit } from '../models/PlatformAuditLog.js';
+import { Institution } from '../models/Institution.js';
 
 /** Platform console API — Super Admin only. */
 const router = Router();
@@ -144,6 +152,62 @@ router.post(
     message: 'Provisioning resumed.',
     status: 202,
   }))
+);
+
+/** Runs work inside an ACTIVE institution chosen by code (the request can never name a database). */
+async function inInstitution<R>(code: string, fn: () => Promise<R>): Promise<R> {
+  const inst = await Institution.findOne({ code: String(code).toLowerCase() }).select('code status dbName').lean();
+  if (!inst) throw AppError.notFound('Institution not found.');
+  if (inst.status !== 'ACTIVE') throw AppError.badRequest('Accounts can only be imported into an active institution.');
+  return runInTenant({ code: inst.code, dbName: tenantDbName(inst.code), institutionId: String(inst._id) }, fn);
+}
+const importActor = (req: PlatformRequest) => ({ id: req.platformUser!.id, label: `platform:${req.platformUser!.email}` });
+
+router.get('/institutions/:code/import/template', async (req: PlatformRequest, res, next) => {
+  try {
+    const buffer = await inInstitution(String(req.params.code), () => facultyImportService.buildTemplate());
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${String(req.params.code)}-import-template.xlsx"`);
+    res.send(buffer);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post(
+  '/institutions/:code/import/preview',
+  spreadsheetUpload.single('file'),
+  wrap(async (req) => {
+    if (!req.file) throw AppError.badRequest('Choose an .xlsx or .csv file to upload.');
+    const options = parseImportOptions(req.body?.options);
+    return { data: await inInstitution(String(req.params.code), () => facultyImportService.plan(req.file!.buffer, req.file!.originalname, options)), message: 'Import preview ready.' };
+  })
+);
+
+router.post(
+  '/institutions/:code/import/commit',
+  spreadsheetUpload.single('file'),
+  wrap(async (req) => {
+    if (!req.file) throw AppError.badRequest('Choose an .xlsx or .csv file to upload.');
+    const options = parseImportOptions(req.body?.options);
+    const code = String(req.params.code);
+    const { job, plan } = await inInstitution(code, () =>
+      facultyImportService.start(req.file!.buffer, req.file!.originalname, options, importActor(req), req, req.query.wait === 'true')
+    );
+    await recordPlatformAudit({
+      action: PLATFORM_AUDIT.ACCOUNTS_IMPORTED,
+      actor: actorOf(req),
+      institutionCode: code,
+      ip: req.ip,
+      details: { jobId: String(job._id), file: job.fileName, ready: plan.ready, invalid: plan.invalid, mode: options.mode },
+    });
+    return { data: job, message: 'Import started.', status: 202 };
+  })
+);
+
+router.get(
+  '/institutions/:code/import/jobs/:jobId',
+  wrap(async (req) => ({ data: await inInstitution(String(req.params.code), () => facultyImportService.job(String(req.params.jobId))), message: 'Import progress.' }))
 );
 
 router.get(

@@ -32,6 +32,22 @@ import { SettingsTab } from './admin/SettingsTab';
 import { AuditLogsTab } from './admin/AuditLogsTab';
 import { type TabType } from './admin/shared';
 
+/**
+ * Saves that would replace a department's HOD or the Principal come back with
+ * CONFIRMATION_REQUIRED; ask the administrator, then save again with the replacement confirmed.
+ */
+async function withReplaceConfirmation<T>(save: (confirm: { replaceHod?: boolean; replacePrincipal?: boolean }) => Promise<T>): Promise<T> {
+  try {
+    return await save({});
+  } catch (err) {
+    const e = err as { code?: string; message?: string; response?: { data?: { code?: string; message?: string } } };
+    const code = e.code ?? e.response?.data?.code;
+    const message = e.response?.data?.message ?? e.message ?? '';
+    if (code === 'CONFIRMATION_REQUIRED' && window.confirm(message)) return save({ replaceHod: true, replacePrincipal: true });
+    throw err;
+  }
+}
+
 export const AdminPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const rawTab = searchParams.get('tab');
@@ -580,7 +596,7 @@ export const AdminPage: React.FC = () => {
     try {
       setError(null);
       if (editingUser) {
-        await adminService.updateUser(editingUser._id, userFormData);
+        await withReplaceConfirmation((confirm) => adminService.updateUser(editingUser._id, { ...userFormData, ...confirm }));
         showToast(`User ${userFormData.name} updated successfully.`);
       } else {
         const result = await adminService.createUser(userFormData);
@@ -652,7 +668,7 @@ export const AdminPage: React.FC = () => {
     e.preventDefault();
     try {
       if (editingDept) {
-        await adminService.updateDepartment(editingDept._id, deptFormData);
+        await withReplaceConfirmation((confirm) => adminService.updateDepartment(editingDept._id, { ...deptFormData, ...confirm }));
         showToast(`Department ${deptFormData.name} updated.`);
       } else {
         await adminService.createDepartment(deptFormData);

@@ -215,7 +215,7 @@ async function runSystemQASuite() {
   }
 
   // Ensure department has hodId set
-  dept.hodId = hodFacultyDoc._id;
+  dept.hodId = hodUser._id; // a department's head is the HOD's user account
   await dept.save();
 
   const ctx: TestContext = {

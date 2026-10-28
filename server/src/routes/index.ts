@@ -1,4 +1,5 @@
 import publicRoutes from './public.routes.js';
+import assignmentRoutes from './assignment.routes.js';
 import aiRoutes from './ai.routes.js';
 import calendarRoutes from './calendar.routes.js';
 import { Router } from 'express';
@@ -81,5 +82,6 @@ router.use('/academic-years', academicYearRoutes);
 router.use('/calendar', calendarRoutes);
 router.use('/ai', aiRoutes);
 router.use('/public', publicRoutes);
+router.use('/assignments', assignmentRoutes);
 
 export default router;

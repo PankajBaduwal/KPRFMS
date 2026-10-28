@@ -24,9 +24,10 @@ const departmentSchema = new Schema<IDepartment>(
       uppercase: true,
       trim: true,
     },
+    // The head of department's user account (always a User id; see services/assignment.service.ts)
     hodId: {
       type: Schema.Types.ObjectId,
-      ref: 'Faculty',
+      ref: 'User',
     },
     isActive: {
       type: Boolean,

@@ -18,6 +18,9 @@ export const createUserSchema = z.object({
 });
 
 export const updateUserSchema = z.object({
+  /** Confirms replacing a department's current HOD / the current Principal (see assignment rules) */
+  replaceHod: z.boolean().optional(),
+  replacePrincipal: z.boolean().optional(),
   name: z.string().min(2, 'Name must be at least 2 characters').trim().optional(),
   email: z.string().email('Valid institutional email is required').toLowerCase().trim().optional(),
   role: z.enum(Object.values(ROLES) as [string, ...string[]]).optional(),
@@ -45,6 +48,8 @@ export const departmentSchema = z.object({
   name: z.string().min(2, 'Department name is required').trim(),
   code: z.string().min(2, 'Department code is required').trim().toUpperCase(),
   hodId: z.string().optional().nullable(),
+  /** Confirms replacing the department's current head */
+  replaceHod: z.boolean().optional(),
   isActive: z.boolean().optional().default(true),
 });
 

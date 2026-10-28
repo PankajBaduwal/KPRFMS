@@ -40,6 +40,7 @@ import { computeAcademicYearForDate } from '../utils/academicYear.js';
 import { Notification } from '../models/Notification.js';
 import { clearInstitutionProfileCache } from '../utils/institution.js';
 import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
+import { assignmentService } from './assignment.service.js';
 
 export class AdminService {
   /**
@@ -272,12 +273,30 @@ export class AdminService {
     if (!user) throw AppError.notFound('User not found.');
 
     const changes: Record<string, { from: unknown; to: unknown }> = {};
-    const previousRole = user.role;
-    const roleChanged = input.role && input.role !== user.role;
-    const previousDepartmentId = user.departmentId;
+    const roleChanged = Boolean(input.role && input.role !== user.role);
     const departmentChanged =
-      input.departmentId !== undefined &&
-      String(input.departmentId || '') !== String(previousDepartmentId || '');
+      input.departmentId !== undefined && String(input.departmentId || '') !== String(user.departmentId || '');
+
+    // Role and department changes follow the institution's assignment rules (and audit themselves)
+    if (roleChanged || departmentChanged) {
+      if (roleChanged) changes.role = { from: user.role, to: input.role };
+      if (departmentChanged) changes.departmentId = { from: user.departmentId ?? null, to: input.departmentId || null };
+      await assignmentService.apply(
+        id,
+        { role: roleChanged ? (input.role as Role) : undefined, departmentId: departmentChanged ? input.departmentId || null : undefined },
+        { id: adminId },
+        { replaceHod: input.replaceHod, replacePrincipal: input.replacePrincipal },
+        req
+      );
+      const fresh = await User.findById(id).select('role departmentId');
+      if (fresh) {
+        user.role = fresh.role;
+        user.departmentId = fresh.departmentId;
+      }
+    }
+    if (input.status && input.status !== user.status && input.status !== USER_STATUS.ACTIVE) {
+      await assignmentService.assertCanDeactivate(id);
+    }
 
     if (input.name && input.name !== user.name) {
       changes.name = { from: user.name, to: input.name };
@@ -291,14 +310,6 @@ export class AdminService {
       if (existingEmail) throw AppError.conflict('Email is already in use by another account.');
       changes.email = { from: user.email, to: input.email.toLowerCase() };
       user.email = input.email.toLowerCase();
-    }
-    if (roleChanged) {
-      changes.role = { from: user.role, to: input.role };
-      user.role = input.role as Role;
-    }
-    if (departmentChanged) {
-      changes.departmentId = { from: previousDepartmentId, to: input.departmentId };
-      user.departmentId = input.departmentId ? new Types.ObjectId(input.departmentId) : undefined;
     }
     if (input.designation !== undefined) {
       changes.designation = { from: user.designation, to: input.designation };
@@ -315,37 +326,7 @@ export class AdminService {
 
     await user.save();
 
-    // Mandatory Audit: if role changed, log ROLE_CHANGE specifically
-    if (roleChanged) {
-      await recordAudit({
-        userId: user._id,
-        action: AUDIT_ACTIONS.ROLE_CHANGE,
-        req,
-        details: {
-          adminId,
-          targetEmployeeId: user.employeeId,
-          targetEmail: user.email,
-          previousRole,
-          newRole: user.role,
-        },
-      });
-    }
 
-    // Mandatory Audit: if department changed, log DEPARTMENT_CHANGED specifically
-    if (departmentChanged) {
-      await recordAudit({
-        userId: user._id,
-        action: AUDIT_ACTIONS.DEPARTMENT_CHANGED,
-        req,
-        details: {
-          adminId,
-          targetEmployeeId: user.employeeId,
-          targetEmail: user.email,
-          previousDepartmentId,
-          newDepartmentId: user.departmentId,
-        },
-      });
-    }
 
     // General update audit
     await recordAudit({
@@ -465,6 +446,7 @@ export class AdminService {
     if (user.status === USER_STATUS.PENDING) {
       throw AppError.badRequest('This is a pending registration. Use Approve or Reject instead.');
     }
+    if (status !== USER_STATUS.ACTIVE) await assignmentService.assertCanDeactivate(id);
 
     const previousStatus = user.status;
     user.status = status as any;
@@ -530,6 +512,7 @@ export class AdminService {
   }
 
   async deleteUser(id: string, adminId: string, req?: Request) {
+    await assignmentService.assertCanDeactivate(id);
     const user = await User.findById(id);
     if (!user) throw AppError.notFound('User not found.');
 
@@ -684,11 +667,14 @@ export class AdminService {
   async createDepartment(input: DepartmentInput, adminId: string, req?: Request) {
     const existing = await Department.findOne({ code: input.code.toUpperCase() });
     if (existing) throw AppError.conflict(`Department code '${input.code}' already exists.`);
+    if (input.hodId) {
+      // A head must already belong to the department, and nobody belongs to a new one yet
+      throw AppError.badRequest('Create the department first, move the person into it, then make them its head.');
+    }
 
     const dept = await Department.create({
       name: input.name,
       code: input.code.toUpperCase(),
-      hodId: input.hodId ? new Types.ObjectId(input.hodId) : undefined,
       isActive: input.isActive ?? true,
     });
 
@@ -720,9 +706,13 @@ export class AdminService {
     }
 
     dept.name = input.name;
-    dept.hodId = input.hodId ? new Types.ObjectId(input.hodId) : undefined;
     if (input.isActive !== undefined) dept.isActive = input.isActive;
     await dept.save();
+
+    // A change of head follows the assignment rules (own department, confirmed replacement, audit)
+    if (input.hodId !== undefined && String(input.hodId || '') !== String(dept.hodId || '')) {
+      await assignmentService.setDepartmentHead(String(dept._id), input.hodId || null, { id: adminId }, { replaceHod: input.replaceHod }, req);
+    }
 
     await recordAudit({
       action: AUDIT_ACTIONS.DEPARTMENT_UPDATED,

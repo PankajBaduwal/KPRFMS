@@ -246,7 +246,7 @@ async function runSecurityAudit() {
     },
     { upsert: true, new: true }
   );
-  deptA.hodId = facHodA._id;
+  deptA.hodId = userHodA._id; // a department's head is the HOD's user account
   await deptA.save();
 
   // HOD Dept B
@@ -276,7 +276,7 @@ async function runSecurityAudit() {
     },
     { upsert: true, new: true }
   );
-  deptB.hodId = facHodB._id;
+  deptB.hodId = userHodB._id;
   await deptB.save();
 
   // Dean

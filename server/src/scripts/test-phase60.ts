@@ -344,7 +344,8 @@ async function run() {
   ws.addRow(['P60IMP1', 'Dr. Imported One', { text: `p60.imp1@${domain}`, hyperlink: `mailto:p60.imp1@${domain}` }, 'cse', '', '9876543210', '']);
   ws.addRow(['P60IMP2', 'Dr. Bad Dept', `p60.imp2@${domain}`, 'NOPE', '', '', '']);
   ws.addRow(['P60IMP3', 'Dr. Duplicate', facultyEmail, 'CSE', '', '', '']);
-  ws.addRow(['P60IMP4', 'Dr. Wrong Domain', 'p60.imp4@gmail.com', 'CSE', '', '', 'ADMIN']);
+  // ADMIN is importable since M5, so an unknown role is used to check role validation
+  ws.addRow(['P60IMP4', 'Dr. Wrong Domain', 'p60.imp4@gmail.com', 'CSE', '', '', 'BOSS']);
   ws.addRow([]);
   const xlsx = Buffer.from(await wb.xlsx.writeBuffer());
   const form = (dryRun: boolean) => {

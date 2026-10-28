@@ -132,6 +132,24 @@ final checks); the institution becomes usable only after the last check passes, 
 setup can be retried from the failed step. Institutions can be suspended (all sessions stop on
 their next request), reactivated or archived, and activation links re-sent.
 
+### Bulk import and leadership assignments
+
+**Admin → Users → Import from Excel** (and the same screen on an institution's page in the
+platform console) imports faculty and staff of every role, including administrators. Choose how
+existing people are treated (create new only / update existing / skip existing / refuse the file),
+whether missing departments may be created, and map spreadsheet department names to existing
+codes. Every row is previewed (create, update with each field change, skip, or the reason it
+cannot be imported) before anything is written; errors and final results download as CSV. Role and
+department changes of existing people are only applied when explicitly allowed. The import runs as
+a background job with live progress; new people are emailed their set-password link once their
+account exists.
+
+Leadership rules apply everywhere (user editor, department form, import, `/api/assignments` for
+Admins and Principals): an HOD heads their own department and each department has one HOD; there
+is one Principal; several Deans are allowed; the last active administrator cannot be removed;
+moving someone to another department keeps their past records where they were made. Replacing
+an HOD or the Principal must be confirmed, and every change is audited.
+
 Files: each institution's uploads and document vault live in
 `server/storage/tenants/<code>/uploads` and `server/storage/tenants/<code>/secure_documents`,
 and are only served to signed-in users of that institution. The old shared `server/uploads/`

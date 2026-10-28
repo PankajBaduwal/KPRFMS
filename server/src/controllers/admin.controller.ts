@@ -20,6 +20,7 @@ import {
 import { facultyImportService } from '../services/faculty-import.service.js';
 import { twoFactorService } from '../services/two-factor.service.js';
 import { AppError } from '../utils/AppError.js';
+import { parseImportOptions } from '../validators/import.validator.js';
 
 export class AdminController {
   // Bulk faculty import from Excel
@@ -29,6 +30,42 @@ export class AdminController {
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', 'attachment; filename="faculty-import-template.xlsx"');
       res.send(buffer);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async previewImport(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      if (!req.file) throw AppError.badRequest('Choose an .xlsx or .csv file to upload.');
+      const options = parseImportOptions(req.body?.options);
+      sendSuccess(res, await facultyImportService.plan(req.file.buffer, req.file.originalname, options), 'Import preview ready.');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async commitImport(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      if (!req.file) throw AppError.badRequest('Choose an .xlsx or .csv file to upload.');
+      const options = parseImportOptions(req.body?.options);
+      const { job } = await facultyImportService.start(
+        req.file.buffer,
+        req.file.originalname,
+        options,
+        { id: req.user!.id, label: `${req.user!.role}:${req.user!.email}` },
+        req,
+        String(req.query.wait) === 'true'
+      );
+      sendSuccess(res, job, 'Import started.', 202);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async importJob(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      sendSuccess(res, await facultyImportService.job(String(req.params.jobId)), 'Import progress.');
     } catch (err) {
       next(err);
     }

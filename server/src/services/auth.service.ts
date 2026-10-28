@@ -33,6 +33,7 @@ import { sessionService } from './session.service.js';
 import { mailService, clientUrl } from './mail.service.js';
 import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
 import { allowedEmailDomains, emailInDomains } from './institution-domains.js';
+import { assignmentService } from './assignment.service.js';
 
 
 const MAX_FAILED_ATTEMPTS = 5;
@@ -590,22 +591,9 @@ export class AuthService {
       throw AppError.notFound('User not found.');
     }
 
-    const previousRole = user.role;
-    user.role = input.role;
-    await user.save();
-
-    await recordAudit({
-      userId: user._id,
-      action: AUDIT_ACTIONS.ROLE_CHANGE,
-      req,
-      details: {
-        adminId,
-        previousRole,
-        newRole: input.role,
-      },
-    });
-
-    return user;
+    // Same assignment rules as everywhere else (HOD department, one Principal, last admin; audited there)
+    await assignmentService.apply(String(user._id), { role: input.role }, { id: adminId }, {}, req);
+    return User.findById(user._id);
   }
 
   async updateUserStatus(input: UpdateStatusInput, adminId: string, req: Request) {
