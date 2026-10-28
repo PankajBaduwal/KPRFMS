@@ -250,7 +250,12 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
     try {
       let saved: Project;
       if (project?._id) {
-        saved = await projectService.updateProject(project._id, payload);
+        // Status changes go through the funding lifecycle (checked and audited), not the edit form
+        const { status: _ignored, ...edits } = payload;
+        saved = await projectService.updateProject(project._id, edits);
+        if (statusToSave && statusToSave !== project.status) {
+          saved = await projectService.updateProjectStatus(project._id, { status: statusToSave });
+        }
       } else {
         saved = await projectService.createProject(payload);
       }

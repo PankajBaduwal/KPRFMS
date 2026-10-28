@@ -3,17 +3,10 @@ import './Department.js';
 import './User.js';
 import './Faculty.js';
 import { tenantModel } from '../tenancy/tenantModel.js';
+import { FUNDING_STATUS, VERIFICATION, initialVerification, type VerificationStatus } from '../services/funding-lifecycle.js';
 
-export const PROJECT_STATUS = {
-  IDEA: 'IDEA',
-  DRAFT: 'DRAFT',
-  SUBMITTED: 'SUBMITTED',
-  UNDER_REVIEW: 'UNDER_REVIEW',
-  SANCTIONED: 'SANCTIONED',
-  ONGOING: 'ONGOING',
-  COMPLETED: 'COMPLETED',
-  REJECTED: 'REJECTED',
-} as const;
+// Funding lifecycle (see services/funding-lifecycle.ts for meanings and transition rules)
+export const PROJECT_STATUS = FUNDING_STATUS;
 
 export type ProjectStatus = (typeof PROJECT_STATUS)[keyof typeof PROJECT_STATUS];
 
@@ -79,6 +72,18 @@ export interface IProjectDoc extends Document {
   utilizationStatus: UtilizationStatus;
   documents: IProjectDocument[];
   remarks?: string;
+  /** Funding scheme within the agency, e.g. "Core Research Grant" */
+  scheme?: string;
+  applicationDate?: Date;
+  expectedDecisionDate?: Date;
+  decisionDate?: Date;
+  /** Institutional verification of the record and its evidence (separate from the agency status) */
+  verificationStatus: VerificationStatus;
+  verifiedBy?: Types.ObjectId;
+  verifiedAt?: Date;
+  verificationRemarks?: string;
+  reviewerComments: Array<{ at: Date; by?: Types.ObjectId; byName?: string; role?: string; source: 'AGENCY' | 'INSTITUTION' | 'INVESTIGATOR'; comment: string }>;
+  statusHistory: Array<{ from?: string; to: string; at: Date; by?: Types.ObjectId; byName?: string; role?: string; note?: string }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -238,6 +243,51 @@ const projectSchema = new Schema<IProjectDoc>(
       type: String,
       trim: true,
     },
+    scheme: { type: String, trim: true },
+    applicationDate: { type: Date },
+    expectedDecisionDate: { type: Date },
+    decisionDate: { type: Date },
+    verificationStatus: {
+      type: String,
+      enum: Object.values(VERIFICATION),
+      // New records start from their lifecycle status (drafts are not yet submitted for checking)
+      default: function (this: { status?: string }) {
+        return initialVerification(this.status);
+      },
+      index: true,
+    },
+    verifiedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    verifiedAt: { type: Date },
+    verificationRemarks: { type: String, trim: true },
+    reviewerComments: {
+      type: [
+        {
+          _id: false,
+          at: { type: Date, default: Date.now },
+          by: { type: Schema.Types.ObjectId, ref: 'User' },
+          byName: String,
+          role: String,
+          source: { type: String, enum: ['AGENCY', 'INSTITUTION', 'INVESTIGATOR'], default: 'INSTITUTION' },
+          comment: { type: String, trim: true, maxlength: 2000 },
+        },
+      ],
+      default: [],
+    },
+    statusHistory: {
+      type: [
+        {
+          _id: false,
+          from: String,
+          to: String,
+          at: { type: Date, default: Date.now },
+          by: { type: Schema.Types.ObjectId, ref: 'User' },
+          byName: String,
+          role: String,
+          note: { type: String, maxlength: 2000 },
+        },
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,
@@ -246,6 +296,7 @@ const projectSchema = new Schema<IProjectDoc>(
 
 // Compound indexes for analytics and efficient filtering
 projectSchema.index({ departmentId: 1, status: 1 });
+projectSchema.index({ departmentId: 1, verificationStatus: 1 });
 projectSchema.index({ facultyId: 1, status: 1 });
 projectSchema.index({ academicYear: 1, status: 1 });
 projectSchema.index({ fundingAgency: 1, fundingType: 1 });

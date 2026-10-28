@@ -12,6 +12,7 @@ import type {
   UpdateProjectStatusInput,
   ProjectFilterQuery,
 } from '../validators/project.validator.js';
+import { STATUS_LABELS, VERIFICATION, initialVerification, mayMove, nextStatuses, requirementsFor, type Actor, type FundingStatus } from './funding-lifecycle.js';
 
 export class ProjectService {
   /**
@@ -80,6 +81,10 @@ export class ProjectService {
       grantNumber: data.grantNumber,
       sanctionNumber: data.sanctionNumber,
       proposalNumber: data.proposalNumber,
+      scheme: data.scheme,
+      applicationDate: data.applicationDate,
+      expectedDecisionDate: data.expectedDecisionDate,
+      decisionDate: data.decisionDate,
       requestedAmount: data.requestedAmount,
       sanctionedAmount: data.sanctionedAmount || 0,
       receivedAmount: data.receivedAmount || 0,
@@ -88,6 +93,8 @@ export class ProjectService {
       durationMonths: data.durationMonths,
       academicYear: data.academicYear,
       status: data.status || PROJECT_STATUS.DRAFT,
+      verificationStatus: initialVerification(data.status || PROJECT_STATUS.DRAFT),
+      statusHistory: [{ to: data.status || PROJECT_STATUS.DRAFT, at: new Date(), by: new Types.ObjectId(user.id), byName: user.name, role: user.role, note: 'Recorded' }],
       submissionDate,
       approvalDate,
       completionDate: data.completionDate,
@@ -151,6 +158,10 @@ export class ProjectService {
     }
 
     const previousStatus = project.status;
+    // The lifecycle has its own checked, audited route; the edit form only repeats the current status
+    if (data.status !== undefined && data.status !== project.status) {
+      throw AppError.badRequest('Change the funding status with the status update, not the edit form.');
+    }
 
     if (data.title !== undefined) project.title = data.title;
     if (data.coInvestigators !== undefined)
@@ -161,6 +172,10 @@ export class ProjectService {
     if (data.grantNumber !== undefined) project.grantNumber = data.grantNumber;
     if (data.sanctionNumber !== undefined) project.sanctionNumber = data.sanctionNumber;
     if (data.proposalNumber !== undefined) project.proposalNumber = data.proposalNumber;
+    if (data.scheme !== undefined) project.scheme = data.scheme;
+    if (data.applicationDate !== undefined) project.applicationDate = data.applicationDate;
+    if (data.expectedDecisionDate !== undefined) project.expectedDecisionDate = data.expectedDecisionDate;
+    if (data.decisionDate !== undefined) project.decisionDate = data.decisionDate;
     if (data.requestedAmount !== undefined)
       project.requestedAmount = data.requestedAmount;
     if (data.sanctionedAmount !== undefined)
@@ -172,7 +187,6 @@ export class ProjectService {
     if (data.durationMonths !== undefined)
       project.durationMonths = data.durationMonths;
     if (data.academicYear !== undefined) project.academicYear = data.academicYear;
-    if (data.status !== undefined) project.status = data.status;
     if (data.submissionDate !== undefined)
       project.submissionDate = data.submissionDate;
     if (data.approvalDate !== undefined) project.approvalDate = data.approvalDate;
@@ -182,6 +196,13 @@ export class ProjectService {
       project.utilizationStatus = data.utilizationStatus as any;
     if (data.documents !== undefined) project.documents = data.documents as any;
     if (data.remarks !== undefined) project.remarks = data.remarks;
+
+    // An investigator's change to a checked or returned record goes back to the HOD
+    if (isOwner && !isHod && !isLeadership && project.isModified() && ['VERIFIED', 'RETURNED_FOR_CORRECTION'].includes(project.verificationStatus)) {
+      project.verificationStatus = initialVerification(project.status);
+      project.verifiedBy = undefined;
+      project.verifiedAt = undefined;
+    }
 
     await project.save();
 
@@ -199,7 +220,36 @@ export class ProjectService {
   }
 
   /**
-   * Update project status (Review / Sanction / Ongoing / Completed / Rejected)
+   * Who is acting on a project: its investigator (OWNER), a reviewer (HOD of the project's
+   * department, Dean, Principal, Admin), or neither.
+   */
+  actorFor(user: AuthenticatedUser, project: { userId: Types.ObjectId; departmentId: Types.ObjectId }): Actor | null {
+    if (project.userId.toString() === user.id) return 'OWNER';
+    const isHod = user.role === ROLES.HOD && project.departmentId.toString() === user.departmentId;
+    const isLeadership = [ROLES.DEAN, ROLES.PRINCIPAL, ROLES.ADMIN].includes(user.role as any);
+    return isHod || isLeadership ? 'REVIEWER' : null;
+  }
+
+  /** The statuses this user may move the project to next (for the "Update status" screen). */
+  async allowedTransitions(user: AuthenticatedUser, projectId: string) {
+    if (!Types.ObjectId.isValid(projectId)) throw AppError.notFound('Research project not found.');
+    const project = await Project.findById(projectId).select('userId departmentId status verificationStatus').lean();
+    if (!project) throw AppError.notFound('Research project not found.');
+    const actor = this.actorFor(user, project as any);
+    const next = actor ? nextStatuses(project.status as FundingStatus).filter((to) => mayMove(to, actor)) : [];
+    return {
+      status: project.status,
+      verificationStatus: project.verificationStatus,
+      actor,
+      next: next.map((to) => ({ status: to, label: STATUS_LABELS[to], needsNote: ['CLARIFICATION_REQUIRED', 'REJECTED', 'WITHDRAWN'].includes(to) })),
+    };
+  }
+
+  /**
+   * Moves a project along the funding lifecycle (see services/funding-lifecycle.ts): only allowed
+   * moves, only by people allowed to make them, with the details each step needs. Every move is
+   * recorded in the project's history and the audit log. A step recorded by a reviewer counts as
+   * verified; a later change by the investigator needs checking again.
    */
   async updateProjectStatus(
     user: AuthenticatedUser,
@@ -212,96 +262,90 @@ export class ProjectService {
       throw AppError.notFound('Research project not found.');
     }
 
-    const isOwner = project.userId.toString() === user.id;
-    const isHod =
-      user.role === ROLES.HOD &&
-      project.departmentId.toString() === user.departmentId;
-    const isLeadership = [ROLES.DEAN, ROLES.PRINCIPAL, ROLES.ADMIN].includes(
-      user.role as any
-    );
-
-    // Self-approval constraint: Reviewer cannot sanction their own project proposal
-    if (isOwner && data.status === PROJECT_STATUS.SANCTIONED) {
+    const actor = this.actorFor(user, project);
+    const to = data.status as FundingStatus;
+    if (!actor) {
+      throw AppError.forbidden('You do not have leadership authorization to update this project status.');
+    }
+    if (!mayMove(to, actor)) {
       throw AppError.forbidden(
-        'Self-approval violation: You cannot sanction or approve your own project proposal.'
+        to === PROJECT_STATUS.SANCTIONED || to === PROJECT_STATUS.APPROVED
+          ? 'Self-approval violation: You cannot sanction or approve your own project proposal.'
+          : 'Agency decisions are recorded by the HOD or institutional leadership, not by the investigator.'
       );
     }
 
-    // Faculty owner can only transition IDEA -> DRAFT -> SUBMITTED
-    if (isOwner && !isHod && !isLeadership) {
-      const allowedTransitions: string[] = [
-        PROJECT_STATUS.IDEA,
-        PROJECT_STATUS.DRAFT,
-        PROJECT_STATUS.SUBMITTED,
-      ];
-      if (!allowedTransitions.includes(data.status)) {
-        throw AppError.forbidden(
-          'Faculty members cannot directly approve, sanction, or reject project proposals.'
-        );
-      }
-    } else if (!isHod && !isLeadership) {
-      throw AppError.forbidden(
-        'You do not have leadership authorization to update this project status.'
-      );
-    }
-
-    const previousStatus = project.status;
-
-    // Strict state machine validation
-    if (
-      (previousStatus === PROJECT_STATUS.IDEA || previousStatus === PROJECT_STATUS.DRAFT) &&
-      (data.status === PROJECT_STATUS.SANCTIONED || data.status === PROJECT_STATUS.REJECTED || data.status === PROJECT_STATUS.ONGOING || data.status === PROJECT_STATUS.COMPLETED)
-    ) {
+    const previousStatus = project.status as FundingStatus;
+    if (previousStatus === to) throw AppError.badRequest(`The project is already ${STATUS_LABELS[to].toLowerCase()}.`);
+    if (!nextStatuses(previousStatus).includes(to)) {
       throw AppError.badRequest(
-        `Cannot transition project directly from '${previousStatus}' to '${data.status}'. Proposal must be submitted first.`
+        previousStatus === PROJECT_STATUS.REJECTED && to === PROJECT_STATUS.SANCTIONED
+          ? 'Rejected project proposal cannot be directly sanctioned.'
+          : `Cannot transition project directly from '${previousStatus}' to '${to}'.`
       );
     }
 
-    if (previousStatus === PROJECT_STATUS.REJECTED && data.status === PROJECT_STATUS.SANCTIONED) {
-      throw AppError.badRequest('Rejected project proposal cannot be directly sanctioned.');
-    }
-
-    project.status = data.status;
-
-    if (data.status === PROJECT_STATUS.SUBMITTED && !project.submissionDate) {
-      project.submissionDate = new Date();
-    }
-
-    if (data.status === PROJECT_STATUS.SANCTIONED) {
-      project.approvalDate = data.approvalDate || project.approvalDate || new Date();
-      if (data.sanctionNumber) project.sanctionNumber = data.sanctionNumber;
-      if (data.sanctionedAmount !== undefined)
-        project.sanctionedAmount = data.sanctionedAmount;
-      if (data.receivedAmount !== undefined)
-        project.receivedAmount = data.receivedAmount;
-    }
-
-    if (data.status === PROJECT_STATUS.COMPLETED) {
-      project.completionDate =
-        data.completionDate || project.completionDate || new Date();
-    }
-
+    // Details supplied with the step
     if (data.sanctionNumber) project.sanctionNumber = data.sanctionNumber;
-    if (data.sanctionedAmount !== undefined)
-      project.sanctionedAmount = data.sanctionedAmount;
-    if (data.receivedAmount !== undefined)
-      project.receivedAmount = data.receivedAmount;
-    if (data.utilizationStatus)
-      project.utilizationStatus = data.utilizationStatus as any;
+    if (data.grantNumber) project.grantNumber = data.grantNumber;
+    if (data.proposalNumber) project.proposalNumber = data.proposalNumber;
+    if (data.scheme) project.scheme = data.scheme;
+    if (data.requestedAmount !== undefined) project.requestedAmount = data.requestedAmount;
+    if (data.sanctionedAmount !== undefined) project.sanctionedAmount = data.sanctionedAmount;
+    if (data.receivedAmount !== undefined) project.receivedAmount = data.receivedAmount;
+    if (data.expectedDecisionDate) project.expectedDecisionDate = data.expectedDecisionDate;
+    if (data.utilizationStatus) project.utilizationStatus = data.utilizationStatus as any;
+
+    const problems = requirementsFor(to, project, data.remarks);
+    if (problems.length) throw AppError.badRequest(problems.join(' '));
+
+    // Dates each step implies (an explicit date wins)
+    const now = new Date();
+    if (to === PROJECT_STATUS.APPLIED) project.applicationDate = data.applicationDate || project.applicationDate || now;
+    if (to === PROJECT_STATUS.SUBMITTED && !project.submissionDate) project.submissionDate = data.applicationDate || now;
+    if (to === PROJECT_STATUS.APPROVED || to === PROJECT_STATUS.REJECTED) project.decisionDate = data.decisionDate || now;
+    if (to === PROJECT_STATUS.SANCTIONED) {
+      project.approvalDate = data.approvalDate || project.approvalDate || now;
+      project.decisionDate = data.decisionDate || project.decisionDate || project.approvalDate;
+    }
+    if (to === PROJECT_STATUS.ONGOING) project.startDate = data.startDate || project.startDate || now;
+    if (to === PROJECT_STATUS.COMPLETED) project.completionDate = data.completionDate || project.completionDate || now;
+
+    project.status = to;
     if (data.remarks) project.remarks = data.remarks;
+    project.statusHistory.push({ from: previousStatus, to, at: now, by: new Types.ObjectId(user.id), byName: user.name, role: user.role, note: data.remarks });
+    if (data.remarks) {
+      const fromAgency = ['CLARIFICATION_REQUIRED', 'REJECTED', 'APPROVED', 'SANCTIONED'].includes(to);
+      project.reviewerComments.push({
+        at: now,
+        by: new Types.ObjectId(user.id),
+        byName: user.name,
+        role: user.role,
+        source: actor === 'OWNER' ? 'INVESTIGATOR' : fromAgency ? 'AGENCY' : 'INSTITUTION',
+        comment: data.remarks,
+      });
+    }
+
+    // Verification: reviewers verify what they record; the investigator's later changes need checking
+    if (actor === 'REVIEWER') {
+      project.verificationStatus = VERIFICATION.VERIFIED;
+      project.verifiedBy = new Types.ObjectId(user.id);
+      project.verifiedAt = now;
+    } else if (to === PROJECT_STATUS.IDEA || to === PROJECT_STATUS.DRAFT) {
+      project.verificationStatus = VERIFICATION.DRAFT;
+    } else {
+      project.verificationStatus = VERIFICATION.SUBMITTED;
+    }
 
     await project.save();
 
-    const auditAction =
-      data.status === PROJECT_STATUS.SANCTIONED
-        ? AUDIT_ACTIONS.PROJECT_SANCTIONED
-        : AUDIT_ACTIONS.PROJECT_STATUS_CHANGED;
-
-    await this.logAudit(auditAction, user.id, req, {
+    await this.logAudit(to === PROJECT_STATUS.SANCTIONED ? AUDIT_ACTIONS.PROJECT_SANCTIONED : AUDIT_ACTIONS.PROJECT_STATUS_CHANGED, user.id, req, {
       projectId: project._id,
       title: project.title,
       previousStatus,
       newStatus: project.status,
+      by: actor,
+      verificationStatus: project.verificationStatus,
       sanctionedAmount: project.sanctionedAmount,
       sanctionNumber: project.sanctionNumber,
       remarks: data.remarks,

@@ -579,10 +579,11 @@ export class DashboardService {
         departmentId: departmentId as any,
         verificationStatus: { $in: ['SUBMITTED', 'UNDER_REVIEW'] },
       }).populate('facultyId', 'name employeeId designation').sort({ createdAt: -1 }).limit(10).lean(),
+      // Projects whose record is waiting for the HOD to verify it
       Project.find({
         departmentId: departmentId as any,
-        status: { $in: ['SUBMITTED', 'UNDER_REVIEW'] as any },
-      }).populate('facultyId', 'name employeeId designation').sort({ createdAt: -1 }).limit(10).lean(),
+        verificationStatus: 'SUBMITTED',
+      } as any).populate('facultyId', 'name employeeId designation').sort({ createdAt: -1 }).limit(10).lean(),
       AcademicActivity.find({
         departmentId: departmentId as any,
         status: 'SUBMITTED',

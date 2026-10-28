@@ -193,10 +193,14 @@ export class ApprovalQueueService {
         const fac: any = pr.facultyId;
         if (!fac) continue;
 
+        // The queue is about the institution checking the record (verificationStatus);
+        // the agency lifecycle (status) is shown alongside but never decided here
+        const v = (pr as any).verificationStatus as string;
+        if (v === 'DRAFT') continue;
         let status: UnifiedStatus = 'PENDING';
-        if (['SANCTIONED', 'ONGOING', 'COMPLETED'].includes(pr.status)) status = 'APPROVED';
-        else if (pr.status === 'REJECTED') status = 'REJECTED';
-        else if (pr.status === 'DRAFT' || pr.status === 'IDEA') status = 'RETURNED_FOR_CORRECTION';
+        if (v === 'VERIFIED') status = 'APPROVED';
+        else if (v === 'REJECTED') status = 'REJECTED';
+        else if (v === 'RETURNED_FOR_CORRECTION') status = 'RETURNED_FOR_CORRECTION';
 
         allRecords.push({
           id: pr._id.toString(),
@@ -216,7 +220,7 @@ export class ApprovalQueueService {
             profilePhoto: fac.profilePhoto,
           },
           department: deptInfo,
-          summary: `Agency: ${pr.fundingAgency} • Budget: ₹${(pr.requestedAmount || pr.sanctionedAmount || 0).toLocaleString('en-IN')}`,
+          summary: `Agency: ${pr.fundingAgency} • Status: ${pr.status} • Budget: ₹${(pr.sanctionedAmount || pr.requestedAmount || 0).toLocaleString('en-IN')}`,
           actionNote: pr.remarks,
           hasDocuments: (pr.documents && pr.documents.length > 0) || false,
           documentCount: pr.documents?.length || 0,
@@ -1253,23 +1257,27 @@ export class ApprovalQueueService {
         facultyUserId = targetDoc.userId;
         facultyDocId = targetDoc.facultyId?._id;
         recordTitle = targetDoc.title;
-        previousStatus = targetDoc.status;
+        previousStatus = targetDoc.verificationStatus;
         academicYear = targetDoc.academicYear;
 
         await this.validateApprovalPreconditions(targetDoc, actorId, action, previousStatus, deptId, user);
 
+        // Approving here verifies the record and its evidence; the agency status is unchanged
+        // (an HOD never "sanctions" external funding from the approval queue)
         if (action === 'APPROVE') {
-          targetDoc.status = 'SANCTIONED';
-          targetDoc.approvalDate = new Date();
-          targetDoc.remarks = reason || comments || 'Approved by HOD';
+          targetDoc.verificationStatus = 'VERIFIED';
+          targetDoc.verificationRemarks = reason || comments || 'Verified by HOD';
         } else if (action === 'RETURN_FOR_CORRECTION') {
-          targetDoc.status = 'DRAFT';
-          targetDoc.remarks = `[Returned for Revision] ${reason}`;
+          targetDoc.verificationStatus = 'RETURNED_FOR_CORRECTION';
+          targetDoc.verificationRemarks = reason;
         } else if (action === 'REJECT') {
-          targetDoc.status = 'REJECTED';
-          targetDoc.remarks = reason;
+          targetDoc.verificationStatus = 'REJECTED';
+          targetDoc.verificationRemarks = reason;
         }
-        newStatus = targetDoc.status;
+        targetDoc.verifiedBy = actorId;
+        targetDoc.verifiedAt = new Date();
+        targetDoc.reviewerComments.push({ at: new Date(), by: actorId, byName: user.name, role: user.role, source: 'INSTITUTION', comment: `${action.replace(/_/g, ' ').toLowerCase()}: ${reason || comments || 'verified'}` });
+        newStatus = targetDoc.verificationStatus;
         await targetDoc.save();
         break;
       }

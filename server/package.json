@@ -21,7 +21,8 @@
     "tenant:files": "tsx src/scripts/tenant-files-copy.ts",
     "tenant:migrate": "tsx src/scripts/tenant-migrate.ts",
     "platform:create-admin": "tsx src/scripts/platform-create-admin.ts",
-    "tenant:normalize-hod": "tsx src/scripts/tenant-normalize-hod.ts"
+    "tenant:normalize-hod": "tsx src/scripts/tenant-normalize-hod.ts",
+    "tenant:migrate-funding": "tsx src/scripts/tenant-migrate-funding.ts"
   },
   "keywords": [],
   "license": "ISC",

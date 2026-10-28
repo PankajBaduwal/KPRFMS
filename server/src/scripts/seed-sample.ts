@@ -550,7 +550,8 @@ async function main() {
       documents: sanctioned ? [{ title: 'Sanction Order', documentType: 'SANCTION_ORDER', fileUrl: '/uploads/documents/sample-sanction-order.pdf', fileName: 'Sanction_Order.pdf', uploadedAt: start }] : [],
     });
   });
-  await create(Project, projectDocs);
+  // Sample data stands for an established institution whose records were already checked
+  await create(Project, projectDocs.map((d) => ({ ...d, verificationStatus: ['IDEA', 'DRAFT'].includes(String((d as { status?: string }).status)) ? 'DRAFT' : 'VERIFIED' })));
 
   const activityDocs: Record<string, unknown>[] = [];
   for (const p of people) {

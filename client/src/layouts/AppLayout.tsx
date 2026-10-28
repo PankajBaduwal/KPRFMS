@@ -185,6 +185,7 @@ export const AppLayout: React.FC = () => {
             { to: ROUTES.PUBLICATIONS, label: 'Publications', icon: 'bi-journal-bookmark' },
             { to: `${ROUTES.PROJECTS}?type=RESEARCH`, label: 'Research Projects', icon: 'bi-folder2-open' },
             { to: `${ROUTES.PROJECTS}?type=FUNDED`, label: 'Funded Projects', icon: 'bi-cash-coin' },
+            { to: ROUTES.FUNDING, label: 'Funding Pipeline', icon: 'bi-graph-up-arrow' },
             { to: `${ROUTES.IPR_CONSULTANCY}?tab=PATENTS`, label: 'Patents', icon: 'bi-lightbulb' },
             { to: `${ROUTES.IPR_CONSULTANCY}?tab=COPYRIGHTS`, label: 'Copyrights', icon: 'bi-c-circle' },
             { to: `${ROUTES.IPR_CONSULTANCY}?tab=CONSULTANCY`, label: 'Consultancy', icon: 'bi-briefcase-fill' },

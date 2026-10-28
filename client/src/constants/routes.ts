@@ -10,6 +10,7 @@ export const ROUTES = {
   FACULTY_VIEW: '/portal/faculty/:facultyId',
   PUBLICATIONS: '/portal/publications',
   PROJECTS: '/portal/projects',
+  FUNDING: '/portal/funding',
   ACTIVITIES: '/portal/activities',
   IPR_CONSULTANCY: '/portal/ipr-consultancy',
   MENTORING: '/portal/mentoring',

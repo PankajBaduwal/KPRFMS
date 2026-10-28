@@ -7,17 +7,17 @@ import { Department } from '../models/Department.js';
 import { InstitutionSettings, DEFAULT_LEADERBOARD_WEIGHTS, LeaderboardWeights } from '../models/InstitutionSettings.js';
 import { getCurrentAcademicYear } from '../utils/academicYear.js';
 import { AppError } from '../utils/AppError.js';
+import { verifiedFundedMatch } from './funding-lifecycle.js';
 
 /**
  * Leaderboards for the Principal and Dean dashboards. Only records that have been checked
- * count: verified publications, patents and activities, and projects that were actually
- * sanctioned (sanctioned, ongoing or completed). Drafts and pending items never rank.
+ * count: verified publications, patents and activities, and funded projects (sanctioned, ongoing
+ * or completed) whose record the institution has verified. Drafts and pending items never rank.
  */
 
 export const LEADERBOARD_METRICS = ['publications', 'projects', 'patents', 'activities'] as const;
 export type LeaderboardMetric = (typeof LEADERBOARD_METRICS)[number];
 
-const FUNDED_PROJECT = ['SANCTIONED', 'ONGOING', 'COMPLETED'];
 const TOP_N = 10;
 
 const previousYear = (ay: string) => {
@@ -29,7 +29,8 @@ const previousYear = (ay: string) => {
 function metricMatch(metric: LeaderboardMetric, academicYear: string, departmentId?: Types.ObjectId) {
   const match: Record<string, unknown> = { academicYear };
   if (departmentId) match.departmentId = departmentId;
-  if (metric === 'projects') match.status = { $in: FUNDED_PROJECT };
+  // Funded and checked by the institution (status alone is the investigator's claim)
+  if (metric === 'projects') Object.assign(match, verifiedFundedMatch());
   else if (metric === 'activities') match.status = 'VERIFIED';
   else match.verificationStatus = 'VERIFIED';
   return match;

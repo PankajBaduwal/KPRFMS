@@ -890,7 +890,8 @@ async function seed() {
   if (facultyRecord && facultyUser && deptCse) {
     await purgeSeeded(Project);
     logger.info('Seeding Phase 6 Research Projects & Funding...');
-    await seedCreate(Project, [
+    // Seeded projects past the draft stage count as already checked by the institution
+    await seedCreate(Project, ([
       {
         title: 'AI-Driven Edge Computing Framework for Autonomous Smart Grid Monitoring',
         facultyId: facultyRecord._id,
@@ -1118,7 +1119,7 @@ async function seed() {
         remarks: 'Proposal not recommended due to duplication with existing DRDO laboratory program. Suggested revision for quantum repeaters.',
         documents: [],
       },
-    ]);
+    ] as Record<string, unknown>[]).map((d) => ({ ...d, verificationStatus: ['IDEA', 'DRAFT'].includes(String(d.status)) ? 'DRAFT' : 'VERIFIED' })));
     logger.info('Sample Phase 6 research projects seeded successfully!');
 
     // 6. Seed Phase 7 Academic Activities (Conferences, Workshops, Seminars, FDP, STTP)

@@ -150,6 +150,17 @@ is one Principal; several Deans are allowed; the last active administrator canno
 moving someone to another department keeps their past records where they were made. Replacing
 an HOD or the Principal must be confirmed, and every change is audited.
 
+### Funding applications
+
+Research → Funding Pipeline tracks each application from idea to completion (applied, pending,
+under review, clarification, approved, sanctioned, ongoing, completed, rejected, withdrawn). The
+investigator records progress; only their HOD, the Dean, Principal or Admin can record an
+agency's approval, sanction or rejection. Money counts as sanctioned or received only after the
+HOD has verified the record. Faculty see their own applications, HODs their department, and the
+Dean and Principal the whole institution by agency and department. Older records get a
+verification state with `npm run tenant:migrate-funding -- --tenant <code>` (add
+`--trust-existing` only if past sanctions were already HOD-checked).
+
 Files: each institution's uploads and document vault live in
 `server/storage/tenants/<code>/uploads` and `server/storage/tenants/<code>/secure_documents`,
 and are only served to signed-in users of that institution. The old shared `server/uploads/`

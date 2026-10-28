@@ -2,6 +2,9 @@ import { Router } from 'express';
 import { projectController } from '../controllers/project.controller.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { documentUpload } from '../middleware/upload.js';
+import { projectService } from '../services/project.service.js';
+import { sendSuccess } from '../utils/apiResponse.js';
+import type { AuthenticatedRequest } from '../types/index.js';
 
 const router = Router();
 
@@ -50,13 +53,24 @@ router.patch('/:id/status', requireAuth, (req, res, next) =>
   projectController.updateStatus(req, res, next)
 );
 
+// Next lifecycle steps this user may take (for the "Update status" screen)
+router.get('/:id/transitions', requireAuth, async (req, res, next) => {
+  try {
+    sendSuccess(res, await projectService.allowedTransitions((req as AuthenticatedRequest).user!, String(req.params.id)), 'Allowed next steps.');
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post('/:id/submit', requireAuth, (req, res, next) => {
   req.body = { ...req.body, status: 'SUBMITTED' };
   return projectController.updateStatus(req, res, next);
 });
 
+// Records the agency's approval; with a sanction or grant number it records the sanction itself
 router.post('/:id/approve', requireAuth, (req, res, next) => {
-  req.body = { ...req.body, status: 'SANCTIONED' };
+  const sanction = Boolean(req.body?.sanctionNumber || req.body?.grantNumber);
+  req.body = { ...req.body, status: sanction ? 'SANCTIONED' : 'APPROVED' };
   return projectController.updateStatus(req, res, next);
 });
 
@@ -65,8 +79,9 @@ router.post('/:id/reject', requireAuth, (req, res, next) => {
   return projectController.updateStatus(req, res, next);
 });
 
+// Returns a submitted proposal to draft (the record's verification is handled in the approval queue)
 router.post('/:id/return', requireAuth, (req, res, next) => {
-  req.body = { ...req.body, status: 'REVISION_REQUESTED' };
+  req.body = { ...req.body, status: 'DRAFT' };
   return projectController.updateStatus(req, res, next);
 });
 

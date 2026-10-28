@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { PROJECT_STATUS, FUNDING_TYPES, UTILIZATION_STATUS } from '../models/Project.js';
+import { FUNDING_STATUSES, type FundingStatus } from '../services/funding-lifecycle.js';
 
 export const coInvestigatorInputSchema = z.object({
   name: z.string().trim().min(1, 'Co-investigator name is required'),
@@ -56,16 +57,11 @@ export const projectSchema = z.object({
   endDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
   durationMonths: z.coerce.number().min(0).optional(),
   academicYear: z.string().trim().min(4, 'Academic year is required (e.g. 2023-2024)'),
-  status: z.enum([
-    PROJECT_STATUS.IDEA,
-    PROJECT_STATUS.DRAFT,
-    PROJECT_STATUS.SUBMITTED,
-    PROJECT_STATUS.UNDER_REVIEW,
-    PROJECT_STATUS.SANCTIONED,
-    PROJECT_STATUS.ONGOING,
-    PROJECT_STATUS.COMPLETED,
-    PROJECT_STATUS.REJECTED,
-  ]).default(PROJECT_STATUS.DRAFT),
+  status: z.enum(FUNDING_STATUSES as [FundingStatus, ...FundingStatus[]]).default(PROJECT_STATUS.DRAFT),
+  scheme: z.string().trim().max(160).optional(),
+  applicationDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
+  expectedDecisionDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
+  decisionDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
   submissionDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
   approvalDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
   completionDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
@@ -79,29 +75,37 @@ export const projectSchema = z.object({
   remarks: z.string().trim().optional(),
 });
 
-export const updateProjectSchema = projectSchema.partial();
+// Edits change only what was sent: the create defaults (DRAFT, 0, []) must not fill in missing fields
+const shape = projectSchema.shape;
+export const updateProjectSchema = projectSchema.partial().extend({
+  coInvestigators: z.array(coInvestigatorInputSchema).or(shape.coInvestigators.options[1]).optional(),
+  fundingType: shape.fundingType.removeDefault().optional(),
+  sanctionedAmount: shape.sanctionedAmount.removeDefault().optional(),
+  receivedAmount: shape.receivedAmount.removeDefault().optional(),
+  status: shape.status.removeDefault().optional(),
+  utilizationStatus: shape.utilizationStatus.removeDefault().optional(),
+  documents: shape.documents.removeDefault().optional(),
+});
 
 export const updateProjectStatusSchema = z.object({
-  status: z
-    .enum([
-      PROJECT_STATUS.IDEA,
-      PROJECT_STATUS.DRAFT,
-      PROJECT_STATUS.SUBMITTED,
-      PROJECT_STATUS.UNDER_REVIEW,
-      PROJECT_STATUS.SANCTIONED,
-      PROJECT_STATUS.ONGOING,
-      PROJECT_STATUS.COMPLETED,
-      PROJECT_STATUS.REJECTED,
-      'APPROVED' as const,
-    ])
-    .transform((val) => (val === 'APPROVED' ? PROJECT_STATUS.SANCTIONED : val)),
+  // Every lifecycle status is real; APPROVED (in principle) is no longer turned into SANCTIONED
+  status: z.enum(FUNDING_STATUSES as [FundingStatus, ...FundingStatus[]]),
   sanctionNumber: z.string().trim().optional(),
+  grantNumber: z.string().trim().optional(),
+  proposalNumber: z.string().trim().optional(),
+  scheme: z.string().trim().max(160).optional(),
+  requestedAmount: z.coerce.number().min(0).optional(),
   sanctionedAmount: z.coerce.number().min(0).optional(),
   receivedAmount: z.coerce.number().min(0).optional(),
+  applicationDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
+  expectedDecisionDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
+  decisionDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
   approvalDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
+  startDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
   completionDate: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
   utilizationStatus: z.string().trim().optional(),
-  remarks: z.string().trim().optional(),
+  /** Why this step was taken (required for clarification, rejection and withdrawal) */
+  remarks: z.string().trim().max(2000).optional(),
 });
 
 export const projectFilterQuerySchema = z.object({
