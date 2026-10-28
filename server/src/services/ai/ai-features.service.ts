@@ -524,9 +524,9 @@ Add a small table only when it helps (e.g. a per-department comparison).`,
       return { overview: 'No active mentoring records were found for this selection.', students: [], analysed: 0 };
     }
 
-    const students = records.map((r) => ({
-      registerNumber: r.registerNumber,
-      studentName: r.studentName,
+    // Students are sent as S1, S2…; names and register numbers stay on the server
+    const students = records.map((r, i) => ({
+      ref: `S${i + 1}`,
       batch: r.batch,
       section: r.section,
       academicConcerns: r.academicConcerns,
@@ -544,11 +544,11 @@ Add a small table only when it helps (e.g. a per-department comparison).`,
 
     const result = await gemini.json<{
       overview: string;
-      students: { registerNumber: string; studentName: string; risk: string; reasons: string[]; suggestedAction: string }[];
+      students: { ref: string; risk: string; reasons: string[]; suggestedAction: string }[];
     }>({
       system: `${await commonRules()}
 You help faculty mentors. Summarise the mentoring notes and flag students who may need help (low attendance, failing subjects, arrears, stress, no meetings for a long time, unresolved action plans).
-Risk HIGH = needs action now, MEDIUM = watch closely, LOW = fine. List only HIGH and MEDIUM students (at most 3 short reasons each); say in the overview how many are doing fine.
+Risk HIGH = needs action now, MEDIUM = watch closely, LOW = fine. List only HIGH and MEDIUM students (at most 3 short reasons each); say in the overview how many are doing fine. Refer to students only by their reference (S1, S2…).
 Base reasons on the notes; do not guess. Today's date is ${isoDate(new Date())}.`,
       parts: [{ text: `Mentoring records:\n${JSON.stringify(students)}` }],
       schema: {
@@ -560,13 +560,12 @@ Base reasons on the notes; do not guess. Today's date is ${isoDate(new Date())}.
             items: {
               type: 'OBJECT',
               properties: {
-                registerNumber: { type: 'STRING' },
-                studentName: { type: 'STRING' },
+                ref: { type: 'STRING', description: 'The student reference exactly as given, e.g. S3' },
                 risk: { type: 'STRING', enum: ['HIGH', 'MEDIUM', 'LOW'] },
                 reasons: { type: 'ARRAY', items: { type: 'STRING' } },
                 suggestedAction: { type: 'STRING' },
               },
-              required: ['registerNumber', 'studentName', 'risk', 'reasons', 'suggestedAction'],
+              required: ['ref', 'risk', 'reasons', 'suggestedAction'],
             },
           },
         },
@@ -576,6 +575,10 @@ Base reasons on the notes; do not guess. Today's date is ${isoDate(new Date())}.
 
     await audit(req, user, 'mentoring-insights', { analysed: records.length });
     const order = { HIGH: 0, MEDIUM: 1, LOW: 2 } as Record<string, number>;
-    return { ...result, students: result.students.sort((a, b) => (order[a.risk] ?? 3) - (order[b.risk] ?? 3)), analysed: records.length };
+    const byRef = new Map(records.map((r, i) => [`S${i + 1}`, r]));
+    const named = result.students
+      .filter((x) => byRef.has(x.ref))
+      .map(({ ref, ...rest }) => ({ registerNumber: byRef.get(ref)!.registerNumber, studentName: byRef.get(ref)!.studentName, ...rest }));
+    return { ...result, students: named.sort((a, b) => (order[a.risk] ?? 3) - (order[b.risk] ?? 3)), analysed: records.length };
   },
 };

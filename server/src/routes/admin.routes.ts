@@ -5,6 +5,8 @@ import { ROLES } from '../permissions/roles.js';
 import { adminController } from '../controllers/admin.controller.js';
 import { spreadsheetUpload, logoUpload } from '../middleware/upload.js';
 import { brandingService } from '../services/branding.service.js';
+import { invitationService } from '../services/invitation.service.js';
+import { z } from 'zod';
 import { sendSuccess } from '../utils/apiResponse.js';
 import type { AuthenticatedRequest } from '../types/index.js';
 
@@ -91,6 +93,22 @@ router.delete('/masters/:id', (req, res, next) => adminController.deleteMasterIt
 router.get('/settings', (req, res, next) => adminController.getInstitutionSettings(req, res, next));
 router.put('/settings', (req, res, next) => adminController.updateInstitutionSettings(req, res, next));
 router.patch('/settings', (req, res, next) => adminController.updateInstitutionSettings(req, res, next));
+// Invitation reminders for accounts that have never signed in
+router.get('/users/invitations/pending', async (_req, res, next) => {
+  try {
+    sendSuccess(res, await invitationService.pending(), 'Accounts that have not signed in yet.');
+  } catch (error) {
+    next(error);
+  }
+});
+router.post('/users/invitations/remind', async (req, res, next) => {
+  try {
+    const { userIds } = z.object({ userIds: z.array(z.string().regex(/^[a-f0-9]{24}$/i)).max(200).optional() }).parse(req.body ?? {});
+    sendSuccess(res, await invitationService.remind(userIds, (req as AuthenticatedRequest).user!.id, req), 'Reminders sent.');
+  } catch (error) {
+    next(error);
+  }
+});
 // Logo: raster image, validated and stored in this institution's own folder
 router.post('/settings/logo', logoUpload.single('logo'), async (req, res, next) => {
   try {

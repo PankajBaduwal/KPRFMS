@@ -7,6 +7,7 @@ import { AppError } from '../utils/AppError.js';
 import { randomToken, sha256 } from '../utils/secureToken.js';
 import { PRODUCT_NAME, PRODUCT_SLUG } from '../config/brand.js';
 import { requireTenant } from '../tenancy/context.js';
+import { getInstitutionProfile } from '../utils/institution.js';
 
 /**
  * Private iCalendar (.ics) feed per user: leave (approved and pending) and weekly timetable.
@@ -90,6 +91,8 @@ export const calendarService = {
 
   async renderFeed(token: string): Promise<string> {
     if (!/^[A-Za-z0-9_-]{20,64}$/.test(token)) throw AppError.notFound('Calendar not found.');
+    // A switched-off calendar module also stops existing feeds (they are public, so requireAuth does not apply)
+    if (!(await getInstitutionProfile()).enabledModules.includes('calendar')) throw AppError.notFound('Calendar not found.');
     const user = await User.findOne({ calendarFeedTokenHash: sha256(token), status: USER_STATUS.ACTIVE })
       .select('name')
       .lean();

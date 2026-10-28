@@ -171,6 +171,10 @@ an Admin can save new weights as a new version (effective date, optional academi
 kept). Admin → Settings holds the logo, accent colour, timezone, enabled modules, appraisal
 deadlines, maintenance mode, idle timeout and upload limit; all of them are enforced.
 
+Emails name the institution they come from (sender name, subject prefix, header and footer).
+Admins can send invitation reminders to accounts that have never signed in (once a day at most).
+Uploaded evidence opens only for its owner, their HOD and the Dean, Principal and Admin.
+
 Files: each institution's uploads and document vault live in
 `server/storage/tenants/<code>/uploads` and `server/storage/tenants/<code>/secure_documents`,
 and are only served to signed-in users of that institution. The old shared `server/uploads/`

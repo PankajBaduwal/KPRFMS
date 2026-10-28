@@ -38,11 +38,12 @@ import {
 } from '../validators/admin.validator.js';
 import { computeAcademicYearForDate } from '../utils/academicYear.js';
 import { Notification } from '../models/Notification.js';
-import { clearInstitutionProfileCache } from '../utils/institution.js';
-import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
+import { clearInstitutionProfileCache, getInstitutionProfile } from '../utils/institution.js';
+import { PRODUCT_NAME } from '../config/brand.js';
 import { assignmentService } from './assignment.service.js';
 import { leaderboardService } from './leaderboard.service.js';
 import { AppraisalCycle } from '../models/AppraisalCycle.js';
+import { notificationStream } from './notification-dispatch.js';
 
 export class AdminService {
   /**
@@ -433,7 +434,7 @@ export class AdminService {
       subject: `Your ${PRODUCT_NAME} registration was not approved`,
       lines: [
         `Dear ${user.name},`,
-        `Your registration on ${PRODUCT_FULL_NAME} was not approved.`,
+        `Your registration at ${(await getInstitutionProfile()).name} on ${PRODUCT_NAME} was not approved.`,
         ...(reason ? [`Reason: ${reason}`] : []),
         'If you think this is a mistake, contact the institution administrator.',
       ],
@@ -462,6 +463,8 @@ export class AdminService {
       user.lockUntil = undefined;
     }
     await user.save();
+    // A deactivated account loses its open live streams straight away
+    if (status !== USER_STATUS.ACTIVE) notificationStream.closeUser(String(user._id));
 
     const action =
       status === USER_STATUS.ACTIVE

@@ -31,7 +31,7 @@ import { ROLES } from '../permissions/roles.js';
 import { notificationService } from './notification.service.js';
 import { sessionService } from './session.service.js';
 import { mailService, clientUrl } from './mail.service.js';
-import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
+import { PRODUCT_NAME } from '../config/brand.js';
 import { allowedEmailDomains, emailInDomains } from './institution-domains.js';
 import { assignmentService } from './assignment.service.js';
 import { getInstitutionProfile } from '../utils/institution.js';
@@ -85,15 +85,17 @@ export async function createPasswordLink(userId: string, ttlMs = RESET_LINK_TTL_
   return clientUrl(`/reset-password?token=${encodeURIComponent(token)}`);
 }
 
-/** Emails a new account its "set your password" link (bulk import). */
-export async function sendWelcomeEmail(user: { _id: unknown; name: string; email: string; employeeId: string }) {
+/** Emails a new account its "set your password" link (bulk import, provisioning, reminders). */
+export async function sendWelcomeEmail(user: { _id: unknown; name: string; email: string; employeeId: string }, opts: { reminder?: boolean } = {}) {
   const link = await createPasswordLink(String(user._id), WELCOME_LINK_TTL_MS);
+  await User.updateOne({ _id: String(user._id) }, { $set: { invitedAt: new Date() } });
   return mailService.send({
     to: user.email,
-    subject: `Your ${PRODUCT_NAME} account is ready`,
+    subject: opts.reminder ? `Reminder: your ${PRODUCT_NAME} account is waiting` : `Your ${PRODUCT_NAME} account is ready`,
     lines: [
       `Dear ${user.name},`,
-      `An account has been created for you on ${PRODUCT_FULL_NAME} (employee ID ${user.employeeId}).`,
+      ...(opts.reminder ? ['You have not signed in yet. Here is a new link; the earlier one no longer works.'] : []),
+      `${(await getInstitutionProfile()).name} has created an account for you on ${PRODUCT_NAME} (employee ID ${user.employeeId}).`,
       'Choose your password with the button below. The link works once and expires in 7 days.',
     ],
     action: { label: 'Set my password', url: link },
@@ -486,7 +488,7 @@ export class AuthService {
         subject: `Reset your ${PRODUCT_NAME} password`,
         lines: [
           `Dear ${user.name},`,
-          `We received a request to reset the password for your ${PRODUCT_FULL_NAME} account.`,
+          `We received a request to reset the password for your ${(await getInstitutionProfile()).name} account on ${PRODUCT_NAME}.`,
           'Use the button below within 30 minutes. If you did not ask for this, ignore this email and your password stays the same.',
         ],
         action: { label: 'Reset password', url: link },

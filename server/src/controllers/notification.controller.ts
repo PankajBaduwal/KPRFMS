@@ -4,6 +4,10 @@ import { AuthenticatedRequest } from '../types/index.js';
 import { notificationService } from '../services/notification.service.js';
 import { sendSuccess } from '../utils/apiResponse.js';
 import { AppError } from '../utils/AppError.js';
+import { requireTenant } from '../tenancy/context.js';
+import { resolveActiveTenant } from '../tenancy/registry.js';
+import { User } from '../models/User.js';
+import { Session } from '../models/Session.js';
 
 export class NotificationController {
   /**
@@ -113,7 +117,20 @@ export class NotificationController {
    */
   /** Keeps a Server-Sent Events stream open; new notifications are pushed as they are created. */
   stream(req: AuthenticatedRequest, res: Response): void {
-    notificationStream.subscribe(req.user!.id, res, (cb) => req.on('close', cb));
+    const { id, sessionId } = req.user!;
+    const { code } = requireTenant();
+    notificationStream.subscribe(id, res, (cb) => req.on('close', cb), {
+      sid: sessionId,
+      // Same conditions as every other request: live session, active account, active institution
+      stillAllowed: async () => {
+        await resolveActiveTenant(code);
+        const [user, session] = await Promise.all([
+          User.findById(id).select('status').lean(),
+          sessionId ? Session.findOne({ sid: sessionId }).select('revokedAt').lean() : Promise.resolve({ revokedAt: undefined }),
+        ]);
+        return user?.status === 'ACTIVE' && Boolean(session) && !session!.revokedAt;
+      },
+    });
   }
 
   async updatePreferences(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {

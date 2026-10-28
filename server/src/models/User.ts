@@ -28,6 +28,8 @@ export interface IUser extends Document {
   failedLoginAttempts: number;
   lockUntil?: Date;
   lastLogin?: Date;
+  /** When the latest "set your password" invitation was emailed */
+  invitedAt?: Date;
   passwordChangedAt?: Date;
   /** Set for self-registrations: the address must be confirmed with an emailed code before approval */
   emailVerificationRequired?: boolean;
@@ -122,6 +124,9 @@ const userSchema = new Schema<IUser>(
       type: Date,
     },
     lastLogin: {
+      type: Date,
+    },
+    invitedAt: {
       type: Date,
     },
     // Session tokens issued before this instant are rejected (see requireAuth)

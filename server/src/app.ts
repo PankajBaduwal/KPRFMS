@@ -20,6 +20,8 @@ import { requireTenant } from './tenancy/context.js';
 import { tenantUploadsRoot } from './tenancy/files.js';
 import platformAuthRoutes from './platform/routes/auth.routes.js';
 import platformAdminRoutes from './platform/routes/admin.routes.js';
+import { fileAccessService } from './services/file-access.service.js';
+import type { AuthenticatedRequest } from './types/index.js';
 
 const app = express();
 
@@ -96,8 +98,24 @@ const uploadsStaticOptions: Parameters<typeof express.static>[1] = {
     }
   },
 };
-app.use('/uploads', requireAuth, (req, res, next) => {
+app.use('/uploads', requireAuth, async (req, res, next) => {
   const { code } = requireTenant();
+  // Only the owner, their HOD, and the Dean/Principal/Admin may open a file (others: 404)
+  try {
+    let rel = '';
+    try {
+      rel = decodeURIComponent(req.path).replace(/^\//, '');
+    } catch {
+      rel = ''; // malformed escape: treated as not found
+    }
+    if (!rel || !(await fileAccessService.canOpen(rel, (req as AuthenticatedRequest).user!))) {
+      res.status(404).json({ success: false, message: 'File not found.' });
+      return;
+    }
+  } catch (error) {
+    next(error);
+    return;
+  }
   let serve = uploadServers.get(code);
   if (!serve) {
     serve = express.static(tenantUploadsRoot(code), uploadsStaticOptions);

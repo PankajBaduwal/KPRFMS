@@ -5,6 +5,7 @@ import { AppError } from '../utils/AppError.js';
 import { randomToken } from '../utils/secureToken.js';
 import { AUTH_COOKIE_NAME, generateToken, getAuthCookieOptions, getSessionLifetimeMs } from '../utils/jwt.js';
 import { Role } from '../permissions/roles.js';
+import { notificationStream } from './notification-dispatch.js';
 
 interface SessionUser {
   _id: Types.ObjectId;
@@ -55,7 +56,8 @@ export const sessionService = {
   },
 
   async revoke(sid: string): Promise<void> {
-    await Session.updateOne({ sid, revokedAt: { $exists: false } }, { $set: { revokedAt: new Date() } });
+    const row = await Session.findOneAndUpdate({ sid, revokedAt: { $exists: false } }, { $set: { revokedAt: new Date() } }).select('userId').lean();
+    if (row) notificationStream.closeUser(String(row.userId), sid);
   },
 
   /** Signs out every session of a user, optionally keeping one (the caller's own). */
@@ -64,6 +66,13 @@ export const sessionService = {
       { userId, revokedAt: { $exists: false }, ...(exceptSid ? { sid: { $ne: exceptSid } } : {}) },
       { $set: { revokedAt: new Date() } }
     );
+    // Close the live streams of the sessions just signed out (the kept session's stay open)
+    if (exceptSid) {
+      const revoked = await Session.find({ userId, sid: { $ne: exceptSid }, revokedAt: { $exists: true } }).select('sid').lean();
+      for (const r of revoked) notificationStream.closeUser(String(userId), r.sid);
+    } else {
+      notificationStream.closeUser(String(userId));
+    }
     return result.modifiedCount;
   },
 

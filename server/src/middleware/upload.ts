@@ -6,6 +6,8 @@ import { AppError } from '../utils/AppError.js';
 import { validateUploadedFile } from '../utils/fileSecurity.js';
 import { ensureDir, tenantUploadsRoot } from '../tenancy/files.js';
 import { getInstitutionProfile } from '../utils/institution.js';
+import { fileAccessService } from '../services/file-access.service.js';
+import type { AuthenticatedRequest } from '../types/index.js';
 
 /** The current institution's upload folder (served back at /uploads/documents/<name>). */
 const uploadDir = () => ensureDir(path.join(tenantUploadsRoot(), 'documents'));
@@ -37,6 +39,7 @@ async function persistValidatedUpload(req: Request, _res: Response, next: NextFu
     const validated = validateUploadedFile(file.buffer, file.originalname, mime, LEGACY_MAX_BYTES);
     const dir = uploadDir();
     fs.writeFileSync(path.join(dir, validated.safeStoredFilename), file.buffer, { flag: 'wx' });
+    await fileAccessService.recordUpload(`documents/${validated.safeStoredFilename}`, (req as AuthenticatedRequest).user);
 
     // Controllers read these fields to build the public /uploads URL
     file.filename = validated.safeStoredFilename;

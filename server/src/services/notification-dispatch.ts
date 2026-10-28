@@ -3,6 +3,7 @@ import { Notification, NOTIFICATION_EVENTS, onNotificationCreated, type INotific
 import { NotificationPreference } from '../models/NotificationPreference.js';
 import { User } from '../models/User.js';
 import { mailService, clientUrl } from './mail.service.js';
+import { PRODUCT_NAME } from '../config/brand.js';
 import { logger } from '../utils/logger.js';
 import { requireTenant } from '../tenancy/context.js';
 
@@ -14,18 +15,33 @@ import { requireTenant } from '../tenancy/context.js';
 const HEARTBEAT_MS = 25_000;
 /** Streams are closed periodically so the browser reconnects and the session is re-checked. */
 const MAX_STREAM_MS = 30 * 60_000;
+/** How often an open stream re-checks its session, account and institution. */
+const RECHECK_MS = Number(process.env.STREAM_RECHECK_MS) || 60_000;
 
 // Keyed by institution + user, so a stream only ever receives its own institution's events
 const streams = new Map<string, Set<Response>>();
 const streamKey = (userId: string) => `${requireTenant().code}:${userId}`;
+// The browser session each stream belongs to, so revoking one session closes only its streams
+const streamSession = new WeakMap<Response, string | undefined>();
 
 function write(res: Response, event: string, data: unknown) {
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 }
 
 export const notificationStream = {
-  subscribe(userId: string, res: Response, onClose: (cb: () => void) => void) {
+  /**
+   * Opens a live stream. `stillAllowed` is re-run every minute (inside the institution) and the
+   * stream ends as soon as the session is revoked, the account is deactivated or the institution
+   * is suspended.
+   */
+  subscribe(
+    userId: string,
+    res: Response,
+    onClose: (cb: () => void) => void,
+    opts: { sid?: string; stillAllowed?: () => Promise<boolean> } = {}
+  ) {
     const key = streamKey(userId);
+    streamSession.set(res, opts.sid);
     res.status(200);
     res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache, no-transform');
@@ -40,9 +56,20 @@ export const notificationStream = {
 
     const heartbeat = setInterval(() => res.write(`: ping\n\n`), HEARTBEAT_MS);
     const maxAge = setTimeout(() => res.end(), MAX_STREAM_MS);
+    const recheck = opts.stillAllowed
+      ? setInterval(() => {
+          opts.stillAllowed!().then(
+            (ok) => {
+              if (!ok) res.end();
+            },
+            () => res.end()
+          );
+        }, RECHECK_MS)
+      : undefined;
     onClose(() => {
       clearInterval(heartbeat);
       clearTimeout(maxAge);
+      if (recheck) clearInterval(recheck);
       set!.delete(res);
       if (set!.size === 0) streams.delete(key);
     });
@@ -50,6 +77,13 @@ export const notificationStream = {
     void Notification.countDocuments({ recipientId: userId, isRead: false }).then((unreadCount) =>
       write(res, 'ready', { unreadCount })
     );
+  },
+
+  /** Ends a user's open streams in this institution (all of them, or one session's). */
+  closeUser(userId: string, sid?: string) {
+    for (const res of streams.get(streamKey(userId)) ?? []) {
+      if (!sid || streamSession.get(res) === sid) res.end();
+    }
   },
 
   publish(userId: string, event: string, data: unknown) {
@@ -103,7 +137,7 @@ async function emailNotification(doc: INotification) {
     to: user.email,
     subject: doc.title,
     lines: [`Dear ${user.name},`, doc.message, 'You can switch these emails off under Notifications → Preferences.'],
-    action: { label: 'Open in FMS', url: clientUrl(link) },
+    action: { label: `Open in ${PRODUCT_NAME}`, url: clientUrl(link) },
   });
 }
 
