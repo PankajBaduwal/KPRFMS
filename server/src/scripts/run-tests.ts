@@ -87,15 +87,23 @@ function runTsx(
     const child = spawn('npx', ['tsx', script, ...quoted], {
       cwd: process.cwd(),
       shell: process.platform === 'win32',
+      // Own process group on Linux/macOS so a timeout can stop npx, tsx and node together
+      detached: process.platform !== 'win32',
       env: { ...testEnv, ...env },
     });
     let output = '';
+    let timedOut = false;
     child.stdout.on('data', (d) => (output += d));
     child.stderr.on('data', (d) => (output += d));
-    const timer = setTimeout(() => child.kill(), timeoutMs);
-    child.on('close', (code) => {
+    const timer = setTimeout(() => {
+      timedOut = true;
+      output += `\n✗ FAIL: suite timed out after ${timeoutMs / 1000}s\n`;
+      stopProcessTree(child, 'SIGKILL');
+    }, timeoutMs);
+    // 'exit' rather than 'close': a leftover grandchild holding the pipes must not stall the run
+    child.on('exit', (code) => {
       clearTimeout(timer);
-      resolve({ code, output });
+      setTimeout(() => resolve({ code: timedOut ? 1 : code, output }), 200);
     });
   });
 }
@@ -139,7 +147,12 @@ async function startTestApi(): Promise<ChildProcess> {
         'Stop that process (or set TEST_API_PORT) and run the tests again.'
     );
   }
-  const child = spawn('npx', ['tsx', 'src/server.ts'], { cwd: process.cwd(), shell: process.platform === 'win32', env: testEnv });
+  const child = spawn('npx', ['tsx', 'src/server.ts'], {
+    cwd: process.cwd(),
+    shell: process.platform === 'win32',
+    detached: process.platform !== 'win32',
+    env: testEnv,
+  });
   let log = '';
   const logFile = fs.createWriteStream(API_LOG);
   child.stdout?.on('data', (d) => { log += d; logFile.write(d); });
@@ -162,11 +175,18 @@ async function startTestApi(): Promise<ChildProcess> {
   throw new Error(`Test API did not start on port ${TEST_API_PORT}:\n${log.slice(-1500)}`);
 }
 
-function stopProcessTree(child: ChildProcess) {
+/** Stops a child and everything it started (npx → tsx → node). */
+function stopProcessTree(child: ChildProcess, signal: NodeJS.Signals = 'SIGTERM') {
   if (!child.pid) return;
   // Wait for taskkill: the runner exits right after this, and an async kill could leave the API running
   if (process.platform === 'win32') spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { shell: true, stdio: 'ignore' });
-  else child.kill('SIGTERM');
+  else {
+    try {
+      process.kill(-child.pid, signal); // the whole process group (spawned with detached: true)
+    } catch {
+      child.kill(signal);
+    }
+  }
 }
 
 async function main() {

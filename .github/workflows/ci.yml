@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
 
+# A newer push to the same branch cancels the run still in progress
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   client:
     name: Web app — type-check, lint, build
@@ -25,6 +30,7 @@ jobs:
   server:
     name: API — type-check, build, test suites (two isolated institutions)
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     defaults:
       run:
         working-directory: server
@@ -63,7 +69,10 @@ jobs:
       - run: npm run build
       # Registers institutions "testa" and "testb" in fctest_* databases, seeds them, starts a
       # private API and runs every suite, including the cross-institution attack suites
-      - run: npm test
+      - name: Run every suite
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee test-output.log
       - name: Keep the test API log when something fails
         if: failure()
         uses: actions/upload-artifact@v4
@@ -75,6 +84,10 @@ jobs:
         if: failure()
         working-directory: .
         run: test -f server/test-api.log && tail -40 server/test-api.log | sed 's/^/::error title=test-api::/' || true
+      - name: Show which suites failed
+        if: failure()
+        working-directory: .
+        run: test -f server/test-output.log && grep -E "FAILED|FAIL:|timed out|suites passed|exited unexpectedly" server/test-output.log | head -40 | sed 's/^/::error title=suites::/' || true
 
   docker:
     name: Docker — build images and start the stack
