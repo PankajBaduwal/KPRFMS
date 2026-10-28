@@ -5,6 +5,25 @@ on:
   pull_request:
 
 jobs:
+  # TEMPORARY: which MongoDB images start on the current runner kernel (SERVER-121912)
+  mongo-probe:
+    name: Probe — MongoDB versions on this runner
+    runs-on: ubuntu-24.04
+    steps:
+      - run: |
+          echo "::notice title=kernel::$(uname -r)"
+          for img in mongo:7.0 mongo:8.0 mongo:8.2 mongo:latest; do
+            name=probe-$(echo $img | tr ':.' '--')
+            docker run -d --name $name $img >/dev/null 2>&1 || { echo "::warning title=probe::$img => pull/run failed"; continue; }
+            ok=fail
+            for i in $(seq 1 20); do
+              if docker exec $name mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' >/dev/null 2>&1; then ok=ok; break; fi
+              sleep 2
+            done
+            ver=$(docker exec $name mongod --version 2>/dev/null | head -1)
+            echo "::warning title=probe::$img => $ok ($ver)"
+            docker rm -f $name >/dev/null 2>&1
+          done
   client:
     name: Web app — type-check, lint, build
     # ubuntu-latest moved to Linux 6.19+, which MongoDB 8.0 refuses to run on (SERVER-121912)
