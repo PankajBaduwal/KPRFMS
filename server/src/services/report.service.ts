@@ -34,7 +34,8 @@ import {
 } from '../models/index.js';
 import { FacultyAppraisal } from '../models/FacultyAppraisal.js';
 import { PRODUCT_FULL_NAME } from '../config/brand.js';
-import { getInstitutionProfile } from '../utils/institution.js';
+import { getInstitutionProfile, logoDataUri, formatInInstitutionTime } from '../utils/institution.js';
+import { isVerifiedFunded, verifiedFundedMatch } from './funding-lifecycle.js';
 
 
 export const STATUTORY_DISCLAIMER =
@@ -626,8 +627,12 @@ export async function generateReport(
     c.applicableReports.includes(filters.reportType)
   );
 
+  const profile = await getInstitutionProfile();
   const header: IReportHeader = {
-    institutionName: (await getInstitutionProfile()).name,
+    institutionName: profile.name,
+    institutionLogo: await logoDataUri(),
+    accentColor: profile.accentColor,
+    timezone: profile.timezone,
     department: departmentName,
     departmentId: filters.departmentId,
     academicYear: filters.academicYear || 'All Academic Years',
@@ -1432,13 +1437,15 @@ async function fetchResearchProjectsReport(filters: IReportFilterParams) {
       sourceFacultyId: proj.facultyId?._id?.toString() || proj.facultyId?.toString() || '',
       facultyName: proj.piName || proj.facultyId?.name,
       facultyEmployeeId: proj.piEmployeeId || proj.facultyId?.employeeId,
-      verificationStatus: proj.status === 'SANCTIONED' || proj.status === 'COMPLETED' ? 'VERIFIED' : 'PENDING',
+      verificationStatus: proj.verificationStatus || 'PENDING',
       referenceCode: `RND-${proj.projectNumber || proj._id.toString().slice(-6)}`,
     },
   }));
 
-  const totalSanctioned = rows.reduce((sum, r) => sum + (Number(r.sanctionedAmount) || 0), 0);
-  const activeCount = rows.filter((r) => r.status === 'ONGOING' || r.status === 'SANCTIONED').length;
+  // Money and active counts: funded projects the institution has verified
+  const funded = projects.filter((p: any) => isVerifiedFunded(p));
+  const totalSanctioned = funded.reduce((sum, p: any) => sum + (p.sanctionedAmount || 0), 0);
+  const activeCount = funded.filter((p: any) => p.status === 'ONGOING' || p.status === 'SANCTIONED').length;
 
   const metrics: IReportSummaryMetric[] = [
     {
@@ -1448,10 +1455,10 @@ async function fetchResearchProjectsReport(filters: IReportFilterParams) {
       traceCount: rows.length,
     },
     {
-      label: 'Total Sanctioned Grant Outlay',
+      label: 'Total Sanctioned Grant Outlay (verified)',
       value: `₹${totalSanctioned.toLocaleString('en-IN')}`,
       sourceCollection: 'projects',
-      traceCount: rows.length,
+      traceCount: funded.length,
     },
     {
       label: 'Active / Ongoing Projects',
@@ -1464,9 +1471,9 @@ async function fetchResearchProjectsReport(filters: IReportFilterParams) {
   return { columns, rows, metrics };
 }
 
-// 10. Funding Report
+// 10. Funding Report: verified funded grants only
 async function fetchFundingReport(filters: IReportFilterParams) {
-  const query: any = {};
+  const query: any = { ...verifiedFundedMatch() };
   if (filters.academicYear) query.academicYear = filters.academicYear;
   if (filters.departmentId) query.departmentId = new Types.ObjectId(filters.departmentId);
   if (filters.facultyId) query.facultyId = new Types.ObjectId(filters.facultyId);
@@ -2447,6 +2454,9 @@ export function exportReportAsPdfHtml(report: IReportResult): string {
     })
     .join('');
 
+  // Institution branding; both values are checked before going into the page
+  const accent = /^#[0-9a-fA-F]{6}$/.test(report.header.accentColor ?? '') ? report.header.accentColor! : '#1e3a8a';
+  const logo = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(report.header.institutionLogo ?? '') ? report.header.institutionLogo : null;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2470,17 +2480,18 @@ export function exportReportAsPdfHtml(report: IReportResult): string {
       margin: 0 auto;
     }
     .header-banner {
-      border-bottom: 2px solid #1e3a8a;
+      border-bottom: 2px solid ${accent};
       padding-bottom: 12px;
       margin-bottom: 14px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
     }
+    .inst-logo { height: 34px; width: auto; vertical-align: middle; margin-right: 10px; }
     .inst-title {
       font-size: 18px;
       font-weight: 700;
-      color: #1e3a8a;
+      color: ${accent};
       letter-spacing: 0.5px;
       text-transform: uppercase;
       margin-bottom: 4px;
@@ -2559,7 +2570,7 @@ export function exportReportAsPdfHtml(report: IReportResult): string {
       page-break-after: auto;
     }
     th {
-      background: #1e3a8a;
+      background: ${accent};
       color: #ffffff;
       font-weight: 600;
       text-align: left;
@@ -2631,7 +2642,7 @@ export function exportReportAsPdfHtml(report: IReportResult): string {
 <body>
   <div class="print-container">
     <div class="no-print" style="margin-bottom: 12px;">
-      <button onclick="window.print()" style="padding: 6px 14px; background: #1e3a8a; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+      <button onclick="window.print()" style="padding: 6px 14px; background: ${accent}; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
         🖨️ Print / Save as PDF
       </button>
     </div>
@@ -2639,7 +2650,7 @@ export function exportReportAsPdfHtml(report: IReportResult): string {
     <!-- MANDATORY REPORT HEADER -->
     <div class="header-banner">
       <div>
-        <div class="inst-title">${escapeHtml(report.header.institutionName)}</div>
+        <div class="inst-title">${logo ? `<img src="${logo}" alt="" class="inst-logo">` : ''}${escapeHtml(report.header.institutionName)}</div>
         <div class="report-name">${escapeHtml(report.reportTitle)}</div>
         <div class="header-meta">
           <strong>Department:</strong> ${escapeHtml(report.header.department)} &nbsp;|&nbsp;
@@ -2648,7 +2659,7 @@ export function exportReportAsPdfHtml(report: IReportResult): string {
       </div>
       <div style="text-align: right;">
         <div class="header-meta">
-          <strong>Generated Date:</strong> ${escapeHtml(new Date(report.header.generatedDate).toLocaleString())}<br>
+          <strong>Generated Date:</strong> ${escapeHtml(formatInInstitutionTime(new Date(report.header.generatedDate), report.header.timezone || 'Asia/Kolkata'))}<br>
           <strong>Generated By:</strong> ${escapeHtml(report.header.generatedBy.name)} (${escapeHtml(report.header.generatedBy.role)})
         </div>
         <div class="framework-badge">

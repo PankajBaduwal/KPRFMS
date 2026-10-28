@@ -3,6 +3,7 @@ import { MASTER_CATEGORIES } from '../../types/admin';
 import React from 'react';
 import { type TabType } from './shared';
 import type { IAdminInstitutionSettings } from '../../types/admin';
+import { BrandingSettings } from './BrandingSettings';
 
 export interface SettingsTabProps {
   handleSaveSettings: (e: React.FormEvent<Element>) => Promise<void>;
@@ -25,6 +26,9 @@ const LEADERBOARD_WEIGHT_FIELDS = [
 
 export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, setActiveTab, setMasterCategory, setSettingsForm, setSettingsSubTab, settingsForm, settingsSaving, settingsSubTab }) => {
   const weights = { ...DEFAULT_WEIGHTS, ...settingsForm.leaderboardWeights };
+  const appraisal = { incrementBenchmark: 75, casThreshold: 150, includeFeedback: true, ...settingsForm.appraisal };
+  const setAppraisal = (patch: Partial<typeof appraisal>) => setSettingsForm({ ...settingsForm, appraisal: { ...appraisal, ...patch } });
+  const dateValue = (d?: string | null) => (d ? String(d).slice(0, 10) : '');
   return (
     <form onSubmit={handleSaveSettings} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* Sub Navigation */}
@@ -208,6 +212,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
               </div>
             )}
   
+            {(settingsSubTab === 'general' || settingsSubTab === 'all') && <BrandingSettings settingsForm={settingsForm} setSettingsForm={setSettingsForm} />}
+
             {/* Group 3: Performance Appraisal Configuration (PBAS) */}
             {(settingsSubTab === 'appraisal' || settingsSubTab === 'all') && (
               <div
@@ -258,7 +264,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                     <input
                       type="date"
                       className="form-control form-control-sm"
-                      defaultValue="2026-06-30"
+                      value={dateValue(appraisal.selfAppraisalDeadline)}
+                      onChange={(e) => setAppraisal({ selfAppraisalDeadline: e.target.value || null })}
                     />
                     <small className="text-muted" style={{ fontSize: '0.72rem' }}>Faculty members cannot modify self-appraisal submissions after this date.</small>
                   </div>
@@ -268,7 +275,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                     <input
                       type="date"
                       className="form-control form-control-sm"
-                      defaultValue="2026-07-15"
+                      value={dateValue(appraisal.hodReviewDeadline)}
+                      onChange={(e) => setAppraisal({ hodReviewDeadline: e.target.value || null })}
                     />
                     <small className="text-muted" style={{ fontSize: '0.72rem' }}>Department heads must complete verification before Principal review window.</small>
                   </div>
@@ -278,7 +286,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                     <input
                       type="number"
                       className="form-control form-control-sm"
-                      defaultValue={75}
+                      value={appraisal.incrementBenchmark}
+                      onChange={(e) => setAppraisal({ incrementBenchmark: Math.max(0, Math.min(300, Number(e.target.value) || 0)) })}
                       min={0}
                       max={300}
                     />
@@ -290,7 +299,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                     <input
                       type="number"
                       className="form-control form-control-sm"
-                      defaultValue={150}
+                      value={appraisal.casThreshold}
+                      onChange={(e) => setAppraisal({ casThreshold: Math.max(0, Math.min(500, Number(e.target.value) || 0)) })}
                       min={0}
                       max={500}
                     />
@@ -303,7 +313,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                         className="form-check-input"
                         type="checkbox"
                         id="peerFeedbackSwitch"
-                        defaultChecked
+                        checked={appraisal.includeFeedback}
+                        onChange={(e) => setAppraisal({ includeFeedback: e.target.checked })}
                       />
                       <label className="form-check-label font-semibold text-sm" htmlFor="peerFeedbackSwitch">
                         Factor Student & Peer Feedback into Score
@@ -330,8 +341,10 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                   Department of the Year — Score Weights
                 </h3>
                 <p style={{ margin: '0 0 1.25rem', fontSize: '0.8rem', color: '#64748b' }}>
-                  Points each verified record earns a department on the Principal and Dean leaderboards. Only verified
-                  publications, patents and activities, and sanctioned projects, are counted.
+                  Points each verified record earns on the Principal and Dean rankings. Only verified publications,
+                  patents and activities, and funded projects the HOD has verified, are counted. Changing these saves a
+                  new ranking-configuration version; funding and FDP weights, effective dates and the full history are
+                  under “How these rankings are calculated” on the rankings.
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
                   {LEADERBOARD_WEIGHT_FIELDS.map(([key, label]) => (

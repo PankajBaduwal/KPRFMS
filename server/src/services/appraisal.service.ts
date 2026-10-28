@@ -19,6 +19,7 @@ import { Notification } from '../models/Notification.js';
 import { AuditLog } from '../models/AuditLog.js';
 import { ROLES, Role } from '../permissions/roles.js';
 import { AppError } from '../utils/AppError.js';
+import { InstitutionSettings } from '../models/InstitutionSettings.js';
 
 interface UserMeta {
   id?: string;
@@ -49,6 +50,7 @@ export class AppraisalService {
       const currentYear = new Date().getFullYear();
       const academicYear = `${currentYear - 1}-${currentYear}`;
       const systemAdmin = await User.findOne({ role: ROLES.ADMIN });
+      const appraisalSettings = (await InstitutionSettings.findOne().select('appraisal').lean())?.appraisal;
       const adminId = systemAdmin ? systemAdmin._id : new Types.ObjectId();
 
       cycle = await AppraisalCycle.create({
@@ -56,8 +58,9 @@ export class AppraisalService {
         academicYear,
         startDate: new Date(`${currentYear - 1}-06-01`),
         endDate: new Date(`${currentYear}-05-31`),
-        submissionDeadline: new Date(`${currentYear}-06-30`),
-        reviewDeadline: new Date(`${currentYear}-07-31`),
+        // Deadlines from Settings > Appraisal when set
+        submissionDeadline: appraisalSettings?.selfAppraisalDeadline ?? new Date(`${currentYear}-06-30`),
+        reviewDeadline: appraisalSettings?.hodReviewDeadline ?? new Date(`${currentYear}-07-31`),
         status: CYCLE_STATUSES.ACTIVE,
         description: 'Institutional performance appraisal covering all academic, research, and service domains for accreditation.',
         requirePrincipalApproval: true,

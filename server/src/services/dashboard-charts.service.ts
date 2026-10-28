@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { verifiedFundedMatch } from './funding-lifecycle.js';
 import { Publication } from '../models/Publication.js';
 import { Project } from '../models/Project.js';
 import { Patent } from '../models/Patent.js';
@@ -152,12 +153,12 @@ export const dashboardChartsService = {
           { $group: { _id: '$academicYear', n: { $sum: 1 } } },
         ]),
         Project.aggregate([
-          { $match: { academicYear: { $in: years }, status: { $in: ['SANCTIONED', 'ONGOING', 'COMPLETED'] } } },
+          { $match: { academicYear: { $in: years }, ...verifiedFundedMatch() } },
           { $group: { _id: '$academicYear', amount: { $sum: '$sanctionedAmount' } } },
         ]),
         Publication.aggregate([{ $match: { academicYear: current, verificationStatus: 'VERIFIED' } }, { $group: { _id: '$departmentId', n: { $sum: 1 } } }]),
         Project.aggregate([
-          { $match: { academicYear: current, status: { $in: ['SANCTIONED', 'ONGOING', 'COMPLETED'] } } },
+          { $match: { academicYear: current, ...verifiedFundedMatch() } },
           { $group: { _id: '$departmentId', n: { $sum: 1 } } },
         ]),
         AcademicActivity.aggregate([

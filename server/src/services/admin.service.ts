@@ -41,6 +41,8 @@ import { Notification } from '../models/Notification.js';
 import { clearInstitutionProfileCache } from '../utils/institution.js';
 import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
 import { assignmentService } from './assignment.service.js';
+import { leaderboardService } from './leaderboard.service.js';
+import { AppraisalCycle } from '../models/AppraisalCycle.js';
 
 export class AdminService {
   /**
@@ -119,6 +121,11 @@ export class AdminService {
         currentAcademicYear: settings.currentAcademicYear,
         currentSemesterType: settings.currentSemesterType,
         maintenanceMode: settings.maintenanceMode,
+        sessionTimeoutMinutes: settings.sessionTimeoutMinutes,
+        maxUploadSizeMb: settings.maxUploadSizeMb,
+        enabledModules: settings.enabledModules,
+        timezone: settings.timezone,
+        accentColor: settings.accentColor,
       },
       recentAuditLogs,
     };
@@ -1477,10 +1484,30 @@ export class AdminService {
       settings = new InstitutionSettings();
     }
 
+    // Department weights edited in Settings become a new ranking-configuration version (traceable history)
+    const before = settings.leaderboardWeights ? { ...(settings.toObject().leaderboardWeights ?? {}) } : undefined;
     Object.assign(settings, input);
     settings.updatedBy = new Types.ObjectId(adminId);
     await settings.save();
     clearInstitutionProfileCache();
+    // Appraisal deadlines from Settings apply to the active appraisal cycle
+    const ap = input.appraisal;
+    if (ap && (ap.selfAppraisalDeadline || ap.hodReviewDeadline)) {
+      await AppraisalCycle.updateOne(
+        { status: 'ACTIVE' },
+        { $set: { ...(ap.selfAppraisalDeadline ? { submissionDeadline: ap.selfAppraisalDeadline } : {}), ...(ap.hodReviewDeadline ? { reviewDeadline: ap.hodReviewDeadline } : {}) } }
+      );
+    }
+    const w = input.leaderboardWeights;
+    if (w && (!before || (['publications', 'projects', 'patents', 'activities'] as const).some((k) => before[k] !== w[k]))) {
+      const active = await leaderboardService.activeConfig(settings.currentAcademicYear);
+      const admin = await User.findById(adminId).select('name role email').lean();
+      await leaderboardService.saveConfig(
+        { id: adminId, name: admin?.name ?? 'Administrator', role: admin?.role ?? 'ADMIN', email: admin?.email ?? '' } as any,
+        { weights: { ...active.weights, ...w }, fundingUnit: active.fundingUnit, risingMinPrevious: active.risingMinPrevious, note: 'Department weights changed in Settings' },
+        req
+      );
+    }
 
     await recordAudit({
       action: AUDIT_ACTIONS.INSTITUTION_SETTINGS_UPDATED,

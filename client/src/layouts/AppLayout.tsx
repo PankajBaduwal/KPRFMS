@@ -314,12 +314,13 @@ export const AppLayout: React.FC = () => {
     },
   ];
 
-  // Drop links into switched-off modules (see constants/features.ts); empty groups disappear
+  // Drop links into switched-off modules (constants/features.ts and the institution's Settings); empty groups disappear
   const navSections: NavSection[] = allNavSections.map((section) => ({
     ...section,
     groups: section.groups
-      .filter((group) => !group.subItems || group.subItems.some((sub) => !isHiddenPath(sub.to)))
-      .map((group) => ({ ...group, subItems: group.subItems?.filter((sub) => !isHiddenPath(sub.to)) })),
+      .filter((group) => (group.to ? !isHiddenPath(group.to, inst.enabledModules) : true))
+      .filter((group) => !group.subItems || group.subItems.some((sub) => !isHiddenPath(sub.to, inst.enabledModules)))
+      .map((group) => ({ ...group, subItems: group.subItems?.filter((sub) => !isHiddenPath(sub.to, inst.enabledModules)) })),
   }));
 
   // Accordion open groups state
@@ -863,6 +864,15 @@ export const AppLayout: React.FC = () => {
 
         {/* Content Viewport */}
         <main id="main-content" className="app-content" tabIndex={-1}>
+          {/* Letterhead on printed pages (dossiers, reports): the institution's logo and name */}
+          <div className="print-letterhead" aria-hidden="true">
+            {inst.logoUrl && <img src={inst.logoUrl} alt="" />}
+            <div>
+              <strong>{inst.name}</strong>
+              <span>{[inst.address, inst.city, inst.state].filter(Boolean).join(', ')}</span>
+            </div>
+            <span className="print-letterhead-date">Printed {new Date().toLocaleDateString(undefined, inst.timezone ? { timeZone: inst.timezone } : undefined)}</span>
+          </div>
           <Outlet />
         </main>
 

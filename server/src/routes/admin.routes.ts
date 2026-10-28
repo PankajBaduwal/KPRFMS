@@ -3,7 +3,10 @@ import { requireAuth } from '../middleware/requireAuth.js';
 import { requireRole } from '../middleware/requireRole.js';
 import { ROLES } from '../permissions/roles.js';
 import { adminController } from '../controllers/admin.controller.js';
-import { spreadsheetUpload } from '../middleware/upload.js';
+import { spreadsheetUpload, logoUpload } from '../middleware/upload.js';
+import { brandingService } from '../services/branding.service.js';
+import { sendSuccess } from '../utils/apiResponse.js';
+import type { AuthenticatedRequest } from '../types/index.js';
 
 const router = Router();
 
@@ -88,6 +91,21 @@ router.delete('/masters/:id', (req, res, next) => adminController.deleteMasterIt
 router.get('/settings', (req, res, next) => adminController.getInstitutionSettings(req, res, next));
 router.put('/settings', (req, res, next) => adminController.updateInstitutionSettings(req, res, next));
 router.patch('/settings', (req, res, next) => adminController.updateInstitutionSettings(req, res, next));
+// Logo: raster image, validated and stored in this institution's own folder
+router.post('/settings/logo', logoUpload.single('logo'), async (req, res, next) => {
+  try {
+    sendSuccess(res, await brandingService.uploadLogo(req.file, (req as AuthenticatedRequest).user!.id, req), 'Logo updated.');
+  } catch (error) {
+    next(error);
+  }
+});
+router.delete('/settings/logo', async (req, res, next) => {
+  try {
+    sendSuccess(res, await brandingService.removeLogo((req as AuthenticatedRequest).user!.id, req), 'Logo removed.');
+  } catch (error) {
+    next(error);
+  }
+});
 
 // System Audit Logs
 router.get('/audit-logs', (req, res, next) => adminController.getAuditLogs(req, res, next));

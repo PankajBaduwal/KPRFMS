@@ -442,3 +442,21 @@ a.lb-row:hover .lb-name { color: #1B345F; text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) {
   .hia-confirm { animation: none; }
 }
+
+/* Ranking methodology and versioned weights */
+.lb-method { margin-top: 16px; background: var(--color-surface, #fff); border: 1px solid var(--color-border, #E2E8F0); border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; }
+.lb-method summary { cursor: pointer; font-weight: 600; color: #13294B; }
+.lb-method-body { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.lb-method-body p { margin: 0; }
+.lb-method-body code { font-size: 0.76rem; white-space: normal; color: #334155; }
+.lb-method-body ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; color: #475467; }
+.lb-weight-table { border-collapse: collapse; max-width: 520px; }
+.lb-weight-table th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: #64748B; padding: 4px 8px; border-bottom: 1px solid #E2E8F0; }
+.lb-weight-table td { padding: 4px 8px; border-bottom: 1px solid #F1F5F9; }
+.lb-weight-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lb-config { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #E2E8F0; padding-top: 10px; }
+.lb-config-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.lb-config label { display: flex; flex-direction: column; gap: 3px; font-size: 0.74rem; font-weight: 600; color: #344054; }
+.lb-config-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.lb-error { color: #B42318; margin: 0; }
+.lb-history ol { margin: 6px 0 0; padding-left: 18px; color: #475467; font-size: 0.76rem; display: flex; flex-direction: column; gap: 3px; }

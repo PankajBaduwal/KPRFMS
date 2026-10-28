@@ -36,7 +36,7 @@ async function call(method: string, url: string, token?: string, body?: unknown)
 const tokenFor = (u: { _id: unknown; email: string; role: any; departmentId?: unknown }) =>
   generateToken({ id: String(u._id), email: u.email, role: u.role, departmentId: u.departmentId ? String(u.departmentId) : undefined });
 
-const METRICS = ['publications', 'projects', 'patents', 'activities'] as const;
+const METRICS = ['publications', 'projects', 'funding', 'patents', 'fdp', 'activities'] as const;
 
 async function run() {
   console.log('================================================================');
@@ -78,13 +78,17 @@ async function run() {
   const res = await call('GET', `/dashboard/leaderboards?academicYear=${year}`, adminT);
   const d = res.data?.data;
   assert(res.status === 200 && d?.academicYear === year, 'Year filter applied', res.data);
-  assert(METRICS.every((m) => Array.isArray(d.faculty[m]) && d.faculty[m].length <= 10), 'Top-10 list for every metric');
+  // Top 10, plus anyone tied with 10th place
+  assert(
+    METRICS.every((m) => Array.isArray(d.faculty[m]) && d.faculty[m].every((r: any, i: number, a: any[]) => i < 10 || r.value === a[9].value)),
+    'Top-10 list for every metric (ties with 10th place included)'
+  );
   assert(
     METRICS.every((m) => d.faculty[m].every(
-        (r: any, i: number, a: any[]) => r.rank === a.filter((x: any) => x.count > r.count).length + 1 && (i === 0 || a[i - 1].count >= r.count)
+        (r: any, i: number, a: any[]) => r.rank === a.filter((x: any) => x.value > r.value).length + 1 && (i === 0 || a[i - 1].value >= r.value)
       )),
     'Faculty lists are ranked highest first, ties share a rank',
-    METRICS.map((m) => d.faculty[m].map((r: any) => [r.rank, r.count]))
+    METRICS.map((m) => d.faculty[m].map((r: any) => [r.rank, r.value]))
   );
 
   const verified = await Publication.countDocuments({ academicYear: year, verificationStatus: 'VERIFIED' });
@@ -130,9 +134,12 @@ async function run() {
 
   console.log('\n--- Department of the year and weights ---');
   const scoreOk = (data: any) =>
-    data.departments.every((x: any) => x.score === METRICS.reduce((s, m) => s + x.counts[m] * data.weights[m], 0));
+    data.departments.every((x: any) => Math.abs(x.score - METRICS.reduce((s, m) => s + x.counts[m] * data.weights[m], 0)) < 0.05);
   assert(scoreOk(d), 'Scores use the configured weights');
-  assert(!d.departmentOfTheYear || d.departmentOfTheYear.departmentId === d.departments[0].departmentId, 'Department of the year is rank 1');
+  assert(
+    d.departmentOfTheYear ? d.departmentOfTheYear.departmentId === d.departments[0].departmentId && d.departments[1]?.score !== d.departments[0].score : d.departments[0]?.score === 0 || d.departmentOfTheYearTie.length > 1,
+    'Department of the year is the single rank 1 (none when the top is shared)'
+  );
 
   const settings = (await call('GET', '/admin/settings', adminT)).data?.data;
   const original = settings?.leaderboardWeights;
@@ -150,7 +157,7 @@ async function run() {
 
   console.log('\n--- Rising ---');
   assert(
-    Array.isArray(d.rising) && d.rising.every((r: any) => r.change === r.current - r.previous && r.change > 0),
+    Array.isArray(d.rising) && d.rising.every((r: any) => Math.abs(r.change - (r.current - r.previous)) < 0.05 && r.change > 0),
     'Rising list shows real increases only'
   );
 

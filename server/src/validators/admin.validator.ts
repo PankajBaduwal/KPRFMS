@@ -4,6 +4,7 @@ import { USER_STATUS } from '../models/User.js';
 import { DEGREE_LEVELS } from '../models/Program.js';
 import { MASTER_CATEGORIES } from '../models/SystemMasterItem.js';
 import { SEMESTER_TYPES } from '../models/Semester.js';
+import { OPTIONAL_MODULE_KEYS, type OptionalModule } from '../models/InstitutionSettings.js';
 
 export const createUserSchema = z.object({
   employeeId: z.string().min(2, 'Employee ID is required').trim().toUpperCase(),
@@ -129,13 +130,38 @@ export const institutionSettingsSchema = z.object({
   city: z.string().optional().nullable(),
   state: z.string().optional().nullable(),
   pincode: z.string().optional().nullable(),
-  logoUrl: z.string().optional().nullable(),
   currentAcademicYear: z.string().min(4, 'Academic year is required').trim(),
   currentSemesterType: z.enum(['ODD', 'EVEN']).default('ODD'),
   allowSelfRegistration: z.boolean().optional().default(false),
   maintenanceMode: z.boolean().optional().default(false),
   sessionTimeoutMinutes: z.coerce.number().min(15).max(1440).default(60),
   maxUploadSizeMb: z.coerce.number().min(1).max(100).default(10),
+  accentColor: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/, 'Accent colour must be a hex colour such as #13294B').optional(),
+  timezone: z
+    .string()
+    .trim()
+    .refine((tz) => {
+      try {
+        new Intl.DateTimeFormat('en', { timeZone: tz });
+        return true;
+      } catch {
+        return false;
+      }
+    }, 'Unknown timezone (use a name such as Asia/Kolkata)')
+    .optional(),
+  enabledModules: z.array(z.enum(OPTIONAL_MODULE_KEYS as [OptionalModule, ...OptionalModule[]])).optional(),
+  appraisal: z
+    .object({
+      selfAppraisalDeadline: z.coerce.date().nullable().optional(),
+      hodReviewDeadline: z.coerce.date().nullable().optional(),
+      incrementBenchmark: z.coerce.number().min(0).max(300),
+      casThreshold: z.coerce.number().min(0).max(500),
+      includeFeedback: z.boolean(),
+    })
+    .refine((a) => !a.selfAppraisalDeadline || !a.hodReviewDeadline || a.hodReviewDeadline >= a.selfAppraisalDeadline, {
+      message: 'The HOD review deadline cannot be before the self-appraisal deadline',
+    })
+    .optional(),
   leaderboardWeights: z
     .object({
       publications: z.coerce.number().min(0).max(20),

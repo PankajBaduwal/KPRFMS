@@ -49,6 +49,10 @@ export class AppError extends Error {
     return new AppError(message, 429, 'RATE_LIMITED');
   }
 
+  static maintenance(message = 'The system is under maintenance. Please try again later.'): AppError {
+    return new AppError(message, 503, 'MAINTENANCE');
+  }
+
   static internal(message = 'Internal server error'): AppError {
     return new AppError(message, 500, 'INTERNAL_ERROR', undefined, false);
   }

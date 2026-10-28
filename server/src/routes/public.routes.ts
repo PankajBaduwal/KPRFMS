@@ -3,7 +3,9 @@ import { Faculty } from '../models/Faculty.js';
 import { Department } from '../models/Department.js';
 import { Publication } from '../models/Publication.js';
 import { AcademicActivity } from '../models/AcademicActivity.js';
-import { InstitutionSettings } from '../models/InstitutionSettings.js';
+import { InstitutionSettings, DEFAULT_ACCENT_COLOR, DEFAULT_TIMEZONE, OPTIONAL_MODULE_KEYS } from '../models/InstitutionSettings.js';
+import { AppError } from '../utils/AppError.js';
+import { brandingService } from '../services/branding.service.js';
 import { sendSuccess } from '../utils/apiResponse.js';
 import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
 import { requireTenant } from '../tenancy/context.js';
@@ -44,7 +46,7 @@ router.get('/overview', async (_req, res, next) => {
 router.get('/institution', async (_req, res, next) => {
   try {
     const s = await InstitutionSettings.findOne()
-      .select('name shortCode tagline logoUrl websiteUrl city state contactEmail contactPhone affiliation')
+      .select('name shortCode tagline logoUrl websiteUrl city state address contactEmail contactPhone affiliation accentColor timezone maintenanceMode enabledModules')
       .lean();
     res.setHeader('Cache-Control', 'public, max-age=60');
     sendSuccess(
@@ -62,10 +64,31 @@ router.get('/institution', async (_req, res, next) => {
         state: s?.state || '',
         contactEmail: s?.contactEmail || '',
         contactPhone: s?.contactPhone || '',
+        address: s?.address || '',
+        accentColor: s?.accentColor || DEFAULT_ACCENT_COLOR,
+        timezone: s?.timezone || DEFAULT_TIMEZONE,
+        maintenanceMode: Boolean(s?.maintenanceMode),
+        enabledModules: Array.isArray(s?.enabledModules) ? s!.enabledModules : OPTIONAL_MODULE_KEYS,
+        emailDomains: await allowedEmailDomains(),
         emailDomain: (await allowedEmailDomains())[0],
       },
       'Institution branding.'
     );
+  } catch (error) {
+    next(error);
+  }
+});
+
+/** The institution's uploaded logo (public: the sign-in page shows it). */
+router.get('/logo', async (_req, res, next) => {
+  try {
+    const logo = await brandingService.logoPath();
+    if (!logo) throw AppError.notFound('No logo has been uploaded.');
+    res.setHeader('Content-Type', logo.contentType);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Security-Policy', "default-src 'none'");
+    res.setHeader('Cache-Control', 'public, max-age=300');
+    res.sendFile(logo.file);
   } catch (error) {
     next(error);
   }

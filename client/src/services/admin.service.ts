@@ -286,6 +286,18 @@ export const adminService = {
     return res.data.data;
   },
 
+  async uploadLogo(file: File): Promise<{ logoUrl: string }> {
+    const form = new FormData();
+    form.append('logo', file);
+    const res = await apiClient.post(`${BASE}/settings/logo`, form, { headers: { 'Content-Type': 'multipart/form-data' } });
+    return res.data.data;
+  },
+
+  async removeLogo(): Promise<{ logoUrl: string }> {
+    const res = await apiClient.delete(`${BASE}/settings/logo`);
+    return res.data.data;
+  },
+
   // Audit Logs
   async getAuditLogs(params: {
     action?: string;

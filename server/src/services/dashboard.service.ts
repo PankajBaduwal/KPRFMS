@@ -27,6 +27,7 @@ import { ROLES } from '../permissions/roles.js';
 import { getCurrentAcademicYear } from '../utils/academicYear.js';
 import os from 'os';
 import { dashboardChartsService } from './dashboard-charts.service.js';
+import { verifiedFundedMatch } from './funding-lifecycle.js';
 
 export interface ActionItem {
   id: string;
@@ -658,7 +659,7 @@ export class DashboardService {
     const [publicationsCount, scopusSciCount, fundedProjects, patentsCount] = await Promise.all([
       Publication.countDocuments({ departmentId: departmentId as any }),
       Publication.countDocuments({ departmentId: departmentId as any, indexing: { $in: [INDEXING_TYPES.SCOPUS, INDEXING_TYPES.SCI, INDEXING_TYPES.SCIE] } }),
-      Project.find({ departmentId: departmentId as any, status: 'SANCTIONED', sanctionedAmount: { $gt: 0 } }).lean(),
+      Project.find({ departmentId: departmentId as any, ...verifiedFundedMatch(), sanctionedAmount: { $gt: 0 } }).lean(),
       Patent.countDocuments({ departmentId: departmentId as any }),
     ]);
 
@@ -845,12 +846,12 @@ export class DashboardService {
       Department.find({ isActive: true }).sort({ name: 1 }).lean(),
       FacultyAllocation.find({ academicYear: currentYear, status: { $ne: 'CANCELLED' } } as any).lean(),
       Publication.find().lean(),
-      Project.find({ status: 'SANCTIONED', sanctionedAmount: { $gt: 0 } }).lean(),
+      Project.find({ ...verifiedFundedMatch(), sanctionedAmount: { $gt: 0 } }).lean(),
       Patent.find().lean(),
       PhdScholar.find().lean(),
       FacultyAppraisal.countDocuments({ status: { $in: ['HOD_REVIEW', 'DEAN_REVIEW'] } }),
       Publication.countDocuments({ verificationStatus: { $in: ['SUBMITTED', 'UNDER_REVIEW'] } }),
-      Project.countDocuments({ status: { $in: ['SUBMITTED', 'UNDER_REVIEW'] as any } }),
+      Project.countDocuments({ verificationStatus: 'SUBMITTED' }),
     ]);
 
     // Workload computation
@@ -865,9 +866,9 @@ export class DashboardService {
       departments.map(async (d) => {
         const [fCount, pubCount, projCount, grants] = await Promise.all([
           Faculty.countDocuments({ departmentId: d._id }),
-          Publication.countDocuments({ departmentId: d._id }),
-          Project.countDocuments({ departmentId: d._id }),
-          Project.find({ departmentId: d._id, status: 'SANCTIONED', sanctionedAmount: { $gt: 0 } }).lean(),
+          Publication.countDocuments({ departmentId: d._id, verificationStatus: 'VERIFIED' }),
+          Project.countDocuments({ departmentId: d._id, ...verifiedFundedMatch() }),
+          Project.find({ departmentId: d._id, ...verifiedFundedMatch(), sanctionedAmount: { $gt: 0 } }).lean(),
         ]);
         const grantSum = grants.reduce((sum, g) => sum + (g.sanctionedAmount || 0), 0);
         return {
@@ -993,7 +994,7 @@ export class DashboardService {
       Faculty.countDocuments(),
       Faculty.countDocuments({ status: { $ne: 'INACTIVE' } }),
       Publication.find().lean(),
-      Project.find({ status: 'SANCTIONED', sanctionedAmount: { $gt: 0 } }).lean(),
+      Project.find({ ...verifiedFundedMatch(), sanctionedAmount: { $gt: 0 } }).lean(),
       Patent.find().lean(),
       StudentProject.countDocuments(),
       PhdScholar.countDocuments(),
@@ -1015,8 +1016,8 @@ export class DashboardService {
     // Trends: Top departments by research & activities
     const deptRanking = await Promise.all(
       departments.map(async (d) => {
-        const pubCount = await Publication.countDocuments({ departmentId: d._id });
-        const grantSum = (await Project.find({ departmentId: d._id, status: 'SANCTIONED', sanctionedAmount: { $gt: 0 } }).lean())
+        const pubCount = await Publication.countDocuments({ departmentId: d._id, verificationStatus: 'VERIFIED' });
+        const grantSum = (await Project.find({ departmentId: d._id, ...verifiedFundedMatch(), sanctionedAmount: { $gt: 0 } }).lean())
           .reduce((sum, g) => sum + (g.sanctionedAmount || 0), 0);
         return {
           name: d.name,

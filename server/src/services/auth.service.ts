@@ -34,6 +34,7 @@ import { mailService, clientUrl } from './mail.service.js';
 import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand.js';
 import { allowedEmailDomains, emailInDomains } from './institution-domains.js';
 import { assignmentService } from './assignment.service.js';
+import { getInstitutionProfile } from '../utils/institution.js';
 
 
 const MAX_FAILED_ATTEMPTS = 5;
@@ -157,6 +158,11 @@ export class AuthService {
       throw signInFailed();
     }
 
+    // During maintenance only administrators can sign in
+    if (user.role !== ROLES.ADMIN && (await getInstitutionProfile()).maintenanceMode) {
+      throw AppError.maintenance('The system is under maintenance. Please try again later.');
+    }
+
     // Check account status
     if (user.status !== USER_STATUS.ACTIVE) {
       await recordAudit({
@@ -217,6 +223,9 @@ export class AuthService {
     }
     if (user.status !== USER_STATUS.ACTIVE) {
       throw AppError.forbidden(`Your account status is ${user.status}. Please contact the institution administrator.`);
+    }
+    if (user.role !== ROLES.ADMIN && (await getInstitutionProfile()).maintenanceMode) {
+      throw AppError.maintenance();
     }
 
     const code = input.code.trim();

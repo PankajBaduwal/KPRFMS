@@ -161,6 +161,16 @@ Dean and Principal the whole institution by agency and department. Older records
 verification state with `npm run tenant:migrate-funding -- --tenant <code>` (add
 `--trust-existing` only if past sanctions were already HOD-checked).
 
+### Rankings and institution settings
+
+Principal and Dean dashboards rank faculty and departments from verified records only (overall,
+publications, funded projects, funding, patents, FDPs, activities), with a designation filter and
+a "Rising" list that compares like-for-like periods. "How these rankings are calculated" shows the
+formula, the configuration version in force and what still awaits verification; the Principal or
+an Admin can save new weights as a new version (effective date, optional academic year, history
+kept). Admin → Settings holds the logo, accent colour, timezone, enabled modules, appraisal
+deadlines, maintenance mode, idle timeout and upload limit; all of them are enforced.
+
 Files: each institution's uploads and document vault live in
 `server/storage/tenants/<code>/uploads` and `server/storage/tenants/<code>/secure_documents`,
 and are only served to signed-in users of that institution. The old shared `server/uploads/`

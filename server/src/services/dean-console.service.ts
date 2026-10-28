@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { verifiedFundedMatch } from './funding-lifecycle.js';
 import { AppError } from '../utils/AppError.js';
 import { Department } from '../models/Department.js';
 import { Faculty } from '../models/Faculty.js';
@@ -163,7 +164,7 @@ export class DeanConsoleService {
     const totalProjects = await Project.countDocuments({ ...yearFilter });
     const sanctionedProjects = await Project.countDocuments({
       ...yearFilter,
-      status: { $in: ['SANCTIONED', 'ONGOING', 'COMPLETED'] } as any,
+      ...verifiedFundedMatch(),
     });
     const ongoingProjects = await Project.countDocuments({
       ...yearFilter,
@@ -171,12 +172,13 @@ export class DeanConsoleService {
     });
     const submittedProjects = await Project.countDocuments({
       ...yearFilter,
-      status: { $in: ['SUBMITTED', 'UNDER_REVIEW'] } as any,
+      status: { $in: ['APPLIED', 'SUBMITTED', 'PENDING', 'UNDER_REVIEW', 'CLARIFICATION_REQUIRED'] } as any,
     });
 
     // Funded projects aggregation
     const fundedProjectDocs = await Project.find({
       ...yearFilter,
+      ...verifiedFundedMatch(),
       sanctionedAmount: { $gt: 0 },
     }).select('sanctionedAmount receivedAmount');
 
@@ -364,10 +366,10 @@ export class DeanConsoleService {
       const sanctionedProjects = await Project.countDocuments({
         departmentId: deptId,
         ...yearFilter,
-        status: { $in: ['SANCTIONED', 'ONGOING', 'COMPLETED'] } as any,
+        ...verifiedFundedMatch(),
       });
 
-      const projectDocs = await Project.find({ departmentId: deptId, ...yearFilter }, 'sanctionedAmount');
+      const projectDocs = await Project.find({ departmentId: deptId, ...yearFilter, ...verifiedFundedMatch() }, 'sanctionedAmount');
       const totalFunding = projectDocs.reduce((acc, p) => acc + (p.sanctionedAmount || 0), 0);
 
       // 5. Student Projects
@@ -596,7 +598,7 @@ export class DeanConsoleService {
         title = metric === 'fundedProjects' ? 'Funded Research Projects' : 'All Research Projects';
         const projFilter: any = { ...filter };
         if (metric === 'fundedProjects') {
-          projFilter.sanctionedAmount = { $gt: 0 };
+          Object.assign(projFilter, verifiedFundedMatch(), { sanctionedAmount: { $gt: 0 } });
         }
 
         const projs = await Project.find(projFilter)

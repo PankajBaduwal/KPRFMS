@@ -182,7 +182,8 @@ async function run() {
   assert(facView.status === 200 && fv?.scope === 'mine' && fv.list.items.every((i: any) => i.mine), 'Faculty see only their own applications', { st: facView.status, scope: fv?.scope });
   assert(fv?.totals.verifiedSanctioned === (await sumVerified({ userId: fac._id })), 'Faculty verified total matches the records', fv?.totals);
   assert(fv?.agencies.length === 0 && fv?.departments.length === 0, 'Faculty get no agency or department breakdown');
-  assert(fv?.totals.pendingVerification >= 3, 'Faculty see how many of theirs await verification', fv?.totals.pendingVerification);
+  const mineWaiting = await inA(() => Project.countDocuments({ userId: fac._id, verificationStatus: 'SUBMITTED' }));
+  assert(fv?.totals.pendingVerification === mineWaiting && mineWaiting >= 2, 'Faculty see how many of theirs await verification', { got: fv?.totals.pendingVerification, mineWaiting });
 
   const hodView = await api('GET', `/funding/overview`, hodT);
   const hv = hodView.data?.data;

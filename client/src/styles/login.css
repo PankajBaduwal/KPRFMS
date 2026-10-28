@@ -20,7 +20,7 @@
 
 /* ===== Left Side: Institutional Brand & Product Architecture (Deep Navy & Royal Blue) ===== */
 .login-brand-panel {
-  background: linear-gradient(145deg, #112547 0%, #1B345F 55%, #1B924B 100%);
+  background: linear-gradient(145deg, #112547 0%, #1B345F 55%, var(--inst-accent, #1B924B) 100%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-xl);
   padding: 2.5rem;

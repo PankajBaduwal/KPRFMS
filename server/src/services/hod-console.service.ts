@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { AWAITING_DECISION, isVerifiedFunded, verifiedFundedMatch } from './funding-lifecycle.js';
 import { Department } from '../models/Department.js';
 import { Faculty } from '../models/Faculty.js';
 import { Subject } from '../models/Subject.js';
@@ -164,8 +165,9 @@ export class HodConsoleService {
     const totalProjects = await Project.countDocuments({ departmentId });
 
     // Sum total funding amount
-    const projects = await Project.find({ departmentId }, 'sanctionedAmount totalFunding');
-    const totalFundingAmount = projects.reduce((acc, p: any) => acc + (p.sanctionedAmount || p.totalFunding || 0), 0);
+    // Money counts only for funded projects the department has verified
+    const projects = await Project.find({ departmentId, ...verifiedFundedMatch() }, 'sanctionedAmount');
+    const totalFundingAmount = projects.reduce((acc, p: any) => acc + (p.sanctionedAmount || 0), 0);
 
     // 6. Scholars & Mentoring
     const totalPhdScholars = await PhdScholar.countDocuments({ departmentId });
@@ -393,15 +395,16 @@ export class HodConsoleService {
     const agencyFundingMap = new Map<string, number>();
 
     for (const proj of projects) {
-      const amount = (proj as any).sanctionedAmount || (proj as any).totalFunding || 0;
+      const st = proj.status as string;
+      const funded = isVerifiedFunded(proj);
+      if (st === 'SANCTIONED' || st === 'APPROVED') sanctionedCount++;
+      else if (st === 'ONGOING') ongoingCount++;
+      else if (st === 'COMPLETED') completedCount++;
+      else if (AWAITING_DECISION.includes(st as any)) proposedCount++;
+      if (!funded) continue;
+
+      const amount = proj.sanctionedAmount || 0;
       totalFunding += amount;
-
-      const st = proj.status?.toUpperCase() || 'ONGOING';
-      if (st.includes('SANCTION') || st === 'SANCTIONED') sanctionedCount++;
-      else if (st.includes('COMPLET') || st === 'COMPLETED') completedCount++;
-      else if (st.includes('PROPOS') || st === 'SUBMITTED') proposedCount++;
-      else ongoingCount++;
-
       const agency = proj.fundingAgency || 'Other / Institutional';
       agencyFundingMap.set(agency, (agencyFundingMap.get(agency) || 0) + amount);
     }

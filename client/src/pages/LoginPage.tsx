@@ -15,6 +15,7 @@ import { InstitutionName, InstitutionContact, InstitutionDetails } from '../comp
 import { BrandMark } from '../components/BrandMark';
 import { InstitutionPicker } from '../components/InstitutionPicker';
 import { institutionStorageKey, useInstitutionCode } from '../lib/institution';
+import { useInstitution } from '../hooks/useInstitution';
 
 // The remembered ID belongs to the institution it was used in
 const rememberedIdKey = () => institutionStorageKey('remembered_id');
@@ -96,6 +97,7 @@ export const LoginPage: React.FC = () => {
 
   // Restore the identifier remembered for the chosen institution
   const institution = useInstitutionCode();
+  const branding = useInstitution();
   useEffect(() => {
     try {
       const savedId = localStorage.getItem(rememberedIdKey());
@@ -227,6 +229,14 @@ export const LoginPage: React.FC = () => {
                 : 'Use your college email or employee ID.'}
             </p>
           </div>
+
+          {branding.maintenanceMode && !challengeToken && (
+            <div style={{ marginBottom: '1rem' }}>
+              <Alert variant="warning" title="Under maintenance">
+                {branding.name || 'This institution'} is under maintenance. Only administrators can sign in until it is finished.
+              </Alert>
+            </div>
+          )}
 
           {/* Session Expired Alert */}
           {sessionExpired && (

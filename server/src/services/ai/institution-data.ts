@@ -65,7 +65,7 @@ export async function buildInstitutionSnapshot(scope: DataScope) {
         quartile: 'quartile',
         verification: 'verificationStatus',
       }, { citations: { $sum: '$citationCount' } }),
-      grouped(Project, scope, { dept: 'departmentId', year: 'academicYear', status: 'status', fundingType: 'fundingType' }, {
+      grouped(Project, scope, { dept: 'departmentId', year: 'academicYear', status: 'status', verification: 'verificationStatus', fundingType: 'fundingType' }, {
         sanctionedAmount: { $sum: '$sanctionedAmount' },
         receivedAmount: { $sum: '$receivedAmount' },
       }),

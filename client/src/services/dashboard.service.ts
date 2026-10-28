@@ -2,7 +2,7 @@ import { apiClient } from '../api/client';
 
 import type { AdminCharts, FacultyCharts, HodCharts, InstitutionCharts } from '../components/dashboard/insights/DashboardInsights';
 
-export type LeaderboardMetric = 'publications' | 'projects' | 'patents' | 'activities';
+export type LeaderboardMetric = 'publications' | 'projects' | 'funding' | 'patents' | 'fdp' | 'activities';
 
 export interface LeaderboardFacultyRow {
   rank: number;
@@ -10,8 +10,20 @@ export interface LeaderboardFacultyRow {
   name: string;
   designation: string;
   department: string;
+  /** What the rank is based on: a count, or for funding the sanctioned amount in funding units */
+  value: number;
   count: number;
   details: Record<string, number>;
+}
+
+export interface LeaderboardOverallRow {
+  rank: number;
+  facultyId: string;
+  name: string;
+  designation: string;
+  department: string;
+  score: number;
+  components: Record<LeaderboardMetric, number>;
 }
 
 export interface LeaderboardDepartmentRow {
@@ -20,17 +32,34 @@ export interface LeaderboardDepartmentRow {
   code: string;
   name: string;
   counts: Record<LeaderboardMetric, number>;
+  points: Record<LeaderboardMetric, number>;
   score: number;
+}
+
+export interface RankingConfigVersion {
+  version: number;
+  academicYear: string | null;
+  effectiveFrom: string | null;
+  weights: Record<LeaderboardMetric, number>;
+  fundingUnit: number;
+  risingMinPrevious: number;
+  note?: string;
+  createdByName?: string;
+  createdAt?: string;
+  source?: 'configured' | 'default';
 }
 
 export interface LeaderboardData {
   academicYear: string;
   previousAcademicYear: string;
   departmentId: string | null;
+  designation: string | null;
   weights: Record<LeaderboardMetric, number>;
   faculty: Record<LeaderboardMetric, LeaderboardFacultyRow[]>;
+  overall: LeaderboardOverallRow[];
   departments: LeaderboardDepartmentRow[];
   departmentOfTheYear: LeaderboardDepartmentRow | null;
+  departmentOfTheYearTie: string[];
   rising: Array<{
     rank: number;
     facultyId: string;
@@ -40,8 +69,20 @@ export interface LeaderboardData {
     current: number;
     previous: number;
     change: number;
+    previousRecords: number;
   }>;
   departmentOptions: Array<{ id: string; code: string; name: string }>;
+  designationOptions: string[];
+  awaitingVerification: Partial<Record<LeaderboardMetric, number>>;
+  methodology: {
+    config: { version: number; source: 'configured' | 'default'; appliesTo: string; effectiveFrom: string | null; note: string | null; createdByName: string | null };
+    weights: Record<LeaderboardMetric, number>;
+    fundingUnit: number;
+    formula: string;
+    categories: Record<LeaderboardMetric, string>;
+    rules: string[];
+    risingWindow: { current: string; previous: string; partial: boolean; days?: number };
+  };
 }
 
 export interface ActionItem {
@@ -375,11 +416,21 @@ export const dashboardService = {
     return res.data.data;
   },
 
-  async getLeaderboards(params: { academicYear?: string; departmentId?: string }): Promise<LeaderboardData> {
+  async getLeaderboards(params: { academicYear?: string; departmentId?: string; designation?: string }): Promise<LeaderboardData> {
     const res = await apiClient.get('/dashboard/leaderboards', {
-      params: { academicYear: params.academicYear || undefined, departmentId: params.departmentId || undefined },
+      params: { academicYear: params.academicYear || undefined, departmentId: params.departmentId || undefined, designation: params.designation || undefined },
     });
     return res.data.data;
+  },
+
+  async getRankingConfig(academicYear?: string): Promise<{ academicYear: string; active: RankingConfigVersion; history: RankingConfigVersion[] }> {
+    const res = await apiClient.get('/rankings/config', { params: { academicYear: academicYear || undefined } });
+    return res.data.data;
+  },
+
+  async saveRankingConfig(input: { academicYear?: string | null; effectiveFrom?: string; weights: Record<LeaderboardMetric, number>; fundingUnit: number; risingMinPrevious: number; note?: string }) {
+    const res = await apiClient.post('/rankings/config', input);
+    return res.data.data as RankingConfigVersion;
   },
 
   async getDeanDashboard(): Promise<DeanDashboardData> {

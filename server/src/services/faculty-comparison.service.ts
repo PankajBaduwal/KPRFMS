@@ -10,6 +10,7 @@ import { StudentMentoring } from '../models/StudentMentoring.js';
 import { FacultyAllocation } from '../models/FacultyAllocation.js';
 import { ROLES } from '../permissions/roles.js';
 import { getCurrentAcademicYear } from '../utils/academicYear.js';
+import { VERIFIED_FUNDED_EXPR as FUNDED_EXPR, verifiedFundedMatch } from './funding-lifecycle.js';
 
 export interface IFacultyComparisonFilters {
   academicYear?: string;
@@ -274,9 +275,7 @@ export class FacultyComparisonService {
     // 2.2 Research Projects & Grants
     const prjMatch: any = { facultyId: { $in: facultyIds } };
     if (ay) prjMatch.academicYear = ay;
-    if (verifiedOnly) {
-      prjMatch.status = { $in: ['SANCTIONED', 'ONGOING', 'COMPLETED'] };
-    }
+    if (verifiedOnly) Object.assign(prjMatch, verifiedFundedMatch());
 
     const prjAgg = await Project.aggregate([
       { $match: prjMatch },
@@ -290,11 +289,10 @@ export class FacultyComparisonService {
           completed: {
             $sum: { $cond: [{ $eq: ['$status', 'COMPLETED'] }, 1, 0] },
           },
-          fundedCount: {
-            $sum: { $cond: [{ $gt: [{ $ifNull: ['$sanctionedAmount', 0] }, 0] }, 1, 0] },
-          },
-          totalSanctionedAmount: { $sum: { $ifNull: ['$sanctionedAmount', 0] } },
-          totalReceivedAmount: { $sum: { $ifNull: ['$receivedAmount', 0] } },
+          // Money and funded counts: verified funded projects only
+          fundedCount: { $sum: { $cond: [FUNDED_EXPR, 1, 0] } },
+          totalSanctionedAmount: { $sum: { $cond: [FUNDED_EXPR, { $ifNull: ['$sanctionedAmount', 0] }, 0] } },
+          totalReceivedAmount: { $sum: { $cond: [FUNDED_EXPR, { $ifNull: ['$receivedAmount', 0] }, 0] } },
         },
       },
     ]);
@@ -616,9 +614,7 @@ export class FacultyComparisonService {
         if (params.metric === 'fundedProjects') {
           query.sanctionedAmount = { $gt: 0 };
         }
-        if (verifiedOnly) {
-          query.status = { $in: ['SANCTIONED', 'ONGOING', 'COMPLETED'] };
-        }
+        if (verifiedOnly || params.metric === 'fundedProjects') Object.assign(query, verifiedFundedMatch());
 
         title = `${fac.name} — Research Projects & Grants`;
         total = await Project.countDocuments(query);

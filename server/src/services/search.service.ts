@@ -19,6 +19,7 @@ import {
   Patent,
 } from '../models/index.js';
 import { appCache } from '../utils/cache.js';
+import { verifiedFundedMatch } from './funding-lifecycle.js';
 
 export interface ISearchUser {
   userId: string;
@@ -52,7 +53,6 @@ function buildRbacFilter(
     { verificationStatus: 'VERIFIED' },
     { status: 'VERIFIED' },
     { status: 'COMPLETED' },
-    { status: 'SANCTIONED' },
     { status: 'GRANTED' },
   ];
 
@@ -186,7 +186,7 @@ export const searchService = {
         ? Project.find(
             combineQuery(
               buildRbacFilter(user, 'facultyId', 'departmentId', [
-                { status: { $in: ['SANCTIONED', 'ONGOING', 'COMPLETED'] } },
+                verifiedFundedMatch(),
               ]),
               {
                 $or: [

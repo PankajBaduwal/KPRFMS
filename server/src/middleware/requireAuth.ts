@@ -6,6 +6,8 @@ import { User, USER_STATUS } from '../models/User.js';
 import { Session } from '../models/Session.js';
 import { runInTenant } from '../tenancy/context.js';
 import { resolveActiveTenant } from '../tenancy/registry.js';
+import { getInstitutionProfile, moduleForPath } from '../utils/institution.js';
+import { ROLES } from '../permissions/roles.js';
 
 export async function requireAuth(
   req: AuthenticatedRequest,
@@ -55,12 +57,19 @@ async function continueInTenant(
   payload: ReturnType<typeof verifyToken>
 ): Promise<void> {
   try {
+    const profile = await getInstitutionProfile();
 
     // Browser sessions are tracked per device so they can be listed and signed out remotely
     if (payload.sid) {
       const session = await Session.findOne({ sid: payload.sid }).select('revokedAt lastSeenAt').lean();
       if (!session || session.revokedAt) {
         throw AppError.unauthorized('This session was signed out. Please sign in again.');
+      }
+      // Idle timeout from Settings: a browser session unused for longer is signed out
+      const idleMs = Date.now() - new Date(session.lastSeenAt).getTime();
+      if (idleMs > profile.sessionTimeoutMinutes * 60_000) {
+        await Session.updateOne({ sid: payload.sid }, { $set: { revokedAt: new Date() } }).catch(() => null);
+        throw AppError.unauthorized(`You were signed out after ${profile.sessionTimeoutMinutes} minutes without activity. Please sign in again.`);
       }
       if (Date.now() - new Date(session.lastSeenAt).getTime() > 60_000) {
         void Session.updateOne({ sid: payload.sid }, { $set: { lastSeenAt: new Date(), ip: req.ip } }).catch(() => null);
@@ -82,6 +91,18 @@ async function continueInTenant(
 
     if (user.status !== USER_STATUS.ACTIVE) {
       throw AppError.forbidden(`Your account is currently ${user.status.toLowerCase()}. Please contact the administrator.`);
+    }
+
+    // Maintenance mode: only administrators keep working (signing out stays possible)
+    const apiPath = `${req.baseUrl}${req.path}`;
+    const authPath = /^\/api(\/t\/[^/]+)?\/auth\//.test(apiPath);
+    if (profile.maintenanceMode && user.role !== ROLES.ADMIN && !authPath) {
+      throw AppError.maintenance();
+    }
+    // Modules the institution has switched off
+    const mod = moduleForPath(req.baseUrl);
+    if (mod && !profile.enabledModules.includes(mod)) {
+      throw new AppError('This module is not enabled for your institution.', 403, 'MODULE_DISABLED');
     }
 
     req.user = {

@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { verifiedFundedMatch } from './funding-lifecycle.js';
 import { AppError } from '../utils/AppError.js';
 import { Department } from '../models/Department.js';
 import { Faculty } from '../models/Faculty.js';
@@ -201,6 +202,7 @@ export class PrincipalConsoleService {
     // 4. Funded Projects & Grants
     const fundedProjectDocs = await Project.find({
       ...yearFilter,
+      ...verifiedFundedMatch(),
       sanctionedAmount: { $gt: 0 },
     }).select('sanctionedAmount receivedAmount status').lean();
 
@@ -321,7 +323,7 @@ export class PrincipalConsoleService {
         const [pubs, vPubs, prjs, acts] = await Promise.all([
           Publication.countDocuments({ academicYear: yr }),
           Publication.countDocuments({ academicYear: yr, verificationStatus: 'VERIFIED' }),
-          Project.find({ academicYear: yr, sanctionedAmount: { $gt: 0 } }).select('sanctionedAmount').lean(),
+          Project.find({ academicYear: yr, ...verifiedFundedMatch(), sanctionedAmount: { $gt: 0 } }).select('sanctionedAmount').lean(),
           AcademicActivity.countDocuments({
             academicYear: yr,
             activityType: { $in: ['FDP', 'STTP', 'WORKSHOP'] },
@@ -435,6 +437,7 @@ export class PrincipalConsoleService {
         // Funded Projects
         const fundedPrjs = await Project.find({
           departmentId: deptId,
+          ...verifiedFundedMatch(),
           sanctionedAmount: { $gt: 0 },
           ...ayFilter,
         }).select('sanctionedAmount').lean();
@@ -613,7 +616,7 @@ export class PrincipalConsoleService {
       case 'researchProjects': {
         const query: any = { ...baseFilter };
         if (params.metric === 'fundedProjects') {
-          query.sanctionedAmount = { $gt: 0 };
+          Object.assign(query, verifiedFundedMatch(), { sanctionedAmount: { $gt: 0 } });
         }
         if (searchRegex) {
           query.$or = [{ title: searchRegex }, { fundingAgency: searchRegex }, { piName: searchRegex }];

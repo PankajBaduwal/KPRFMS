@@ -372,7 +372,23 @@ input[type="radio"]:focus-visible {
 }
 
 /* ===== Institutional Print Stylesheet ===== */
+.print-letterhead { display: none; }
+
 @media print {
+  .print-letterhead {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 2px solid var(--inst-accent, #1B924B);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+  .print-letterhead img { height: 40px; width: auto; }
+  .print-letterhead div { display: flex; flex-direction: column; }
+  .print-letterhead strong { font-size: 14pt; }
+  .print-letterhead span { font-size: 9pt; color: #444; }
+  .print-letterhead-date { margin-left: auto; }
+
   *,
   *::before,
   *::after {

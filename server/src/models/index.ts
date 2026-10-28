@@ -186,3 +186,4 @@ export { InstitutionSettings, type IInstitutionSettings } from './InstitutionSet
 export { DocumentRecord, type IDocument } from './Document.js';
 export { Session, type ISession } from './Session.js';
 export { ImportJob, type IImportJob } from './ImportJob.js';
+export { RankingConfig, type IRankingConfig } from './RankingConfig.js';

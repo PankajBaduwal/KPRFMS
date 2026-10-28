@@ -49,6 +49,12 @@ export const AGENCY_DECISIONS: FundingStatus[] = ['APPROVED', 'SANCTIONED', 'REJ
 
 /** Mongo filter for funded projects that the institution has verified. */
 export const verifiedFundedMatch = () => ({ status: { $in: FUNDED_STATUSES }, verificationStatus: VERIFICATION.VERIFIED });
+/** The same rule inside an aggregation ($cond). */
+export const VERIFIED_FUNDED_EXPR = { $and: [{ $in: ['$status', FUNDED_STATUSES] }, { $eq: ['$verificationStatus', VERIFICATION.VERIFIED] }] };
+
+/** The same rule for a loaded record. */
+export const isVerifiedFunded = (p: { status?: string; verificationStatus?: string }) =>
+  (FUNDED_STATUSES as string[]).includes(p.status ?? '') && p.verificationStatus === VERIFICATION.VERIFIED;
 
 const T: Record<FundingStatus, FundingStatus[]> = {
   IDEA: ['DRAFT', 'WITHDRAWN'],

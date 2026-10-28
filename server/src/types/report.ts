@@ -51,6 +51,10 @@ export interface IReportFilterParams {
 
 export interface IReportHeader {
   institutionName: string;
+  /** Logo as a data URI (printable documents open outside the app) */
+  institutionLogo?: string | null;
+  accentColor?: string;
+  timezone?: string;
   department: string;
   departmentId?: string;
   academicYear: string;

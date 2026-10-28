@@ -156,6 +156,16 @@ export interface IAdminInstitutionSettings {
   sessionTimeoutMinutes: number;
   maxUploadSizeMb: number;
   leaderboardWeights?: { publications: number; projects: number; patents: number; activities: number };
+  accentColor?: string;
+  timezone?: string;
+  enabledModules?: string[];
+  appraisal?: {
+    selfAppraisalDeadline?: string | null;
+    hodReviewDeadline?: string | null;
+    incrementBenchmark: number;
+    casThreshold: number;
+    includeFeedback: boolean;
+  };
   updatedBy?: string;
   createdAt: string;
   updatedAt: string;

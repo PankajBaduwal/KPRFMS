@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { documentController } from '../controllers/document.controller.js';
 import { requireAuth } from '../middleware/requireAuth.js';
-import { secureDocumentUpload } from '../middleware/upload.js';
+import { secureDocumentUpload, enforceInstitutionUploadLimit } from '../middleware/upload.js';
 
 const router = Router();
 
@@ -12,6 +12,7 @@ router.use(requireAuth);
 router.post(
   '/upload',
   secureDocumentUpload.single('file'),
+  enforceInstitutionUploadLimit,
   (req, res, next) => documentController.upload(req, res, next)
 );
 

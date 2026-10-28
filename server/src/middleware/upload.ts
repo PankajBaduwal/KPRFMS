@@ -5,6 +5,7 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { AppError } from '../utils/AppError.js';
 import { validateUploadedFile } from '../utils/fileSecurity.js';
 import { ensureDir, tenantUploadsRoot } from '../tenancy/files.js';
+import { getInstitutionProfile } from '../utils/institution.js';
 
 /** The current institution's upload folder (served back at /uploads/documents/<name>). */
 const uploadDir = () => ensureDir(path.join(tenantUploadsRoot(), 'documents'));
@@ -22,10 +23,11 @@ const memoryUpload = multer({
  * extension/MIME match, magic bytes, size) and only then writes it to disk under a random
  * server-generated name. The client's filename and extension are never used on disk.
  */
-function persistValidatedUpload(req: Request, _res: Response, next: NextFunction): void {
+async function persistValidatedUpload(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
     const file = req.file;
     if (!file) return next();
+    await checkInstitutionUploadLimit(file.size);
 
     const mime = file.mimetype.toLowerCase().trim();
     if (!LEGACY_ALLOWED_MIMES.includes(mime)) {
@@ -48,12 +50,26 @@ function persistValidatedUpload(req: Request, _res: Response, next: NextFunction
   }
 }
 
+/** The institution's own limit from Settings (never above the fixed ceiling of each upload type). */
+async function checkInstitutionUploadLimit(size: number): Promise<void> {
+  const { maxUploadSizeMb } = await getInstitutionProfile();
+  if (size > maxUploadSizeMb * 1024 * 1024) {
+    throw new AppError(`Files can be at most ${maxUploadSizeMb} MB at this institution.`, 413, 'FILE_TOO_LARGE');
+  }
+}
+
+/** Applies the institution's upload limit after a memory-storage multer parser. */
+export const enforceInstitutionUploadLimit: RequestHandler = (req, _res, next) => {
+  if (!req.file) return next();
+  checkInstitutionUploadLimit(req.file.size).then(() => next(), next);
+};
+
 /** Drop-in replacement for the old disk-storage multer instance: `documentUpload.single('file')`. */
 export const documentUpload = {
   single: (fieldName: string): RequestHandler => {
     const parse = memoryUpload.single(fieldName);
     return (req, res, next) => {
-      parse(req, res, (err?: unknown) => (err ? next(err) : persistValidatedUpload(req, res, next)));
+      parse(req, res, (err?: unknown) => (err ? next(err) : void persistValidatedUpload(req, res, next)));
     };
   },
 };
@@ -73,4 +89,10 @@ export const spreadsheetUpload = multer({
     if (/\.(xlsx|csv)$/i.test(file.originalname)) cb(null, true);
     else cb(new AppError('Upload an Excel (.xlsx) or .csv file.', 400, 'INVALID_FILE_TYPE'));
   },
+});
+
+/** Institution logo (PNG/JPEG/WebP, checked further by the branding service), kept in memory. */
+export const logoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 512 * 1024, files: 1 },
 });

@@ -87,6 +87,8 @@ export class DashboardController {
       const data = await leaderboardService.get({
         academicYear: (req.query.academicYear as string) || undefined,
         departmentId: (req.query.departmentId as string) || undefined,
+        designation: (req.query.designation as string) || undefined,
+        category: (req.query.category as string) || undefined,
       });
       sendSuccess(res, data, 'Leaderboards loaded.');
     } catch (error) {

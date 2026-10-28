@@ -22,6 +22,7 @@ import { gemini, GeminiSchema, isAiEnabled } from './gemini.client.js';
 import { buildInstitutionSnapshot } from './institution-data.js';
 import { getInstitutionProfile } from '../../utils/institution.js';
 import { resolveUploadUrl } from '../../tenancy/files.js';
+import { verifiedFundedMatch } from '../funding-lifecycle.js';
 
 const LEADERSHIP: string[] = [ROLES.DEAN, ROLES.PRINCIPAL, ROLES.ADMIN];
 const MAX_PROOF_BYTES = 15 * 1024 * 1024;
@@ -311,7 +312,7 @@ overall: LOOKS_CORRECT when nothing important differs, CHECK_DETAILS for minor d
       Publication.find({ ...verified, verificationStatus: 'VERIFIED' })
         .select('title publicationType journalOrConference indexing quartile authorPosition publicationDate citationCount')
         .lean(),
-      Project.find({ userId, academicYear, status: { $in: ['SANCTIONED', 'ONGOING', 'COMPLETED'] } })
+      Project.find({ userId, academicYear, ...verifiedFundedMatch() })
         .select('title fundingAgency fundingType sanctionedAmount status')
         .lean(),
       Patent.find({ ...verified, verificationStatus: 'VERIFIED' }).select('title status filingDate grantDate').lean(),

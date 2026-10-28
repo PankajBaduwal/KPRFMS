@@ -11,6 +11,7 @@ import { FacultyAllocation } from '../models/FacultyAllocation.js';
 import { ROLES } from '../permissions/roles.js';
 import { appCache } from '../utils/cache.js';
 import { getCurrentAcademicYear } from '../utils/academicYear.js';
+import { FUNDING_STATUSES, VERIFIED_FUNDED_EXPR as FUNDED_EXPR, verifiedFundedMatch } from './funding-lifecycle.js';
 
 export interface IInstitutionAnalyticsFilters {
   academicYear?: string;
@@ -336,13 +337,13 @@ export class InstitutionAnalyticsService {
       actMatch.status = status;
 
       if (status === 'VERIFIED') {
-        prjMatch.status = { $in: ['SANCTIONED', 'ONGOING', 'COMPLETED'] };
+        prjMatch.verificationStatus = 'VERIFIED';
         spMatch.status = { $in: ['APPROVED', 'ONGOING', 'COMPLETED'] };
       } else if (status === 'SUBMITTED' || status === 'UNDER_REVIEW') {
-        prjMatch.status = { $in: ['SUBMITTED', 'UNDER_REVIEW'] };
+        prjMatch.verificationStatus = 'SUBMITTED';
         spMatch.status = { $in: ['PROPOSED', 'SUBMITTED', 'UNDER_REVIEW'] };
       } else if (status === 'REJECTED') {
-        prjMatch.status = 'REJECTED';
+        prjMatch.verificationStatus = 'REJECTED';
       }
     }
 
@@ -449,7 +450,7 @@ export class InstitutionAnalyticsService {
     // 3. Research Funding Aggregations
     const [fundingAgencyAgg, fundingTypeAgg, fundingYearTrends, fundingTotals] = await Promise.all([
       Project.aggregate([
-        { $match: prjMatch },
+        { $match: { $and: [prjMatch, verifiedFundedMatch()] } },
         {
           $group: {
             _id: '$fundingAgency',
@@ -461,7 +462,7 @@ export class InstitutionAnalyticsService {
         { $limit: 10 },
       ]),
       Project.aggregate([
-        { $match: prjMatch },
+        { $match: { $and: [prjMatch, verifiedFundedMatch()] } },
         {
           $group: {
             _id: '$fundingType',
@@ -472,7 +473,7 @@ export class InstitutionAnalyticsService {
         { $sort: { totalSanctioned: -1 } },
       ]),
       Project.aggregate([
-        { $match: prjMatch },
+        { $match: { $and: [prjMatch, verifiedFundedMatch()] } },
         {
           $group: {
             _id: '$academicYear',
@@ -488,14 +489,10 @@ export class InstitutionAnalyticsService {
         {
           $group: {
             _id: null,
-            totalSanctionedAmount: { $sum: { $ifNull: ['$sanctionedAmount', 0] } },
-            totalReceivedAmount: { $sum: { $ifNull: ['$receivedAmount', 0] } },
+            totalSanctionedAmount: { $sum: { $cond: [FUNDED_EXPR, { $ifNull: ['$sanctionedAmount', 0] }, 0] } },
+            totalReceivedAmount: { $sum: { $cond: [FUNDED_EXPR, { $ifNull: ['$receivedAmount', 0] }, 0] } },
             totalRequestedAmount: { $sum: { $ifNull: ['$requestedAmount', 0] } },
-            fundedProjectsCount: {
-              $sum: {
-                $cond: [{ $gt: [{ $ifNull: ['$sanctionedAmount', 0] }, 0] }, 1, 0],
-              },
-            },
+            fundedProjectsCount: { $sum: { $cond: [FUNDED_EXPR, 1, 0] } },
           },
         },
       ]),
@@ -1120,7 +1117,7 @@ export class InstitutionAnalyticsService {
       case 'projects': {
         const query: any = { ...prjMatch };
         if (params.subType && params.subType !== 'ALL') {
-          if (['IDEA', 'SUBMITTED', 'UNDER_REVIEW', 'SANCTIONED', 'ONGOING', 'COMPLETED', 'REJECTED'].includes(params.subType)) {
+          if ((FUNDING_STATUSES as string[]).includes(params.subType)) {
             query.status = params.subType;
           } else if (['Government', 'Industry', 'Institutional', 'International', 'Other'].includes(params.subType)) {
             query.fundingType = params.subType;
