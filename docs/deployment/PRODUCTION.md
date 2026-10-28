@@ -10,7 +10,7 @@
 |---|---|---|
 | `web` | nginx serving the built React app, proxying `/api` and `/uploads` to the API | One public origin; no CORS needed |
 | `server` | Node 22 API (`dist/server.js`) | Stateless except the live-notification streams (see §9) and files on its volume |
-| `mongo` | MongoDB 8.0 | One server/cluster holds every database |
+| `mongo` | MongoDB 8.2 | One server/cluster holds every database |
 
 Databases on the MongoDB server:
 
@@ -52,10 +52,10 @@ tokens, cookies and keys; error responses never include stack traces or connecti
 
 ## 3. MongoDB
 
-* **Check the host kernel.** MongoDB 8.0 refuses to start on Linux 6.19 and newer
-  ("known incompatibility", SERVER-121912) — this is what CI ran into on `ubuntu-latest`. Run the
-  database on a host with an older kernel (e.g. Ubuntu 24.04), on a managed cluster, or on a
-  MongoDB release that states support for your kernel.
+* **MongoDB version and host kernel.** MongoDB 8.0 refuses to start on Linux 6.19 and newer
+  (SERVER-121912). The bundled stack therefore uses **MongoDB 8.2**, which CI verified on a 7.0
+  kernel (7.0 and 9.0 also started; 8.0 did not). Development on Windows uses 8.0, which is
+  data-compatible. With a managed cluster, choose a version the provider supports.
 * **Use a replica set** (three members, or a managed cluster such as MongoDB Atlas) for durability
   and point-in-time recovery. The bundled single container is fine for evaluation only.
 * **Enable authentication.** Create one application user. It needs `readWrite` on `fc_platform`

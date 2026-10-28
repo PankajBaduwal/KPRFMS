@@ -10,7 +10,8 @@
 # Full guide: docs/deployment/PRODUCTION.md
 services:
   mongo:
-    image: mongo:8.0
+    # 8.2 runs on current Linux kernels; 8.0 refuses kernels 6.19+ (SERVER-121912)
+    image: mongo:8.2
     restart: unless-stopped
     volumes:
       - mongo-data:/data/db

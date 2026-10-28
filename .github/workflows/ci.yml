@@ -5,28 +5,8 @@ on:
   pull_request:
 
 jobs:
-  # TEMPORARY: which MongoDB images start on the current runner kernel (SERVER-121912)
-  mongo-probe:
-    name: Probe — MongoDB versions on this runner
-    runs-on: ubuntu-24.04
-    steps:
-      - run: |
-          echo "::notice title=kernel::$(uname -r)"
-          for img in mongo:7.0 mongo:8.0 mongo:8.2 mongo:latest; do
-            name=probe-$(echo $img | tr ':.' '--')
-            docker run -d --name $name $img >/dev/null 2>&1 || { echo "::warning title=probe::$img => pull/run failed"; continue; }
-            ok=fail
-            for i in $(seq 1 20); do
-              if docker exec $name mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' >/dev/null 2>&1; then ok=ok; break; fi
-              sleep 2
-            done
-            ver=$(docker exec $name mongod --version 2>/dev/null | head -1)
-            echo "::warning title=probe::$img => $ok ($ver)"
-            docker rm -f $name >/dev/null 2>&1
-          done
   client:
     name: Web app — type-check, lint, build
-    # ubuntu-latest moved to Linux 6.19+, which MongoDB 8.0 refuses to run on (SERVER-121912)
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -44,7 +24,6 @@ jobs:
 
   server:
     name: API — type-check, build, test suites (two isolated institutions)
-    # ubuntu-latest moved to Linux 6.19+, which MongoDB 8.0 refuses to run on (SERVER-121912)
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -61,10 +40,11 @@ jobs:
       GEMINI_API_KEY: ''
     steps:
       # MongoDB started explicitly (not as a service container) so a start-up problem is reported
-      - name: Start MongoDB 8.0
+      # 8.2: MongoDB 8.0 refuses Linux 6.19+ kernels, which GitHub runners now use (SERVER-121912)
+      - name: Start MongoDB 8.2
         working-directory: .
         run: |
-          docker run -d --name mongo -p 27017:27017 mongo:8.0
+          docker run -d --name mongo -p 27017:27017 mongo:8.2
           for i in $(seq 1 60); do
             if docker exec mongo mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' >/dev/null 2>&1; then echo "MongoDB is up"; exit 0; fi
             sleep 2
@@ -98,7 +78,6 @@ jobs:
 
   docker:
     name: Docker — build images and start the stack
-    # ubuntu-latest moved to Linux 6.19+, which MongoDB 8.0 refuses to run on (SERVER-121912)
     runs-on: ubuntu-24.04
     # Throwaway values; every compose command below needs them
     env:
