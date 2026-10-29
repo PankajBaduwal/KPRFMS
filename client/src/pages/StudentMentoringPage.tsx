@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { mentoringService } from '../services/mentoring.service';
 import { useAuthStore } from '../stores/authStore';
@@ -50,6 +51,10 @@ export const StudentMentoringPage: React.FC = () => {
 
   // Modal States
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
+  // Quick Actions links (?new=…) open this page's own form
+  useOpenFromQuery({
+    mentee: () => { setEditingRecord(null); setIsRecordModalOpen(true); },
+  });
   const [editingRecord, setEditingRecord] = useState<StudentMentoring | null>(null);
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);

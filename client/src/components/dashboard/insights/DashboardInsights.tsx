@@ -145,6 +145,39 @@ const Donut: React.FC<{ data: NameValue[]; centerLabel: string; colors?: string[
 // Faculty
 // ------------------------------------------------------------------------------------------
 
+/** Verified publications per academic year (last five), by type; used on the faculty dashboard. */
+export const FacultyPublicationsChart: React.FC<{ rows: FacultyCharts['publicationsByYear'] }> = ({ rows }) => {
+  const hover = useHover();
+  const anim = useChartAnimation();
+  const pubs = rows.map((r) => ({
+    ...r,
+    Journal: Number(r.JOURNAL || 0) + Number(r.REVIEW_PAPER || 0),
+    Conference: Number(r.CONFERENCE || 0),
+    'Book / chapter': Number(r.BOOK || 0) + Number(r.BOOK_CHAPTER || 0) + Number(r.EDITED_BOOK || 0),
+    Other: Number(r.TECHNICAL_PAPER || 0) + Number(r.OTHER || 0),
+  }));
+  // Journal and Conference always shown (zero is a real value); other types only when present
+  const series = ['Journal', 'Conference', 'Book / chapter', 'Other'].filter((k, i) => i < 2 || sum(pubs, [k]) > 0);
+  return (
+    <FitChart>
+      <BarChart data={pubs} barCategoryGap="28%" {...hover.chartProps}>
+        {GRID}
+        <XAxis dataKey="year" {...AXIS} />
+        <YAxis allowDecimals={false} width={28} {...AXIS} />
+        <Tooltip cursor={CURSOR} content={<ChartTooltip labelPrefix="AY " />} />
+        {series.map((k, si) => (
+          <Bar key={k} dataKey={k} stackId="p" fill={CHART_COLORS[si]} radius={si === series.length - 1 ? [4, 4, 0, 0] : 0} {...anim} animationBegin={si * 120}>
+            {pubs.map((_, i) => (
+              <Cell key={i} fillOpacity={hover.opacity(i)} />
+            ))}
+          </Bar>
+        ))}
+        <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+      </BarChart>
+    </FitChart>
+  );
+};
+
 export const FacultyInsights: React.FC<{ charts?: FacultyCharts }> = ({ charts }) => {
   const hover = useHover();
   const anim = useChartAnimation();

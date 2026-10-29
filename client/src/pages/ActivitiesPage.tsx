@@ -35,6 +35,7 @@ import {
   ACTIVITY_STATUS_BADGE_VARIANTS,
 } from '../types/activity';
 import { fileUrl } from '../utils/fileUrl';
+import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 
 type TabView = 'ALL' | 'CONFERENCE' | 'WORKSHOP' | 'SEMINAR' | 'FDP' | 'STTP' | 'TIMELINE';
 
@@ -66,6 +67,11 @@ export const ActivitiesPage: React.FC = () => {
 
   // Modals state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // Quick Actions links (?new=…) open this page's own form
+  useOpenFromQuery({
+    activity: () => handleOpenAddModal(),
+    ...Object.fromEntries((['FDP', 'STTP', 'WORKSHOP', 'SEMINAR', 'CONFERENCE'] as const).map((t) => [t.toLowerCase(), () => handleOpenAddModal(t as ActivityType)])),
+  });
   const [editingActivity, setEditingActivity] = useState<AcademicActivity | null>(null);
   const [modalDefaultType, setModalDefaultType] = useState<ActivityType>(ACTIVITY_TYPES.CONFERENCE);
 

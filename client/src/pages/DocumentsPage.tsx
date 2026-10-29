@@ -34,6 +34,7 @@ import {
   type DocumentQueryFilters,
 } from '../types/document';
 import { useAuthStore } from '../stores/authStore';
+import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 
 export const DocumentsPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -68,6 +69,10 @@ export const DocumentsPage: React.FC = () => {
 
   // Modal States
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false);
+  // Quick Actions links (?new=…) open this page's own form
+  useOpenFromQuery({
+    upload: () => setUploadModalOpen(true),
+  });
   const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null);
   const [detailDoc, setDetailDoc] = useState<DocumentItem | null>(null);
   const [archiveTarget, setArchiveTarget] = useState<DocumentItem | null>(null);

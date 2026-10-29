@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 import { useAuthStore } from '../stores/authStore';
 import { projectService } from '../services/project.service';
 import { useAcademicYears } from '../hooks/useAcademicYears';
@@ -69,6 +70,10 @@ export const ProjectsPage: React.FC = () => {
 
   // Modals state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // Quick Actions links (?new=…) open this page's own form
+  useOpenFromQuery({
+    project: () => { setEditingProject(null); setIsModalOpen(true); },
+  });
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);

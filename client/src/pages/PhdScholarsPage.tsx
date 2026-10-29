@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 import { useAuthStore } from '../stores/authStore';
 import { phdScholarService } from '../services/phd-scholar.service';
 import type {
@@ -43,6 +44,10 @@ export const PhdScholarsPage: React.FC = () => {
 
   // Modals state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // Quick Actions links (?new=…) open this page's own form
+  useOpenFromQuery({
+    scholar: () => { setSelectedScholar(null); setIsModalOpen(true); },
+  });
   const [isStageModalOpen, setIsStageModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedScholar, setSelectedScholar] = useState<PhdScholar | null>(null);

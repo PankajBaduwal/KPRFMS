@@ -5,13 +5,13 @@ import { Project } from '../models/Project.js';
 import { Patent } from '../models/Patent.js';
 import { AcademicActivity } from '../models/AcademicActivity.js';
 import { FacultyAttendance } from '../models/FacultyAttendance.js';
-import { LeaveBalance } from '../models/LeaveBalance.js';
 import { LeaveApplication } from '../models/LeaveApplication.js';
 import { Faculty } from '../models/Faculty.js';
 import { Department } from '../models/Department.js';
 import { User } from '../models/User.js';
 import { AuditLog } from '../models/AuditLog.js';
 import { getCurrentAcademicYear } from '../utils/academicYear.js';
+import { leaveService } from './leave.service.js';
 
 /**
  * Chart data for the role dashboards. Everything here is computed from real records —
@@ -92,7 +92,8 @@ export const dashboardChartsService = {
         { $group: { _id: '$activityType', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]),
-      LeaveBalance.findOne({ userId: uid, academicYear: current }).lean(),
+      // Same balance the Leave page uses (created from the leave policy on first use)
+      Faculty.findOne({ userId: uid }).select("_id").lean().then((f) => (f ? leaveService.ensureLeaveBalance(String(f._id), userId, current).then((d) => d.toObject({ flattenMaps: true })) : null)),
       attendanceRate({ userId: uid }, new Date(Date.now() - 90 * 86_400_000)),
     ]);
 

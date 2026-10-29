@@ -57,6 +57,139 @@ export class DashboardService {
   // =========================================================================
   // 1. FACULTY DASHBOARD
   // =========================================================================
+  /** Who the dashboard belongs to, from the account and faculty profile (nothing invented). */
+  private async facultyProfile(userId: string, faculty: any) {
+    const user = await User.findById(userId).select('name email employeeId designation status departmentId').lean();
+    const deptId = faculty?.departmentId || user?.departmentId;
+    const dept = deptId ? await Department.findById(deptId).select('name code').lean() : null;
+    return {
+      name: faculty?.name || user?.name || '',
+      designation: faculty?.designation || user?.designation || '',
+      employeeId: faculty?.employeeId || user?.employeeId || '',
+      email: user?.email || '',
+      status: user?.status || '',
+      department: dept?.name || '',
+      departmentCode: dept?.code || '',
+      hasFacultyProfile: Boolean(faculty),
+    };
+  }
+
+  /** The overview figures, from the faculty member's own records only. */
+  private async facultyMetrics(userId: string, facultyId?: Types.ObjectId) {
+    const uid = new Types.ObjectId(userId);
+    const INDEXED = [INDEXING_TYPES.SCOPUS, INDEXING_TYPES.SCI, INDEXING_TYPES.SCIE, INDEXING_TYPES.WEB_OF_SCIENCE];
+    const AWAITING = ['SUBMITTED', 'UNDER_REVIEW'];
+    const RETURNED = 'RETURNED_FOR_CORRECTION';
+    // Without a faculty profile nothing matches (never another person's records)
+    const mine: Record<string, unknown> = facultyId ? { facultyId } : { _id: null };
+    const sum = (n: number[]) => n.reduce((a, b) => a + b, 0);
+    const [pubTotal, pubVerified, pubIndexed, mentees, batches, projTotal, projFunded, phdTotal, phdActive, waiting, returned] = await Promise.all([
+      Publication.countDocuments(mine as any),
+      Publication.countDocuments({ ...mine, verificationStatus: 'VERIFIED' } as any),
+      Publication.countDocuments({ ...mine, verificationStatus: 'VERIFIED', indexing: { $in: INDEXED } } as any),
+      StudentMentoring.countDocuments({ userId: uid, status: { $ne: 'COMPLETED' } } as any),
+      StudentMentoring.distinct('batch', { userId: uid, status: { $ne: 'COMPLETED' } } as any),
+      Project.countDocuments(mine as any),
+      Project.countDocuments({ ...mine, ...verifiedFundedMatch() } as any),
+      PhdScholar.countDocuments({ supervisorUserId: uid } as any),
+      PhdScholar.countDocuments({ supervisorUserId: uid, stage: { $ne: 'COMPLETED' } } as any),
+      // Submissions waiting for the HOD, and those sent back for correction, across modules
+      Promise.all([
+        Publication.countDocuments({ ...mine, verificationStatus: { $in: AWAITING } } as any),
+        Project.countDocuments({ ...mine, verificationStatus: 'SUBMITTED' } as any),
+        AcademicActivity.countDocuments({ ...mine, status: 'SUBMITTED' } as any),
+        Patent.countDocuments({ ...mine, verificationStatus: { $in: AWAITING } } as any),
+      ]).then(sum),
+      Promise.all([
+        Publication.countDocuments({ ...mine, verificationStatus: RETURNED } as any),
+        Project.countDocuments({ ...mine, verificationStatus: RETURNED } as any),
+        AcademicActivity.countDocuments({ ...mine, status: RETURNED } as any),
+        Patent.countDocuments({ ...mine, verificationStatus: RETURNED } as any),
+      ]).then(sum),
+    ]);
+    return {
+      publications: { total: pubTotal, verified: pubVerified, indexed: pubIndexed },
+      mentoring: { students: mentees, batches: (batches as unknown[]).filter(Boolean).length },
+      verification: { awaiting: waiting, returned },
+      projects: { total: projTotal, verifiedFunded: projFunded },
+      phdScholars: { total: phdTotal, active: phdActive },
+    };
+  }
+
+  /**
+   * "Needs your attention": real outstanding tasks only, most urgent first. Overdue before due
+   * soon (within 14 days) before other pending items.
+   */
+  private facultyAttention(
+    activeCycle: { name?: string; submissionDeadline?: Date } | null,
+    appraisal: { status: string; appraisalId: string | null },
+    pending: Array<{ id: string; title: string; type: string; status: string; link: string }>,
+    todayAttendance: string
+  ) {
+    type Urgency = 'OVERDUE' | 'DUE_SOON' | 'PENDING';
+    const items: Array<{
+      id: string;
+      kind: 'APPRAISAL' | 'CORRECTION' | 'ATTENDANCE';
+      title: string;
+      detail: string;
+      dueDate: string | null;
+      status: string;
+      urgency: Urgency;
+      link: string;
+      actionText: string;
+      secondary?: { label: string; link: string };
+    }> = [];
+    const urgencyOf = (due: Date | null): Urgency => {
+      if (!due) return 'PENDING';
+      const days = (due.getTime() - Date.now()) / 86400000;
+      return days < 0 ? 'OVERDUE' : days <= 14 ? 'DUE_SOON' : 'PENDING';
+    };
+    if (activeCycle && ['NOT_STARTED', 'DRAFT', 'RETURNED', 'RETURNED_FOR_CORRECTION'].includes(appraisal.status)) {
+      const due = activeCycle.submissionDeadline ? new Date(activeCycle.submissionDeadline) : null;
+      const started = appraisal.status !== 'NOT_STARTED';
+      items.push({
+        id: 'appraisal',
+        kind: 'APPRAISAL',
+        title: activeCycle.name || 'Annual Performance Appraisal',
+        detail: started ? 'Your self-appraisal is saved as a draft and not yet submitted.' : 'Your self-appraisal has not been started.',
+        dueDate: due ? due.toISOString() : null,
+        status: appraisal.status === 'NOT_STARTED' ? 'Not started' : appraisal.status.startsWith('RETURNED') ? 'Returned for changes' : 'Draft, not submitted',
+        urgency: urgencyOf(due),
+        link: '/portal/appraisals',
+        actionText: started ? 'Continue Self-Appraisal' : 'Complete Self-Appraisal',
+        secondary: { label: 'View appraisal details', link: '/portal/appraisals' },
+      });
+    }
+    for (const r of pending.filter((i) => i.status === 'RETURNED_FOR_CORRECTION').slice(0, 5)) {
+      items.push({
+        id: `returned-${r.id}`,
+        kind: 'CORRECTION',
+        title: r.title,
+        detail: `${r.type} returned by the reviewer for correction.`,
+        dueDate: null,
+        status: 'Needs correction',
+        urgency: 'PENDING',
+        link: r.link,
+        actionText: 'Review and resubmit',
+      });
+    }
+    if (todayAttendance === 'ABSENT' || todayAttendance === 'LATE') {
+      items.push({
+        id: 'attendance-today',
+        kind: 'ATTENDANCE',
+        title: `Today's attendance is marked ${todayAttendance.toLowerCase()}`,
+        detail: 'If you were on official duty, request a correction.',
+        dueDate: null,
+        status: todayAttendance === 'ABSENT' ? 'Absent' : 'Late',
+        urgency: 'PENDING',
+        link: '/portal/attendance',
+        actionText: 'Request correction',
+      });
+    }
+    const rank: Record<Urgency, number> = { OVERDUE: 0, DUE_SOON: 1, PENDING: 2 };
+    return items.sort((a, b) => rank[a.urgency] - rank[b.urgency] || (a.dueDate ?? '9').localeCompare(b.dueDate ?? '9'));
+  }
+
   async getFacultyDashboard(userId: string) {
     const faculty = await this.resolveFaculty(userId);
     const facultyId = faculty?._id as Types.ObjectId | undefined;
@@ -88,7 +221,7 @@ export class DashboardService {
         }).sort({ createdAt: -1 }).limit(5).lean(),
         Project.find({
           facultyId: facultyId as any,
-          status: { $in: ['SUBMITTED', 'UNDER_REVIEW', 'DRAFT'] as any },
+          verificationStatus: { $in: ['SUBMITTED', 'RETURNED_FOR_CORRECTION'] },
         }).sort({ createdAt: -1 }).limit(5).lean(),
         AcademicActivity.find({
           facultyId: facultyId as any,
@@ -127,7 +260,7 @@ export class DashboardService {
           type: `${p.fundingAgency ? 'Funded' : 'Research'} Project`,
           module: 'Research',
           submittedDate: p.createdAt,
-          status: p.status,
+          status: p.verificationStatus,
           link: '/portal/projects',
         });
       });
@@ -311,12 +444,8 @@ export class DashboardService {
 
     // 5. Leave Status
     const leaveStatus = {
-      balances: [
-        { type: 'Casual Leave', total: 12, remaining: 10, used: 2 },
-        { type: 'Sick Leave', total: 10, remaining: 9, used: 1 },
-        { type: 'Earned Leave', total: 15, remaining: 15, used: 0 },
-        { type: 'On Duty', total: 15, remaining: 13, used: 2 },
-      ],
+      // Only the faculty member's real balances; none are invented when none are set up
+      balances: [] as Array<{ type: string; total: number; remaining: number; used: number }>,
       recentLeaves: [] as Array<{
         leaveType: string;
         fromDate: Date;
@@ -518,12 +647,18 @@ export class DashboardService {
       });
     }
 
+    const [profile, metrics] = await Promise.all([this.facultyProfile(userId, faculty), this.facultyMetrics(userId, facultyId)]);
+    const attentionItems = this.facultyAttention(activeCycle, appraisalInfo, pendingItems, attendanceStats.todayStatus);
+
     return {
       role: 'FACULTY',
-      facultyName: faculty?.name || 'Faculty Member',
-      employeeId: faculty?.employeeId || '',
-      department: faculty?.departmentId ? (await Department.findById(faculty.departmentId))?.name : 'CSE',
-      designation: faculty?.designation || 'Assistant Professor',
+      facultyName: profile.name,
+      employeeId: profile.employeeId,
+      department: profile.department,
+      designation: profile.designation,
+      profile,
+      metrics,
+      attentionItems,
       pendingSubmissions: {
         total: pendingItems.length,
         items: pendingItems,

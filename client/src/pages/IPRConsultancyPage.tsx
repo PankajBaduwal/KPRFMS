@@ -36,6 +36,7 @@ import {
   VERIFICATION_STATUS_BADGES,
 } from '../types/ipr';
 import { fileUrl } from '../utils/fileUrl';
+import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 
 type IPRTab = 'PATENTS' | 'COPYRIGHTS' | 'CONSULTANCY' | 'ANALYTICS';
 
@@ -78,6 +79,12 @@ export const IPRConsultancyPage: React.FC = () => {
 
   // Modals state
   const [patentModalOpen, setPatentModalOpen] = useState(false);
+  // Quick Actions links (?new=…) open this page's own form
+  useOpenFromQuery({
+    patent: () => { setSelectedPatent(null); setPatentModalOpen(true); },
+    copyright: () => { setSelectedCopyright(null); setCopyrightModalOpen(true); },
+    consultancy: () => { setSelectedConsultancy(null); setConsultancyModalOpen(true); },
+  });
   const [selectedPatent, setSelectedPatent] = useState<IPatent | null>(null);
 
   const [copyrightModalOpen, setCopyrightModalOpen] = useState(false);

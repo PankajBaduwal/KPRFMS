@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 import { useAuthStore } from '../stores/authStore';
 import { leaveService } from '../services/leave.service';
 import { facultyService } from '../services/faculty.service';
@@ -98,6 +99,10 @@ export const LeaveManagementPage: React.FC = () => {
 
   // Modals state
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  // Quick Actions links (?new=…) open this page's own form
+  useOpenFromQuery({
+    leave: () => setIsApplyModalOpen(true),
+  });
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedLeaveForReview, setSelectedLeaveForReview] = useState<LeaveApplicationRecord | null>(null);
 

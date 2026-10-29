@@ -135,7 +135,8 @@ export const PortalPage: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-      {/* Header Profile & Role Overview Card */}
+      {/* Header Profile & Role Overview Card (faculty see their own identity header in the dashboard) */}
+      {!(user.role === 'FACULTY' && !isLeadership) && (
       <div className="card-custom" style={{ marginBottom: 'var(--space-6)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
           <div>
@@ -229,6 +230,7 @@ export const PortalPage: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Main Content Area */}
       {loading ? (

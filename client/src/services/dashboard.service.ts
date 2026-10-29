@@ -98,6 +98,36 @@ export interface ActionItem {
 export interface FacultyDashboardData {
   charts?: FacultyCharts;
   role: 'FACULTY';
+  profile?: {
+    name: string;
+    designation: string;
+    employeeId: string;
+    email: string;
+    status: string;
+    department: string;
+    departmentCode: string;
+    hasFacultyProfile: boolean;
+  };
+  metrics?: {
+    publications: { total: number; verified: number; indexed: number };
+    mentoring: { students: number; batches: number };
+    verification: { awaiting: number; returned: number };
+    projects: { total: number; verifiedFunded: number };
+    phdScholars: { total: number; active: number };
+  };
+  /** Outstanding tasks, most urgent first (server-computed from real workflows) */
+  attentionItems?: Array<{
+    id: string;
+    kind: 'APPRAISAL' | 'CORRECTION' | 'ATTENDANCE';
+    title: string;
+    detail: string;
+    dueDate: string | null;
+    status: string;
+    urgency: 'OVERDUE' | 'DUE_SOON' | 'PENDING';
+    link: string;
+    actionText: string;
+    secondary?: { label: string; link: string };
+  }>;
   facultyName: string;
   employeeId: string;
   department: string;

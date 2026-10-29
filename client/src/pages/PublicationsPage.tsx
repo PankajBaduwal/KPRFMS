@@ -35,6 +35,7 @@ import {
   AUTHOR_POSITION_LABELS,
 } from '../types/publication';
 import { fileUrl } from '../utils/fileUrl';
+import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 
 export const PublicationsPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -69,6 +70,10 @@ export const PublicationsPage: React.FC = () => {
 
   // Modals state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // Quick Actions links (?new=…) open this page's own form
+  useOpenFromQuery({
+    publication: () => { setEditingPub(null); setPrefillDoi(undefined); setIsModalOpen(true); },
+  });
   const [editingPub, setEditingPub] = useState<Publication | null>(null);
   const [orcidOpen, setOrcidOpen] = useState(false);
   const [prefillDoi, setPrefillDoi] = useState<string | undefined>(undefined);
