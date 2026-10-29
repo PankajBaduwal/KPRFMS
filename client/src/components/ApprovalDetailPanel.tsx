@@ -12,6 +12,20 @@ import { SkeletonCard } from './Skeleton';
 import { useAuthStore } from '../stores/authStore';
 import { formatErrorMessage } from '../utils/errorHandler';
 import { fileUrl } from '../utils/fileUrl';
+import { documentService } from '../services/document.service';
+
+// Vault documents are fetched with the session and opened as a temporary local URL
+const openVaultDocument = async (id: string) => {
+  const tab = window.open('', '_blank');
+  try {
+    const { url } = await documentService.getPreviewBlob(id);
+    if (tab) tab.location.href = url;
+    else window.open(url, '_blank');
+  } catch {
+    tab?.close();
+    window.alert('The document could not be opened.');
+  }
+};
 
 interface ApprovalDetailPanelProps {
   recordType: string | null;
@@ -557,6 +571,15 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                         </div>
                       </div>
 
+                      {doc.documentId ? (
+                        <button
+                          type="button"
+                          onClick={() => openVaultDocument(doc.documentId!)}
+                          style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #2563eb', color: '#2563eb', fontSize: '0.82rem', fontWeight: 600, background: '#fff', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
+                        >
+                          <i className="bi bi-box-arrow-up-right" /> View
+                        </button>
+                      ) : (
                       <a
                         href={fileUrl(doc.url)}
                         target="_blank"
@@ -577,6 +600,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                       >
                         <i className="bi bi-box-arrow-up-right" /> View / Download
                       </a>
+                      )}
                     </div>
                   ))}
                 </div>

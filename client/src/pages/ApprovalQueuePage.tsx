@@ -187,6 +187,14 @@ export const ApprovalQueuePage: React.FC = () => {
         return { bg: '#fdf4ff', text: '#86198f', icon: 'bi-clock', label: 'Attendance' };
       case 'APPRAISAL':
         return { bg: '#fef2f2', text: '#991b1b', icon: 'bi-award', label: 'Appraisal' };
+      case 'FACULTY_COURSE':
+        return { bg: '#eef4ff', text: '#1e3a8a', icon: 'bi-patch-check', label: 'Course / Cert' };
+      case 'FACULTY_ACHIEVEMENT':
+        return { bg: '#fefce8', text: '#854d0e', icon: 'bi-trophy', label: 'Achievement' };
+      case 'QUALIFICATION':
+        return { bg: '#f0f9ff', text: '#075985', icon: 'bi-mortarboard', label: 'Qualification' };
+      case 'EXPERIENCE':
+        return { bg: '#f8fafc', text: '#334155', icon: 'bi-briefcase', label: 'Experience' };
       default:
         return { bg: '#f1f5f9', text: '#334155', icon: 'bi-file-text', label: type };
     }
@@ -486,6 +494,10 @@ export const ApprovalQueuePage: React.FC = () => {
             <option value="LEAVE">Leave Applications</option>
             <option value="ATTENDANCE_CORRECTION">Attendance Corrections</option>
             <option value="APPRAISAL">Faculty Appraisals</option>
+            <option value="FACULTY_COURSE">Courses & Certifications</option>
+            <option value="FACULTY_ACHIEVEMENT">Achievements</option>
+            <option value="QUALIFICATION">Qualifications</option>
+            <option value="EXPERIENCE">Experience</option>
           </select>
 
           {/* Academic Year Dropdown */}

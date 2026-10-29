@@ -164,6 +164,27 @@ Dean and Principal the whole institution by agency and department. Older records
 verification state with `npm run tenant:migrate-funding -- --tenant <code>` (add
 `--trust-existing` only if past sanctions were already HOD-checked).
 
+### Faculty dossier
+
+Faculty → My Dossier brings a faculty member's profile together:
+- **Identity:** designation, department, institution and highest qualification.
+- **Experience:** teaching, industry and research, with overlapping periods counted once.
+- **Profile completion:** against configurable requirements, with what is missing.
+- **Verification status:** of every record, and a list of what is waiting, returned or not accepted.
+
+Courses & Certifications and Achievements are separate reviewed modules. Achievements cover awards, honours, memberships, editorial roles, invited talks, keynotes, guest lectures and responsibilities.
+- The owner submits each record with evidence from the document vault.
+- The department's HOD, the Dean or the Principal verifies it, returns it with a comment, or rejects it. The owner cannot review their own records, and neither can an Institution Admin by role.
+- Changing a verified record sends it back for review and keeps the verified version on file.
+- These records, qualifications and experience all appear in the approval queue.
+
+Analytics → Faculty Performance gives HODs their department and the Dean and Principal the whole institution:
+- A directory with completion and verified counts.
+- Rankings in 32 categories. Only verified records count, equal values share a rank, and each row shows waiting counts and completeness.
+- A department comparison in totals and per faculty member.
+
+The certifications, awards, invited talks and guest lectures previously stored on profiles are copied into the new modules as drafts with `npm run tenant:migrate-dossier -- --tenant <code>` (`--dry-run` to preview; safe to repeat). Owners then add evidence and submit them.
+
 ### Rankings and institution settings
 
 Principal and Dean dashboards rank faculty and departments from verified records only (overall,

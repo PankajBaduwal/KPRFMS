@@ -47,6 +47,7 @@ export class ActivityService {
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined,
       duration: input.duration || undefined,
+      hours: input.hours ?? undefined,
 
       location: input.location || undefined,
       country: input.country || 'India',
@@ -127,6 +128,7 @@ export class ActivityService {
     if (input.endDate !== undefined)
       activity.endDate = input.endDate ? new Date(input.endDate) : undefined;
     if (input.duration !== undefined) activity.duration = input.duration || undefined;
+    if (input.hours !== undefined) activity.hours = input.hours ?? undefined;
 
     if (input.location !== undefined) activity.location = input.location || undefined;
     if (input.country !== undefined) activity.country = input.country || 'India';

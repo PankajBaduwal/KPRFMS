@@ -27,7 +27,8 @@ const GROUPS: ActionGroup[] = [
   {
     title: 'Profile & personal information',
     actions: [
-      { id: 'profile', label: 'View my profile', description: 'Your faculty dossier', to: ROUTES.FACULTY_PROFILE, icon: 'bi-person' },
+      { id: 'dossier', label: 'My dossier & verification status', description: 'Completion, portfolio and what is waiting for review', to: ROUTES.DOSSIER, icon: 'bi-folder2-open' },
+      { id: 'profile', label: 'View my profile', description: 'Your full faculty profile', to: ROUTES.FACULTY_PROFILE, icon: 'bi-person' },
       { id: 'profile-edit', label: 'Update profile & contact details', description: 'Personal, contact and employment details', to: ROUTES.FACULTY_PROFILE, icon: 'bi-person-gear' },
       { id: 'qualifications', label: 'Update qualifications', description: 'Degrees and certifications', to: `${ROUTES.FACULTY_PROFILE}?tab=qualifications`, icon: 'bi-mortarboard' },
       { id: 'experience', label: 'Update experience', description: 'Teaching, industry and research experience', to: `${ROUTES.FACULTY_PROFILE}?tab=experience`, icon: 'bi-briefcase' },
@@ -45,6 +46,16 @@ const GROUPS: ActionGroup[] = [
       { id: 'add-patent', label: 'Add patent', description: 'Filed, published or granted', to: `${ROUTES.IPR_CONSULTANCY}?tab=PATENTS&new=patent`, icon: 'bi-lightbulb' },
       { id: 'add-copyright', label: 'Add copyright', description: 'Registered works', to: `${ROUTES.IPR_CONSULTANCY}?tab=COPYRIGHTS&new=copyright`, icon: 'bi-c-circle' },
       { id: 'add-consultancy', label: 'Submit consultancy', description: 'Industry and external consultancy', to: `${ROUTES.IPR_CONSULTANCY}?tab=CONSULTANCY&new=consultancy`, icon: 'bi-briefcase-fill' },
+    ],
+  },
+  {
+    title: 'Courses, certifications & achievements',
+    actions: [
+      { id: 'add-course', label: 'Add course or certification', description: 'NPTEL, Coursera, professional certifications', to: `${ROUTES.COURSES}?new=course`, icon: 'bi-patch-plus' },
+      { id: 'courses', label: 'My courses & certifications', description: 'Learning hours and verification', to: ROUTES.COURSES, icon: 'bi-patch-check' },
+      { id: 'add-award', label: 'Add award or honour', description: 'With the award letter or certificate', to: `${ROUTES.ACHIEVEMENTS}?category=AWARD&new=achievement`, icon: 'bi-trophy' },
+      { id: 'add-talk', label: 'Add invited talk', description: 'Keynotes, invited talks, guest lectures', to: `${ROUTES.ACHIEVEMENTS}?category=INVITED_TALK&new=achievement`, icon: 'bi-megaphone' },
+      { id: 'achievements', label: 'My achievements', description: 'Awards, memberships, editorial roles and more', to: ROUTES.ACHIEVEMENTS, icon: 'bi-stars' },
     ],
   },
   {
@@ -99,7 +110,7 @@ const GROUPS: ActionGroup[] = [
 ];
 
 /** Shown first: the tasks faculty start most often. */
-const FREQUENT = ['apply-leave', 'add-publication', 'add-activity', 'appraisal', 'upload-document', 'profile-edit'];
+const FREQUENT = ['apply-leave', 'add-publication', 'add-activity', 'add-course', 'appraisal', 'upload-document', 'profile-edit'];
 
 export const QuickActions: React.FC<{ appraisalLabel?: string }> = ({ appraisalLabel }) => {
   const { enabledModules } = useInstitution();

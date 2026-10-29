@@ -18,6 +18,7 @@ import { AuditLog } from '../models/AuditLog.js';
 import { notificationService } from './notification.service.js';
 import { ROLES } from '../permissions/roles.js';
 import { appCache } from '../utils/cache.js';
+import { dossierApprovalAction, dossierQueueRecords, dossierRecordDetail, isDossierQueueType } from './approval-queue-dossier.js';
 
 export type UnifiedStatus = 'PENDING' | 'APPROVED' | 'RETURNED_FOR_CORRECTION' | 'REJECTED';
 
@@ -524,6 +525,11 @@ export class ApprovalQueueService {
     }
 
     // Query 10: Appraisals
+    // Dossier records: courses, achievements, qualifications and experience
+    if (!recordType || isDossierQueueType(recordType)) {
+      allRecords.push(...(await dossierQueueRecords(departmentId, recordType, deptInfo)));
+    }
+
     if (!recordType || recordType === 'APPRAISAL') {
       const appraisals = await FacultyAppraisal.find({ departmentId })
         .populate('facultyId', 'name employeeId designation email profilePhoto')
@@ -652,6 +658,7 @@ export class ApprovalQueueService {
     if (!Types.ObjectId.isValid(recordId)) {
       throw AppError.badRequest('Invalid record ID');
     }
+    if (isDossierQueueType(recordType)) return dossierRecordDetail(recordType, recordId, user);
 
     const recObjId = new Types.ObjectId(recordId);
     let recordDoc: any = null;
@@ -1204,6 +1211,13 @@ export class ApprovalQueueService {
       throw AppError.badRequest(
         `A specific justification reason of at least 5 characters is required to ${action.replace(/_/g, ' ').toLowerCase()} this record.`
       );
+    }
+
+    if (isDossierQueueType(recordType)) {
+      const result = await dossierApprovalAction({ recordType, recordId, action, reason, comments, user });
+      appCache.invalidate('hod_');
+      appCache.invalidate('dean_');
+      return result;
     }
 
     const recObjId = new Types.ObjectId(recordId);

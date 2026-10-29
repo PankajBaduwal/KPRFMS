@@ -1,14 +1,8 @@
 import { z } from 'zod';
-import { ACTIVITY_TYPES, ACTIVITY_STATUS, ACTIVITY_MODES } from '../models/AcademicActivity.js';
+import { ACTIVITY_TYPES, ACTIVITY_STATUS, ACTIVITY_MODES, type ActivityType } from '../models/AcademicActivity.js';
 
 export const activitySchema = z.object({
-  activityType: z.enum([
-    ACTIVITY_TYPES.CONFERENCE,
-    ACTIVITY_TYPES.WORKSHOP,
-    ACTIVITY_TYPES.SEMINAR,
-    ACTIVITY_TYPES.FDP,
-    ACTIVITY_TYPES.STTP,
-  ]),
+  activityType: z.enum(Object.values(ACTIVITY_TYPES) as [ActivityType, ...ActivityType[]]),
   title: z
     .string()
     .trim()
@@ -29,6 +23,7 @@ export const activitySchema = z.object({
   startDate: z.string().optional().or(z.date()).nullable(),
   endDate: z.string().optional().or(z.date()).nullable(),
   duration: z.string().trim().max(100).optional().nullable(),
+  hours: z.coerce.number().min(0).max(2000).optional().nullable(),
 
   // Location & Country
   location: z.string().trim().max(200).optional().nullable(),
@@ -84,15 +79,7 @@ export const activityFilterQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10),
   search: z.string().trim().optional(),
-  activityType: z
-    .enum([
-      ACTIVITY_TYPES.CONFERENCE,
-      ACTIVITY_TYPES.WORKSHOP,
-      ACTIVITY_TYPES.SEMINAR,
-      ACTIVITY_TYPES.FDP,
-      ACTIVITY_TYPES.STTP,
-    ])
-    .optional(),
+  activityType: z.enum(Object.values(ACTIVITY_TYPES) as [ActivityType, ...ActivityType[]]).optional(),
   status: z
     .enum([
       ACTIVITY_STATUS.DRAFT,

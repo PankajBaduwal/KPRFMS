@@ -48,7 +48,10 @@ interface Summary {
   metrics: Record<string, { verified: number; submitted: number }>;
   recordStatus: Record<string, number>;
   completion: { overall: number; categories: Category[] };
+  openRecords: Array<{ id: string; type: string; title: string; status: 'SUBMITTED' | 'RETURNED' | 'REJECTED'; updatedAt: string; comment: string; link: string }>;
 }
+const OPEN_LABEL: Record<string, string> = { SUBMITTED: 'Awaiting verification', RETURNED: 'Returned for correction', REJECTED: 'Not accepted' };
+const OPEN_CLASS: Record<string, string> = { SUBMITTED: 'st-submitted', RETURNED: 'st-returned_for_correction', REJECTED: 'st-rejected' };
 
 const span = (s: Span) => (s.years || s.months ? `${s.years ? `${s.years} yr` : ''}${s.years && s.months ? ' ' : ''}${s.months ? `${s.months} mo` : ''}` : '—');
 const meterClass = (p: number) => (p >= 80 ? '' : p >= 50 ? 'is-mid' : 'is-low');
@@ -219,6 +222,40 @@ export const DossierPage: React.FC = () => {
           </section>
         </div>
       </div>
+
+      <section className="fd-card">
+        <h2>{d.own ? 'My records & verification status' : 'Records awaiting action'}</h2>
+        {d.openRecords.length === 0 ? (
+          <p className="fd-muted">Nothing is waiting: every submitted record has been decided.</p>
+        ) : (
+          <div className="fd-table-wrap">
+            <table className="fd-table">
+              <thead>
+                <tr>
+                  <th>Record</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Reviewer’s comment</th>
+                  <th>Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {d.openRecords.map((r) => (
+                  <tr key={`${r.type}-${r.id}`}>
+                    <td>{d.own ? <Link className="ds-title" to={r.link}>{r.title}</Link> : r.title}</td>
+                    <td>{r.type}</td>
+                    <td>
+                      <span className={`ds-status ${OPEN_CLASS[r.status] ?? ''}`}>{OPEN_LABEL[r.status] ?? r.status}</span>
+                    </td>
+                    <td className="fd-muted">{r.comment || '—'}</td>
+                    <td className="fd-dates">{r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 };

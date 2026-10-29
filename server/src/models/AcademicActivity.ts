@@ -10,6 +10,9 @@ export const ACTIVITY_TYPES = {
   SEMINAR: 'SEMINAR',
   FDP: 'FDP',
   STTP: 'STTP',
+  WEBINAR: 'WEBINAR',
+  TRAINING: 'TRAINING',
+  TECHNICAL_EVENT: 'TECHNICAL_EVENT',
 } as const;
 
 export type ActivityType = (typeof ACTIVITY_TYPES)[keyof typeof ACTIVITY_TYPES];
@@ -50,6 +53,8 @@ export interface IAcademicActivityDoc extends Document {
   startDate?: Date;
   endDate?: Date;
   duration?: string; // e.g. "2 Days", "1 Week", "15 Hours"
+  /** Contact hours, when known (used for learning-hour totals) */
+  hours?: number;
 
   // Location & Country
   location?: string;
@@ -150,6 +155,7 @@ const academicActivitySchema = new Schema<IAcademicActivityDoc>(
     startDate: { type: Date },
     endDate: { type: Date },
     duration: { type: String, trim: true },
+    hours: { type: Number, min: 0, max: 2000 },
 
     // Location & Country
     location: { type: String, trim: true },

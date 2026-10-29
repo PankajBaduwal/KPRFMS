@@ -4,6 +4,9 @@ export const ACTIVITY_TYPES = {
   SEMINAR: 'SEMINAR',
   FDP: 'FDP',
   STTP: 'STTP',
+  WEBINAR: 'WEBINAR',
+  TRAINING: 'TRAINING',
+  TECHNICAL_EVENT: 'TECHNICAL_EVENT',
 } as const;
 
 export type ActivityType = (typeof ACTIVITY_TYPES)[keyof typeof ACTIVITY_TYPES];
@@ -14,6 +17,9 @@ export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
   SEMINAR: 'Seminar',
   FDP: 'Faculty Development Program (FDP)',
   STTP: 'Short Term Training Program (STTP)',
+  WEBINAR: 'Webinar',
+  TRAINING: 'Training Programme',
+  TECHNICAL_EVENT: 'Technical Event (hackathon, symposium, expo)',
 };
 
 export const ACTIVITY_TYPE_SHORT_LABELS: Record<ActivityType, string> = {
@@ -22,6 +28,9 @@ export const ACTIVITY_TYPE_SHORT_LABELS: Record<ActivityType, string> = {
   SEMINAR: 'Seminar',
   FDP: 'FDP',
   STTP: 'STTP',
+  WEBINAR: 'Webinar',
+  TRAINING: 'Training',
+  TECHNICAL_EVENT: 'Technical event',
 };
 
 export const ACTIVITY_STATUS = {
@@ -82,6 +91,7 @@ export interface AcademicActivity {
   startDate?: string;
   endDate?: string;
   duration?: string;
+  hours?: number;
 
   // Location & Country
   location?: string;
@@ -127,6 +137,7 @@ export interface ActivityInput {
   startDate?: string | null;
   endDate?: string | null;
   duration?: string | null;
+  hours?: number | null;
 
   location?: string | null;
   country?: string | null;

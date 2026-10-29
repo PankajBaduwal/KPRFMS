@@ -38,3 +38,13 @@ existing models and modules; no parallel copies of the same record.
 | 7 | **Faculty performance**: per-category rankings (rank, ties, period, verified vs submitted, completeness) and department comparison with per-faculty figures |
 | 8 | Dashboard: profile completion, course statistics, "My records & verification status" page, new quick actions |
 | 9 | Tests for ownership, review routing, evidence access, completion, verified-only counts, rankings, isolation; full run; migration notes |
+
+## Status (2026-10-29)
+
+All nine phases are implemented and covered by the phase 74 tests; the full suite passes (49/49).
+
+- Phases 2–3, 6–7: commit `00deb1c`.
+- Phases 4–5, 8–9 and the new activity types: the commit that follows it.
+- Existing data: `npm run tenant:migrate-dossier -- --tenant <code>` copies profile certifications, awards, invited talks and guest lectures as drafts. A dry run on the demo institution found 36 certifications, 15 awards, 1 invited talk and 1 guest lecture. The command has not been run against any institution yet.
+- Academic verification of qualifications and experience no longer accepts the Institution Admin role (HOD, Dean, Principal only), matching the dossier records.
+- Not done: the faculty dashboard view itself has uncommitted edits by someone else, so the dossier reaches it only through the server data (pending submissions, a completion attention item below 80%, `dossierCompletion`) and Quick Actions. No dashboard component was changed.

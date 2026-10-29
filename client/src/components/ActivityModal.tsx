@@ -30,6 +30,11 @@ interface ActivityModalProps {
   onSuccess: () => void;
 }
 
+
+// Programme-style activities: dates, duration, hours and mode
+const isFdpLike = (t: ActivityType) => t === ACTIVITY_TYPES.FDP || t === ACTIVITY_TYPES.STTP;
+const isProgramme = (t: ActivityType) => isFdpLike(t) || t === ACTIVITY_TYPES.WEBINAR || t === ACTIVITY_TYPES.TRAINING || t === ACTIVITY_TYPES.TECHNICAL_EVENT;
+
 export const ActivityModal: React.FC<ActivityModalProps> = ({
   isOpen,
   onClose,
@@ -50,6 +55,7 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [duration, setDuration] = useState('');
+  const [hours, setHours] = useState('');
 
   // Location & Country
   const [location, setLocation] = useState('');
@@ -92,6 +98,7 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
       setStartDate(activity.startDate ? activity.startDate.substring(0, 10) : '');
       setEndDate(activity.endDate ? activity.endDate.substring(0, 10) : '');
       setDuration(activity.duration || '');
+      setHours(activity.hours != null ? String(activity.hours) : '');
 
       setLocation(activity.location || '');
       setCountry(activity.country || 'India');
@@ -252,8 +259,10 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
         payload.role = role || 'Participant';
         payload.topic = topic.trim() || null;
         payload.location = location.trim() || null;
-      } else if (activityType === ACTIVITY_TYPES.FDP || activityType === ACTIVITY_TYPES.STTP) {
+      } else if (isProgramme(activityType)) {
         payload.duration = duration.trim() || null;
+        payload.hours = hours ? Number(hours) : null;
+        if (!isFdpLike(activityType)) payload.role = role || 'Participant';
         payload.startDate = startDate || null;
         payload.endDate = endDate || null;
         payload.mode = mode;
@@ -379,6 +388,9 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
               { value: ACTIVITY_TYPES.SEMINAR, label: 'Seminar' },
               { value: ACTIVITY_TYPES.FDP, label: 'Faculty Development Program (FDP)' },
               { value: ACTIVITY_TYPES.STTP, label: 'Short Term Training Program (STTP)' },
+              { value: ACTIVITY_TYPES.WEBINAR, label: 'Webinar' },
+              { value: ACTIVITY_TYPES.TRAINING, label: 'Training Programme' },
+              { value: ACTIVITY_TYPES.TECHNICAL_EVENT, label: 'Technical Event (hackathon, symposium, expo)' },
             ]}
           />
 
@@ -394,7 +406,7 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
         {/* Title & Organizer */}
         <Input
           label={
-            activityType === ACTIVITY_TYPES.FDP || activityType === ACTIVITY_TYPES.STTP
+            isProgramme(activityType)
               ? 'Program Name / Course Title *'
               : 'Activity Title / Conference Name *'
           }
@@ -583,9 +595,29 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
           </>
         )}
 
-        {/* CONDITIONAL: FDP & STTP Fields */}
-        {(activityType === ACTIVITY_TYPES.FDP || activityType === ACTIVITY_TYPES.STTP) && (
+        {/* CONDITIONAL: FDP, STTP, webinar, training and technical event fields */}
+        {isProgramme(activityType) && (
           <>
+            {!isFdpLike(activityType) && (
+              <div className="grid grid-2" style={{ gap: 'var(--space-3)' }}>
+                <Select
+                  label="Your role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  options={[
+                    { value: 'Participant', label: 'Participant / Attendee' },
+                    { value: 'Resource Person', label: 'Resource Person / Speaker' },
+                    { value: 'Coordinator', label: 'Coordinator / Convener' },
+                    { value: 'Organizer', label: 'Organizer' },
+                    { value: 'Judge', label: 'Judge / Evaluator' },
+                  ]}
+                />
+                <Input label="Contact hours" type="number" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="e.g. 6" />
+              </div>
+            )}
+            {isFdpLike(activityType) && (
+              <Input label="Contact hours" type="number" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="e.g. 40" />
+            )}
             <div className="grid grid-4" style={{ gap: 'var(--space-3)' }}>
               <Input
                 label="Start Date"

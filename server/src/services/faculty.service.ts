@@ -707,9 +707,10 @@ export class FacultyService {
     requestingUser: AuthenticatedUser,
     req?: Request
   ): Promise<IFaculty> {
-    const verifiers: Role[] = [ROLES.ADMIN, ROLES.PRINCIPAL, ROLES.DEAN, ROLES.HOD];
+    // Academic verification belongs to academic leadership, not to the Institution Admin role
+    const verifiers: Role[] = [ROLES.PRINCIPAL, ROLES.DEAN, ROLES.HOD];
     if (!verifiers.includes(requestingUser.role)) {
-      throw AppError.forbidden('Only HOD, Dean, Principal, or Admin can review qualification records.');
+      throw AppError.forbidden('Only the HOD, Dean or Principal can review qualification records.');
     }
 
     const faculty = await Faculty.findById(facultyId);
@@ -954,9 +955,9 @@ export class FacultyService {
     requestingUser: AuthenticatedUser,
     req?: Request
   ): Promise<IFaculty> {
-    const verifiers: Role[] = [ROLES.ADMIN, ROLES.PRINCIPAL, ROLES.DEAN, ROLES.HOD];
+    const verifiers: Role[] = [ROLES.PRINCIPAL, ROLES.DEAN, ROLES.HOD];
     if (!verifiers.includes(requestingUser.role)) {
-      throw AppError.forbidden('Only HOD, Dean, Principal, or Admin can review experience records.');
+      throw AppError.forbidden('Only the HOD, Dean or Principal can review experience records.');
     }
 
     const faculty = await Faculty.findById(facultyId);

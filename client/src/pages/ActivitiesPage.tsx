@@ -37,7 +37,10 @@ import {
 import { fileUrl } from '../utils/fileUrl';
 import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 
-type TabView = 'ALL' | 'CONFERENCE' | 'WORKSHOP' | 'SEMINAR' | 'FDP' | 'STTP' | 'TIMELINE';
+type TabView = 'ALL' | ActivityType | 'TIMELINE';
+const TABS: string[] = ['ALL', ...Object.values(ACTIVITY_TYPES), 'TIMELINE'];
+// Types added with the dossier work; their tabs carry no analytics count yet
+const EXTRA_TABS = [ACTIVITY_TYPES.WEBINAR, ACTIVITY_TYPES.TRAINING, ACTIVITY_TYPES.TECHNICAL_EVENT];
 
 export const ActivitiesPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -48,13 +51,13 @@ export const ActivitiesPage: React.FC = () => {
   const urlParam = (searchParams.get('type') || searchParams.get('tab'))?.toUpperCase() as TabView | undefined;
 
   const [activeTab, setActiveTab] = useState<TabView>(
-    urlParam && ['ALL', 'CONFERENCE', 'WORKSHOP', 'SEMINAR', 'FDP', 'STTP', 'TIMELINE'].includes(urlParam)
+    urlParam && TABS.includes(urlParam)
       ? urlParam
       : 'ALL'
   );
 
   useEffect(() => {
-    if (urlParam && ['ALL', 'CONFERENCE', 'WORKSHOP', 'SEMINAR', 'FDP', 'STTP', 'TIMELINE'].includes(urlParam)) {
+    if (urlParam && TABS.includes(urlParam)) {
       setActiveTab(urlParam);
     }
   }, [urlParam]);
@@ -70,7 +73,7 @@ export const ActivitiesPage: React.FC = () => {
   // Quick Actions links (?new=…) open this page's own form
   useOpenFromQuery({
     activity: () => handleOpenAddModal(),
-    ...Object.fromEntries((['FDP', 'STTP', 'WORKSHOP', 'SEMINAR', 'CONFERENCE'] as const).map((t) => [t.toLowerCase(), () => handleOpenAddModal(t as ActivityType)])),
+    ...Object.fromEntries((['FDP', 'STTP', 'WORKSHOP', 'SEMINAR', 'CONFERENCE', 'WEBINAR', 'TRAINING', 'TECHNICAL_EVENT'] as const).map((t) => [t.toLowerCase(), () => handleOpenAddModal(t as ActivityType)])),
   });
   const [editingActivity, setEditingActivity] = useState<AcademicActivity | null>(null);
   const [modalDefaultType, setModalDefaultType] = useState<ActivityType>(ACTIVITY_TYPES.CONFERENCE);
@@ -547,6 +550,29 @@ export const ActivitiesPage: React.FC = () => {
         >
           STTP ({analyticsLoading ? '…' : analytics?.totalSttp || 0})
         </button>
+
+        {EXTRA_TABS.map((t) => (
+          <button
+            key={t}
+            onClick={() => {
+              setActiveTab(t);
+              setPage(1);
+            }}
+            style={{
+              padding: '8px 16px',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              fontSize: 'var(--font-sm)',
+              fontWeight: activeTab === t ? 600 : 500,
+              color: activeTab === t ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              borderBottom: activeTab === t ? '2px solid var(--color-primary)' : '2px solid transparent',
+              marginBottom: '-2px',
+            }}
+          >
+            {ACTIVITY_TYPE_SHORT_LABELS[t]}
+          </button>
+        ))}
 
         <button
           onClick={() => {

@@ -82,7 +82,7 @@ const day = (d?: string) => (d ? new Date(d).toLocaleDateString() : '—');
 const toInput = (d?: string) => (d ? new Date(d).toISOString().slice(0, 10) : '');
 const EDITABLE = ['DRAFT', 'RETURNED_FOR_CORRECTION', 'VERIFIED'];
 
-const RecordForm: React.FC<{ kind: Kind; options: Options; record: Rec | null; onClose: () => void; onSaved: () => void }> = ({ kind, options, record, onClose, onSaved }) => {
+const RecordForm: React.FC<{ kind: Kind; options: Options; record: Rec | null; defaultCategory?: string; onClose: () => void; onSaved: () => void }> = ({ kind, options, record, defaultCategory, onClose, onSaved }) => {
   const isCourse = kind === 'courses';
   const [f, setF] = useState<Record<string, string>>((): Record<string, string> => {
     const r = record ?? ({} as Rec);
@@ -104,7 +104,7 @@ const RecordForm: React.FC<{ kind: Kind; options: Options; record: Rec | null; o
           description: r.description ?? '',
         }
       : {
-          category: r.category ?? 'AWARD',
+          category: r.category ?? (defaultCategory && options.achievementCategories.includes(defaultCategory) ? defaultCategory : 'AWARD'),
           title: r.title ?? '',
           body: r.body ?? '',
           date: toInput(r.date),
@@ -632,7 +632,7 @@ export const DossierRecordsPage: React.FC<{ kind: Kind }> = ({ kind }) => {
         </div>
       </section>
 
-      {editing !== undefined && options.data && <RecordForm kind={kind} options={options.data} record={editing} onClose={() => setEditing(undefined)} onSaved={refresh} />}
+      {editing !== undefined && options.data && <RecordForm kind={kind} options={options.data} record={editing} defaultCategory={isCourse ? undefined : category} onClose={() => setEditing(undefined)} onSaved={refresh} />}
       {viewing && (
         <RecordDetail
           kind={kind}

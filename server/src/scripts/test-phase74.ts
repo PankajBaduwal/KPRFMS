@@ -8,11 +8,13 @@ import { User } from '../models/User.js';
 import { Faculty } from '../models/Faculty.js';
 import { Publication } from '../models/Publication.js';
 import { DocumentRecord } from '../models/Document.js';
+import { AcademicActivity } from '../models/AcademicActivity.js';
 import { FacultyCourse } from '../models/FacultyCourse.js';
 import { FacultyAchievement } from '../models/FacultyAchievement.js';
 import { runInTenant, type TenantContext } from '../tenancy/context.js';
 import { tenantDbName } from '../tenancy/dbNames.js';
 import { generateToken } from '../utils/jwt.js';
+import { migrateDossier } from './tenant-migrate-dossier.js';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 const ROOT = process.env.TEST_API_ROOT || 'http://localhost:5055/api';
@@ -145,6 +147,37 @@ async function run() {
     const verifiedHours = (await inA(() => FacultyCourse.find({ facultyId: profile._id, status: 'VERIFIED' }).lean())).reduce((n, c) => n + (c.durationHours ?? 0), 0);
     assert(stats.status === 200 && stats.data?.verified?.hours === verifiedHours, 'Course statistics match the verified records', { api: stats.data?.verified, verifiedHours });
 
+    console.log('\n--- The unified approval queue ---');
+    const qDraft = await call(fac.token, 'POST', '/dossier/courses', { kind: 'CERTIFICATION', title: 'P74 queue cert', provider: 'AWS', completionDate: '2026-08-20', documentIds: [String(doc._id)] });
+    const qId = String(qDraft.data?._id);
+    created.courses.push(qId);
+    const queueList = async () => (await call(hod.token, 'GET', '/approvals?recordType=FACULTY_COURSE&status=ALL&limit=100')).data;
+    const inQueue = (d: any) => (d?.records ?? d?.items ?? d?.data ?? []).some((x: any) => x.id === qId);
+    assert(!inQueue(await queueList()), 'A draft is not in the HOD’s queue');
+    await call(fac.token, 'POST', `/dossier/courses/${qId}/submit`);
+    const ql = await queueList();
+    assert(inQueue(ql), 'Once submitted it appears in the HOD’s approval queue', Object.keys(ql ?? {}));
+    const qd = await call(hod.token, 'GET', `/approvals/FACULTY_COURSE/${qId}`);
+    assert(qd.status === 200 && qd.data?.record?.documents?.[0]?.documentId === String(doc._id) && qd.data?.record?.canReview === true, 'The queue detail shows the evidence and that the HOD can decide', qd.data?.record);
+    const qAdmin = await call(admin.token, 'POST', `/approvals/FACULTY_COURSE/${qId}/action`, { action: 'APPROVE' });
+    assert(qAdmin.status === 403, 'An Institution Admin cannot verify it from the queue', qAdmin.status);
+    const qOk = await call(hod.token, 'POST', `/approvals/FACULTY_COURSE/${qId}/action`, { action: 'APPROVE' });
+    const qRec = await inA(() => FacultyCourse.findById(qId).lean());
+    assert(qOk.status === 200 && qRec?.status === 'VERIFIED' && qRec.history.some((h: any) => h.action === 'VERIFIED'), 'Approving from the queue verifies it through the record’s own workflow', qOk);
+
+    // Qualifications reach the queue too, and the Admin cannot verify them
+    const qual = await call(fac.token, 'POST', '/faculty/qualifications', { degree: 'P74 Diploma', specialization: 'Testing', institution: 'X', university: 'Y', completionYear: 2019, percentageOrCgpa: '8' });
+    const qualId = String(qual.data?.qualifications?.find((x: any) => x.degree === 'P74 Diploma')?._id);
+    await call(fac.token, 'POST', `/faculty/qualifications/${qualId}/submit`);
+    const qq = await call(hod.token, 'GET', '/approvals?recordType=QUALIFICATION&status=ALL&limit=100');
+    assert((qq.data?.records ?? qq.data?.items ?? []).some((x: any) => x.id === qualId), 'A submitted qualification appears in the queue');
+    assert((await call(admin.token, 'POST', `/faculty/${profile._id}/qualifications/${qualId}/approve`, {})).status === 403, 'The Admin cannot verify a qualification directly either');
+    const qv = await call(hod.token, 'POST', `/approvals/QUALIFICATION/${qualId}/action`, { action: 'APPROVE' });
+    const qualAfter = (await inA(() => Faculty.findById(profile._id).lean()))?.qualifications?.find((x: any) => String(x._id) === qualId);
+    assert(qv.status === 200 && qualAfter?.verificationStatus === 'VERIFIED', 'The HOD verifies it from the queue', qv);
+    await call(fac.token, 'DELETE', `/faculty/qualifications/${qualId}`);
+    await inA(() => Faculty.updateOne({ _id: profile._id }, { $pull: { qualifications: { _id: new mongoose.Types.ObjectId(qualId) } } }));
+
     console.log('\n--- Achievements ---');
     const talk = await call(fac.token, 'POST', '/dossier/achievements', { category: 'INVITED_TALK', title: 'P74 talk', body: 'IEEE', date: '2026-09-01', submit: true });
     assert(talk.status === 201 && talk.data?.status === 'SUBMITTED', 'An invited talk can be submitted without a certificate', talk);
@@ -154,6 +187,23 @@ async function run() {
     const leftovers = await inA(() => FacultyAchievement.find({ facultyId: profile._id, title: 'P74 award' }).select('_id').lean());
     created.achievements.push(...leftovers.map((x) => String(x._id)));
 
+    console.log('\n--- New professional development types ---');
+    const web = await call(fac.token, 'POST', '/activities', { activityType: 'WEBINAR', title: 'P74 webinar on MLOps', organizer: 'IEEE CS', academicYear: '2026-2027', startDate: '2026-09-10', endDate: '2026-09-10', hours: 2, role: 'Resource Person', mode: 'Online' });
+    assert(web.status === 201 && web.data?.activityType === 'WEBINAR' && web.data?.hours === 2 && web.data?.role === 'Resource Person', 'A webinar is recorded with role and hours', web);
+    if (web.data?._id) await inA(() => AcademicActivity.deleteOne({ _id: web.data._id }));
+    assert((await call(dean.token, 'GET', '/dossier/rankings?metric=webinars')).status === 200, 'Webinars are a ranking category');
+
+    console.log('\n--- Migrating the old profile lists ---');
+    const awardId = new mongoose.Types.ObjectId();
+    await inA(() => Faculty.updateOne({ _id: profile._id }, { $push: { awards: { _id: awardId, title: 'P74 legacy award', awardingBody: 'ISTE', year: 2024 } } }));
+    await inA(() => migrateDossier());
+    const migrated = await inA(() => FacultyAchievement.find({ legacyRef: `awards:${awardId}` }).lean());
+    created.achievements.push(...migrated.map((m) => String(m._id)));
+    assert(migrated.length === 1 && migrated[0].status === 'DRAFT' && migrated[0].category === 'AWARD' && String(migrated[0].facultyId) === String(profile._id), 'An old award is copied as a draft achievement of its owner', migrated[0]);
+    await inA(() => migrateDossier());
+    assert((await inA(() => FacultyAchievement.countDocuments({ legacyRef: `awards:${awardId}` }))) === 1, 'Running the migration again copies nothing twice');
+    await inA(() => Faculty.updateOne({ _id: profile._id }, { $pull: { awards: { _id: awardId } } }));
+
     console.log('\n--- Dossier summary and profile completion ---');
     const sum = await call(fac.token, 'GET', '/dossier/summary');
     assert(sum.status === 200 && sum.data?.identity?.employeeId === profile.employeeId && sum.data?.own === true, 'The summary loads with the real identity', sum.status);
@@ -162,6 +212,11 @@ async function run() {
     const comp = sum.data?.completion;
     assert(comp && comp.overall >= 0 && comp.overall <= 100 && comp.categories.length === 7, 'Completion has an overall figure and seven categories', comp?.categories?.length);
     assert(comp?.categories?.find((c: any) => c.key === 'courses')?.counts?.VERIFIED >= 1, 'The verified course counts towards completion');
+    const talkId = String(talk.data?._id);
+    assert((sum.data?.openRecords ?? []).some((r: any) => r.id === talkId && r.status === 'SUBMITTED'), 'The submitted talk is listed under records awaiting verification');
+    const dash = await call(fac.token, 'GET', '/dashboard');
+    assert((dash.data?.pendingSubmissions?.items ?? []).some((i: any) => i.id === talkId && i.module === 'Achievements'), 'and on the dashboard’s pending submissions', dash.data?.pendingSubmissions);
+    assert(typeof dash.data?.dossierCompletion === 'number' && dash.data.dossierCompletion === comp?.overall, 'The dashboard reports the same completion as the dossier', { dash: dash.data?.dossierCompletion, comp: comp?.overall });
     const someoneElse = other ? await call(fac.token, 'GET', `/dossier/summary?facultyId=${other._id}`) : { status: 403 };
     assert(someoneElse.status === 403, 'A faculty member cannot open someone else’s dossier', someoneElse.status);
     const hodView = await call(hod.token, 'GET', `/dossier/summary?facultyId=${profile._id}`);

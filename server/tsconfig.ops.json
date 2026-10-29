@@ -7,6 +7,7 @@
     "src/scripts/tenant-register.ts",
     "src/scripts/tenant-migrate.ts",
     "src/scripts/tenant-migrate-funding.ts",
+    "src/scripts/tenant-migrate-dossier.ts",
     "src/scripts/tenant-normalize-hod.ts",
     "src/scripts/tenant-copy-db.ts",
     "src/scripts/tenant-files-copy.ts",

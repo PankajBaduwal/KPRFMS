@@ -183,6 +183,42 @@ function experienceTotals(faculty: any) {
   };
 }
 
+/** Records that are waiting for a reviewer, need correction or were not accepted, across modules. */
+async function openRecords(f: any) {
+  const fid = f._id;
+  const OPEN = ['SUBMITTED', 'UNDER_REVIEW', 'RETURNED_FOR_CORRECTION', 'REJECTED'];
+  const sources: Array<[string, any, string, string, string]> = [
+    ['Publication', Publication, 'verificationStatus', 'title', '/portal/publications'],
+    ['Project', Project, 'verificationStatus', 'title', '/portal/projects'],
+    ['Patent', Patent, 'verificationStatus', 'title', '/portal/ipr-consultancy?tab=PATENTS'],
+    ['Copyright', Copyright, 'verificationStatus', 'title', '/portal/ipr-consultancy?tab=COPYRIGHTS'],
+    ['Consultancy', Consultancy, 'verificationStatus', 'projectTitle', '/portal/ipr-consultancy?tab=CONSULTANCY'],
+    ['Academic activity', AcademicActivity, 'status', 'title', '/portal/activities'],
+    ['Course / certification', FacultyCourse, 'status', 'title', '/portal/courses'],
+    ['Achievement', FacultyAchievement, 'status', 'title', '/portal/achievements'],
+  ];
+  const lists = await Promise.all(
+    sources.map(([type, model, statusField, titleField, link]) =>
+      model
+        .find({ facultyId: fid, [statusField]: { $in: OPEN } })
+        .select(`${statusField} ${titleField} updatedAt verificationRemarks reviewRemarks reviewComment remarks`)
+        .sort({ updatedAt: -1 })
+        .limit(50)
+        .lean()
+        .then((rows: any[]) =>
+          rows.map((r) => ({ id: String(r._id), type, title: r[titleField], status: stageOf(r[statusField]), updatedAt: r.updatedAt, comment: [r.reviewComment, r.verificationRemarks, r.reviewRemarks].find((c) => c && !/^Set by .*migration/.test(c)) ?? '', link }))
+        )
+    )
+  );
+  const embedded = (['qualifications', 'experience'] as const).flatMap((field) =>
+    ((f[field] ?? []) as any[])
+      .filter((i) => OPEN.includes(i.verificationStatus))
+      .map((i) => ({ id: String(i._id), type: field === 'qualifications' ? 'Qualification' : 'Experience', title: field === 'qualifications' ? i.degree : `${i.designation} — ${i.organization}`, status: stageOf(i.verificationStatus), updatedAt: i.reviewedAt ?? f.updatedAt, comment: i.verificationRemarks || '', link: '/portal/profile?tab=academic' }))
+  );
+  const order: Record<string, number> = { RETURNED: 0, REJECTED: 1, SUBMITTED: 2 };
+  return [...lists.flat(), ...embedded].sort((a, b) => (order[a.status] ?? 3) - (order[b.status] ?? 3) || new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+}
+
 const DEGREE_RANK = (d: string) => (/ph\.?\s?d|doctor/i.test(d) ? 4 : /m\.?\s?(e|tech|sc|s|ba|phil)|master|post\s?grad/i.test(d) ? 3 : /b\.?\s?(e|tech|sc)|bachelor/i.test(d) ? 2 : 1);
 
 async function loadFaculty(user: AuthenticatedUser, facultyId?: string) {
@@ -240,6 +276,9 @@ export const METRICS: Metric[] = [
   { key: 'conferences', label: 'Conferences (verified)', group: 'Courses & professional development', model: AcademicActivity, owner: 'facultyId', verified: { ...ACT_VER, activityType: 'CONFERENCE' }, submitted: { ...ACT_WAIT, activityType: 'CONFERENCE' } },
   { key: 'seminars', label: 'Seminars (verified)', group: 'Courses & professional development', model: AcademicActivity, owner: 'facultyId', verified: { ...ACT_VER, activityType: 'SEMINAR' }, submitted: { ...ACT_WAIT, activityType: 'SEMINAR' } },
   { key: 'sttps', label: 'STTPs completed (verified)', group: 'Courses & professional development', model: AcademicActivity, owner: 'facultyId', verified: { ...ACT_VER, activityType: 'STTP' }, submitted: { ...ACT_WAIT, activityType: 'STTP' } },
+  { key: 'webinars', label: 'Webinars (verified)', group: 'Courses & professional development', model: AcademicActivity, owner: 'facultyId', verified: { ...ACT_VER, activityType: 'WEBINAR' }, submitted: { ...ACT_WAIT, activityType: 'WEBINAR' } },
+  { key: 'trainings', label: 'Training programmes (verified)', group: 'Courses & professional development', model: AcademicActivity, owner: 'facultyId', verified: { ...ACT_VER, activityType: 'TRAINING' }, submitted: { ...ACT_WAIT, activityType: 'TRAINING' } },
+  { key: 'technicalEvents', label: 'Technical events (verified)', group: 'Courses & professional development', model: AcademicActivity, owner: 'facultyId', verified: { ...ACT_VER, activityType: 'TECHNICAL_EVENT' }, submitted: { ...ACT_WAIT, activityType: 'TECHNICAL_EVENT' } },
   { key: 'eventsOrganised', label: 'Academic events organised (verified)', group: 'Courses & professional development', model: AcademicActivity, owner: 'facultyId', verified: { ...ACT_VER, ...ORGANISED }, submitted: { ...ACT_WAIT, ...ORGANISED } },
   { key: 'invitedTalks', label: 'Invited talks & keynotes (verified)', group: 'Courses & professional development', model: FacultyAchievement, owner: 'facultyId', verified: { status: 'VERIFIED', category: { $in: ['INVITED_TALK', 'KEYNOTE', 'GUEST_LECTURE'] } }, submitted: { status: { $in: ['SUBMITTED', 'UNDER_REVIEW'] }, category: { $in: ['INVITED_TALK', 'KEYNOTE', 'GUEST_LECTURE'] } } },
   { key: 'awards', label: 'Awards & honours (verified)', group: 'Courses & professional development', model: FacultyAchievement, owner: 'facultyId', verified: { status: 'VERIFIED', category: { $in: ['AWARD', 'HONOR', 'RECOGNITION'] } }, submitted: { status: { $in: ['SUBMITTED', 'UNDER_REVIEW'] }, category: { $in: ['AWARD', 'HONOR', 'RECOGNITION'] } } },
@@ -352,6 +391,7 @@ export const dossierService = {
       metrics: Object.fromEntries(metrics),
       recordStatus: statusTotals,
       completion,
+      openRecords: await openRecords(f),
     };
   },
 

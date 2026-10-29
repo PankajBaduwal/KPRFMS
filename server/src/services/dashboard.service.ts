@@ -28,6 +28,10 @@ import { getCurrentAcademicYear } from '../utils/academicYear.js';
 import os from 'os';
 import { dashboardChartsService } from './dashboard-charts.service.js';
 import { verifiedFundedMatch } from './funding-lifecycle.js';
+import { dossierService } from './dossier.service.js';
+import type { AuthenticatedUser } from '../types/index.js';
+import { FacultyCourse } from '../models/FacultyCourse.js';
+import { FacultyAchievement } from '../models/FacultyAchievement.js';
 
 export interface ActionItem {
   id: string;
@@ -124,12 +128,13 @@ export class DashboardService {
     activeCycle: { name?: string; submissionDeadline?: Date } | null,
     appraisal: { status: string; appraisalId: string | null },
     pending: Array<{ id: string; title: string; type: string; status: string; link: string }>,
-    todayAttendance: string
+    todayAttendance: string,
+    completion: { overall: number; categories: Array<{ label: string; percent: number }> } | null = null
   ) {
     type Urgency = 'OVERDUE' | 'DUE_SOON' | 'PENDING';
     const items: Array<{
       id: string;
-      kind: 'APPRAISAL' | 'CORRECTION' | 'ATTENDANCE';
+      kind: 'APPRAISAL' | 'CORRECTION' | 'ATTENDANCE' | 'PROFILE';
       title: string;
       detail: string;
       dueDate: string | null;
@@ -184,6 +189,21 @@ export class DashboardService {
         urgency: 'PENDING',
         link: '/portal/attendance',
         actionText: 'Request correction',
+      });
+    }
+    // A thin dossier makes reports and rankings understate the person's work
+    if (completion && completion.overall < 80) {
+      const weakest = [...completion.categories].sort((a, b) => a.percent - b.percent).filter((c) => c.percent < 100).slice(0, 2);
+      items.push({
+        id: 'profile-completion',
+        kind: 'PROFILE',
+        title: `Your dossier is ${completion.overall}% complete`,
+        detail: weakest.length ? `Least complete: ${weakest.map((c) => `${c.label} (${c.percent}%)`).join(', ')}.` : 'Some required details are missing.',
+        dueDate: null,
+        status: 'Incomplete',
+        urgency: 'PENDING',
+        link: '/portal/dossier',
+        actionText: 'Complete my dossier',
       });
     }
     const rank: Record<Urgency, number> = { OVERDUE: 0, DUE_SOON: 1, PENDING: 2 };
@@ -288,6 +308,33 @@ export class DashboardService {
           link: '/portal/ipr-consultancy?tab=PATENTS',
         });
       });
+
+      // Dossier records: courses & certifications, achievements, qualifications and experience
+      const waiting = { facultyId, status: { $in: ['SUBMITTED', 'UNDER_REVIEW', 'RETURNED_FOR_CORRECTION'] } };
+      const [courses, achievements] = await Promise.all([
+        FacultyCourse.find(waiting as any).sort({ updatedAt: -1 }).limit(5).lean(),
+        FacultyAchievement.find(waiting as any).sort({ updatedAt: -1 }).limit(5).lean(),
+      ]);
+      courses.forEach((c) =>
+        pendingItems.push({ id: String(c._id), title: c.title, type: c.kind === 'CERTIFICATION' ? 'Certification' : 'Course', module: 'Courses & Certifications', submittedDate: c.updatedAt, status: c.status, link: '/portal/courses' })
+      );
+      achievements.forEach((a) =>
+        pendingItems.push({ id: String(a._id), title: a.title, type: a.category.charAt(0) + a.category.slice(1).toLowerCase().replace(/_/g, ' '), module: 'Achievements', submittedDate: a.updatedAt, status: a.status, link: '/portal/achievements' })
+      );
+      for (const [field, label] of [['qualifications', 'Qualification'], ['experience', 'Experience']] as const) {
+        for (const item of ((faculty as any)?.[field] ?? []) as any[]) {
+          if (!['SUBMITTED', 'UNDER_REVIEW', 'RETURNED_FOR_CORRECTION'].includes(item.verificationStatus)) continue;
+          pendingItems.push({
+            id: String(item._id),
+            title: field === 'qualifications' ? item.degree : `${item.designation} — ${item.organization}`,
+            type: label,
+            module: 'Profile',
+            submittedDate: item.reviewedAt ?? (faculty as any).updatedAt,
+            status: item.verificationStatus,
+            link: '/portal/profile?tab=academic',
+          });
+        }
+      }
 
       pendingLeaves.forEach((l) => {
         pendingItems.push({
@@ -647,11 +694,16 @@ export class DashboardService {
       });
     }
 
-    const [profile, metrics] = await Promise.all([this.facultyProfile(userId, faculty), this.facultyMetrics(userId, facultyId)]);
-    const attentionItems = this.facultyAttention(activeCycle, appraisalInfo, pendingItems, attendanceStats.todayStatus);
+    const [profile, metrics, completion] = await Promise.all([
+      this.facultyProfile(userId, faculty),
+      this.facultyMetrics(userId, facultyId),
+      faculty ? dossierService.completion({ id: userId, role: 'FACULTY' } as AuthenticatedUser).catch(() => null) : Promise.resolve(null),
+    ]);
+    const attentionItems = this.facultyAttention(activeCycle, appraisalInfo, pendingItems, attendanceStats.todayStatus, completion);
 
     return {
       role: 'FACULTY',
+      dossierCompletion: completion?.overall ?? null,
       facultyName: profile.name,
       employeeId: profile.employeeId,
       department: profile.department,

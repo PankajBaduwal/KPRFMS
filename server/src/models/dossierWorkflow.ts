@@ -42,6 +42,7 @@ export interface IWorkflowFields {
   /** The last verified version, kept when a verified record is edited and sent back for review */
   verifiedSnapshot?: Record<string, unknown> | null;
   history: IReviewEvent[];
+  legacyRef?: string;
 }
 
 const reviewEventSchema = new Schema<IReviewEvent>(
@@ -72,4 +73,6 @@ export const workflowFields = () => ({
   reviewComment: { type: String, maxlength: 2000 },
   verifiedSnapshot: { type: Schema.Types.Mixed, default: null },
   history: { type: [reviewEventSchema], default: [] },
+  /** Source item for records copied from the old profile lists (tenant-migrate-dossier) */
+  legacyRef: { type: String, index: true, sparse: true },
 });

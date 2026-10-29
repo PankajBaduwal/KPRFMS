@@ -92,6 +92,8 @@ export interface ApprovalHistoryItem {
 export interface ApprovalDocument {
   name: string;
   url: string;
+  /** A file in the secure document vault, opened through the document API */
+  documentId?: string;
   type?: string;
   uploadedAt?: string;
 }
