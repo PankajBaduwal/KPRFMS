@@ -29,6 +29,10 @@ const FacultyProfilePage = React.lazy(() => import('../pages/FacultyProfilePage'
 const FacultyDirectoryPage = React.lazy(() => import('../pages/FacultyDirectoryPage').then((m) => ({ default: m.FacultyDirectoryPage })));
 const PublicationsPage = React.lazy(() => import('../pages/PublicationsPage').then((m) => ({ default: m.PublicationsPage })));
 const ProjectsPage = React.lazy(() => import('../pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })));
+const DossierPage = React.lazy(() => import('../pages/DossierPage').then((m) => ({ default: m.DossierPage })));
+const CoursesPage = React.lazy(() => import('../pages/DossierRecordsPage').then((m) => ({ default: m.CoursesPage })));
+const AchievementsPage = React.lazy(() => import('../pages/DossierRecordsPage').then((m) => ({ default: m.AchievementsPage })));
+const FacultyInsightsPage = React.lazy(() => import('../pages/FacultyInsightsPage').then((m) => ({ default: m.FacultyInsightsPage })));
 const FundingPage = React.lazy(() => import('../pages/FundingPage').then((m) => ({ default: m.FundingPage })));
 const ActivitiesPage = React.lazy(() => import('../pages/ActivitiesPage').then((m) => ({ default: m.ActivitiesPage })));
 const IPRConsultancyPage = React.lazy(() => import('../pages/IPRConsultancyPage').then((m) => ({ default: m.IPRConsultancyPage })));
@@ -173,6 +177,22 @@ export const router = createBrowserRouter([
       {
         path: 'funding',
         element: lazyRoute(FundingPage),
+      },
+      {
+        path: 'dossier',
+        element: lazyRoute(DossierPage),
+      },
+      {
+        path: 'courses',
+        element: lazyRoute(CoursesPage),
+      },
+      {
+        path: 'achievements',
+        element: lazyRoute(AchievementsPage),
+      },
+      {
+        path: 'faculty-insights',
+        element: lazyRoute(FacultyInsightsPage),
       },
       {
         path: 'activities',

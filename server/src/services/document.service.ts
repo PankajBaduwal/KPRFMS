@@ -22,6 +22,8 @@ import {
 import { ROLES } from '../permissions/roles.js';
 import { AppError } from '../utils/AppError.js';
 import { AuthenticatedUser } from '../types/index.js';
+import { FacultyCourse } from '../models/FacultyCourse.js';
+import { FacultyAchievement } from '../models/FacultyAchievement.js';
 
 export interface RequestAuditMeta {
   ipAddress?: string;
@@ -94,6 +96,23 @@ export class DocumentService {
     }
 
     return false;
+  }
+
+  /**
+   * Private evidence attached to a dossier record may be opened by that record's reviewers (the
+   * HOD of the record's department, or the Dean) — only when a record actually lists the document,
+   * not because of a label the uploader chose.
+   */
+  public async isReviewEvidence(user: AuthenticatedUser, doc: IDocument): Promise<boolean> {
+    if (user.role !== ROLES.HOD && user.role !== ROLES.DEAN) return false;
+    const where = { documentIds: doc._id, userId: { $ne: new Types.ObjectId(user.id) } };
+    const [course, achievement] = await Promise.all([
+      FacultyCourse.findOne(where).select('departmentId').lean(),
+      FacultyAchievement.findOne(where).select('departmentId').lean(),
+    ]);
+    const rec = course ?? achievement;
+    if (!rec) return false;
+    return user.role === ROLES.DEAN || (Boolean(user.departmentId) && String(rec.departmentId) === user.departmentId);
   }
 
   /**
@@ -292,7 +311,7 @@ export class DocumentService {
       throw AppError.notFound('Document record not found.');
     }
 
-    if (!this.isAuthorized(user, doc)) {
+    if (!this.isAuthorized(user, doc) && !(await this.isReviewEvidence(user, doc))) {
       throw AppError.forbidden('Access denied: You do not have authorization to view this private document.');
     }
 

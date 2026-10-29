@@ -75,11 +75,17 @@ async function runTests() {
     assert(false, 'Update basic info failed', String(err));
   }
 
-  // 3. Faculty adds an item to qualifications
+  // 3. Qualifications go through their own (reviewed) routes, not the generic section API
+  try {
+    await axios.post(`${API_URL}/faculty/me/qualifications`, { degree: 'PhD', verificationStatus: 'VERIFIED' }, { headers: { Cookie: facultyCookie } });
+    assert(false, 'The generic section API should refuse qualifications');
+  } catch (err: any) {
+    assert(err?.response?.status === 400, 'The generic section API refuses qualifications (no self-verification)');
+  }
   let addedItemId = '';
   try {
     const res = await axios.post(
-      `${API_URL}/faculty/me/qualifications`,
+      `${API_URL}/faculty/qualifications`,
       {
         degree: 'Post-Doc',
         specialization: 'Edge AI Systems',
@@ -90,7 +96,8 @@ async function runTests() {
       },
       { headers: { Cookie: facultyCookie } }
     );
-    assert(res.status === 200, 'POST /api/faculty/me/qualifications adds a new qualification');
+    assert(res.status === 201, 'POST /api/faculty/qualifications adds a new qualification');
+    assert(res.data.data.qualifications.find((q: { degree: string }) => q.degree === 'Post-Doc')?.verificationStatus !== 'VERIFIED', 'A new qualification is not verified');
     const added = res.data.data.qualifications.find((q: { degree: string }) => q.degree === 'Post-Doc');
     assert(!!added, 'Qualification found in returned profile');
     addedItemId = added?._id;
@@ -101,13 +108,18 @@ async function runTests() {
   // 4. Faculty updates the added item
   try {
     const res = await axios.put(
-      `${API_URL}/faculty/me/qualifications/${addedItemId}`,
+      `${API_URL}/faculty/qualifications/${addedItemId}`,
       {
+        degree: 'Post-Doc',
         specialization: 'Advanced Edge AI & Microservices',
+        institution: 'National University of Singapore',
+        university: 'NUS',
+        completionYear: 2022,
+        percentageOrCgpa: 'Research Fellow',
       },
       { headers: { Cookie: facultyCookie } }
     );
-    assert(res.status === 200, 'PUT /api/faculty/me/qualifications/:itemId updates the item');
+    assert(res.status === 200, 'PUT /api/faculty/qualifications/:id updates the item');
   } catch (err: unknown) {
     assert(false, 'Update qualification item failed', String(err));
   }
@@ -115,10 +127,10 @@ async function runTests() {
   // 5. Faculty deletes the item
   try {
     const res = await axios.delete(
-      `${API_URL}/faculty/me/qualifications/${addedItemId}`,
+      `${API_URL}/faculty/qualifications/${addedItemId}`,
       { headers: { Cookie: facultyCookie } }
     );
-    assert(res.status === 200, 'DELETE /api/faculty/me/qualifications/:itemId removes the item');
+    assert(res.status === 200, 'DELETE /api/faculty/qualifications/:id removes the item');
     const deleted = res.data.data.qualifications.find((q: { _id: string }) => q._id === addedItemId);
     assert(!deleted, 'Item successfully removed from qualifications');
   } catch (err: unknown) {

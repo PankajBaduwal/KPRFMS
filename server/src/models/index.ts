@@ -188,3 +188,5 @@ export { Session, type ISession } from './Session.js';
 export { ImportJob, type IImportJob } from './ImportJob.js';
 export { RankingConfig, type IRankingConfig } from './RankingConfig.js';
 export { UploadedFile, type IUploadedFile } from './UploadedFile.js';
+export { FacultyCourse, type IFacultyCourse } from './FacultyCourse.js';
+export { FacultyAchievement, type IFacultyAchievement } from './FacultyAchievement.js';

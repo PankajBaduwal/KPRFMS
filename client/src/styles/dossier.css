@@ -1,0 +1,58 @@
+/* Faculty dossier: records, completion, directory and rankings (builds on funding.css) */
+.ds-req { color: #b42318; }
+.ds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.fd-dialog textarea { resize: vertical; }
+.ds-note { background: #eef4ff; border: 1px solid #d6e4ff; color: #1e3a6e; border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; margin: 0; }
+.ds-note.is-warn { background: #fff8eb; border-color: #f7dfb0; color: #7a4a00; }
+.ds-evidence { display: flex; flex-direction: column; gap: 6px; border: 1px dashed var(--color-border, #e2e8f0); border-radius: 8px; padding: 10px 12px; font-size: 0.82rem; }
+.ds-evidence ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.ds-evidence li { display: flex; align-items: center; gap: 6px; }
+.ds-upload { align-self: flex-start; display: inline-flex !important; flex-direction: row !important; }
+.ds-link { border: 0; background: none; color: #1d4ed8; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; padding: 0 4px; }
+.ds-link:hover { text-decoration: underline; }
+.ds-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.ds-filters select { border: 1px solid var(--color-border, #e2e8f0); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 0.82rem; background: #fff; color: inherit; }
+.ds-row { cursor: pointer; }
+.ds-row:hover td { background: #f8fafc; }
+.ds-title { border: 0; background: none; padding: 0; font: inherit; font-weight: 600; color: #13294b; text-align: left; cursor: pointer; }
+.ds-status { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #f1f5f9; color: #334155; white-space: nowrap; }
+.ds-status.st-verified { background: #e8f5ee; color: #1e7a47; }
+.ds-status.st-submitted, .ds-status.st-under_review { background: #fdf3e3; color: #9a5b00; }
+.ds-status.st-returned_for_correction { background: #fff1e6; color: #b54708; }
+.ds-status.st-rejected { background: #fdecea; color: #b42318; }
+.ds-dl { display: grid; grid-template-columns: 140px 1fr; gap: 6px 12px; margin: 0; font-size: 0.84rem; }
+.ds-dl dt { color: #64748b; font-weight: 600; }
+.ds-dl dd { margin: 0; overflow-wrap: anywhere; }
+.ds-desc { font-size: 0.84rem; margin: 0; white-space: pre-wrap; }
+.ds-history { font-size: 0.78rem; color: #475467; }
+.ds-history ol { margin: 6px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 2px; }
+.ds-review { border-top: 1px solid #e2e8f0; padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Dossier page */
+.ds-identity { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.ds-avatar { width: 64px; height: 64px; border-radius: 50%; background: #e8eef8; color: #13294b; display: grid; place-items: center; font-weight: 700; font-size: 1.3rem; overflow: hidden; flex: none; }
+.ds-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.ds-identity h1 { font-size: 1.3rem; margin: 0; color: #13294b; font-weight: 650; }
+.ds-facts { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.8rem; color: #475467; margin-top: 4px; }
+.ds-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 900px) { .ds-two { grid-template-columns: 1fr; } .ds-dl { grid-template-columns: 110px 1fr; } }
+.ds-meter { height: 8px; border-radius: 999px; background: #eef2f6; overflow: hidden; }
+.ds-meter > span { display: block; height: 100%; background: #1e7a47; border-radius: inherit; }
+.ds-meter.is-mid > span { background: #c27c0e; }
+.ds-meter.is-low > span { background: #b42318; }
+.ds-overall { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.ds-overall strong { font-size: 2rem; color: #13294b; font-variant-numeric: tabular-nums; }
+.ds-cats { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.ds-cats li { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 0.82rem; }
+.ds-cats li .ds-meter { grid-column: 1 / -1; }
+.ds-cats a { color: #13294b; font-weight: 600; text-decoration: none; }
+.ds-cats a:hover { text-decoration: underline; }
+.ds-cats small { grid-column: 1 / -1; color: #64748b; }
+
+/* Tabs for the leadership pages */
+.ds-tabs { display: flex; gap: 4px; border-bottom: 1px solid #e2e8f0; }
+.ds-tabs button { border: 0; background: none; padding: 8px 14px; font: inherit; font-size: 0.85rem; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.ds-tabs button.is-on { color: #13294b; border-bottom-color: #13294b; }
+.ds-rules { margin: 0; padding-left: 18px; font-size: 0.78rem; color: #475467; display: flex; flex-direction: column; gap: 2px; }
+.ds-rank { font-weight: 700; color: #13294b; font-variant-numeric: tabular-nums; }
+.ds-search { border: 1px solid var(--color-border, #e2e8f0); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 0.82rem; min-width: 200px; }

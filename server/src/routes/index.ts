@@ -2,6 +2,7 @@ import publicRoutes from './public.routes.js';
 import assignmentRoutes from './assignment.routes.js';
 import fundingRoutes from './funding.routes.js';
 import rankingRoutes from './ranking.routes.js';
+import dossierRoutes from './dossier.routes.js';
 import aiRoutes from './ai.routes.js';
 import calendarRoutes from './calendar.routes.js';
 import { Router } from 'express';
@@ -87,5 +88,6 @@ router.use('/public', publicRoutes);
 router.use('/assignments', assignmentRoutes);
 router.use('/funding', fundingRoutes);
 router.use('/rankings', rankingRoutes);
+router.use('/dossier', dossierRoutes);
 
 export default router;

@@ -99,6 +99,18 @@ function calculatePhdScholarStats(scholars: any[]) {
   };
 }
 
+/** Sections with their own reviewed workflow (status set by the server, never by the request). */
+const REVIEWED_SECTIONS = ['qualifications', 'experience'];
+/** Review fields a faculty member may never set on their own items. */
+const REVIEW_FIELDS = ['verificationStatus', 'verificationRemarks', 'reviewedBy', 'reviewedAt', 'isVerified', 'verifiedBy', 'verifiedAt'];
+const stripReviewFields = (item: Record<string, unknown>) =>
+  Object.fromEntries(Object.entries(item).filter(([k]) => !REVIEW_FIELDS.includes(k)));
+const assertGenericSection = (section: string) => {
+  if (REVIEWED_SECTIONS.includes(section)) {
+    throw AppError.badRequest('Qualifications and experience are added and submitted through their own forms.');
+  }
+};
+
 const ALLOWED_SECTIONS = [
   'qualifications',
   'certifications',
@@ -415,13 +427,14 @@ export class FacultyService {
     if (!ALLOWED_SECTIONS.includes(section)) {
       throw AppError.badRequest(`Invalid profile section: ${section}`);
     }
+    assertGenericSection(section);
 
     const faculty = await facultyRepository.findByUserId(userId);
     if (!faculty) {
       throw AppError.notFound('Faculty profile not found.');
     }
 
-    const updated = await facultyRepository.addItemToSection(faculty._id, section, item);
+    const updated = await facultyRepository.addItemToSection(faculty._id, section, stripReviewFields(item));
     if (!updated) {
       throw AppError.internal(`Failed to add item to section: ${section}`);
     }
@@ -437,13 +450,14 @@ export class FacultyService {
     if (!ALLOWED_SECTIONS.includes(section)) {
       throw AppError.badRequest(`Invalid profile section: ${section}`);
     }
+    assertGenericSection(section);
 
     const faculty = await facultyRepository.findByUserId(userId);
     if (!faculty) {
       throw AppError.notFound('Faculty profile not found.');
     }
 
-    const updated = await facultyRepository.updateItemInSection(faculty._id, section, itemId, item);
+    const updated = await facultyRepository.updateItemInSection(faculty._id, section, itemId, stripReviewFields(item));
     if (!updated) {
       throw AppError.notFound(`Item with ID ${itemId} not found in section ${section}.`);
     }
@@ -458,6 +472,7 @@ export class FacultyService {
     if (!ALLOWED_SECTIONS.includes(section)) {
       throw AppError.badRequest(`Invalid profile section: ${section}`);
     }
+    assertGenericSection(section);
 
     const faculty = await facultyRepository.findByUserId(userId);
     if (!faculty) {
