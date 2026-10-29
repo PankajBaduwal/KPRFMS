@@ -10,9 +10,7 @@ import { ROUTES } from '../constants/routes';
 import { PasswordChecklist } from '../components/PasswordChecklist';
 import { PASSWORD_POLICY } from '../utils/passwordPolicy';
 import '../styles/login.css';
-import { PRODUCT_NAME } from '../config/brand';
-import { InstitutionName, InstitutionContact } from '../components/InstitutionName';
-import { BrandMark } from '../components/BrandMark';
+import { PRODUCT_NAME, PRODUCT_MARK } from '../config/brand';
 import { useInstitutionCode } from '../lib/institution';
 import { InstitutionPicker } from '../components/InstitutionPicker';
 
@@ -308,8 +306,8 @@ export const RegisterPage: React.FC = () => {
         <aside className="login-brand-panel register-brand" aria-label="How registration works">
           <div>
             <div className="register-brand-badge">
-              <BrandMark size={22} />
-              <span><InstitutionName fallback={PRODUCT_NAME} /></span>
+              <img src={PRODUCT_MARK} alt="" width={22} height={22} />
+              <span>{PRODUCT_NAME}</span>
             </div>
             <h1 className="login-brand-title">Join the Faculty Management System</h1>
             <p className="login-brand-desc">
@@ -341,7 +339,7 @@ export const RegisterPage: React.FC = () => {
               <span><i className="bi bi-building" aria-hidden="true" /> Department</span>
             </div>
             <div className="register-brand-help">
-              Need help? Contact <InstitutionContact />
+              Need help? Contact your administrator
             </div>
           </div>
         </aside>

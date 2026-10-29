@@ -7,8 +7,7 @@ import { authService } from '../services/auth.service';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { ROUTES } from '../constants/routes';
 import '../styles/login.css';
-import { PRODUCT_FULL_NAME } from '../config/brand';
-import { BrandMark } from '../components/BrandMark';
+import { PRODUCT_FULL_NAME, PRODUCT_MARK } from '../config/brand';
 
 /** Landing page for emailed links: "Forgot password" and "Set my password" for new accounts. */
 export const ResetPasswordPage: React.FC = () => {
@@ -37,7 +36,7 @@ export const ResetPasswordPage: React.FC = () => {
         <div className="login-panel-header">
           <div className="login-panel-logo" style={{ marginBottom: '1.25rem' }}>
             <Link to={ROUTES.HOME} style={{ display: 'inline-block' }}>
-              <BrandMark size={46} />
+              <img src={PRODUCT_MARK} alt="" width={46} height={46} />
             </Link>
           </div>
           <h2 className="login-panel-title">{done ? 'Password updated' : 'Choose a new password'}</h2>

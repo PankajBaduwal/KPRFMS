@@ -12,8 +12,6 @@ import { authService, isTwoFactorChallenge } from '../services/auth.service';
 import '../styles/login.css';
 import { PRODUCT_NAME, PRODUCT_TAGLINE, PRODUCT_MARK, PORTAL_NAME } from '../config/brand';
 import { AccountTypeSwitch, PlatformSignInForm, type AccountType } from '../components/auth/PlatformSignIn';
-import { InstitutionName, InstitutionContact, InstitutionDetails } from '../components/InstitutionName';
-import { BrandMark } from '../components/BrandMark';
 import { InstitutionPicker } from '../components/InstitutionPicker';
 import { institutionStorageKey, useInstitutionCode } from '../lib/institution';
 import { useInstitution } from '../hooks/useInstitution';
@@ -211,8 +209,8 @@ export const LoginPage: React.FC = () => {
             ) : (
               <>
                 <div className="login-brand-mark">
-                  <BrandMark size={28} />
-                  <span><InstitutionName fallback={PRODUCT_NAME} /></span>
+                  <img src={PRODUCT_MARK} alt="" width={28} height={28} />
+                  <span>{PRODUCT_NAME}</span>
                 </div>
                 <h1 className="login-brand-title">{PORTAL_NAME}</h1>
                 <p className="login-brand-desc">
@@ -235,7 +233,7 @@ export const LoginPage: React.FC = () => {
               </li>
             </ul>
           </div>
-          <p className="login-brand-foot">{isPlatform ? `${PRODUCT_NAME} · ${PRODUCT_TAGLINE}` : <InstitutionDetails />}</p>
+          <p className="login-brand-foot">{PRODUCT_NAME} · {PRODUCT_TAGLINE}</p>
         </aside>
 
         {/* ========================================================
@@ -469,7 +467,7 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <p className="login-help">
-            Trouble signing in? Contact <InstitutionContact />.
+            Trouble signing in? Contact your administrator.
           </p>
           </>
           )}
@@ -586,7 +584,7 @@ export const LoginPage: React.FC = () => {
             </form>
           )}
           <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: 'var(--space-3) 0 0' }}>
-            No access to your college email? Contact <InstitutionContact fallback="IT services" /> or your HOD. An
+            No access to your college email? Contact IT services or your HOD. An
             administrator can reset the password from the admin console.
           </p>
         </div>

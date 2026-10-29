@@ -4,9 +4,7 @@ import { ROUTES } from '../constants/routes';
 import { FEATURES } from '../constants/features';
 import { apiGet } from '../api/client';
 import { AnimatedNumber, usePrefersReducedMotion } from '../components/charts';
-import { PRODUCT_NAME } from '../config/brand';
-import { InstitutionName } from '../components/InstitutionName';
-import { BrandMark } from '../components/BrandMark';
+import { PRODUCT_NAME, PRODUCT_MARK } from '../config/brand';
 import { useInstitutionCode } from '../lib/institution';
 
 const MODULES = [
@@ -232,8 +230,8 @@ export const HomePage: React.FC = () => {
         <div className="pub-container pub-hero-grid">
           <div className="pub-hero-copy">
             <span className="pub-hero-badge">
-              <BrandMark size={20} />
-              <InstitutionName fallback={PRODUCT_NAME} />
+              <img src={PRODUCT_MARK} alt="" width={20} height={20} />
+              {PRODUCT_NAME}
             </span>
             <RevealHeading text="Faculty records, research and approvals in one place" />
             <p className="pub-hero-lead">
@@ -395,7 +393,7 @@ export const HomePage: React.FC = () => {
         <div className="pub-container pub-cta-inner">
           <div>
             <h2>Ready to get started?</h2>
-            <p>Sign in with your college account, or register if you have just joined <InstitutionName />.</p>
+            <p>Sign in with your institutional credentials, or register if you are new to the platform.</p>
           </div>
           <div className="pub-hero-actions">
             <Link to={ROUTES.LOGIN} className="pub-btn pub-btn-light pub-btn-shine">
