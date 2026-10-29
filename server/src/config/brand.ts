@@ -5,4 +5,5 @@
  */
 export const PRODUCT_NAME = 'FacultyCore';
 export const PRODUCT_FULL_NAME = 'FacultyCore Faculty Management System';
+export const PRODUCT_TAGLINE = 'Faculty Management & Institutional Intelligence Platform';
 export const PRODUCT_SLUG = 'facultycore';

@@ -70,3 +70,6 @@ docs/ui-redesign/*.gif
 
 # Throwaway files written by the test runner
 server/test-files/
+
+# Local-only notes (credentials for this machine)
+*.local.md

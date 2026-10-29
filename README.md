@@ -115,9 +115,12 @@ npm run tenant:register -- --code demo --name "Demo Institute of Technology" --a
 
 ### Platform console (FacultyCore operators)
 
-The Super Admin console at `/platform` manages institutions; it is separate from every
-institution (own accounts, own session cookie, own sign-in) and only shows registry data and
-counts, never academic records. Create the first operator account once from the command line;
+The Super Admin console at `/platform` manages institutions. There is **one sign-in page**
+(`/login`): choose **FacultyCore Super Admin** there (or open `/login?as=platform`; the old
+`/platform/login` address redirects to it). The choice only selects the form; the server decides
+who is a Super Admin. Platform accounts, sessions and cookies are separate from every institution's,
+and the console shows registry data and counts, never academic records. It can edit each
+institution's name, type, address, contact, email domains and logo. Create the first operator account once from the command line;
 it prints a single-use activation link (24 hours) where the operator chooses the password:
 
 ```bash

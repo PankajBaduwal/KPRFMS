@@ -1056,3 +1056,53 @@ select.register-email-domain {
   cursor: pointer;
   padding-right: 4px;
 }
+
+/* Account type on the shared sign-in page: institution account or FacultyCore Super Admin */
+.login-account-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 3px;
+  margin: 12px 0 4px;
+  background: #EEF1F5;
+  border-radius: 10px;
+}
+.login-account-switch button {
+  border: 0;
+  background: transparent;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475467;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.login-account-switch button:hover { color: #13294B; }
+.login-account-switch button.is-on {
+  background: #FFFFFF;
+  color: #13294B;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+}
+.login-account-switch button:focus-visible { outline: 2px solid #13294B; outline-offset: 1px; }
+.login-eye-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+}
+@media (max-width: 420px) {
+  .login-account-switch button { font-size: 0.76rem; padding: 8px 6px; }
+}
+
+/* Super Admin sign-in: FacultyCore navy only, no institution accent */
+.auth-layout.is-platform .login-brand-panel {
+  background: linear-gradient(145deg, #0E1F3A 0%, #13294B 60%, #1B345F 100%);
+}
+.auth-layout.is-platform .login-aurora { display: none; }

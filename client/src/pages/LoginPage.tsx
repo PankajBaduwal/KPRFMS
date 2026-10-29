@@ -10,7 +10,8 @@ import { DEV_SEED_ACCOUNTS, SHOW_DEV_SEED_HELPERS } from '../dev/devSeedAccounts
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { authService, isTwoFactorChallenge } from '../services/auth.service';
 import '../styles/login.css';
-import { PRODUCT_NAME } from '../config/brand';
+import { PRODUCT_NAME, PRODUCT_TAGLINE, PRODUCT_MARK, PORTAL_NAME } from '../config/brand';
+import { AccountTypeSwitch, PlatformSignInForm, type AccountType } from '../components/auth/PlatformSignIn';
 import { InstitutionName, InstitutionContact, InstitutionDetails } from '../components/InstitutionName';
 import { BrandMark } from '../components/BrandMark';
 import { InstitutionPicker } from '../components/InstitutionPicker';
@@ -35,7 +36,16 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  // One sign-in page for everyone: the account type only chooses which form is shown
+  const accountType: AccountType = searchParams.get('as') === 'platform' ? 'platform' : 'institution';
+  const isPlatform = accountType === 'platform';
+  const setAccountType = (t: AccountType) => {
+    const next = new URLSearchParams(searchParams);
+    if (t === 'platform') next.set('as', 'platform');
+    else next.delete('as');
+    setSearchParams(next, { replace: true, state: location.state });
+  };
   const { login, loginTwoFactor } = useAuthStore();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -189,15 +199,28 @@ export const LoginPage: React.FC = () => {
           <span className="login-aurora login-aurora-a" aria-hidden="true" />
           <span className="login-aurora login-aurora-b" aria-hidden="true" />
           <div className="login-brand-top">
-            <div className="login-brand-mark">
-              <BrandMark size={28} />
-              <span><InstitutionName fallback={PRODUCT_NAME} /></span>
-            </div>
-            <h1 className="login-brand-title">Faculty Management System</h1>
-            <p className="login-brand-desc">
-              Your profile, research, leave, attendance and appraisals in one place.
-            </p>
-            <ul className="login-brand-points">
+            {isPlatform ? (
+              <>
+                <div className="login-brand-mark">
+                  <img src={PRODUCT_MARK} alt="" width={28} height={28} />
+                  <span>{PRODUCT_NAME}</span>
+                </div>
+                <h1 className="login-brand-title">Platform Administration</h1>
+                <p className="login-brand-desc">{PRODUCT_TAGLINE}. Create and manage colleges and universities, provision their accounts and watch platform health.</p>
+              </>
+            ) : (
+              <>
+                <div className="login-brand-mark">
+                  <BrandMark size={28} />
+                  <span><InstitutionName fallback={PRODUCT_NAME} /></span>
+                </div>
+                <h1 className="login-brand-title">{PORTAL_NAME}</h1>
+                <p className="login-brand-desc">
+                  Your profile, research, leave, attendance and appraisals in one place.
+                </p>
+              </>
+            )}
+            <ul className="login-brand-points" hidden={isPlatform}>
               <li>
                 <i className="bi bi-check2-circle" aria-hidden="true" />
                 <span>Add a record once; your HOD verifies it online</span>
@@ -212,7 +235,7 @@ export const LoginPage: React.FC = () => {
               </li>
             </ul>
           </div>
-          <p className="login-brand-foot"><InstitutionDetails /></p>
+          <p className="login-brand-foot">{isPlatform ? `${PRODUCT_NAME} · ${PRODUCT_TAGLINE}` : <InstitutionDetails />}</p>
         </aside>
 
         {/* ========================================================
@@ -221,16 +244,19 @@ export const LoginPage: React.FC = () => {
         <div className={`login-auth-panel ${shake ? 'is-shaking' : ''}`} role="region" aria-label="Sign In Panel">
           <div className="login-panel-header">
             <h2 className="login-panel-title">{challengeToken ? 'Two-step verification' : 'Sign in'}</h2>
+            {!challengeToken && <AccountTypeSwitch value={accountType} onChange={setAccountType} />}
             <p className="login-panel-desc">
               {challengeToken
                 ? useRecoveryCode
                   ? 'Enter one of the recovery codes you saved when you turned on two-factor sign-in.'
                   : `Open your authenticator app and enter the 6-digit code for ${PRODUCT_NAME}.`
-                : 'Use your college email or employee ID.'}
+                : isPlatform
+                  ? 'Platform administration for FacultyCore operators. No institution needs to be chosen.'
+                  : 'Choose your institution, then use your college email or employee ID.'}
             </p>
           </div>
 
-          {branding.maintenanceMode && !challengeToken && (
+          {branding.maintenanceMode && !challengeToken && !isPlatform && (
             <div style={{ marginBottom: '1rem' }}>
               <Alert variant="warning" title="Under maintenance">
                 {branding.name || 'This institution'} is under maintenance. Only administrators can sign in until it is finished.
@@ -252,7 +278,7 @@ export const LoginPage: React.FC = () => {
           )}
 
           {/* Error Alert */}
-          {errorMessage && (
+          {errorMessage && !isPlatform && (
             <div style={{ marginBottom: '1rem' }}>
               <Alert
                 variant="danger"
@@ -336,14 +362,17 @@ export const LoginPage: React.FC = () => {
           )}
 
           {/* Which institution's sign-in (chosen before credentials) */}
-          {!challengeToken && <InstitutionPicker />}
+          {!challengeToken && !isPlatform && <InstitutionPicker />}
+
+          {/* FacultyCore Super Admin: platform account store and session (checked by the server) */}
+          {isPlatform && !challengeToken && <PlatformSignInForm from={from} />}
 
           {/* Authentication Form */}
           <form
             onSubmit={handleSubmit((data) => signIn.run(data))}
             noValidate
             className="login-form"
-            style={challengeToken ? { display: 'none' } : undefined}
+            style={challengeToken || isPlatform ? { display: 'none' } : undefined}
           >
             <Input
               label="Email or employee ID"
@@ -432,6 +461,8 @@ export const LoginPage: React.FC = () => {
             </button>
           </form>
 
+          {!isPlatform && (
+          <>
           <div className="login-register-cta">
             New faculty member?{' '}
             <Link to={ROUTES.REGISTER}>Register with your college email</Link>
@@ -440,9 +471,11 @@ export const LoginPage: React.FC = () => {
           <p className="login-help">
             Trouble signing in? Contact <InstitutionContact />.
           </p>
+          </>
+          )}
 
           {/* DEVELOPMENT SEED ACCOUNTS — Rendered only in local vite dev mode */}
-          {SHOW_DEV_SEED_HELPERS && (
+          {SHOW_DEV_SEED_HELPERS && !isPlatform && (
             <details
               style={{
                 marginTop: '1.5rem',

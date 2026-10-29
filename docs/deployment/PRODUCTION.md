@@ -77,7 +77,8 @@ curl -fsS https://<your-domain>/api/health/ready
 docker compose exec server node dist/scripts/platform-create-admin.js --email owner@example.com --name "Platform Owner"
 ```
 
-Open the link, choose a password, then sign in to the console at `/platform`.
+Open the link, choose a password, then sign in on the normal sign-in page with the
+**FacultyCore Super Admin** option (`/login?as=platform`).
 
 ## 5. Adding an institution
 

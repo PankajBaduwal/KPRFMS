@@ -31,7 +31,7 @@ as such: nothing below is claimed beyond what was actually built and tested.
 | 20 | Cross-tenant access tests pass | Met | Phases 64, 66, 71, 72 |
 | 21 | Existing automated tests still pass | Met | Full run green |
 | 22 | New multi-tenant tests pass | Met | Phases 64–72 |
-| 23 | CI and Docker configuration functional | **Configured, not yet verified** | Workflow and compose updated for multi-tenancy; `docker compose config` validates. The images were not built locally (Docker daemon not running) and the workflow has not run on GitHub because nothing has been pushed |
+| 23 | CI and Docker configuration functional | Met | GitHub Actions run 40754509828 (commit `77b280e`): web build, all API suites against two isolated institutions, and the Docker job (images build, stack starts healthy, readiness through nginx) pass. MongoDB 8.2 is used because 8.0 refuses current runner kernels |
 | 24 | Documentation: setup, migration, recovery, deployment | Met | README; `docs/deployment/PRODUCTION.md`; `docs/multi-tenant/PHASE-1-AUDIT-AND-PLAN.md` (progress log) |
 | 25 | No unimplemented feature reported as complete | — | See "Known gaps" below |
 
@@ -74,10 +74,24 @@ The required cross-tenant scenario (a user of institution A attempting B's recor
 identifiers, search, export, documents and AI, repeated for HOD and Admin) is covered by phases
 64 and 71.
 
+## Unified branding and shared sign-in (follow-up brief, 2026-10-29)
+
+| Criterion | Status | Evidence |
+|---|---|---|
+| FacultyCore remains the product name | Met | `config/brand.ts` (client and server); tagline "Faculty Management & Institutional Intelligence Platform"; refined navy-and-white mark and wordmark |
+| Super Admin dashboard shows FacultyCore branding | Met | Console header "FacultyCore · Platform Administration"; never an institution's name |
+| Login page offers Institution account and FacultyCore Super Admin | Met | Account-type switch on `/login` (`?as=platform` selects Super Admin); browser-checked |
+| Only one login page | Met | The separate console sign-in page was removed; `/platform/login` redirects to `/login?as=platform`; console sign-out and expired sessions return there |
+| Super Admin sign-in leads to the platform dashboard | Met | Browser-checked (`/login?as=platform` → `/platform`); no institution has to be chosen |
+| Institutional sign-in leads to the institution and role dashboard | Met | Browser-checked (Principal → `/portal` with the institution's identity); role routing unchanged |
+| Each institution shows its own name and logo | Met | Sidebar "<Institution> / Faculty Management Portal", footer "Powered by FacultyCore"; phases 70, 71 |
+| The account-type choice never grants anything | Met | Phase 67: institution credentials refused by the Super Admin sign-in and vice versa; institution admins cannot use the platform API; platform sessions cannot read institution records |
+| Super Admin configures institution identity | Met | Console "Edit" on an institution: name, type, address, contact, email domains, logo (registry + the institution's own settings, audited); phase 67 |
+| Data isolated per institution; existing modules work | Met | Database per institution; full run green |
+
 ## Known gaps (not implemented or not verified)
 
 * **Not deployed.** No production server exists yet; `docs/deployment/PRODUCTION.md` is the plan.
-* **CI and Docker images** have not run outside this machine (see criterion 23).
 * **Platform console two-factor sign-in** is not implemented (institution users have it).
 * **Live notifications** run in one API process; several API instances need a shared pub/sub.
 * **File storage** is a local volume; several API hosts need shared or object storage.

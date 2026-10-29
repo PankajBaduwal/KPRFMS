@@ -113,6 +113,14 @@ export const platformApi = {
   login: (email: string, password: string) => data<{ email: string; name: string }>(apiClient.post('/platform/auth/login', { email, password })),
   activate: (token: string, password: string) => data<{ email: string; name: string }>(apiClient.post('/platform/auth/activate', { token, password })),
   logout: () => apiClient.post('/platform/auth/logout'),
+  updateProfile: (code: string, body: Record<string, unknown>) =>
+    data<InstitutionDetail>(apiClient.patch(`/platform/admin/institutions/${encodeURIComponent(code)}/profile`, body)),
+  uploadLogo: (code: string, file: File) => {
+    const form = new FormData();
+    form.append('logo', file);
+    return data<{ logoUrl: string }>(apiClient.post(`/platform/admin/institutions/${encodeURIComponent(code)}/logo`, form, { headers: { 'Content-Type': 'multipart/form-data' } }));
+  },
+  removeLogo: (code: string) => data<{ logoUrl: string }>(apiClient.delete(`/platform/admin/institutions/${encodeURIComponent(code)}/logo`)),
   metrics: () => data<PlatformMetrics>(apiClient.get('/platform/admin/metrics')),
   institutions: (params: { search?: string; status?: string; page: number; limit: number }) =>
     data<{ items: InstitutionSummary[]; total: number; page: number; pages: number }>(apiClient.get('/platform/admin/institutions', { params })),

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { platformApi, STATUS_LABEL } from './api';
 import { formatErrorMessage } from '../utils/errorHandler';
 import { AccountImport } from '../components/import/AccountImport';
+import { InstitutionProfileEditor } from './PlatformInstitutionProfile';
 
 const STEP_LABEL: Record<string, string> = {
   REGISTRY: 'Registry entry',
@@ -19,6 +20,7 @@ const STEP_LABEL: Record<string, string> = {
 export const PlatformInstitutionPage: React.FC = () => {
   const { code = '' } = useParams();
   const queryClient = useQueryClient();
+  const [editing, setEditing] = useState(false);
   const [reason, setReason] = useState('');
   const [showImport, setShowImport] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
@@ -100,8 +102,16 @@ export const PlatformInstitutionPage: React.FC = () => {
 
       <div className="pc-grid">
         <section className="pc-card">
-          <h2>Details</h2>
-          <dl className="pc-dl">
+          <div className="pc-card-head">
+            <h2>Details</h2>
+            {!editing && i.status !== 'ARCHIVED' && (
+              <button type="button" className="pc-btn" onClick={() => setEditing(true)}>
+                Edit
+              </button>
+            )}
+          </div>
+          {editing && <InstitutionProfileEditor inst={i} onClose={() => setEditing(false)} />}
+          <dl className="pc-dl" hidden={editing}>
             <dt>Email domains</dt>
             <dd>{i.officialEmailDomains.map((d) => `@${d}`).join(', ') || '—'}</dd>
             <dt>Contact</dt>

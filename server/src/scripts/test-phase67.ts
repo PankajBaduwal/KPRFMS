@@ -38,11 +38,12 @@ class Client {
   async request(method: string, url: string, body?: unknown, opts: { csrf?: boolean } = {}) {
     if (!this.cookies.has('fms_csrf_token') && opts.csrf !== false) await this.request('GET', '/health', undefined, { csrf: false });
     const headers: Record<string, string> = {};
-    if (body) headers['Content-Type'] = 'application/json';
+    const isForm = body instanceof FormData;
+    if (body && !isForm) headers['Content-Type'] = 'application/json';
     if (this.cookies.size) headers.Cookie = [...this.cookies].map(([k, v]) => `${k}=${v}`).join('; ');
     if (opts.csrf !== false && this.cookies.has('fms_csrf_token')) headers['x-csrf-token'] = this.cookies.get('fms_csrf_token')!;
     if (this.bearer) headers.Authorization = `Bearer ${this.bearer}`;
-    const res = await fetch(`${ROOT}${url}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    const res = await fetch(`${ROOT}${url}`, { method, headers, body: body ? (isForm ? (body as FormData) : JSON.stringify(body)) : undefined });
     for (const c of res.headers.getSetCookie()) {
       const [pair] = c.split(';');
       const [k, ...v] = pair.split('=');
@@ -136,6 +137,43 @@ async function run() {
   assert((await new Client(instToken).request('GET', '/platform/admin/metrics')).status === 401, 'An institution admin cannot use the platform API');
   assert((await ops.request('GET', '/auth/me')).status === 401, 'A platform session is not an institution session');
   assert((await ops.request('GET', '/t/testa/publications')).status === 401, 'A platform session cannot read institution records');
+  console.log('\n--- One sign-in page: the account type never grants anything ---');
+  // The page's "FacultyCore Super Admin" option posts to the platform endpoint; the server decides
+  const adminAtPlatform = await new Client().request('POST', '/platform/auth/login', { email: 'admin@college.edu', password: 'Admin@12345' });
+  assert(adminAtPlatform.status === 401, 'Institution admin credentials are refused by the Super Admin sign-in', adminAtPlatform.status);
+  const opsAtInstitution = await new Client().request('POST', '/t/testa/auth/login', { identifier: email, password: STRONG });
+  assert(opsAtInstitution.status === 401, 'Super Admin credentials are refused by institution sign-in', opsAtInstitution.status);
+  const opsNoInstitution = await new Client().request('POST', '/auth/login', { identifier: email, password: STRONG });
+  assert(opsNoInstitution.status !== 200, 'Super Admin credentials do not open any institution without one being chosen', opsNoInstitution.status);
+  const metricsText = JSON.stringify((await ops.request('GET', '/platform/admin/metrics')).data ?? {});
+  assert(!/@college\.edu|@[a-z0-9-]+\.(ac\.in|edu)/i.test(metricsText), 'Platform metrics are counts only: no institution users’ addresses', metricsText.slice(0, 200));
+
+  console.log('\n--- The Super Admin edits an institution’s identity ---');
+  const pubB = async () => (await new Client().request('GET', '/t/testb/public/institution')).data?.data;
+  const originalB = await pubB();
+  const registryB = await Institution.findOne({ code: 'testb' }).lean();
+  const renamed = await ops.request('PATCH', '/platform/admin/institutions/testb/profile', { name: 'Test University B (renamed)', type: 'UNIVERSITY', city: 'Madurai' });
+  assert(renamed.status === 200 && renamed.data?.data?.type === 'UNIVERSITY', 'Name and type are updated in the registry', renamed.data);
+  const afterB = await pubB();
+  assert(afterB?.name === 'Test University B (renamed)' && afterB?.city === 'Madurai', 'The institution’s own branding shows the new identity', afterB);
+  assert((await new Client().request('GET', '/t/testa/public/institution')).data?.data?.name !== 'Test University B (renamed)', 'Other institutions are untouched');
+  assert((await new Client(instToken).request('PATCH', '/platform/admin/institutions/testb/profile', { name: 'Hijack' })).status === 401, 'An institution admin cannot edit institutions');
+  const badDomain = await ops.request('PATCH', '/platform/admin/institutions/testb/profile', { officialEmailDomains: ['not a domain'] });
+  const sneakyDb = await ops.request('PATCH', '/platform/admin/institutions/testb/profile', { dbName: 'fc_t_testa' });
+  assert([400, 422].includes(badDomain.status) && [400, 422].includes(sneakyDb.status), 'Invalid domains and unknown fields (such as a database name) are refused', [badDomain.status, sneakyDb.status]);
+  const png = Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13]),
+    Buffer.from('IHDR'),
+    Buffer.from([0, 0, 0, 64, 0, 0, 0, 64, 8, 6, 0, 0, 0, 0, 0, 0, 0]),
+  ]);
+  const logoForm = new FormData();
+  logoForm.append('logo', new Blob([png], { type: 'image/png' }), 'crest.png');
+  const logoUp = await ops.request('POST', '/platform/admin/institutions/testb/logo', logoForm);
+  assert(logoUp.status === 200 && /\/api\/t\/testb\/public\/logo/.test(logoUp.data?.data?.logoUrl ?? ''), 'The Super Admin uploads the institution’s logo', logoUp.data);
+  assert((await new Client().request('GET', '/t/testb/public/logo')).status === 200, 'and it is served on that institution’s pages');
+  assert((await ops.request('DELETE', '/platform/admin/institutions/testb/logo')).status === 200, 'The logo can be removed again');
+  await ops.request('PATCH', '/platform/admin/institutions/testb/profile', { name: registryB!.name, type: registryB!.type, city: registryB!.city ?? '' });
+
   const noCsrf = await ops.request('PATCH', '/platform/admin/institutions/testb/status', { status: 'SUSPENDED', reason: 'csrf check' }, { csrf: false });
   assert(noCsrf.status === 403, 'Platform changes require the CSRF header', noCsrf.status);
 

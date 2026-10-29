@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import '../styles/public.css';
 import '../styles/public-motion.css';
-import { PRODUCT_NAME, PRODUCT_FULL_NAME } from '../config/brand';
+import { PRODUCT_NAME, PRODUCT_FULL_NAME, PRODUCT_WORDMARK } from '../config/brand';
 import { BrandMark } from '../components/BrandMark';
 import { useInstitution } from '../hooks/useInstitution';
 
@@ -136,7 +136,9 @@ export const PublicLayout: React.FC = () => {
         </div>
         <div className="pub-container pub-footer-bottom">
           <span>&copy; {new Date().getFullYear()} {inst.name || PRODUCT_NAME}</span>
-          <span>Powered by {PRODUCT_NAME}</span>
+          <span className="pub-powered">
+            Powered by <img src={PRODUCT_WORDMARK} alt={PRODUCT_NAME} height={20} />
+          </span>
         </div>
       </footer>
     </div>

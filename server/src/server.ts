@@ -15,6 +15,10 @@ async function startServer(): Promise<void> {
     logger.info(`${PRODUCT_NAME} API server running on port ${env.PORT}`);
     logger.info(`Environment: ${env.NODE_ENV}`);
   });
+  // Keep idle connections open longer than clients and proxies do (nginx, load balancers, fetch
+  // pools), so a reused connection is never closed by the server at the moment a request is sent
+  server.keepAliveTimeout = 65_000;
+  server.headersTimeout = 66_000;
 
   // Graceful shutdown
   const shutdown = async (signal: string): Promise<void> => {

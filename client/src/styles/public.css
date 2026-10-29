@@ -659,3 +659,7 @@
   .pub-home .pub-section-head h2 { font-size: 1.5rem !important; line-height: 1.25 !important; }
   .pub-home h3 { font-size: 1rem !important; }
 }
+
+/* "Powered by FacultyCore" wordmark on the white plate it was drawn for */
+.pub-powered { display: inline-flex; align-items: center; gap: 8px; }
+.pub-powered img { height: 20px; width: auto; background: #FFFFFF; border-radius: 4px; padding: 2px 6px; }

@@ -8,7 +8,7 @@ import { INSTITUTION_STATUS, INSTITUTION_TYPES } from '../models/Institution.js'
 import { INSTITUTION_CODE_PATTERN } from '../../tenancy/dbNames.js';
 import { parseImportOptions } from '../../validators/import.validator.js';
 import { facultyImportService } from '../../services/faculty-import.service.js';
-import { spreadsheetUpload } from '../../middleware/upload.js';
+import { spreadsheetUpload, logoUpload } from '../../middleware/upload.js';
 import { AppError } from '../../utils/AppError.js';
 import { tenantDbName } from '../../tenancy/dbNames.js';
 import { runInTenant } from '../../tenancy/context.js';
@@ -128,6 +128,42 @@ router.post(
 );
 
 router.get('/institutions/:code', wrap(async (req) => ({ data: await platformAdminService.detail(String(req.params.code)), message: 'Institution.' })));
+
+router.patch(
+  '/institutions/:code/profile',
+  wrap(async (req) => {
+    const body = z
+      .object({
+        name: z.string().trim().min(3).max(160).optional(),
+        type: z.enum(INSTITUTION_TYPES).optional(),
+        address: z.string().trim().max(300).optional(),
+        city: z.string().trim().max(80).optional(),
+        state: z.string().trim().max(80).optional(),
+        contactEmail: z.string().trim().toLowerCase().email().optional(),
+        contactPhone: z.string().trim().max(30).optional(),
+        officialEmailDomains: z.array(z.string().trim().toLowerCase().regex(DOMAIN, 'Invalid email domain')).min(1).max(5).optional(),
+      })
+      .strict()
+      .parse(req.body);
+    return { data: await platformAdminService.updateProfile(String(req.params.code), body, actorOf(req), req.ip), message: 'Institution updated.' };
+  })
+);
+
+router.post('/institutions/:code/logo', logoUpload.single('logo'), async (req: PlatformRequest, res, next) => {
+  try {
+    sendSuccess(res, await platformAdminService.setLogo(String(req.params.code), req.file, false, actorOf(req), req.ip), 'Logo updated.');
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/institutions/:code/logo', async (req: PlatformRequest, res, next) => {
+  try {
+    sendSuccess(res, await platformAdminService.setLogo(String(req.params.code), undefined, true, actorOf(req), req.ip), 'Logo removed.');
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.patch(
   '/institutions/:code/status',

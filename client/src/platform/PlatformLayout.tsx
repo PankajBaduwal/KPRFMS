@@ -5,6 +5,9 @@ import { platformApi } from './api';
 import { PRODUCT_MARK, PRODUCT_NAME } from '../config/brand';
 import './platform.css';
 
+/** There is one sign-in page for everyone; this selects its Super Admin option. */
+export const PLATFORM_SIGN_IN = '/login?as=platform';
+
 /** Shell for the operator console: separate session, separate look from institution portals. */
 export const PlatformLayout: React.FC = () => {
   const location = useLocation();
@@ -13,12 +16,13 @@ export const PlatformLayout: React.FC = () => {
   const { data: me, isLoading, isError } = useQuery({ queryKey: ['platform', 'me'], queryFn: platformApi.me, retry: false, staleTime: 60_000 });
 
   if (isLoading) return <div className="pc-loading">Checking platform session…</div>;
-  if (isError || !me) return <Navigate to="/platform/login" replace state={{ from: location.pathname }} />;
+  // The shared sign-in page, with the Super Admin option selected; return here afterwards
+  if (isError || !me) return <Navigate to={PLATFORM_SIGN_IN} replace state={{ from: { pathname: location.pathname } }} />;
 
   const signOut = async () => {
     await platformApi.logout().catch(() => undefined);
     queryClient.removeQueries({ queryKey: ['platform'] });
-    navigate('/platform/login', { replace: true });
+    navigate(PLATFORM_SIGN_IN, { replace: true });
   };
 
   return (
@@ -28,7 +32,7 @@ export const PlatformLayout: React.FC = () => {
           <NavLink to="/platform" end className="pc-brand">
             <img src={PRODUCT_MARK} alt="" width={26} height={26} />
             <span>
-              {PRODUCT_NAME} <em>Platform console</em>
+              {PRODUCT_NAME} <em>Platform Administration</em>
             </span>
           </NavLink>
           <nav className="pc-nav" aria-label="Platform">

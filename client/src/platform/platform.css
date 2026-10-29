@@ -145,3 +145,13 @@
 
 /* Keyboard focus stays visible on the dark console header */
 .pc-top :focus-visible { outline: 2px solid #93c5fd !important; outline-offset: 2px !important; }
+
+/* Institution profile editing */
+.pc-card-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pc-card-head h2 { margin: 0; }
+.pc-profile-edit { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; }
+.pc-logo-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 640px) {
+  .pc-form-grid { grid-template-columns: 1fr; }
+  .pc-form-grid .span-2 { grid-column: auto; }
+}

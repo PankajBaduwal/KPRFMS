@@ -9,6 +9,9 @@ import { Faculty } from '../../models/Faculty.js';
 import { Department } from '../../models/Department.js';
 import { sendWelcomeEmail } from '../../services/auth.service.js';
 import { AppError } from '../../utils/AppError.js';
+import { InstitutionSettings } from '../../models/InstitutionSettings.js';
+import { clearInstitutionProfileCache } from '../../utils/institution.js';
+import { brandingService } from '../../services/branding.service.js';
 
 /**
  * Platform console data. Only registry metadata and aggregate counts per institution are
@@ -149,6 +152,50 @@ export const platformAdminService = {
       })),
       audit: audit.map((a) => ({ action: a.action, actorEmail: a.actorEmail ?? '', createdAt: a.createdAt, details: a.details })),
     };
+  },
+
+  /**
+   * Identity of an institution (registry + the institution's own settings, so its portal, emails
+   * and reports show the change). Database name and code never change.
+   */
+  async updateProfile(
+    code: string,
+    input: { name?: string; type?: IInstitution['type']; address?: string; city?: string; state?: string; contactEmail?: string; contactPhone?: string; officialEmailDomains?: string[] },
+    actor: Actor,
+    ip?: string
+  ) {
+    const inst = await Institution.findOne({ code: String(code).toLowerCase() });
+    if (!inst) throw AppError.notFound('Institution not found.');
+    if (inst.status === 'ARCHIVED') throw AppError.badRequest('An archived institution cannot be changed.');
+    const before = { name: inst.name, type: inst.type, officialEmailDomains: [...(inst.officialEmailDomains ?? [])] };
+    for (const k of ['name', 'type', 'address', 'city', 'state', 'contactEmail', 'contactPhone'] as const) {
+      if (input[k] !== undefined) (inst as any)[k] = input[k];
+    }
+    if (input.officialEmailDomains) inst.officialEmailDomains = [...new Set(input.officialEmailDomains)];
+    await inst.save();
+    invalidateTenant(inst.code);
+    await runInTenant({ code: inst.code, dbName: inst.dbName, institutionId: String(inst._id) }, async () => {
+      const mirror: Record<string, unknown> = {};
+      for (const k of ['name', 'address', 'city', 'state', 'contactEmail', 'contactPhone'] as const) if (input[k] !== undefined) mirror[k] = input[k];
+      // Created with defaults when the institution has never saved its settings
+      if (Object.keys(mirror).length) await InstitutionSettings.updateOne({}, { $set: mirror }, { upsert: true, setDefaultsOnInsert: true });
+      clearInstitutionProfileCache();
+    });
+    await recordPlatformAudit({ action: PLATFORM_AUDIT.INSTITUTION_PROFILE_UPDATED, actor, institutionCode: inst.code, ip, details: { before, changed: Object.keys(input) } });
+    return this.detail(inst.code);
+  },
+
+  /** Uploads (or removes) the institution's logo into its own branding folder. */
+  async setLogo(code: string, file: Express.Multer.File | undefined, remove: boolean, actor: Actor, ip?: string) {
+    const inst = await Institution.findOne({ code: String(code).toLowerCase() }).lean();
+    if (!inst) throw AppError.notFound('Institution not found.');
+    if (inst.status === 'ARCHIVED') throw AppError.badRequest('An archived institution cannot be changed.');
+    const result = await runInTenant({ code: inst.code, dbName: inst.dbName, institutionId: String(inst._id) }, () =>
+      remove ? brandingService.removeLogo(actor.id) : brandingService.uploadLogo(file, actor.id)
+    );
+    await Institution.updateOne({ code: inst.code }, { $set: { 'logo.url': result.logoUrl, 'logo.updatedAt': new Date() } });
+    await recordPlatformAudit({ action: PLATFORM_AUDIT.INSTITUTION_LOGO_UPDATED, actor, institutionCode: inst.code, ip, details: { removed: remove } });
+    return result;
   },
 
   async setStatus(code: string, status: InstitutionStatus, reason: string, actor: Actor, ip?: string) {

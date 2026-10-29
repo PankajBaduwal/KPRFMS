@@ -10,7 +10,7 @@ import { ROUTES } from '../constants/routes';
 import { FEATURES, isHiddenPath } from '../constants/features';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { useAcademicYears } from '../hooks/useAcademicYears';
-import { PRODUCT_NAME, PRODUCT_TAGLINE, PRODUCT_FULL_NAME } from '../config/brand';
+import { PRODUCT_NAME, PRODUCT_TAGLINE, PORTAL_NAME, PRODUCT_FULL_NAME } from '../config/brand';
 import { BrandMark } from '../components/BrandMark';
 import { useInstitution } from '../hooks/useInstitution';
 
@@ -437,8 +437,9 @@ export const AppLayout: React.FC = () => {
             </span>
             {!sidebarCollapsed && (
               <span className="sidebar-brand-text">
-                <span className="sidebar-brand-name">{inst.shortCode || PRODUCT_NAME}</span>
-                <span className="sidebar-brand-sub">{inst.shortCode ? PRODUCT_NAME : PRODUCT_TAGLINE}</span>
+                {/* The institution's own identity; FacultyCore appears as "Powered by" in the footer */}
+                <span className="sidebar-brand-name">{inst.name || PRODUCT_NAME}</span>
+                <span className="sidebar-brand-sub">{inst.name ? PORTAL_NAME : PRODUCT_TAGLINE}</span>
               </span>
             )}
           </Link>
@@ -890,7 +891,7 @@ export const AppLayout: React.FC = () => {
             <div className="app-footer-meta">
               <span>Academic Year: <strong>{currentYear || '2026-2027'}</strong></span>
               <span className="app-footer-divider">&bull;</span>
-              <span>Faculty Management ERP v2.4</span>
+              <span>Powered by <strong>{PRODUCT_NAME}</strong></span>
               <span className="app-footer-divider">&bull;</span>
               <span className="app-footer-status">
                 <span className="status-dot" aria-hidden="true" />

@@ -13,7 +13,6 @@ const LoginPage = React.lazy(() => import('../pages/LoginPage').then((m) => ({ d
 const InstitutionLinkPage = React.lazy(() => import('../pages/InstitutionLinkPage').then((m) => ({ default: m.InstitutionLinkPage })));
 // Platform console (operators only): separate session and layout
 const PlatformLayout = React.lazy(() => import('../platform/PlatformLayout').then((m) => ({ default: m.PlatformLayout })));
-const PlatformLoginPage = React.lazy(() => import('../platform/PlatformAuthPages').then((m) => ({ default: m.PlatformLoginPage })));
 const PlatformActivatePage = React.lazy(() => import('../platform/PlatformAuthPages').then((m) => ({ default: m.PlatformActivatePage })));
 const PlatformDashboardPage = React.lazy(() => import('../platform/PlatformDashboardPage').then((m) => ({ default: m.PlatformDashboardPage })));
 const PlatformInstitutionPage = React.lazy(() => import('../platform/PlatformInstitutionPage').then((m) => ({ default: m.PlatformInstitutionPage })));
@@ -94,7 +93,8 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  { path: '/platform/login', element: lazyRoute(PlatformLoginPage) },
+  // Old console sign-in address: the shared sign-in page with the Super Admin option selected
+  { path: '/platform/login', element: <Navigate to="/login?as=platform" replace /> },
   { path: '/platform/activate', element: lazyRoute(PlatformActivatePage) },
   {
     path: '/platform',
