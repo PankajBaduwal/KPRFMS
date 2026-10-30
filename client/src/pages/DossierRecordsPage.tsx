@@ -435,17 +435,23 @@ export const DossierRecordsPage: React.FC<{ kind: Kind }> = ({ kind }) => {
   const [editing, setEditing] = useState<Rec | null | undefined>(undefined);
   const [viewing, setViewing] = useState<string | null>(null);
   const isFaculty = role === 'FACULTY' || role === 'HOD' || role === 'DEAN';
+  // Leaders open on their department (HOD) or the institution (Dean, Principal, Admin); HODs and Deans can switch to their own
+  const isLeader = role === 'HOD' || role === 'DEAN' || role === 'PRINCIPAL' || role === 'ADMIN';
+  const [mine, setMine] = useState(false);
+  const team = !facultyId && isLeader && !(mine && isFaculty);
+  const teamLabel = role === 'HOD' ? 'My department' : 'All departments';
+  const scope = team ? 'team' : undefined;
   useOpenFromQuery({ course: () => setEditing(null), certification: () => setEditing(null), achievement: () => setEditing(null), award: () => setEditing(null) });
 
   const options = useQuery({ queryKey: ['dossier-options'], queryFn: async () => (await apiClient.get('/dossier/options')).data.data as Options, staleTime: Infinity });
   const list = useQuery({
-    queryKey: ['dossier', kind, facultyId, status, academicYear, category, type],
+    queryKey: ['dossier', kind, facultyId, scope, status, academicYear, category, type],
     queryFn: async () =>
-      (await apiClient.get(`/dossier/${kind}`, { params: { facultyId: facultyId || undefined, status: status || undefined, academicYear: academicYear || undefined, category: category || undefined, kind: type || undefined } })).data.data as Rec[],
+      (await apiClient.get(`/dossier/${kind}`, { params: { facultyId: facultyId || undefined, scope, status: status || undefined, academicYear: academicYear || undefined, category: category || undefined, kind: type || undefined } })).data.data as Rec[],
   });
   const stats = useQuery({
-    queryKey: ['dossier-course-stats', facultyId],
-    queryFn: async () => (await apiClient.get('/dossier/courses/stats', { params: { facultyId: facultyId || undefined } })).data.data as Stats,
+    queryKey: ['dossier-course-stats', facultyId, scope],
+    queryFn: async () => (await apiClient.get('/dossier/courses/stats', { params: { facultyId: facultyId || undefined, scope } })).data.data as Stats,
     enabled: isCourse,
   });
   const refresh = () => {
@@ -472,7 +478,9 @@ export const DossierRecordsPage: React.FC<{ kind: Kind }> = ({ kind }) => {
           <p className="fd-muted">
             {facultyId
               ? `Records of ${items[0]?.facultyName ?? 'this faculty member'}. Only verified records count in reports and rankings.`
-              : isCourse
+              : team
+                ? `Submitted records of ${role === 'HOD' ? 'faculty in your department' : 'faculty across the institution'}. Drafts stay private until their owner submits them; open a record to review it.`
+                : isCourse
                 ? 'Online courses, training programmes and professional certifications you have completed. Attach the certificate and submit; your HOD verifies it.'
                 : 'Awards, honours, memberships, editorial roles, invited talks and responsibilities. Submit each with its evidence for verification.'}
           </p>
@@ -483,7 +491,17 @@ export const DossierRecordsPage: React.FC<{ kind: Kind }> = ({ kind }) => {
               Open dossier
             </Link>
           )}
-          {!facultyId && isFaculty && options.data && (
+          {!facultyId && isLeader && isFaculty && (
+            <div className="ds-toggle" role="group" aria-label="Whose records">
+              <button type="button" className={`fd-btn ${team ? 'fd-primary' : ''}`} aria-pressed={team} onClick={() => setMine(false)}>
+                {teamLabel}
+              </button>
+              <button type="button" className={`fd-btn ${!team ? 'fd-primary' : ''}`} aria-pressed={!team} onClick={() => setMine(true)}>
+                My records
+              </button>
+            </div>
+          )}
+          {!facultyId && !team && isFaculty && options.data && (
             <button type="button" className="fd-btn fd-primary" onClick={() => setEditing(null)}>
               <i className="bi bi-plus-lg" aria-hidden /> Add {isCourse ? 'course' : 'achievement'}
             </button>
@@ -530,7 +548,7 @@ export const DossierRecordsPage: React.FC<{ kind: Kind }> = ({ kind }) => {
         <div className="ds-filters">
           <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Status">
             <option value="">All statuses</option>
-            {Object.entries(STATUS_LABEL).map(([k, v]) => (
+            {Object.entries(STATUS_LABEL).filter(([k]) => !team || k !== 'DRAFT').map(([k, v]) => (
               <option key={k} value={k}>
                 {v}
               </option>
@@ -578,6 +596,7 @@ export const DossierRecordsPage: React.FC<{ kind: Kind }> = ({ kind }) => {
           <table className="fd-table">
             <thead>
               <tr>
+                {team && <th>Faculty</th>}
                 <th>Title</th>
                 <th>{isCourse ? 'Provider' : 'Body'}</th>
                 <th>{isCourse ? 'Type' : 'Category'}</th>
@@ -590,27 +609,28 @@ export const DossierRecordsPage: React.FC<{ kind: Kind }> = ({ kind }) => {
             <tbody>
               {list.isLoading && (
                 <tr>
-                  <td colSpan={7} className="fd-muted">
+                  <td colSpan={8} className="fd-muted">
                     Loading…
                   </td>
                 </tr>
               )}
               {list.isError && (
                 <tr>
-                  <td colSpan={7} className="fd-error">
+                  <td colSpan={8} className="fd-error">
                     {formatErrorMessage(list.error, 'Records could not be loaded.')}
                   </td>
                 </tr>
               )}
               {list.data && items.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="fd-muted">
+                  <td colSpan={8} className="fd-muted">
                     Nothing recorded yet{status || academicYear || category || type ? ' for these filters' : ''}.
                   </td>
                 </tr>
               )}
               {items.map((r) => (
                 <tr key={r._id} className="ds-row" onClick={() => setViewing(r._id)}>
+                  {team && <td>{r.facultyName}</td>}
                   <td>
                     <button type="button" className="ds-title" onClick={() => setViewing(r._id)}>
                       {r.title}

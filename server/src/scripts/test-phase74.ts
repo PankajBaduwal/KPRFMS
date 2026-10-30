@@ -147,6 +147,21 @@ async function run() {
     const verifiedHours = (await inA(() => FacultyCourse.find({ facultyId: profile._id, status: 'VERIFIED' }).lean())).reduce((n, c) => n + (c.durationHours ?? 0), 0);
     assert(stats.status === 200 && stats.data?.verified?.hours === verifiedHours, 'Course statistics match the verified records', { api: stats.data?.verified, verifiedHours });
 
+    console.log('\n--- Department and institution views ---');
+    const privateDraft = await call(fac.token, 'POST', '/dossier/courses', { kind: 'COURSE', title: 'P74 private draft', provider: 'NPTEL', completionDate: '2026-08-10' });
+    created.courses.push(String(privateDraft.data?._id));
+    const facTeam = await call(fac.token, 'GET', '/dossier/courses?scope=team');
+    assert(facTeam.status === 403, 'A faculty member cannot list everyone’s records', facTeam.status);
+    const hodTeam = await call(hod.token, 'GET', '/dossier/courses?scope=team');
+    const hodIds = (hodTeam.data ?? []).map((r: any) => String(r._id));
+    assert(hodTeam.status === 200 && hodIds.includes(courseId), 'The HOD’s department view lists faculty records', hodTeam.status);
+    assert(!hodIds.includes(String(privateDraft.data?._id)), 'Drafts stay private in the department view');
+    assert((hodTeam.data ?? []).every((r: any) => String(r.departmentId) === String(profile.departmentId)), 'The HOD sees only their own department');
+    const deanTeam = await call(dean.token, 'GET', '/dossier/courses?scope=team');
+    assert(deanTeam.status === 200 && (deanTeam.data ?? []).some((r: any) => String(r._id) === courseId), 'The Dean’s institution view lists it too', deanTeam.status);
+    const hodStats = await call(hod.token, 'GET', '/dossier/courses/stats?scope=team');
+    assert(hodStats.status === 200 && hodStats.data?.verified?.hours >= verifiedHours, 'Department course statistics are available to the HOD', hodStats.data?.verified);
+
     console.log('\n--- The unified approval queue ---');
     const qDraft = await call(fac.token, 'POST', '/dossier/courses', { kind: 'CERTIFICATION', title: 'P74 queue cert', provider: 'AWS', completionDate: '2026-08-20', documentIds: [String(doc._id)] });
     const qId = String(qDraft.data?._id);

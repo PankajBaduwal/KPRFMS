@@ -10,6 +10,7 @@
 .ds-upload { align-self: flex-start; display: inline-flex !important; flex-direction: row !important; }
 .ds-link { border: 0; background: none; color: #1d4ed8; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; padding: 0 4px; }
 .ds-link:hover { text-decoration: underline; }
+.ds-toggle { display: inline-flex; gap: 4px; }
 .ds-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
 .ds-filters select { border: 1px solid var(--color-border, #e2e8f0); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 0.82rem; background: #fff; color: inherit; }
 .ds-row { cursor: pointer; }

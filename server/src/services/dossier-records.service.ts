@@ -87,6 +87,36 @@ function canReview(user: AuthenticatedUser, rec: { userId: unknown; departmentId
   return user.role === ROLES.HOD && Boolean(user.departmentId) && String(rec.departmentId) === user.departmentId;
 }
 
+const LEADERS: string[] = [ROLES.HOD, ROLES.DEAN, ROLES.PRINCIPAL, ROLES.ADMIN];
+
+/**
+ * Whose records a list or statistic covers: one faculty member (facultyId, or the caller), or
+ * with scope=team the HOD's department / the whole institution for Dean, Principal and Admin.
+ * Team views leave out drafts, which stay private to their owner until submitted.
+ */
+async function recordScope(user: AuthenticatedUser, q: { facultyId?: string; scope?: string; departmentId?: string }): Promise<Record<string, unknown>> {
+  if (q.facultyId) {
+    if (!Types.ObjectId.isValid(q.facultyId)) throw AppError.badRequest('Invalid faculty.');
+    const f = await Faculty.findById(q.facultyId).select('departmentId userId').lean();
+    if (!f) throw AppError.notFound('Faculty not found.');
+    if (String(f.userId) !== user.id && !canOversee(user, f.departmentId)) throw AppError.forbidden('You cannot view this faculty member’s records.');
+    return { facultyId: f._id };
+  }
+  if (q.scope === 'team') {
+    if (!LEADERS.includes(user.role)) throw AppError.forbidden('Only HODs, Deans, the Principal and admins can view everyone’s records.');
+    const filter: Record<string, unknown> = { status: { $ne: RECORD_WORKFLOW.DRAFT } };
+    if (user.role === ROLES.HOD) {
+      if (!user.departmentId) throw AppError.forbidden('Your account is not linked to a department.');
+      filter.departmentId = new Types.ObjectId(user.departmentId);
+    } else if (q.departmentId) {
+      if (!Types.ObjectId.isValid(q.departmentId)) throw AppError.badRequest('Invalid department.');
+      filter.departmentId = new Types.ObjectId(q.departmentId);
+    }
+    return filter;
+  }
+  return { facultyId: (await ownFaculty(user))._id };
+}
+
 const pick = (body: Record<string, unknown>, fields: string[]) =>
   Object.fromEntries(Object.entries(body).filter(([k, v]) => fields.includes(k) && v !== undefined));
 
@@ -116,17 +146,8 @@ const event = (user: AuthenticatedUser, action: string, from: string | undefined
 export const dossierRecordsService = {
   async list(user: AuthenticatedUser, kind: string, q: Record<string, string | undefined>) {
     const cfg = kindOf(kind);
-    const filter: Record<string, unknown> = {};
-    if (q.facultyId) {
-      if (!Types.ObjectId.isValid(q.facultyId)) throw AppError.badRequest('Invalid faculty.');
-      const f = await Faculty.findById(q.facultyId).select('departmentId userId').lean();
-      if (!f) throw AppError.notFound('Faculty not found.');
-      if (String(f.userId) !== user.id && !canOversee(user, f.departmentId)) throw AppError.forbidden('You cannot view this faculty member’s records.');
-      filter.facultyId = f._id;
-    } else {
-      filter.facultyId = (await ownFaculty(user))._id;
-    }
-    if (q.status) filter.status = q.status;
+    const filter = await recordScope(user, q);
+    if (q.status) filter.status = filter.status && q.status === RECORD_WORKFLOW.DRAFT ? { $in: [] } : q.status;
     if (q.academicYear) filter.academicYear = q.academicYear;
     if (q.category) filter.category = q.category;
     if (q.kind && kind === 'course') filter.kind = q.kind;
@@ -136,16 +157,10 @@ export const dossierRecordsService = {
   },
 
   /** Course statistics: self-reported (any non-rejected) and verified counted separately. */
-  async courseStats(user: AuthenticatedUser, facultyId?: string, currentYear?: string) {
-    let fid: Types.ObjectId;
-    if (facultyId) {
-      const f = await Faculty.findById(facultyId).select('departmentId userId').lean();
-      if (!f) throw AppError.notFound('Faculty not found.');
-      if (String(f.userId) !== user.id && !canOversee(user, f.departmentId)) throw AppError.forbidden('You cannot view this faculty member’s records.');
-      fid = f._id as Types.ObjectId;
-    } else fid = (await ownFaculty(user))._id as Types.ObjectId;
+  async courseStats(user: AuthenticatedUser, q: { facultyId?: string; scope?: string; departmentId?: string }, currentYear?: string) {
+    const scope = await recordScope(user, q);
     const ay = currentYear || computeAcademicYearForDate();
-    const rows = await FacultyCourse.find({ facultyId: fid, status: { $ne: RECORD_WORKFLOW.REJECTED } }).select('kind status durationHours academicYear').lean();
+    const rows = (await FacultyCourse.find(scope).select('kind status durationHours academicYear').lean()).filter((r) => r.status !== RECORD_WORKFLOW.REJECTED);
     const verified = rows.filter((r) => r.status === RECORD_WORKFLOW.VERIFIED);
     const hours = (list: typeof rows) => list.reduce((n, r) => n + (r.durationHours || 0), 0);
     const byYear: Record<string, { recorded: number; verified: number }> = {};

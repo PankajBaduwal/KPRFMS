@@ -64,7 +64,7 @@ router.get('/departments', requireRole(ROLES.DEAN, ROLES.PRINCIPAL, ROLES.ADMIN)
   'Department comparison.',
 ]));
 
-router.get('/courses/stats', h(async (req) => [await dossierRecordsService.courseStats(req.user!, str(req.query.facultyId), await getCurrentAcademicYear()), 'Course statistics.']));
+router.get('/courses/stats', h(async (req) => [await dossierRecordsService.courseStats(req.user!, { facultyId: str(req.query.facultyId), scope: str(req.query.scope), departmentId: str(req.query.departmentId) }, await getCurrentAcademicYear()), 'Course statistics.']));
 
 // Records: kind is "course" or "achievement"
 const reviewSchema = z.object({ action: z.enum(['VERIFY', 'RETURN', 'REJECT']), comment: z.string().trim().max(1000).optional() });
