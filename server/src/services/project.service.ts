@@ -13,6 +13,7 @@ import type {
   ProjectFilterQuery,
 } from '../validators/project.validator.js';
 import { STATUS_LABELS, VERIFICATION, initialVerification, mayMove, nextStatuses, requirementsFor, type Actor, type FundingStatus } from './funding-lifecycle.js';
+import { notifySubmitted } from './workflow-notify.js';
 
 export class ProjectService {
   /**
@@ -338,6 +339,10 @@ export class ProjectService {
     }
 
     await project.save();
+    // The investigator's change now needs verification by the HOD
+    if (project.verificationStatus === VERIFICATION.SUBMITTED) {
+      await notifySubmitted({ recordType: 'PROJECT', recordId: String(project._id), title: project.title, ownerUserId: String(project.userId), ownerName: user.name, departmentId: project.departmentId });
+    }
 
     await this.logAudit(to === PROJECT_STATUS.SANCTIONED ? AUDIT_ACTIONS.PROJECT_SANCTIONED : AUDIT_ACTIONS.PROJECT_STATUS_CHANGED, user.id, req, {
       projectId: project._id,

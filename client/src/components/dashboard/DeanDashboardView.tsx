@@ -107,7 +107,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
             <Link to={ROUTES.APPROVALS} className="btn-primary-custom btn-sm" style={{ textDecoration: 'none' }}>
               <i className="bi bi-check2-square" style={{ marginRight: 6 }} />
-              Approvals ({data.pendingApprovals.total})
+              Approvals queue ({data.pendingApprovals.total})
             </Link>
             <Link to={ROUTES.DEAN_CONSOLE} className="btn-outline-custom btn-sm" style={{ textDecoration: 'none' }}>
               <i className="bi bi-sliders" style={{ marginRight: 6 }} />
@@ -279,7 +279,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             onClick={() => setActiveDeanTab('APPROVALS')}
           >
             <i className="bi bi-check2-circle" />
-            <span>Approvals ({data.pendingApprovals.total})</span>
+            <span>Pending reviews ({data.pendingApprovals.total})</span>
           </button>
           <button
             type="button"
@@ -606,13 +606,13 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
           <div>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)' }}>
               <i className="bi bi-check2-circle" style={{ color: 'var(--color-warning)' }} />
-              Waiting for your approval
+              Pending reviews across departments
               <span className="badge-custom badge-warning" style={{ fontSize: '0.75rem', fontWeight: 700 }}>
                 {data.pendingApprovals.total} Pending Review
               </span>
             </h3>
             <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginTop: 2 }}>
-              Appraisals, high-impact research publications, and external grant applications requiring Dean verification.
+              Appraisals at the Dean stage are yours to decide. Publications and projects are verified by each department's HOD first; you can also verify them from the queue.
             </div>
           </div>
 
@@ -627,7 +627,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginTop: 4 }}>
               {data.pendingApprovals.appraisals}
             </div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>Awaiting Dean recommendation</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>At the Dean stage (yours)</div>
           </div>
 
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
@@ -635,7 +635,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginTop: 4 }}>
               {data.pendingApprovals.publications}
             </div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>Scopus / SCI verification</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>Awaiting HOD verification, all departments</div>
           </div>
 
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
@@ -643,7 +643,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text)', marginTop: 4 }}>
               {data.pendingApprovals.projects}
             </div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>Sanction order endorsements</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>Project records awaiting verification</div>
           </div>
         </div>
       </section>

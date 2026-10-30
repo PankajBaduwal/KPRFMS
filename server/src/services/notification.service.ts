@@ -13,6 +13,7 @@ import {
 } from '../types/notification.js';
 import { AppError } from '../utils/AppError.js';
 import { logger } from '../utils/logger.js';
+import { recordLink } from '../utils/recordLinks.js';
 
 export const DEFAULT_PREFERENCES: INotificationPreferences = {
   newSubmission: true,
@@ -313,7 +314,7 @@ export const notificationService = {
       message: `${opts.facultyName} has submitted "${opts.recordTitle}" for your review.`,
       relatedEntityId: opts.relatedEntityId,
       relatedEntityType: opts.recordType,
-      actionUrl: '/portal/approvals',
+      actionUrl: opts.relatedEntityId ? `/portal/approvals?status=PENDING&open=${opts.recordType}:${opts.relatedEntityId}` : '/portal/approvals',
     });
   },
 
@@ -374,7 +375,7 @@ export const notificationService = {
       }`,
       relatedEntityId: opts.relatedEntityId,
       relatedEntityType: opts.recordType,
-      actionUrl: `/portal/${opts.recordType.toLowerCase().replace(/_/g, '-')}`,
+      actionUrl: recordLink(opts.recordType),
     });
   },
 

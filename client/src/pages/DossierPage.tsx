@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { apiClient } from '../api/client';
 import { formatErrorMessage } from '../utils/errorHandler';
 import '../styles/funding.css';
@@ -76,6 +76,11 @@ export const DossierPage: React.FC = () => {
     queryFn: async () => (await apiClient.get('/dossier/summary', { params: { facultyId: facultyId || undefined } })).data.data as Summary,
   });
   const d = q.data;
+  // /portal/dossier#submissions scrolls to the records list once it has loaded
+  const { hash } = useLocation();
+  React.useEffect(() => {
+    if (d && hash) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
+  }, [d, hash]);
   if (q.isLoading) return <p className="fd-muted">Loading the dossier…</p>;
   if (q.isError || !d) return <p className="fd-error">{formatErrorMessage(q.error, 'The dossier could not be loaded.')}</p>;
   const id = d.identity;
@@ -223,7 +228,7 @@ export const DossierPage: React.FC = () => {
         </div>
       </div>
 
-      <section className="fd-card">
+      <section className="fd-card" id="submissions">
         <h2>{d.own ? 'My records & verification status' : 'Records awaiting action'}</h2>
         {d.openRecords.length === 0 ? (
           <p className="fd-muted">Nothing is waiting: every submitted record has been decided.</p>

@@ -16,6 +16,7 @@ import type {
   ReviewPatentInput,
   PatentFilterQuery,
 } from '../validators/patent.validator.js';
+import { notifyDecision, notifySubmitted } from './workflow-notify.js';
 
 export class PatentService {
   private async getFacultyForUser(user: AuthenticatedUser) {
@@ -146,6 +147,7 @@ export class PatentService {
       patent.reviewRemarks = remarks;
     }
     await patent.save();
+    await notifySubmitted({ recordType: 'PATENT', recordId: String(patent._id), title: patent.title, ownerUserId: String(patent.userId), ownerName: user.name, departmentId: patent.departmentId, resubmitted: false });
 
     await this.logAudit(req, user, AUDIT_ACTIONS.PATENT_SUBMITTED, {
       patentId: patent._id.toString(),
@@ -189,6 +191,7 @@ export class PatentService {
     }
 
     await patent.save();
+    await notifyDecision({ recordType: 'PATENT', recordId: String(patent._id), title: patent.title, ownerUserId: String(patent.userId), status: input.status, remarks: input.reviewRemarks, reviewer: { id: reviewer.id, name: reviewer.name, role: reviewer.role } });
 
     await this.logAudit(req, reviewer, AUDIT_ACTIONS.PATENT_REVIEWED, {
       patentId: patent._id.toString(),

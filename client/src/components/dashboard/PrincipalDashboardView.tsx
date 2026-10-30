@@ -324,7 +324,7 @@ export const PrincipalDashboardView: React.FC<PrincipalDashboardViewProps> = ({ 
               </span>
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-              <strong>{data.majorPendingApprovals.appraisals}</strong> Appraisals &bull; <strong>{data.majorPendingApprovals.highValueGrants}</strong> Major Grants
+              <strong>{data.majorPendingApprovals.appraisals}</strong> appraisals for your final approval &bull; <strong>{data.majorPendingApprovals.highValueGrants}</strong> large proposals with funding agencies
             </div>
           </div>
           <div style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>

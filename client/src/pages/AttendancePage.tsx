@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { attendanceService } from '../services/attendance.service';
 import { facultyService } from '../services/faculty.service';
@@ -58,9 +59,16 @@ export const AttendancePage: React.FC = () => {
   const canManage = ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'].includes(user?.role || '');
 
   // Active View Tab
+  // Sidebar and dashboard links open a view directly (?tab=monthly, ?tab=corrections)
+  const [searchParams] = useSearchParams();
+  const urlView = searchParams.get('view') === 'calendar' ? 'monthly' : searchParams.get('tab');
   const [activeTab, setActiveTab] = useState<
     'daily' | 'monthly' | 'yearly' | 'department' | 'corrections' | 'summaries'
-  >(isLeadership ? 'summaries' : isHOD ? 'department' : 'daily');
+  >(
+    urlView && ['daily', 'monthly', 'yearly', 'department', 'corrections', 'summaries'].includes(urlView)
+      ? (urlView as 'daily')
+      : isLeadership ? 'summaries' : isHOD ? 'department' : 'daily'
+  );
 
   // Baseline data
   const [facultyList, setFacultyList] = useState<FacultyProfile[]>([]);

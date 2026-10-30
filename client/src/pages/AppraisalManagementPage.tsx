@@ -35,7 +35,9 @@ export const AppraisalManagementPage: React.FC = () => {
   // State
   // ?tab=review (from the HOD dashboard) opens the review queue
   const [searchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState<'MY_APPRAISAL' | 'REVIEW_QUEUE' | 'ANALYTICS' | 'CYCLES'>(searchParams.get('tab') === 'review' ? 'REVIEW_QUEUE' : 'MY_APPRAISAL');
+  const [activeTab, setActiveTab] = useState<'MY_APPRAISAL' | 'REVIEW_QUEUE' | 'ANALYTICS' | 'CYCLES'>(
+    ({ review: 'REVIEW_QUEUE', analytics: 'ANALYTICS', cycles: 'CYCLES' } as const)[searchParams.get('tab') as 'review'] ?? 'MY_APPRAISAL'
+  );
   const [activeCycle, setActiveCycle] = useState<IAppraisalCycle | null>(null);
   const [allCycles, setAllCycles] = useState<IAppraisalCycle[]>([]);
   const [myAppraisal, setMyAppraisal] = useState<IFacultyAppraisal | null>(null);

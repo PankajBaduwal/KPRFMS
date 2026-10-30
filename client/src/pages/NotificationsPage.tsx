@@ -7,6 +7,7 @@ import { EmptyState } from '../components/EmptyState';
 import { SkeletonCard } from '../components/Skeleton';
 import { Pagination } from '../components/Pagination';
 import { NotificationDetailModal } from '../components/NotificationDetailModal';
+import { notificationLink } from '../utils/notificationLink';
 import type {
   NotificationItem,
   NotificationPreferences,
@@ -892,12 +893,12 @@ export const NotificationsPage: React.FC = () => {
                             <span>Details</span>
                           </button>
 
-                          {item.actionUrl && (
+                          {notificationLink(item) && (
                             <button
                               type="button"
                               onClick={() => {
                                 if (!item.isRead) handleMarkAsRead(item._id);
-                                navigate(item.actionUrl!);
+                                navigate(notificationLink(item)!);
                               }}
                               style={{
                                 display: 'inline-flex',

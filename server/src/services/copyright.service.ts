@@ -16,6 +16,7 @@ import type {
   ReviewCopyrightInput,
   CopyrightFilterQuery,
 } from '../validators/copyright.validator.js';
+import { notifyDecision, notifySubmitted } from './workflow-notify.js';
 
 export class CopyrightService {
   private async getFacultyForUser(user: AuthenticatedUser) {
@@ -143,6 +144,7 @@ export class CopyrightService {
       copyright.reviewRemarks = remarks;
     }
     await copyright.save();
+    await notifySubmitted({ recordType: 'COPYRIGHT', recordId: String(copyright._id), title: copyright.title, ownerUserId: String(copyright.userId), ownerName: user.name, departmentId: copyright.departmentId, resubmitted: false });
 
     await this.logAudit(req, user, AUDIT_ACTIONS.COPYRIGHT_SUBMITTED, {
       copyrightId: copyright._id.toString(),
@@ -186,6 +188,7 @@ export class CopyrightService {
     }
 
     await copyright.save();
+    await notifyDecision({ recordType: 'COPYRIGHT', recordId: String(copyright._id), title: copyright.title, ownerUserId: String(copyright.userId), status: input.status, remarks: input.reviewRemarks, reviewer: { id: reviewer.id, name: reviewer.name, role: reviewer.role } });
 
     await this.logAudit(req, reviewer, AUDIT_ACTIONS.COPYRIGHT_REVIEWED, {
       copyrightId: copyright._id.toString(),

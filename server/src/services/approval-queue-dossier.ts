@@ -7,7 +7,6 @@ import { AppError } from '../utils/AppError.js';
 import { ROLES } from '../permissions/roles.js';
 import { dossierRecordsService } from './dossier-records.service.js';
 import { facultyService } from './faculty.service.js';
-import { notificationService } from './notification.service.js';
 import type { AuthenticatedUser } from '../types/index.js';
 import type { UnifiedApprovalRecord, UnifiedStatus } from './approval-queue.service.js';
 
@@ -209,17 +208,7 @@ export async function dossierApprovalAction(p: {
     newStatus = p.action === 'APPROVE' ? 'VERIFIED' : p.action === 'REJECT' ? 'REJECTED' : 'RETURNED_FOR_CORRECTION';
     const review = p.recordType === 'QUALIFICATION' ? facultyService.reviewQualification.bind(facultyService) : facultyService.reviewExperience.bind(facultyService);
     await review(String(faculty._id), p.recordId, newStatus as any, comment, user);
-    await notificationService.notifyApprovalDecision({
-      recipientId: faculty.userId,
-      senderId: new Types.ObjectId(user.id),
-      reviewerName: user.name,
-      reviewerRole: user.role,
-      recordType: p.recordType,
-      recordTitle: p.recordType === 'QUALIFICATION' ? item.degree : `${item.designation} — ${item.organization}`,
-      decision: p.action === 'APPROVE' ? 'APPROVED' : p.action === 'RETURN_FOR_CORRECTION' ? 'RETURNED' : 'REJECTED',
-      remarks: comment,
-      relatedEntityId: p.recordId,
-    });
+    // The review itself notifies the faculty member
   }
   return {
     success: true,

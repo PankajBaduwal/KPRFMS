@@ -16,6 +16,7 @@ import type {
   ReviewConsultancyInput,
   ConsultancyFilterQuery,
 } from '../validators/consultancy.validator.js';
+import { notifyDecision, notifySubmitted } from './workflow-notify.js';
 
 export class ConsultancyService {
   private async getFacultyForUser(user: AuthenticatedUser) {
@@ -145,6 +146,7 @@ export class ConsultancyService {
       consultancy.reviewRemarks = remarks;
     }
     await consultancy.save();
+    await notifySubmitted({ recordType: 'CONSULTANCY', recordId: String(consultancy._id), title: consultancy.projectTitle, ownerUserId: String(consultancy.userId), ownerName: user.name, departmentId: consultancy.departmentId, resubmitted: false });
 
     await this.logAudit(req, user, AUDIT_ACTIONS.CONSULTANCY_SUBMITTED, {
       consultancyId: consultancy._id.toString(),
@@ -188,6 +190,7 @@ export class ConsultancyService {
     }
 
     await consultancy.save();
+    await notifyDecision({ recordType: 'CONSULTANCY', recordId: String(consultancy._id), title: consultancy.projectTitle, ownerUserId: String(consultancy.userId), status: input.status, remarks: input.reviewRemarks, reviewer: { id: reviewer.id, name: reviewer.name, role: reviewer.role } });
 
     await this.logAudit(req, reviewer, AUDIT_ACTIONS.CONSULTANCY_REVIEWED, {
       consultancyId: consultancy._id.toString(),

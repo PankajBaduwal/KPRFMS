@@ -5,6 +5,7 @@ import { Button } from './Button';
 import { Badge } from './Badge';
 import type { NotificationItem } from '../types/notification';
 import { getNotificationMeta, formatFullTimestamp, formatRelativeTime } from '../utils/notificationTypes';
+import { notificationLink } from '../utils/notificationLink';
 
 export interface NotificationDetailModalProps {
   isOpen: boolean;
@@ -32,8 +33,9 @@ export const NotificationDetailModal: React.FC<NotificationDetailModalProps> = (
       onMarkAsRead(notification._id);
     }
     onClose();
-    if (notification.actionUrl) {
-      navigate(notification.actionUrl);
+    const link = notificationLink(notification);
+    if (link) {
+      navigate(link);
     }
   };
 
@@ -68,14 +70,14 @@ export const NotificationDetailModal: React.FC<NotificationDetailModalProps> = (
             <Button variant="ghost" size="sm" onClick={onClose}>
               Close
             </Button>
-            {notification.actionUrl && (
+            {notificationLink(notification) && (
               <Button
                 variant="primary"
                 size="sm"
                 icon={<i className="bi bi-box-arrow-up-right" />}
                 onClick={handleActionClick}
               >
-                Open Linked Resource
+                Open
               </Button>
             )}
           </div>

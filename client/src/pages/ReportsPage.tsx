@@ -32,8 +32,14 @@ export const ReportsPage: React.FC = () => {
   // Framework & Report Type Selection
   // Links can pre-select a framework and report (?framework=NBA&type=PUBLICATIONS)
   const [searchParams] = useSearchParams();
-  const urlFramework = searchParams.get('framework') as AccreditationFramework | null;
-  const urlType = searchParams.get('type') as ReportType | null;
+  const TAB_DEFAULTS: Record<string, { type?: ReportType; framework?: AccreditationFramework }> = {
+    faculty: { type: REPORT_TYPES.FACULTY_PROFILE },
+    research: { type: REPORT_TYPES.PUBLICATIONS },
+    accreditation: { framework: ACCREDITATION_FRAMEWORKS.NAAC },
+  };
+  const tabDefault = TAB_DEFAULTS[searchParams.get('tab') ?? ''] ?? {};
+  const urlFramework = (searchParams.get('framework') as AccreditationFramework | null) ?? tabDefault.framework ?? null;
+  const urlType = (searchParams.get('type') as ReportType | null) ?? tabDefault.type ?? null;
   const [selectedFramework, setSelectedFramework] = useState<AccreditationFramework>(
     urlFramework && Object.values(ACCREDITATION_FRAMEWORKS).includes(urlFramework) ? urlFramework : ACCREDITATION_FRAMEWORKS.NAAC
   );

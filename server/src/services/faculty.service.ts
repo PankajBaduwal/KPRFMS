@@ -19,6 +19,7 @@ import { AUDIT_ACTIONS } from '../models/AuditLog.js';
 import { Request } from 'express';
 import { z } from 'zod';
 import { qualificationSchema, experienceSchema } from '../validators/faculty.validator.js';
+import { notifyDecision, notifySubmitted } from './workflow-notify.js';
 
 export function calculateDuration(
   startDate: Date | string,
@@ -683,6 +684,7 @@ export class FacultyService {
     qual.verificationStatus = RECORD_STATUS.SUBMITTED;
     qual.submittedAt = new Date();
     await faculty.save();
+    await notifySubmitted({ recordType: 'QUALIFICATION', recordId: String(qual._id), title: qual.degree, ownerUserId: String(faculty.userId), ownerName: faculty.name, departmentId: faculty.departmentId, resubmitted: prevStatus === RECORD_STATUS.RETURNED_FOR_CORRECTION });
 
     await recordAudit({
       userId,
@@ -766,6 +768,7 @@ export class FacultyService {
     qual.reviewedAt = new Date();
 
     await faculty.save();
+    await notifyDecision({ recordType: 'QUALIFICATION', recordId: String(qual._id), title: qual.degree, ownerUserId: String(faculty.userId), status, remarks, reviewer: { id: requestingUser.id, name: requestingUser.name, role: requestingUser.role } });
 
     await recordAudit({
       userId: requestingUser.id,
@@ -931,6 +934,7 @@ export class FacultyService {
     exp.verificationStatus = RECORD_STATUS.SUBMITTED;
     exp.submittedAt = new Date();
     await faculty.save();
+    await notifySubmitted({ recordType: 'EXPERIENCE', recordId: String(exp._id), title: `${exp.designation}, ${exp.organization}`, ownerUserId: String(faculty.userId), ownerName: faculty.name, departmentId: faculty.departmentId, resubmitted: prevStatus === RECORD_STATUS.RETURNED_FOR_CORRECTION });
 
     await recordAudit({
       userId,
@@ -984,6 +988,7 @@ export class FacultyService {
     exp.reviewedAt = new Date();
 
     await faculty.save();
+    await notifyDecision({ recordType: 'EXPERIENCE', recordId: String(exp._id), title: `${exp.designation}, ${exp.organization}`, ownerUserId: String(faculty.userId), status, remarks, reviewer: { id: requestingUser.id, name: requestingUser.name, role: requestingUser.role } });
 
     await recordAudit({
       userId: requestingUser.id,

@@ -32,6 +32,7 @@ import { dossierService } from './dossier.service.js';
 import type { AuthenticatedUser } from '../types/index.js';
 import { FacultyCourse } from '../models/FacultyCourse.js';
 import { FacultyAchievement } from '../models/FacultyAchievement.js';
+import { REVIEW_SLA_DAYS as OVERDUE_REVIEW_DAYS } from './hod-overview.service.js';
 
 export interface ActionItem {
   id: string;
@@ -837,7 +838,7 @@ export class DashboardService {
     const [totalFaculty, activeFaculty, professorsCount, assocProfCount, asstProfCount] = await Promise.all([
       Faculty.countDocuments({ departmentId: departmentId as any }),
       Faculty.countDocuments({ departmentId: departmentId as any, status: { $ne: 'INACTIVE' } }),
-      Faculty.countDocuments({ departmentId: departmentId as any, designation: /Professor/i }),
+      Faculty.countDocuments({ departmentId: departmentId as any, $and: [{ designation: /Professor/i }, { designation: { $not: /Associate|Assistant/i } }] }),
       Faculty.countDocuments({ departmentId: departmentId as any, designation: /Associate Professor/i }),
       Faculty.countDocuments({ departmentId: departmentId as any, designation: /Assistant Professor/i }),
     ]);
@@ -1036,7 +1037,8 @@ export class DashboardService {
       Project.find({ ...verifiedFundedMatch(), sanctionedAmount: { $gt: 0 } }).lean(),
       Patent.find().lean(),
       PhdScholar.find().lean(),
-      FacultyAppraisal.countDocuments({ status: { $in: ['HOD_REVIEW', 'DEAN_REVIEW'] } }),
+      // Only appraisals at the Dean's own stage
+      FacultyAppraisal.countDocuments({ status: 'DEAN_REVIEW' }),
       Publication.countDocuments({ verificationStatus: { $in: ['SUBMITTED', 'UNDER_REVIEW'] } }),
       Project.countDocuments({ verificationStatus: 'SUBMITTED' }),
     ]);
@@ -1046,7 +1048,7 @@ export class DashboardService {
     allAllocations.forEach((a) => {
       instTotalHours += a.totalHours || (a.lectureHours || 0) + (a.practicalHours || 0);
     });
-    const avgWorkload = activeFaculty > 0 ? Math.round((instTotalHours / activeFaculty) * 10) / 10 : 14.5;
+    const avgWorkload = activeFaculty > 0 ? Math.round((instTotalHours / activeFaculty) * 10) / 10 : 0;
 
     // Cross-department comparison
     const deptComparison = await Promise.all(
@@ -1088,23 +1090,24 @@ export class DashboardService {
       requiredActions.push({
         id: 'act-dean-appraisals',
         type: 'CRITICAL',
-        title: `${pendingAppraisals} Appraisal Reviews Awaiting Dean Stage`,
-        description: 'Complete academic division evaluations for pending faculty performance dossiers.',
+        title: `${pendingAppraisals} faculty appraisal${pendingAppraisals === 1 ? '' : 's'} awaiting your review`,
+        description: 'Endorsed by the HOD and now at the Dean stage.',
         link: '/portal/appraisals?tab=review',
         actionText: 'Review Appraisals',
         badge: `${pendingAppraisals} Appraisals`,
       });
     }
 
-    if (pendingPubs > 0 || pendingProjects > 0) {
+    const deanBacklog = await this.overdueVerificationBacklog();
+    if (deanBacklog.total > 0) {
       requiredActions.push({
-        id: 'act-dean-approvals',
+        id: 'act-dean-backlog',
         type: 'WARNING',
-        title: `${pendingPubs + pendingProjects} Research Submissions in Institutional Review`,
-        description: `${pendingPubs} publications and ${pendingProjects} projects pending institutional clearance.`,
-        link: '/portal/approvals',
-        actionText: 'View Queue',
-        badge: 'Clearance Needed',
+        title: `${deanBacklog.total} faculty submission${deanBacklog.total === 1 ? '' : 's'} waiting over ${OVERDUE_REVIEW_DAYS} days for HOD verification`,
+        description: `By department: ${deanBacklog.byDepartment.map((d) => `${d.code} ${d.count}`).join(', ')}.`,
+        link: '/portal/approvals?status=PENDING&sort=oldest',
+        actionText: 'See delayed approvals',
+        badge: 'Delayed reviews',
       });
     }
 
@@ -1113,7 +1116,7 @@ export class DashboardService {
         id: 'act-dean-nirf',
         type: 'INFO',
         title: `NAAC/NIRF Target: Ph.D. Faculty Ratio at ${phdFacultyPercentage}%`,
-        description: 'Institutional benchmark requires >60% Ph.D. qualified faculty. Review doctoral progression programs.',
+        description: 'Fewer than half of the faculty hold a Ph.D. Review doctoral progression plans.',
         link: '/portal/reports?tab=accreditation',
         actionText: 'Accreditation Report',
         badge: 'Accreditation Metric',
@@ -1163,7 +1166,6 @@ export class DashboardService {
   // 4. PRINCIPAL DASHBOARD
   // =========================================================================
   async getPrincipalDashboard(_userId: string) {
-    const currentYear = await getCurrentAcademicYear();
 
     const [
       totalDepartments,
@@ -1185,7 +1187,8 @@ export class DashboardService {
       Patent.find().lean(),
       StudentProject.countDocuments(),
       PhdScholar.countDocuments(),
-      FacultyAppraisal.countDocuments({ status: { $in: ['DEAN_REVIEW', 'PRINCIPAL_REVIEW'] } }),
+      // Only appraisals at the Principal's own (final) stage
+      FacultyAppraisal.countDocuments({ status: 'PRINCIPAL_REVIEW' }),
       Department.find({ isActive: true }).lean(),
     ]);
 
@@ -1195,7 +1198,7 @@ export class DashboardService {
 
     // Faculty Cadre Ratio
     const [professors, assocProfs, asstProfs] = await Promise.all([
-      Faculty.countDocuments({ designation: /Professor/i }),
+      Faculty.countDocuments({ $and: [{ designation: /Professor/i }, { designation: { $not: /Associate|Assistant/i } }] }),
       Faculty.countDocuments({ designation: /Associate Professor/i }),
       Faculty.countDocuments({ designation: /Assistant Professor/i }),
     ]);
@@ -1223,39 +1226,43 @@ export class DashboardService {
       requiredActions.push({
         id: 'act-prin-appraisals',
         type: 'CRITICAL',
-        title: `${pendingPrincipalAppraisals} Faculty Appraisals Awaiting Final Principal Sign-off`,
-        description: 'Endorse approved annual appraisal scores for increment and promotion clearance.',
+        title: `${pendingPrincipalAppraisals} faculty appraisal${pendingPrincipalAppraisals === 1 ? '' : 's'} awaiting your final approval`,
+        description: 'Endorsed by the HOD and the Dean; your decision completes them.',
         link: '/portal/appraisals?tab=review',
         actionText: 'Authorize Appraisals',
         badge: 'Your approval',
       });
     }
 
+    // Large proposals still with funding agencies (information: the agency decides, not the Principal)
     const highValueProjects = await Project.countDocuments({
-      status: { $in: ['SUBMITTED', 'UNDER_REVIEW'] as any },
-      sanctionedAmount: { $gte: 500000 },
+      status: { $in: ['APPLIED', 'SUBMITTED', 'PENDING', 'UNDER_REVIEW', 'CLARIFICATION_REQUIRED'] as any },
+      requestedAmount: { $gte: 500000 },
     });
     if (highValueProjects > 0) {
       requiredActions.push({
         id: 'act-prin-grants',
-        type: 'WARNING',
-        title: `${highValueProjects} Major Sponsored Research Grant(s) Pending Final Sanction Review`,
-        description: 'High-value external research grants (>₹5L) awaiting your sign-off.',
-        link: '/portal/projects',
-        actionText: 'Review Grants',
-        badge: 'Grant Authorization',
+        type: 'INFO',
+        title: `${highValueProjects} large research proposal${highValueProjects === 1 ? '' : 's'} (5 lakh or more) awaiting agency decisions`,
+        description: 'Submitted to funding agencies; the sanction is recorded when the agency decides.',
+        link: '/portal/funding',
+        actionText: 'View funding pipeline',
+        badge: 'Research funding',
       });
     }
 
-    requiredActions.push({
-      id: 'act-prin-inst',
-      type: 'INFO',
-      title: 'NAAC & NBA readiness',
-      description: `Accreditation criteria compilation for academic year ${currentYear} is ready for your review.`,
-      link: '/portal/reports?tab=accreditation',
-      actionText: 'View Readiness Scorecard',
-      badge: 'Accreditation',
-    });
+    const principalBacklog = await this.overdueVerificationBacklog();
+    if (principalBacklog.total > 0) {
+      requiredActions.push({
+        id: 'act-prin-backlog',
+        type: 'WARNING',
+        title: `${principalBacklog.total} faculty submission${principalBacklog.total === 1 ? '' : 's'} waiting over ${OVERDUE_REVIEW_DAYS} days for HOD verification`,
+        description: `By department: ${principalBacklog.byDepartment.map((d) => `${d.code} ${d.count}`).join(', ')}.`,
+        link: '/portal/approvals?status=PENDING&sort=oldest',
+        actionText: 'See delayed approvals',
+        badge: 'Delayed reviews',
+      });
+    }
 
     const institutionCharts = await dashboardChartsService.institution();
     const pct = (v: number | null) => (v === null ? '—' : `${v}%`);
@@ -1332,7 +1339,7 @@ export class DashboardService {
     ] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ status: USER_STATUS.ACTIVE }),
-      User.countDocuments({ status: { $ne: USER_STATUS.ACTIVE } }),
+      User.countDocuments({ status: { $in: [USER_STATUS.INACTIVE, USER_STATUS.SUSPENDED] } }),
       User.aggregate([{ $group: { _id: '$role', count: { $sum: 1 } } }]),
       Department.countDocuments(),
       Department.countDocuments({ isActive: true }),
@@ -1382,6 +1389,33 @@ export class DashboardService {
       });
     }
 
+    const [pendingRegistrations, departmentsWithoutHod] = await Promise.all([
+      User.countDocuments({ status: USER_STATUS.PENDING }),
+      Department.countDocuments({ isActive: true, $or: [{ hodId: null }, { hodId: { $exists: false } }] }),
+    ]);
+    if (pendingRegistrations > 0) {
+      requiredActions.push({
+        id: 'act-admin-registrations',
+        type: 'CRITICAL',
+        title: `${pendingRegistrations} new registration${pendingRegistrations === 1 ? '' : 's'} awaiting approval`,
+        description: 'Faculty who registered themselves cannot sign in until an administrator approves the account.',
+        link: '/portal/admin-console?tab=users',
+        actionText: 'Review registrations',
+        badge: 'Registrations',
+      });
+    }
+    if (departmentsWithoutHod > 0) {
+      requiredActions.push({
+        id: 'act-admin-hod',
+        type: 'WARNING',
+        title: `${departmentsWithoutHod} active department${departmentsWithoutHod === 1 ? ' has' : 's have'} no HOD assigned`,
+        description: 'Faculty submissions in these departments have no one to verify them.',
+        link: '/portal/admin-console?tab=departments',
+        actionText: 'Assign HOD',
+        badge: 'Departments',
+      });
+    }
+
     if (inactiveUsers > 0) {
       requiredActions.push({
         id: 'act-admin-inactive',
@@ -1406,15 +1440,6 @@ export class DashboardService {
       });
     }
 
-    requiredActions.push({
-      id: 'act-admin-backup',
-      type: 'INFO',
-      title: 'Database & Security Audit Logging Active',
-      description: `MongoDB operational. ${recentAuditLogs.length} recent system security events logged.`,
-      link: '/portal/audit-logs',
-      actionText: 'View Audit Logs',
-      badge: 'Security Normal',
-    });
 
     return {
       role: 'ADMIN',
@@ -1443,7 +1468,7 @@ export class DashboardService {
       },
       configuration: {
         activeAcademicYear: activeYearDoc?.name || (await getCurrentAcademicYear()),
-        activeSemester: activeSemDoc?.name || 'Current Active Semester',
+        activeSemester: activeSemDoc?.name || '—',
         appraisalCycleActive: !!activeCycle,
         activeAppraisalTitle: activeCycle?.name || 'None active',
       },
@@ -1452,7 +1477,7 @@ export class DashboardService {
         user: log.userId ? `${log.userId.name} (${log.userId.role})` : 'System',
         action: log.action,
         module: log.module,
-        ipAddress: log.ipAddress || '127.0.0.1',
+        ipAddress: log.ipAddress || '—',
         createdAt: log.createdAt,
       })),
       requiredActions,
@@ -1462,6 +1487,26 @@ export class DashboardService {
   // =========================================================================
   // Dispatcher by Role
   // =========================================================================
+  /** Faculty submissions waiting longer than the review period for HOD verification, by department. */
+  private async overdueVerificationBacklog() {
+    const before = new Date(Date.now() - OVERDUE_REVIEW_DAYS * 86_400_000);
+    const waiting = { $in: ['SUBMITTED', 'UNDER_REVIEW'] };
+    const group = [{ $group: { _id: '$departmentId', n: { $sum: 1 } } }];
+    const lists = await Promise.all([
+      Publication.aggregate([{ $match: { verificationStatus: waiting, submittedAt: { $lt: before } } }, ...group]),
+      AcademicActivity.aggregate([{ $match: { status: waiting, submittedAt: { $lt: before } } }, ...group]),
+      Patent.aggregate([{ $match: { verificationStatus: waiting, submittedAt: { $lt: before } } }, ...group]),
+      FacultyCourse.aggregate([{ $match: { status: waiting, submittedAt: { $lt: before } } }, ...group]),
+      FacultyAchievement.aggregate([{ $match: { status: waiting, submittedAt: { $lt: before } } }, ...group]),
+    ]);
+    const byDept = new Map<string, number>();
+    for (const list of lists) for (const r of list) byDept.set(String(r._id), (byDept.get(String(r._id)) ?? 0) + r.n);
+    const ids = [...byDept.keys()].filter((k) => Types.ObjectId.isValid(k));
+    const codes = new Map((await Department.find({ _id: { $in: ids } }).select('code').lean()).map((d) => [String(d._id), d.code]));
+    const byDepartment = [...byDept.entries()].map(([id, count]) => ({ code: codes.get(id) ?? 'Other', count })).sort((a, b) => b.count - a.count);
+    return { total: byDepartment.reduce((sum, d) => sum + d.count, 0), byDepartment };
+  }
+
   async getDashboardForUser(user: { id: string; role: string; departmentId?: string }) {
     return this.getDashboardForRole(user.role, user.id, user.departmentId);
   }

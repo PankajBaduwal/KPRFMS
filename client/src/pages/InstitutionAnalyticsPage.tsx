@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   BarChart,
   Bar,
@@ -71,7 +72,16 @@ export const InstitutionAnalyticsPage: React.FC = () => {
     | 'phd'
     | 'students'
     | 'workload'
-  >('all');
+  >(() => {
+    // ?tab=publications (from the sidebar) opens that section
+    const t = new URLSearchParams(window.location.search).get('tab');
+    return t && ['publications', 'funding', 'projects', 'facultyDev', 'conferences', 'phd', 'students', 'workload'].includes(t) ? (t as 'publications') : 'all';
+  });
+  const [searchParams] = useSearchParams();
+  useEffect(() => {
+    const t = searchParams.get('tab');
+    if (t && ['all', 'publications', 'funding', 'projects', 'facultyDev', 'conferences', 'phd', 'students', 'workload'].includes(t)) setActiveTab(t as 'all');
+  }, [searchParams]);
 
   // Drill-down Modal State
   const [drillDown, setDrillDown] = useState<{

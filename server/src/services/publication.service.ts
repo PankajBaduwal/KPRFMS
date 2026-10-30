@@ -23,6 +23,7 @@ import {
 } from '../validators/publication.validator.js';
 import { appCache } from '../utils/cache.js';
 import { getInstitutionProfile } from '../utils/institution.js';
+import { notifyDecision, notifySubmitted } from './workflow-notify.js';
 
 export class PublicationService {
   async createPublication(
@@ -180,6 +181,7 @@ export class PublicationService {
     publication.verificationStatus = PUBLICATION_VERIFICATION_STATUS.SUBMITTED;
     publication.submittedAt = new Date();
     await publication.save();
+    await notifySubmitted({ recordType: 'PUBLICATION', recordId: String(publication._id), title: publication.title, ownerUserId: String(publication.userId), ownerName: user.name, departmentId: publication.departmentId, resubmitted: prevStatus === PUBLICATION_VERIFICATION_STATUS.RETURNED_FOR_CORRECTION });
 
     await recordAudit({
       userId: user.id,
@@ -261,6 +263,7 @@ export class PublicationService {
     publication.reviewedAt = new Date();
 
     await publication.save();
+    await notifyDecision({ recordType: 'PUBLICATION', recordId: String(publication._id), title: publication.title, ownerUserId: String(publication.userId), status: status, remarks: remarks, reviewer: { id: user.id, name: user.name, role: user.role } });
 
     await recordAudit({
       userId: user.id,

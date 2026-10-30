@@ -81,7 +81,7 @@ async function runPhase28Tests() {
       relatedEntityId: new Types.ObjectId().toString(),
     });
     assert(!!n1 && n1.type === NOTIFICATION_EVENTS.NEW_SUBMISSION, 'Real event: new submission generated');
-    assert(n1?.actionUrl === '/portal/approvals', 'New submission notification links to approvals portal');
+    assert(!!n1?.actionUrl?.startsWith('/portal/approvals?') && n1.actionUrl.includes('open=PUBLICATION:'), 'New submission notification opens that record in the approvals queue');
 
     // 2.2 approval required
     const n2 = await notificationService.notifyApprovalRequired({

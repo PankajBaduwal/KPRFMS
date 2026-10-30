@@ -140,9 +140,11 @@ export const AppLayout: React.FC = () => {
           icon: 'bi-person-badge',
           roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'],
           subItems: [
-            { to: ROUTES.FACULTY_DIRECTORY, label: 'Faculty Directory', icon: 'bi-people' },
-            { to: ROUTES.FACULTY_PROFILE, label: 'Faculty Profile', icon: 'bi-person' },
+            { to: ROUTES.FACULTY_PROFILE, label: 'My Profile', icon: 'bi-person', roles: ['HOD', 'DEAN', 'FACULTY'] },
             { to: ROUTES.DOSSIER, label: 'My Dossier', icon: 'bi-folder2-open', roles: ['HOD', 'DEAN', 'FACULTY'] },
+            { to: `${ROUTES.DOSSIER}#submissions`, label: 'My Submissions', icon: 'bi-send-check', roles: ['HOD', 'DEAN', 'FACULTY'] },
+            { to: ROUTES.FACULTY_DIRECTORY, label: 'Faculty Directory', icon: 'bi-people' },
+            { to: ROUTES.FACULTY_PROFILE, label: 'Faculty Profile', icon: 'bi-person', roles: ['ADMIN', 'PRINCIPAL'] },
             { to: `${ROUTES.FACULTY_PROFILE}?tab=qualifications`, label: 'Qualifications', icon: 'bi-mortarboard' },
             { to: `${ROUTES.FACULTY_PROFILE}?tab=experience`, label: 'Experience', icon: 'bi-briefcase' },
             { to: ROUTES.DOCUMENTS, label: 'Documents', icon: 'bi-file-earmark-lock' },
@@ -184,9 +186,8 @@ export const AppLayout: React.FC = () => {
           roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'],
           subItems: [
             { to: ROUTES.PUBLICATIONS, label: 'Publications', icon: 'bi-journal-bookmark' },
-            { to: `${ROUTES.PROJECTS}?type=RESEARCH`, label: 'Research Projects', icon: 'bi-folder2-open' },
-            { to: `${ROUTES.PROJECTS}?type=FUNDED`, label: 'Funded Projects', icon: 'bi-cash-coin' },
-            { to: ROUTES.FUNDING, label: 'Funding Pipeline', icon: 'bi-graph-up-arrow' },
+            { to: ROUTES.PROJECTS, label: 'Research Projects', icon: 'bi-folder2-open' },
+            { to: ROUTES.FUNDING, label: 'Grants & Funding', icon: 'bi-cash-coin' },
             { to: `${ROUTES.IPR_CONSULTANCY}?tab=PATENTS`, label: 'Patents', icon: 'bi-lightbulb' },
             { to: `${ROUTES.IPR_CONSULTANCY}?tab=COPYRIGHTS`, label: 'Copyrights', icon: 'bi-c-circle' },
             { to: `${ROUTES.IPR_CONSULTANCY}?tab=CONSULTANCY`, label: 'Consultancy', icon: 'bi-briefcase-fill' },
@@ -194,7 +195,7 @@ export const AppLayout: React.FC = () => {
         },
         {
           id: 'academic_activities',
-          label: 'Academic Activities',
+          label: 'Professional Development',
           icon: 'bi-mortarboard',
           roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'],
           subItems: [
@@ -207,8 +208,16 @@ export const AppLayout: React.FC = () => {
             { to: `${ROUTES.ACTIVITIES}?type=TRAINING`, label: 'Training', icon: 'bi-person-workspace' },
             { to: `${ROUTES.ACTIVITIES}?type=TECHNICAL_EVENT`, label: 'Technical Events', icon: 'bi-cpu' },
             { to: ROUTES.COURSES, label: 'Courses & Certifications', icon: 'bi-patch-check' },
+          ],
+        },
+        {
+          id: 'achievements',
+          label: 'Achievements',
+          icon: 'bi-trophy',
+          roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'],
+          subItems: [
+            { to: `${ROUTES.ACHIEVEMENTS}?category=AWARD`, label: 'Awards & Honours', icon: 'bi-trophy' },
             { to: `${ROUTES.ACHIEVEMENTS}?category=INVITED_TALK`, label: 'Invited Talks', icon: 'bi-megaphone' },
-            { to: `${ROUTES.ACHIEVEMENTS}?category=AWARD`, label: 'Awards', icon: 'bi-trophy' },
             { to: ROUTES.ACHIEVEMENTS, label: 'All Achievements', icon: 'bi-stars' },
           ],
         },
@@ -225,7 +234,8 @@ export const AppLayout: React.FC = () => {
           subItems: [
             { to: ROUTES.ATTENDANCE, label: 'Attendance', icon: 'bi-calendar-check' },
             { to: ROUTES.LEAVES, label: 'Leave', icon: 'bi-calendar2-range' },
-            { to: `${ROUTES.ATTENDANCE}?view=calendar`, label: 'Calendar', icon: 'bi-calendar3-event' },
+            { to: `${ROUTES.ATTENDANCE}?tab=monthly`, label: 'Monthly Summary', icon: 'bi-calendar3-event' },
+            { to: `${ROUTES.ATTENDANCE}?tab=corrections`, label: 'Correction Requests', icon: 'bi-pencil-square' },
           ],
         },
         {
@@ -234,8 +244,9 @@ export const AppLayout: React.FC = () => {
           icon: 'bi-graph-up',
           roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'],
           subItems: [
-            { to: ROUTES.APPRAISALS, label: 'Appraisal', icon: 'bi-award' },
-            { to: `${ROUTES.APPRAISALS}?tab=evidence`, label: 'Evidence', icon: 'bi-patch-check' },
+            { to: ROUTES.APPRAISALS, label: 'My Appraisal', icon: 'bi-award', roles: ['HOD', 'DEAN', 'FACULTY'] },
+            { to: `${ROUTES.APPRAISALS}?tab=review`, label: 'Review Appraisals', icon: 'bi-clipboard-check', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'] },
+            { to: `${ROUTES.APPRAISALS}?tab=analytics`, label: 'Appraisal Progress', icon: 'bi-bar-chart-line', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'] },
           ],
         },
       ],
@@ -249,7 +260,7 @@ export const AppLayout: React.FC = () => {
           icon: 'bi-check2-square',
           roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'],
           subItems: [
-            { to: `${ROUTES.APPROVALS}?status=PENDING`, label: 'Pending', icon: 'bi-hourglass-split' },
+            { to: `${ROUTES.APPROVALS}?status=PENDING&sort=oldest`, label: 'Pending Approvals', icon: 'bi-hourglass-split' },
             { to: `${ROUTES.APPROVALS}?status=APPROVED`, label: 'Approved', icon: 'bi-check-circle' },
             { to: `${ROUTES.APPROVALS}?status=REJECTED`, label: 'Rejected', icon: 'bi-x-circle' },
             { to: `${ROUTES.APPROVALS}?status=RETURNED_FOR_CORRECTION`, label: 'Returned', icon: 'bi-arrow-counterclockwise' },
@@ -288,11 +299,10 @@ export const AppLayout: React.FC = () => {
           icon: 'bi-file-earmark-text',
           roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'],
           subItems: [
-            { to: `${ROUTES.REPORTS}?tab=faculty`, label: 'Faculty', icon: 'bi-person-lines-fill', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'] },
-            { to: `${ROUTES.REPORTS}?tab=department`, label: 'Department', icon: 'bi-file-earmark-bar-graph', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'] },
-            { to: `${ROUTES.REPORTS}?tab=research`, label: 'Research', icon: 'bi-journal-text', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'] },
-            { to: `${ROUTES.REPORTS}?tab=accreditation`, label: 'Accreditation', icon: 'bi-shield-check', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'] },
-            { to: `${ROUTES.REPORTS}?tab=export`, label: 'Export', icon: 'bi-cloud-download', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'] },
+            { to: `${ROUTES.REPORTS}?type=FACULTY_PROFILE`, label: 'Faculty Reports', icon: 'bi-person-lines-fill', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'] },
+            { to: `${ROUTES.REPORTS}?type=PUBLICATIONS`, label: 'Research Reports', icon: 'bi-journal-text', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'] },
+            { to: `${ROUTES.REPORTS}?type=APPRAISAL`, label: 'Appraisal Reports', icon: 'bi-award', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'] },
+            { to: `${ROUTES.REPORTS}?framework=NAAC`, label: 'NAAC / NBA (Accreditation)', icon: 'bi-shield-check', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'] },
           ],
         },
       ],
@@ -334,12 +344,17 @@ export const AppLayout: React.FC = () => {
   // Accordion open groups state
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
+  // A link is active when the path matches, each of its query values is present, and its #section (if any) matches
   const isSubActive = (to: string) => {
-    const [path, search] = to.split('?');
+    const [beforeHash, hash] = to.split('#');
+    const [path, search] = beforeHash.split('?');
+    if (location.pathname !== path) return false;
+    if ((hash ? `#${hash}` : '') !== (location.hash || '')) return false;
     if (search) {
-      return location.pathname === path && location.search.includes(search);
+      const current = new URLSearchParams(location.search);
+      return [...new URLSearchParams(search).entries()].every(([k, v]) => current.get(k) === v);
     }
-    return location.pathname === path && (!location.search || location.search === '');
+    return !location.search;
   };
 
   const isGroupActive = (group: NavGroup) => {

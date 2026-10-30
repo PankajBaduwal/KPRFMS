@@ -17,6 +17,7 @@ import type {
   ReviewActivityInput,
   ActivityFilterQuery,
 } from '../validators/activity.validator.js';
+import { notifyDecision, notifySubmitted } from './workflow-notify.js';
 
 export class ActivityService {
   async createActivity(
@@ -200,6 +201,7 @@ export class ActivityService {
       activity.remarks = remarks;
     }
     await activity.save();
+    await notifySubmitted({ recordType: 'ACADEMIC_ACTIVITY', recordId: String(activity._id), title: activity.title, ownerUserId: String(activity.userId), ownerName: activity.facultyName || user.name, departmentId: activity.departmentId, resubmitted: false });
 
     await AuditLog.create({
       userId: new Types.ObjectId(user.id),
@@ -279,6 +281,7 @@ export class ActivityService {
     activity.reviewedBy = new Types.ObjectId(user.id);
     activity.reviewedAt = new Date();
     await activity.save();
+    await notifyDecision({ recordType: 'ACADEMIC_ACTIVITY', recordId: String(activity._id), title: activity.title, ownerUserId: String(activity.userId), status: reviewData.status, remarks: reviewData.remarks, reviewer: { id: user.id, name: user.name, role: user.role } });
 
     await AuditLog.create({
       userId: new Types.ObjectId(user.id),
