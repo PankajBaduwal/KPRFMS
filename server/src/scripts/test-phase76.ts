@@ -95,6 +95,12 @@ async function run() {
     const dossier = await call(fac.token, 'GET', '/dossier/summary');
     assert(dossier.status === 200 && (dossier.data?.metrics?.publications?.verified ?? 0) >= 1, 'It now counts in the faculty dossier as verified');
 
+    console.log('\n--- Personal pages follow the faculty profile ---');
+    const facMe = await call(fac.token, 'GET', '/auth/me');
+    const adminMe = await call(admin.token, 'GET', '/auth/me');
+    const adminHas = Boolean(await inA(() => Faculty.exists({ userId: admin.user._id })));
+    assert(facMe.data?.hasFacultyProfile === true && adminMe.data?.hasFacultyProfile === adminHas, 'The session says whether the account has a faculty profile', { fac: facMe.data?.hasFacultyProfile, admin: adminMe.data?.hasFacultyProfile, adminHas });
+
     console.log('\n--- Attention items show only the reader’s own stage ---');
     const atDean = await inA(() => FacultyAppraisal.countDocuments({ status: 'DEAN_REVIEW' }));
     const atPrincipal = await inA(() => FacultyAppraisal.countDocuments({ status: 'PRINCIPAL_REVIEW' }));

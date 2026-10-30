@@ -192,7 +192,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'faculty-insights',
-        element: lazyRoute(FacultyInsightsPage),
+        element: (
+          <ProtectedRoute allowedRoles={['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD']}>
+            {lazyRoute(FacultyInsightsPage)}
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'activities',

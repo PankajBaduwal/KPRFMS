@@ -82,6 +82,14 @@ export const DossierPage: React.FC = () => {
     if (d && hash) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
   }, [d, hash]);
   if (q.isLoading) return <p className="fd-muted">Loading the dossier…</p>;
+  if (q.isError && (q.error as { status?: number })?.status === 404 && !facultyId) {
+    return (
+      <div className="fd-card">
+        <h2>No faculty profile linked</h2>
+        <p className="fd-muted">This account does not have a faculty profile, so there is no personal dossier. Faculty profiles are created by the administrator.</p>
+      </div>
+    );
+  }
   if (q.isError || !d) return <p className="fd-error">{formatErrorMessage(q.error, 'The dossier could not be loaded.')}</p>;
   const id = d.identity;
   const suffix = d.own ? '' : `?facultyId=${d.facultyId}`;

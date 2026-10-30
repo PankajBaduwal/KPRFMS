@@ -13,11 +13,20 @@ import { useAcademicYears } from '../hooks/useAcademicYears';
 import { PRODUCT_NAME, PRODUCT_TAGLINE, PORTAL_NAME, PRODUCT_FULL_NAME } from '../config/brand';
 import { BrandMark } from '../components/BrandMark';
 import { useInstitution } from '../hooks/useInstitution';
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '../api/client';
 
 export const AppLayout: React.FC = () => {
   const inst = useInstitution();
   const { sidebarOpen, sidebarCollapsed, toggleSidebar, setSidebarOpen, toggleSidebarCollapsed } = useUIStore();
   const { user, logout } = useAuthStore();
+  // Whether this account has a faculty profile (Dean, Principal and Admin accounts may not)
+  const { data: hasFacultyProfile } = useQuery({
+    queryKey: ['has-faculty-profile', user?.id],
+    queryFn: async () => Boolean((await apiClient.get('/auth/me')).data.data?.hasFacultyProfile),
+    enabled: !!user,
+    staleTime: Infinity,
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const [searchModalOpen, setSearchModalOpen] = useState(false);
@@ -93,6 +102,8 @@ export const AppLayout: React.FC = () => {
     label: string;
     icon: string;
     roles?: string[];
+    /** Personal pages (My Profile, My Dossier …) need a faculty profile behind the account */
+    personal?: boolean;
   }
 
   interface NavGroup {
@@ -140,13 +151,13 @@ export const AppLayout: React.FC = () => {
           icon: 'bi-person-badge',
           roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'],
           subItems: [
-            { to: ROUTES.FACULTY_PROFILE, label: 'My Profile', icon: 'bi-person', roles: ['HOD', 'DEAN', 'FACULTY'] },
-            { to: ROUTES.DOSSIER, label: 'My Dossier', icon: 'bi-folder2-open', roles: ['HOD', 'DEAN', 'FACULTY'] },
-            { to: `${ROUTES.DOSSIER}#submissions`, label: 'My Submissions', icon: 'bi-send-check', roles: ['HOD', 'DEAN', 'FACULTY'] },
+            { to: ROUTES.FACULTY_PROFILE, label: 'My Profile', icon: 'bi-person', roles: ['HOD', 'DEAN', 'FACULTY'], personal: true },
+            { to: ROUTES.DOSSIER, label: 'My Dossier', icon: 'bi-folder2-open', roles: ['HOD', 'DEAN', 'FACULTY'], personal: true },
+            { to: `${ROUTES.DOSSIER}#submissions`, label: 'My Submissions', icon: 'bi-send-check', roles: ['HOD', 'DEAN', 'FACULTY'], personal: true },
             { to: ROUTES.FACULTY_DIRECTORY, label: 'Faculty Directory', icon: 'bi-people' },
-            { to: ROUTES.FACULTY_PROFILE, label: 'Faculty Profile', icon: 'bi-person', roles: ['ADMIN', 'PRINCIPAL'] },
-            { to: `${ROUTES.FACULTY_PROFILE}?tab=qualifications`, label: 'Qualifications', icon: 'bi-mortarboard' },
-            { to: `${ROUTES.FACULTY_PROFILE}?tab=experience`, label: 'Experience', icon: 'bi-briefcase' },
+            { to: ROUTES.FACULTY_PROFILE, label: 'Faculty Profile', icon: 'bi-person', roles: ['ADMIN', 'PRINCIPAL'], personal: true },
+            { to: `${ROUTES.FACULTY_PROFILE}?tab=qualifications`, label: 'Qualifications', icon: 'bi-mortarboard', personal: true },
+            { to: `${ROUTES.FACULTY_PROFILE}?tab=experience`, label: 'Experience', icon: 'bi-briefcase', personal: true },
             { to: ROUTES.DOCUMENTS, label: 'Documents', icon: 'bi-file-earmark-lock' },
           ],
         },
@@ -244,7 +255,7 @@ export const AppLayout: React.FC = () => {
           icon: 'bi-graph-up',
           roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD', 'FACULTY'],
           subItems: [
-            { to: ROUTES.APPRAISALS, label: 'My Appraisal', icon: 'bi-award', roles: ['HOD', 'DEAN', 'FACULTY'] },
+            { to: ROUTES.APPRAISALS, label: 'My Appraisal', icon: 'bi-award', roles: ['HOD', 'DEAN', 'FACULTY'], personal: true },
             { to: `${ROUTES.APPRAISALS}?tab=review`, label: 'Review Appraisals', icon: 'bi-clipboard-check', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'] },
             { to: `${ROUTES.APPRAISALS}?tab=analytics`, label: 'Appraisal Progress', icon: 'bi-bar-chart-line', roles: ['ADMIN', 'PRINCIPAL', 'DEAN', 'HOD'] },
           ],
@@ -506,7 +517,7 @@ export const AppLayout: React.FC = () => {
                 {authorizedGroups.map((group) => {
                   const hasSubItems = !!group.subItems && group.subItems.length > 0;
                   const visibleSubItems = hasSubItems
-                    ? group.subItems!.filter((sub) => !sub.roles || (user && sub.roles.includes(user.role)))
+                    ? group.subItems!.filter((sub) => (!sub.roles || (user && sub.roles.includes(user.role))) && !(sub.personal && hasFacultyProfile === false))
                     : [];
 
                   if (hasSubItems && visibleSubItems.length === 0) return null;
