@@ -12,6 +12,7 @@
     "test": "tsx src/scripts/run-tests.ts",
     "seed:clean": "tsx src/scripts/seed-clean.ts",
     "seed:sample": "tsx src/scripts/seed-sample.ts",
+    "seed:sample-activities": "tsx src/scripts/seed-sample-activities.ts",
     "backup": "tsx src/scripts/backup.ts",
     "mail:test": "tsx src/scripts/mail-test.ts",
     "restore": "tsx src/scripts/restore.ts",

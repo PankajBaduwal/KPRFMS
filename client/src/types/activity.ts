@@ -178,6 +178,9 @@ export interface YearlySummary {
   seminars: number;
   fdp: number;
   sttp: number;
+  webinars: number;
+  training: number;
+  technicalEvents: number;
   verified: number;
 }
 
@@ -190,6 +193,9 @@ export interface ActivityAnalytics {
   totalSeminars: number;
   totalFdp: number;
   totalSttp: number;
+  totalWebinars: number;
+  totalTraining: number;
+  totalTechnicalEvents: number;
   papersPresentedCount: number;
   activitiesByType: Record<string, number>;
   activitiesByStatus: Record<string, number>;

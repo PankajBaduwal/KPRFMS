@@ -39,7 +39,7 @@ import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 
 type TabView = 'ALL' | ActivityType | 'TIMELINE';
 const TABS: string[] = ['ALL', ...Object.values(ACTIVITY_TYPES), 'TIMELINE'];
-// Types added with the dossier work; their tabs carry no analytics count yet
+// Types added with the dossier work; their tabs are drawn from one list
 const EXTRA_TABS = [ACTIVITY_TYPES.WEBINAR, ACTIVITY_TYPES.TRAINING, ACTIVITY_TYPES.TECHNICAL_EVENT];
 
 export const ActivitiesPage: React.FC = () => {
@@ -234,7 +234,7 @@ export const ActivitiesPage: React.FC = () => {
     <div style={{ paddingBottom: 'var(--space-8)' }}>
       <PageHeader
         title="Academic Activities & Professional Development"
-        subtitle="Manage Conferences, Workshops, Seminars, Faculty Development Programs (FDP), and STTP"
+        subtitle="Manage conferences, workshops, seminars, FDPs, STTPs, webinars, training programmes and technical events"
         actions={
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
             <Button
@@ -283,7 +283,7 @@ export const ActivitiesPage: React.FC = () => {
             {analytics?.totalActivities || 0}
           </div>
           <div style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-            Conferences, Workshops, Seminars, FDP, STTP
+            Conferences, workshops, seminars, FDP, STTP, webinars, training, technical events
           </div>
         </div>
 
@@ -337,13 +337,13 @@ export const ActivitiesPage: React.FC = () => {
           }}
         >
           <div style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
-            FDP & STTP Attended
+            Professional Development
           </div>
           <div style={{ fontSize: 'var(--font-2xl)', fontWeight: 700, color: '#0d9488', marginTop: '4px' }}>
-            {(analytics?.totalFdp || 0) + (analytics?.totalSttp || 0)}
+            {(analytics?.totalFdp || 0) + (analytics?.totalSttp || 0) + (analytics?.totalTraining || 0) + (analytics?.totalWebinars || 0)}
           </div>
           <div style={{ fontSize: 'var(--font-xs)', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-            FDP: {analytics?.totalFdp || 0} | STTP: {analytics?.totalSttp || 0}
+            FDP: {analytics?.totalFdp || 0} | STTP: {analytics?.totalSttp || 0} | Training: {analytics?.totalTraining || 0} | Webinars: {analytics?.totalWebinars || 0}
           </div>
         </div>
       </div>
@@ -380,6 +380,9 @@ export const ActivitiesPage: React.FC = () => {
                   <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 600 }}>Seminars</th>
                   <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 600 }}>FDP</th>
                   <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 600 }}>STTP</th>
+                  <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 600 }}>Webinars</th>
+                  <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 600 }}>Training</th>
+                  <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 600 }}>Technical events</th>
                   <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 600 }}>Verified</th>
                 </tr>
               </thead>
@@ -409,6 +412,9 @@ export const ActivitiesPage: React.FC = () => {
                     <td style={{ padding: '8px 12px', textAlign: 'center' }}>{yr.seminars}</td>
                     <td style={{ padding: '8px 12px', textAlign: 'center' }}>{yr.fdp}</td>
                     <td style={{ padding: '8px 12px', textAlign: 'center' }}>{yr.sttp}</td>
+                    <td style={{ padding: '8px 12px', textAlign: 'center' }}>{yr.webinars}</td>
+                    <td style={{ padding: '8px 12px', textAlign: 'center' }}>{yr.training}</td>
+                    <td style={{ padding: '8px 12px', textAlign: 'center' }}>{yr.technicalEvents}</td>
                     <td style={{ padding: '8px 12px', textAlign: 'center', color: 'var(--color-success)', fontWeight: 600 }}>
                       {yr.verified} / {yr.total}
                     </td>
@@ -570,7 +576,7 @@ export const ActivitiesPage: React.FC = () => {
               marginBottom: '-2px',
             }}
           >
-            {ACTIVITY_TYPE_SHORT_LABELS[t]}
+            {ACTIVITY_TYPE_SHORT_LABELS[t]} ({analyticsLoading ? '…' : analytics?.activitiesByType?.[t] || 0})
           </button>
         ))}
 

@@ -452,6 +452,9 @@ export class ActivityService {
     totalSeminars: number;
     totalFdp: number;
     totalSttp: number;
+    totalWebinars: number;
+    totalTraining: number;
+    totalTechnicalEvents: number;
     papersPresentedCount: number;
     activitiesByType: Record<string, number>;
     activitiesByStatus: Record<string, number>;
@@ -463,6 +466,9 @@ export class ActivityService {
       seminars: number;
       fdp: number;
       sttp: number;
+      webinars: number;
+      training: number;
+      technicalEvents: number;
       verified: number;
     }>;
   }> {
@@ -491,6 +497,9 @@ export class ActivityService {
     let totalSeminars = 0;
     let totalFdp = 0;
     let totalSttp = 0;
+    let totalWebinars = 0;
+    let totalTraining = 0;
+    let totalTechnicalEvents = 0;
     let papersPresentedCount = 0;
 
     const activitiesByType: Record<string, number> = {
@@ -499,6 +508,9 @@ export class ActivityService {
       SEMINAR: 0,
       FDP: 0,
       STTP: 0,
+      WEBINAR: 0,
+      TRAINING: 0,
+      TECHNICAL_EVENT: 0,
     };
 
     const activitiesByStatus: Record<string, number> = {
@@ -519,6 +531,9 @@ export class ActivityService {
         seminars: number;
         fdp: number;
         sttp: number;
+        webinars: number;
+        training: number;
+        technicalEvents: number;
         verified: number;
       }
     >();
@@ -533,6 +548,9 @@ export class ActivityService {
       if (act.activityType === ACTIVITY_TYPES.SEMINAR) totalSeminars++;
       if (act.activityType === ACTIVITY_TYPES.FDP) totalFdp++;
       if (act.activityType === ACTIVITY_TYPES.STTP) totalSttp++;
+      if (act.activityType === ACTIVITY_TYPES.WEBINAR) totalWebinars++;
+      if (act.activityType === ACTIVITY_TYPES.TRAINING) totalTraining++;
+      if (act.activityType === ACTIVITY_TYPES.TECHNICAL_EVENT) totalTechnicalEvents++;
 
       // Status breakdown
       if (act.status && activitiesByStatus[act.status] !== undefined) {
@@ -560,6 +578,9 @@ export class ActivityService {
           seminars: 0,
           fdp: 0,
           sttp: 0,
+          webinars: 0,
+          training: 0,
+          technicalEvents: 0,
           verified: 0,
         });
       }
@@ -570,6 +591,9 @@ export class ActivityService {
       if (act.activityType === ACTIVITY_TYPES.SEMINAR) yItem.seminars++;
       if (act.activityType === ACTIVITY_TYPES.FDP) yItem.fdp++;
       if (act.activityType === ACTIVITY_TYPES.STTP) yItem.sttp++;
+      if (act.activityType === ACTIVITY_TYPES.WEBINAR) yItem.webinars++;
+      if (act.activityType === ACTIVITY_TYPES.TRAINING) yItem.training++;
+      if (act.activityType === ACTIVITY_TYPES.TECHNICAL_EVENT) yItem.technicalEvents++;
       if (act.status === ACTIVITY_STATUS.VERIFIED) yItem.verified++;
     }
 
@@ -589,6 +613,9 @@ export class ActivityService {
       totalSeminars,
       totalFdp,
       totalSttp,
+      totalWebinars,
+      totalTraining,
+      totalTechnicalEvents,
       papersPresentedCount,
       activitiesByType,
       activitiesByStatus,
