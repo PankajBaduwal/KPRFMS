@@ -5,6 +5,7 @@ import { platformApi, STATUS_LABEL } from './api';
 import { formatErrorMessage } from '../utils/errorHandler';
 import { AccountImport } from '../components/import/AccountImport';
 import { InstitutionProfileEditor } from './PlatformInstitutionProfile';
+import { InstitutionOperationsCard } from './PlatformControlPages';
 
 const STEP_LABEL: Record<string, string> = {
   REGISTRY: 'Registry entry',
@@ -66,7 +67,7 @@ export const PlatformInstitutionPage: React.FC = () => {
   return (
     <div className="pc-page">
       <p className="pc-small">
-        <Link to="/platform">← Institutions</Link>
+        <Link to="/platform/institutions">← Institutions</Link>
       </p>
       <div className="pc-page-head">
         <div>
@@ -83,6 +84,8 @@ export const PlatformInstitutionPage: React.FC = () => {
           {message.text}
         </p>
       )}
+
+      {i.usage.dbError && <p className="pc-error">This institution’s database could not be read ({i.usage.dbError}); the counts below are unknown, not zero.</p>}
 
       <section className="pc-metrics" aria-label="Usage">
         {[
@@ -242,6 +245,8 @@ export const PlatformInstitutionPage: React.FC = () => {
           )}
         </section>
       )}
+
+      {!['PROVISIONING', 'PROVISIONING_FAILED'].includes(i.status) && <InstitutionOperationsCard code={i.code} active={i.status !== 'ARCHIVED'} />}
 
       <section className="pc-card">
         <h2>Recent platform activity</h2>

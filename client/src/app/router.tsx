@@ -17,7 +17,16 @@ const PlatformActivatePage = React.lazy(() => import('../platform/PlatformAuthPa
 const PlatformDashboardPage = React.lazy(() => import('../platform/PlatformDashboardPage').then((m) => ({ default: m.PlatformDashboardPage })));
 const PlatformInstitutionPage = React.lazy(() => import('../platform/PlatformInstitutionPage').then((m) => ({ default: m.PlatformInstitutionPage })));
 const PlatformNewInstitutionPage = React.lazy(() => import('../platform/PlatformNewInstitutionPage').then((m) => ({ default: m.PlatformNewInstitutionPage })));
-const PlatformAuditPage = React.lazy(() => import('../platform/PlatformAuditPage').then((m) => ({ default: m.PlatformAuditPage })));
+const PlatformOverviewPage = React.lazy(() => import('../platform/PlatformControlPages').then((m) => ({ default: m.PlatformOverviewPage })));
+const PlatformUsersPage = React.lazy(() => import('../platform/PlatformControlPages').then((m) => ({ default: m.PlatformUsersPage })));
+const PlatformInvitationsPage = React.lazy(() => import('../platform/PlatformControlPages').then((m) => ({ default: m.PlatformInvitationsPage })));
+const PlatformOnboardingPage = React.lazy(() => import('../platform/PlatformControlPages').then((m) => ({ default: m.PlatformOnboardingPage })));
+const PlatformDatabasesPage = React.lazy(() => import('../platform/PlatformControlPages').then((m) => ({ default: m.PlatformDatabasesPage })));
+const PlatformBackupsPage = React.lazy(() => import('../platform/PlatformControlPages').then((m) => ({ default: m.PlatformBackupsPage })));
+const PlatformHealthPage = React.lazy(() => import('../platform/PlatformControlPages').then((m) => ({ default: m.PlatformHealthPage })));
+const PlatformSecurityPage = React.lazy(() => import('../platform/PlatformControlPages').then((m) => ({ default: m.PlatformSecurityPage })));
+const PlatformAuditLogPage = React.lazy(() => import('../platform/PlatformControlPages').then((m) => ({ default: m.PlatformAuditLogPage })));
+const PlatformSettingsPage = React.lazy(() => import('../platform/PlatformControlPages').then((m) => ({ default: m.PlatformSettingsPage })));
 const ResetPasswordPage = React.lazy(() => import('../pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })));
 const AiAssistantPage = React.lazy(() => import('../pages/AiAssistantPage').then((m) => ({ default: m.AiAssistantPage })));
 const AccountSecurityPage = React.lazy(() => import('../pages/AccountSecurityPage').then((m) => ({ default: m.AccountSecurityPage })));
@@ -104,10 +113,19 @@ export const router = createBrowserRouter([
     path: '/platform',
     element: lazyRoute(PlatformLayout),
     children: [
-      { index: true, element: lazyRoute(PlatformDashboardPage) },
+      { index: true, element: lazyRoute(PlatformOverviewPage) },
+      { path: 'institutions', element: lazyRoute(PlatformDashboardPage) },
       { path: 'new', element: lazyRoute(PlatformNewInstitutionPage) },
       { path: 'institutions/:code', element: lazyRoute(PlatformInstitutionPage) },
-      { path: 'audit', element: lazyRoute(PlatformAuditPage) },
+      { path: 'users', element: lazyRoute(PlatformUsersPage) },
+      { path: 'onboarding', element: lazyRoute(PlatformOnboardingPage) },
+      { path: 'invitations', element: lazyRoute(PlatformInvitationsPage) },
+      { path: 'databases', element: lazyRoute(PlatformDatabasesPage) },
+      { path: 'backups', element: lazyRoute(PlatformBackupsPage) },
+      { path: 'health', element: lazyRoute(PlatformHealthPage) },
+      { path: 'settings', element: lazyRoute(PlatformSettingsPage) },
+      { path: 'security', element: lazyRoute(PlatformSecurityPage) },
+      { path: 'audit', element: lazyRoute(PlatformAuditLogPage) },
     ],
   },
   {

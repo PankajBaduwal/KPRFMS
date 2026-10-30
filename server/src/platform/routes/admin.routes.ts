@@ -4,6 +4,7 @@ import { sendSuccess } from '../../utils/apiResponse.js';
 import { requirePlatformAdmin, type PlatformRequest } from '../middleware/requirePlatformAdmin.js';
 import { platformAdminService } from '../services/platformAdmin.service.js';
 import { provisioningService } from '../services/provisioning.service.js';
+import { platformOpsService } from '../services/platformOps.service.js';
 import { INSTITUTION_STATUS, INSTITUTION_TYPES } from '../models/Institution.js';
 import { INSTITUTION_CODE_PATTERN } from '../../tenancy/dbNames.js';
 import { parseImportOptions } from '../../validators/import.validator.js';
@@ -90,6 +91,8 @@ const listSchema = z.object({
   search: z.string().trim().max(80).optional(),
   status: z.enum(INSTITUTION_STATUS).optional(),
   type: z.enum(INSTITUTION_TYPES).optional(),
+  onboarding: z.enum(['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED']).optional(),
+  sort: z.enum(['newest', 'oldest', 'name', 'status', 'users']).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
@@ -249,9 +252,86 @@ router.get(
 router.get(
   '/audit',
   wrap(async (req) => {
-    const q = z.object({ page: z.coerce.number().int().min(1).default(1), limit: z.coerce.number().int().min(1).max(100).default(50), institution: z.string().optional() }).parse(req.query);
-    return { data: await platformAdminService.audit(q), message: 'Platform audit log.' };
+    const q = z
+      .object({
+        page: z.coerce.number().int().min(1).default(1),
+        limit: z.coerce.number().int().min(1).max(100).default(50),
+        institution: z.string().regex(INSTITUTION_CODE_PATTERN).optional(),
+        action: z.string().regex(/^[A-Z_]{3,60}$/).optional(),
+        search: z.string().trim().max(80).optional(),
+        from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      })
+      .parse(req.query);
+    return { data: await platformOpsService.audit(q), message: 'Platform audit log.' };
   })
 );
+
+// ---- Control centre: overview, databases, health, accounts, invitations, onboarding, backups ----
+const codeParam = (req: PlatformRequest) => z.string().regex(INSTITUTION_CODE_PATTERN).parse(String(req.params.code ?? '').toLowerCase());
+const optionalCode = z.string().toLowerCase().regex(INSTITUTION_CODE_PATTERN).optional();
+
+router.get('/overview', wrap(async () => ({ data: await platformOpsService.overview(), message: 'Platform overview.' })));
+router.get('/databases', wrap(async () => ({ data: await platformOpsService.databases(), message: 'Institution databases.' })));
+router.post('/databases/:code/check', wrap(async (req) => ({ data: await platformOpsService.checkDatabase(codeParam(req), actorOf(req), req.ip), message: 'Database checked.' })));
+router.get('/health', wrap(async () => ({ data: await platformOpsService.health(), message: 'System health.' })));
+
+router.get('/platform-users', wrap(async () => ({ data: await platformOpsService.platformUsers(), message: 'Platform administrators.' })));
+router.post(
+  '/platform-users',
+  wrap(async (req) => {
+    const body = z.object({ email: z.string().trim().toLowerCase().email(), name: z.string().trim().min(2).max(120) }).parse(req.body);
+    return { data: await platformOpsService.invitePlatformUser(body, actorOf(req), req.ip), message: 'Invitation sent.', status: 201 };
+  })
+);
+router.patch(
+  '/platform-users/:id/status',
+  wrap(async (req) => {
+    const body = z.object({ status: z.enum(['ACTIVE', 'DISABLED']), reason: z.string().max(300).default('') }).parse(req.body);
+    const id = z.string().regex(/^[a-f0-9]{24}$/).parse(String(req.params.id));
+    return { data: await platformOpsService.setPlatformUserStatus(id, body.status, body.reason, actorOf(req), req.ip), message: 'Account updated.' };
+  })
+);
+router.get('/sessions', wrap(async () => ({ data: await platformOpsService.sessions(), message: 'Active sessions.' })));
+router.delete(
+  '/sessions/:id',
+  wrap(async (req) => ({ data: await platformOpsService.revokeSession(String(req.params.id), { ...actorOf(req), sessionId: req.platformUser!.sessionId }, req.ip), message: 'Session ended.' }))
+);
+router.get('/security', wrap(async () => ({ data: await platformOpsService.security(), message: 'Security overview.' })));
+
+router.get(
+  '/institution-admins',
+  wrap(async (req) => {
+    const q = z.object({ institution: optionalCode, role: z.enum(['ADMIN', 'PRINCIPAL', 'DEAN']).optional(), status: z.enum(['ACTIVE', 'INACTIVE', 'SUSPENDED', 'PENDING']).optional() }).parse(req.query);
+    return { data: await platformOpsService.institutionAdmins(q), message: 'Institution administrators.' };
+  })
+);
+router.get(
+  '/invitations',
+  wrap(async (req) => {
+    const q = z.object({ institution: optionalCode, status: z.enum(['PENDING', 'EXPIRED', 'NOT_SENT']).optional() }).parse(req.query);
+    return { data: await platformOpsService.invitations(q), message: 'Invitations.' };
+  })
+);
+router.post(
+  '/institutions/:code/invitations/revoke',
+  wrap(async (req) => {
+    const { email } = z.object({ email: z.string().trim().email() }).parse(req.body);
+    return { data: await platformOpsService.revokeInvitation(codeParam(req), email, actorOf(req), req.ip), message: 'Invitation revoked.' };
+  })
+);
+
+router.get('/onboarding', wrap(async () => ({ data: await platformOpsService.onboarding(), message: 'Onboarding.' })));
+router.get('/institutions/:code/onboarding', wrap(async (req) => ({ data: await platformOpsService.onboardingFor(codeParam(req)), message: 'Onboarding.' })));
+
+router.get('/backups', wrap(async () => ({ data: platformOpsService.backups(), message: 'Backups.' })));
+router.post(
+  '/backups',
+  wrap(async (req) => {
+    const { target } = z.object({ target: z.union([z.literal('platform'), z.string().toLowerCase().regex(INSTITUTION_CODE_PATTERN)]) }).parse(req.body);
+    return { data: await platformOpsService.createBackup(target, actorOf(req), req.ip), message: 'Backup created.', status: 201 };
+  })
+);
+router.post('/backups/:id/verify', wrap(async (req) => ({ data: await platformOpsService.verifyBackup(String(req.params.id), actorOf(req), req.ip), message: 'Backup verified.' })));
 
 export default router;

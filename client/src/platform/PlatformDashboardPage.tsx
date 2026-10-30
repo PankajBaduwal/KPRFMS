@@ -1,16 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { platformApi, STATUS_LABEL, type InstitutionStatus } from './api';
+import { platformApi, STATUS_LABEL, type InstitutionStatus, type InstitutionSummary } from './api';
 
 const fmt = (n: number) => n.toLocaleString('en-IN');
+const ONBOARDING_LABEL: Record<string, string> = { NOT_STARTED: 'Not started', IN_PROGRESS: 'In progress', COMPLETED: 'Completed' };
 
-/** Institutions overview: real registry and per-institution counts, paginated on the server. */
+const csvCell = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+function exportCsv(items: InstitutionSummary[]) {
+  const head = ['Name', 'Code', 'Type', 'City', 'State', 'Status', 'Onboarding', 'Faculty', 'Users', 'Active accounts', 'Departments', 'Created', 'Last activity'];
+  const rows = items.map((i) => [i.name, i.code, i.type, i.city, i.state, STATUS_LABEL[i.status], ONBOARDING_LABEL[i.onboardingStatus], i.usage.dbError ? '' : i.usage.faculty, i.usage.dbError ? '' : i.usage.users, i.usage.dbError ? '' : i.usage.activeUsers, i.usage.dbError ? '' : i.usage.departments, i.createdAt.slice(0, 10), i.usage.lastActivity?.slice(0, 10) ?? '']);
+  const blob = new Blob([[head, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `facultycore-institutions-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/** Institutions: the registry with each institution's own counts, filtered and paginated on the server. */
 export const PlatformDashboardPage: React.FC = () => {
+  const [params, setParams] = useSearchParams();
+  const status = params.get('status') ?? '';
+  const type = params.get('type') ?? '';
+  const onboarding = params.get('onboarding') ?? '';
+  const sort = params.get('sort') ?? 'newest';
   const [search, setSearch] = useState('');
   const [debounced, setDebounced] = useState('');
-  const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
+  const set = (k: string, v: string) => {
+    const next = new URLSearchParams(params);
+    if (v) next.set(k, v);
+    else next.delete(k);
+    setParams(next, { replace: true });
+    setPage(1);
+  };
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -20,64 +44,61 @@ export const PlatformDashboardPage: React.FC = () => {
     return () => clearTimeout(t);
   }, [search]);
 
-  const metrics = useQuery({ queryKey: ['platform', 'metrics'], queryFn: platformApi.metrics });
   const list = useQuery({
-    queryKey: ['platform', 'institutions', debounced, status, page],
-    queryFn: () => platformApi.institutions({ search: debounced || undefined, status: status || undefined, page, limit: 20 }),
+    queryKey: ['platform', 'institutions', debounced, status, type, onboarding, sort, page],
+    queryFn: () => platformApi.institutions({ search: debounced || undefined, status: status || undefined, type: type || undefined, onboarding: onboarding || undefined, sort, page, limit: 20 }),
     placeholderData: keepPreviousData,
   });
-  const m = metrics.data;
-
-  const tiles: Array<[string, number | undefined, string?]> = [
-    ['Institutions', m?.institutions],
-    ['Active', m?.active],
-    ['Suspended', m?.suspended],
-    ['Setup failed', m?.provisioningFailed, m?.provisioningFailed ? 'is-warn' : undefined],
-    ['Users', m?.users],
-    ['Faculty accounts', m?.facultyAccounts],
-    ['Active accounts', m?.activeUsers],
-    ['Pending invitations', m?.pendingInvitations],
-    ['Onboarding incomplete', m?.incompleteOnboarding],
-  ];
+  const exportAll = async () => exportCsv((await platformApi.institutions({ search: debounced || undefined, status: status || undefined, type: type || undefined, onboarding: onboarding || undefined, sort, page: 1, limit: 100 })).items);
 
   return (
     <div className="pc-page">
       <div className="pc-page-head">
         <div>
           <h1>Institutions</h1>
-          <p className="pc-muted">Every college and university on {`FacultyCore`}. Counts come from each institution’s own database.</p>
+          <p className="pc-muted">Every college and university on FacultyCore. Counts come from each institution’s own database.</p>
         </div>
-        <Link to="/platform/new" className="pc-btn pc-btn-primary">
-          New institution
-        </Link>
+        <div className="pc-actions">
+          <button type="button" className="pc-btn" onClick={exportAll} disabled={!list.data?.total}>
+            Export CSV
+          </button>
+          <Link to="/platform/new" className="pc-btn pc-btn-primary">
+            New institution
+          </Link>
+        </div>
       </div>
-
-      <section className="pc-metrics" aria-label="Platform totals">
-        {tiles.map(([label, value, cls]) => (
-          <div key={label} className={`pc-metric ${cls ?? ''}`}>
-            <span>{label}</span>
-            <strong>{metrics.isLoading ? '…' : value === undefined ? '—' : fmt(value)}</strong>
-          </div>
-        ))}
-      </section>
 
       <section className="pc-card">
         <div className="pc-filters">
           <input type="search" placeholder="Search name, code or city" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search institutions" />
-          <select
-            value={status}
-            onChange={(e) => {
-              setStatus(e.target.value);
-              setPage(1);
-            }}
-            aria-label="Filter by status"
-          >
+          <select value={status} onChange={(e) => set('status', e.target.value)} aria-label="Filter by status">
             <option value="">All statuses</option>
             {(Object.keys(STATUS_LABEL) as InstitutionStatus[]).map((s) => (
               <option key={s} value={s}>
                 {STATUS_LABEL[s]}
               </option>
             ))}
+          </select>
+          <select value={type} onChange={(e) => set('type', e.target.value)} aria-label="Filter by type">
+            <option value="">All types</option>
+            <option value="COLLEGE">College</option>
+            <option value="UNIVERSITY">University</option>
+            <option value="OTHER">Other</option>
+          </select>
+          <select value={onboarding} onChange={(e) => set('onboarding', e.target.value)} aria-label="Filter by onboarding">
+            <option value="">Any onboarding</option>
+            {Object.entries(ONBOARDING_LABEL).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+          <select value={sort} onChange={(e) => set('sort', e.target.value)} aria-label="Sort">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="name">Name</option>
+            <option value="status">Status</option>
+            <option value="users">Most users</option>
           </select>
           <span className="pc-muted pc-small">{list.data ? `${fmt(list.data.total)} found` : ''}</span>
         </div>
@@ -92,49 +113,75 @@ export const PlatformDashboardPage: React.FC = () => {
                 <th className="num">Active</th>
                 <th className="num">Depts</th>
                 <th>Onboarding</th>
+                <th>Database</th>
                 <th>Status</th>
                 <th>Created</th>
+                <th>Last activity</th>
+                <th />
               </tr>
             </thead>
             <tbody>
               {list.isLoading && (
                 <tr>
-                  <td colSpan={9} className="pc-muted">Loading…</td>
+                  <td colSpan={12} className="pc-muted">
+                    Loading…
+                  </td>
                 </tr>
               )}
               {list.isError && (
                 <tr>
-                  <td colSpan={9} className="pc-error">Institutions could not be loaded.</td>
+                  <td colSpan={12} className="pc-error">
+                    Institutions could not be loaded.
+                  </td>
                 </tr>
               )}
               {list.data?.items.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="pc-muted">No institutions match.</td>
+                  <td colSpan={12} className="pc-muted">
+                    No institutions match.
+                  </td>
                 </tr>
               )}
-              {list.data?.items.map((i) => (
-                <tr key={i.code}>
-                  <td>
-                    <Link to={`/platform/institutions/${i.code}`} className="pc-strong">
-                      {i.name}
-                    </Link>
-                    <div className="pc-muted pc-small">
-                      {i.code}
-                      {i.city ? ` · ${i.city}` : ''}
-                    </div>
-                  </td>
-                  <td>{i.type.toLowerCase()}</td>
-                  <td className="num">{fmt(i.usage.faculty)}</td>
-                  <td className="num">{fmt(i.usage.users)}</td>
-                  <td className="num">{fmt(i.usage.activeUsers)}</td>
-                  <td className="num">{fmt(i.usage.departments)}</td>
-                  <td>{i.onboardingStatus.replace('_', ' ').toLowerCase()}</td>
-                  <td>
-                    <span className={`pc-status pc-status-${i.status.toLowerCase()}`}>{STATUS_LABEL[i.status]}</span>
-                  </td>
-                  <td className="pc-small">{new Date(i.createdAt).toLocaleDateString()}</td>
-                </tr>
-              ))}
+              {list.data?.items.map((i) => {
+                const unknown = Boolean(i.usage.dbError);
+                const n = (v: number) => (unknown ? '—' : fmt(v));
+                return (
+                  <tr key={i.code}>
+                    <td>
+                      <div className="pc-inst">
+                        {i.logoUrl ? <img src={i.logoUrl} alt="" width={28} height={28} /> : <span className="pc-inst-mark">{i.name.charAt(0)}</span>}
+                        <div>
+                          <Link to={`/platform/institutions/${i.code}`} className="pc-strong">
+                            {i.name}
+                          </Link>
+                          <div className="pc-muted pc-small">
+                            {i.code}
+                            {i.city ? ` · ${i.city}` : ''}
+                            {i.state ? `, ${i.state}` : ''}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{i.type.toLowerCase()}</td>
+                    <td className="num">{n(i.usage.faculty)}</td>
+                    <td className="num">{n(i.usage.users)}</td>
+                    <td className="num">{n(i.usage.activeUsers)}</td>
+                    <td className="num">{n(i.usage.departments)}</td>
+                    <td className="pc-small">{ONBOARDING_LABEL[i.onboardingStatus] ?? i.onboardingStatus}</td>
+                    <td className="pc-small">{['PROVISIONING', 'PROVISIONING_FAILED'].includes(i.status) ? '—' : unknown ? <span className="pc-error" title={i.usage.dbError}>Unreachable</span> : <span className="pc-ok">Reachable</span>}</td>
+                    <td>
+                      <span className={`pc-status pc-status-${i.status.toLowerCase()}`}>{STATUS_LABEL[i.status]}</span>
+                    </td>
+                    <td className="pc-small">{new Date(i.createdAt).toLocaleDateString('en-IN')}</td>
+                    <td className="pc-small">{i.usage.lastActivity ? new Date(i.usage.lastActivity).toLocaleDateString('en-IN') : '—'}</td>
+                    <td>
+                      <Link to={`/platform/institutions/${i.code}`} className="pc-btn">
+                        Manage
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

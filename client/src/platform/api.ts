@@ -34,6 +34,10 @@ export interface InstitutionUsage {
   pendingInvitations: number;
   expiredInvitations: number;
   adminSignedIn: boolean;
+  activeAdmins: number;
+  lastActivity: string | null;
+  /** The institution database could not be read: counts are unknown, not zero */
+  dbError?: string;
 }
 
 export interface InstitutionSummary {
@@ -44,6 +48,7 @@ export interface InstitutionSummary {
   state: string;
   status: InstitutionStatus;
   statusReason: string;
+  logoUrl?: string;
   onboardingStatus: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
   officialEmailDomains: string[];
   contactEmail: string;
@@ -122,7 +127,7 @@ export const platformApi = {
   },
   removeLogo: (code: string) => data<{ logoUrl: string }>(apiClient.delete(`/platform/admin/institutions/${encodeURIComponent(code)}/logo`)),
   metrics: () => data<PlatformMetrics>(apiClient.get('/platform/admin/metrics')),
-  institutions: (params: { search?: string; status?: string; page: number; limit: number }) =>
+  institutions: (params: { search?: string; status?: string; type?: string; onboarding?: string; sort?: string; page: number; limit: number }) =>
     data<{ items: InstitutionSummary[]; total: number; page: number; pages: number }>(apiClient.get('/platform/admin/institutions', { params })),
   institution: (code: string) => data<InstitutionDetail>(apiClient.get(`/platform/admin/institutions/${encodeURIComponent(code)}`)),
   codeAvailable: (code: string) => data<{ valid: boolean; available: boolean }>(apiClient.get('/platform/admin/institutions/code-available', { params: { code } })),

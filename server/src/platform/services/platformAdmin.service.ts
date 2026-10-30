@@ -29,17 +29,23 @@ export interface InstitutionUsage {
   pendingInvitations: number;
   expiredInvitations: number;
   adminSignedIn: boolean;
+  /** Active institutional administrator accounts */
+  activeAdmins: number;
+  /** Most recent sign-in of anyone in the institution */
+  lastActivity: Date | null;
+  /** Set when the institution's database could not be read: the counts above are then unknown, not zero */
+  dbError?: string;
 }
 
-const EMPTY_USAGE: InstitutionUsage = { users: 0, activeUsers: 0, faculty: 0, departments: 0, pendingInvitations: 0, expiredInvitations: 0, adminSignedIn: false };
+const EMPTY_USAGE: InstitutionUsage = { users: 0, activeUsers: 0, faculty: 0, departments: 0, pendingInvitations: 0, expiredInvitations: 0, adminSignedIn: false, activeAdmins: 0, lastActivity: null };
 
 /** Counts inside one institution's database (no records leave this function). */
-async function usageFor(inst: Pick<IInstitution, 'code' | '_id'>): Promise<InstitutionUsage> {
+export async function usageFor(inst: Pick<IInstitution, 'code' | '_id'>): Promise<InstitutionUsage> {
   try {
     return await runInTenant({ code: inst.code, dbName: tenantDbName(inst.code), institutionId: String(inst._id) }, async () => {
       const now = new Date();
       const neverSignedIn = { $or: [{ lastLogin: { $exists: false } }, { lastLogin: null }] };
-      const [users, activeUsers, faculty, departments, pendingInvitations, expiredInvitations, adminSignedIn] = await Promise.all([
+      const [users, activeUsers, faculty, departments, pendingInvitations, expiredInvitations, adminSignedIn, activeAdmins, latest] = await Promise.all([
         User.countDocuments({}),
         User.countDocuments({ status: 'ACTIVE' }),
         Faculty.countDocuments({}),
@@ -47,11 +53,14 @@ async function usageFor(inst: Pick<IInstitution, 'code' | '_id'>): Promise<Insti
         User.countDocuments({ ...neverSignedIn, 'passwordReset.expiresAt': { $gt: now } }),
         User.countDocuments({ ...neverSignedIn, 'passwordReset.expiresAt': { $lte: now } }),
         User.exists({ role: 'ADMIN', lastLogin: { $exists: true, $ne: null } }),
+        User.countDocuments({ role: 'ADMIN', status: 'ACTIVE' }),
+        User.findOne({ lastLogin: { $ne: null } }).sort({ lastLogin: -1 }).select('lastLogin').lean(),
       ]);
-      return { users, activeUsers, faculty, departments, pendingInvitations, expiredInvitations, adminSignedIn: Boolean(adminSignedIn) };
+      return { users, activeUsers, faculty, departments, pendingInvitations, expiredInvitations, adminSignedIn: Boolean(adminSignedIn), activeAdmins, lastActivity: latest?.lastLogin ?? null };
     });
-  } catch {
-    return EMPTY_USAGE;
+  } catch (err) {
+    // Never report an unreadable database as an empty institution
+    return { ...EMPTY_USAGE, dbError: err instanceof Error ? err.message.split('\n')[0].slice(0, 200) : 'Database could not be read' };
   }
 }
 
@@ -66,6 +75,7 @@ function summary(inst: IInstitution | Record<string, any>, usage: InstitutionUsa
     state: inst.state ?? '',
     status: inst.status,
     statusReason: inst.statusReason ?? '',
+    logoUrl: inst.logo?.url ?? '',
     onboardingStatus: onboarding,
     officialEmailDomains: inst.officialEmailDomains ?? [],
     contactEmail: inst.contactEmail ?? '',
@@ -76,7 +86,7 @@ function summary(inst: IInstitution | Record<string, any>, usage: InstitutionUsa
 
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const TRANSITIONS: Partial<Record<InstitutionStatus, InstitutionStatus[]>> = {
+export const TRANSITIONS: Partial<Record<InstitutionStatus, InstitutionStatus[]>> = {
   ACTIVE: ['SUSPENDED', 'ARCHIVED'],
   SUSPENDED: ['ACTIVE', 'ARCHIVED'],
   ARCHIVED: ['SUSPENDED'],
@@ -105,7 +115,7 @@ export const platformAdminService = {
     };
   },
 
-  async list(params: { search?: string; status?: string; type?: string; page: number; limit: number }) {
+  async list(params: { search?: string; status?: string; type?: string; onboarding?: string; sort?: string; page: number; limit: number }) {
     const filter: Record<string, unknown> = {};
     if (params.status) filter.status = params.status;
     if (params.type) filter.type = params.type;
@@ -113,10 +123,22 @@ export const platformAdminService = {
       const rx = new RegExp(escapeRegex(params.search.slice(0, 80)), 'i');
       filter.$or = [{ name: rx }, { code: rx }, { city: rx }, { state: rx }];
     }
+    // Onboarding and user counts live in each institution's database, so those filters and sorts
+    // are applied after reading the (small) registry; everything else stays a database query
+    const needsUsage = Boolean(params.onboarding) || params.sort === 'users';
+    const order: Record<string, Record<string, 1 | -1>> = { name: { name: 1 }, status: { status: 1, name: 1 }, oldest: { createdAt: 1 }, newest: { createdAt: -1 } };
+    const sort = order[params.sort ?? 'newest'] ?? order.newest;
+    if (needsUsage) {
+      const all = await Promise.all((await Institution.find(filter).sort(sort).lean()).map(async (inst) => summary(inst, await usageFor(inst))));
+      let rows = params.onboarding ? all.filter((r) => r.onboardingStatus === params.onboarding) : all;
+      if (params.sort === 'users') rows = [...rows].sort((a, b) => b.usage.users - a.usage.users);
+      const items = rows.slice((params.page - 1) * params.limit, params.page * params.limit);
+      return { items, total: rows.length, page: params.page, limit: params.limit, pages: Math.max(1, Math.ceil(rows.length / params.limit)) };
+    }
     const [total, page] = await Promise.all([
       Institution.countDocuments(filter),
       Institution.find(filter)
-        .sort({ createdAt: -1 })
+        .sort(sort)
         .skip((params.page - 1) * params.limit)
         .limit(params.limit)
         .lean(),
