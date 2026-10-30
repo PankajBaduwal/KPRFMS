@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { appraisalService } from '../services/appraisal.service';
 import { useAcademicYears } from '../hooks/useAcademicYears';
@@ -32,7 +33,9 @@ export const AppraisalManagementPage: React.FC = () => {
   const { currentYear } = useAcademicYears();
 
   // State
-  const [activeTab, setActiveTab] = useState<'MY_APPRAISAL' | 'REVIEW_QUEUE' | 'ANALYTICS' | 'CYCLES'>('MY_APPRAISAL');
+  // ?tab=review (from the HOD dashboard) opens the review queue
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'MY_APPRAISAL' | 'REVIEW_QUEUE' | 'ANALYTICS' | 'CYCLES'>(searchParams.get('tab') === 'review' ? 'REVIEW_QUEUE' : 'MY_APPRAISAL');
   const [activeCycle, setActiveCycle] = useState<IAppraisalCycle | null>(null);
   const [allCycles, setAllCycles] = useState<IAppraisalCycle[]>([]);
   const [myAppraisal, setMyAppraisal] = useState<IFacultyAppraisal | null>(null);

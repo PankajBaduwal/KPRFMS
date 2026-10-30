@@ -3,6 +3,8 @@ import { dashboardController } from '../controllers/dashboard.controller.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { requireRole } from '../middleware/requireRole.js';
 import { ROLES } from '../permissions/roles.js';
+import { hodOverviewService } from '../services/hod-overview.service.js';
+import { sendSuccess } from '../utils/apiResponse.js';
 
 const router = Router();
 
@@ -21,6 +23,17 @@ router.get(
   requireRole(ROLES.ADMIN, ROLES.PRINCIPAL, ROLES.DEAN, ROLES.HOD),
   (req, res, next) => dashboardController.getHodDashboard(req, res, next)
 );
+
+// HOD department console: attention, metrics, progress and calendar for one academic year
+router.get('/hod/overview', requireRole(ROLES.ADMIN, ROLES.PRINCIPAL, ROLES.DEAN, ROLES.HOD), async (req, res, next) => {
+  try {
+    const str = (v: unknown) => (typeof v === 'string' && v ? v : undefined);
+    const data = await hodOverviewService.overview((req as any).user, { academicYear: str(req.query.academicYear), departmentId: str(req.query.departmentId) });
+    sendSuccess(res, data, 'Department overview.');
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.get(
   '/dean',

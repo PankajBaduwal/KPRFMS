@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { reportService } from '../services/report.service';
 import { apiClient } from '../api/client';
 import { useAuthStore } from '../stores/authStore';
@@ -29,11 +30,15 @@ export const ReportsPage: React.FC = () => {
   const { user } = useAuthStore();
 
   // Framework & Report Type Selection
+  // Links can pre-select a framework and report (?framework=NBA&type=PUBLICATIONS)
+  const [searchParams] = useSearchParams();
+  const urlFramework = searchParams.get('framework') as AccreditationFramework | null;
+  const urlType = searchParams.get('type') as ReportType | null;
   const [selectedFramework, setSelectedFramework] = useState<AccreditationFramework>(
-    ACCREDITATION_FRAMEWORKS.NAAC
+    urlFramework && Object.values(ACCREDITATION_FRAMEWORKS).includes(urlFramework) ? urlFramework : ACCREDITATION_FRAMEWORKS.NAAC
   );
   const [selectedReportType, setSelectedReportType] = useState<ReportType>(
-    REPORT_TYPES.FACULTY_PROFILE
+    urlType && Object.values(REPORT_TYPES).includes(urlType) ? urlType : REPORT_TYPES.FACULTY_PROFILE
   );
 
   // Metadata Lists

@@ -152,6 +152,8 @@ export class ApprovalQueueService {
         const fac: any = p.facultyId;
         if (!fac) continue;
 
+        // Drafts have not been submitted, so they are not waiting for anyone
+        if (p.verificationStatus === 'DRAFT') continue;
         let status: UnifiedStatus = 'PENDING';
         if (p.verificationStatus === 'VERIFIED') status = 'APPROVED';
         else if (p.verificationStatus === 'RETURNED_FOR_CORRECTION') status = 'RETURNED_FOR_CORRECTION';
@@ -240,6 +242,8 @@ export class ApprovalQueueService {
         const fac: any = a.facultyId;
         if (!fac) continue;
 
+        // Drafts have not been submitted, so they are not waiting for anyone
+        if (a.status === 'DRAFT') continue;
         let status: UnifiedStatus = 'PENDING';
         if (a.status === 'VERIFIED') status = 'APPROVED';
         else if (a.status === 'RETURNED_FOR_CORRECTION') status = 'RETURNED_FOR_CORRECTION';
@@ -282,6 +286,8 @@ export class ApprovalQueueService {
         const fac: any = pat.facultyId;
         if (!fac) continue;
 
+        // Drafts have not been submitted, so they are not waiting for anyone
+        if (pat.verificationStatus === 'DRAFT') continue;
         let status: UnifiedStatus = 'PENDING';
         if (pat.verificationStatus === 'VERIFIED') status = 'APPROVED';
         else if (pat.verificationStatus === 'RETURNED_FOR_CORRECTION') status = 'RETURNED_FOR_CORRECTION';
@@ -324,6 +330,8 @@ export class ApprovalQueueService {
         const fac: any = cr.facultyId;
         if (!fac) continue;
 
+        // Drafts have not been submitted, so they are not waiting for anyone
+        if (cr.verificationStatus === 'DRAFT') continue;
         let status: UnifiedStatus = 'PENDING';
         if (cr.verificationStatus === 'VERIFIED') status = 'APPROVED';
         else if (cr.verificationStatus === 'RETURNED_FOR_CORRECTION') status = 'RETURNED_FOR_CORRECTION';
@@ -366,6 +374,8 @@ export class ApprovalQueueService {
         const fac: any = con.facultyId;
         if (!fac) continue;
 
+        // Drafts have not been submitted, so they are not waiting for anyone
+        if (con.verificationStatus === 'DRAFT') continue;
         let status: UnifiedStatus = 'PENDING';
         if (con.verificationStatus === 'VERIFIED') status = 'APPROVED';
         else if (con.verificationStatus === 'RETURNED_FOR_CORRECTION') status = 'RETURNED_FOR_CORRECTION';
@@ -450,7 +460,8 @@ export class ApprovalQueueService {
         if (!fac) continue;
 
         let status: UnifiedStatus = 'PENDING';
-        if (lv.status === 'APPROVED') status = 'APPROVED';
+        // Endorsed by the HOD and now with the Dean / admin: no longer waiting for the HOD
+        if (lv.status === 'APPROVED' || (lv.status === 'PENDING' && lv.workflowStage === 'DEAN_ADMIN_REVIEW')) status = 'APPROVED';
         else if (lv.status === 'REJECTED') status = 'REJECTED';
         else if (lv.status === 'CANCELLED') status = 'REJECTED';
 
@@ -539,8 +550,11 @@ export class ApprovalQueueService {
         const fac: any = ap.facultyId;
         if (!fac) continue;
 
+        // A draft self-appraisal has not been submitted yet
+        if (ap.status === 'DRAFT') continue;
         let status: UnifiedStatus = 'PENDING';
-        if (['APPROVED', 'DEAN_REVIEW'].includes(ap.status)) status = 'APPROVED';
+        // Past the HOD's evaluation (with the Dean or Principal, or finished)
+        if (['APPROVED', 'DEAN_REVIEW', 'PRINCIPAL_REVIEW'].includes(ap.status)) status = 'APPROVED';
         else if (ap.status === 'REVISION_REQUESTED') status = 'RETURNED_FOR_CORRECTION';
         else if (ap.status === 'REJECTED') status = 'REJECTED';
 

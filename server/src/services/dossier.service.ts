@@ -292,7 +292,7 @@ export const METRICS: Metric[] = [
 /** Metrics whose owner field is the user id rather than the faculty profile id */
 const BY_USER = new Set(['guideUserId', 'supervisorUserId', 'userId']);
 
-async function metricValues(m: Metric, years: string[] | null, facultyIds: Types.ObjectId[], userIds: Types.ObjectId[]) {
+export async function metricValues(m: Metric, years: string[] | null, facultyIds: Types.ObjectId[], userIds: Types.ObjectId[]) {
   const owners = BY_USER.has(m.owner) ? userIds : facultyIds;
   const yearMatch = years && m.yearField !== null ? { [m.yearField ?? 'academicYear']: { $in: years } } : {};
   const agg = (match: Record<string, unknown>, sum?: string) =>
@@ -304,7 +304,7 @@ async function metricValues(m: Metric, years: string[] | null, facultyIds: Types
   return { verified: new Map<string, number>(v.map((r: any) => [String(r._id), r.v])), submitted: new Map<string, number>(s.map((r: any) => [String(r._id), r.v])) };
 }
 
-const yearsOf = (from?: string, to?: string): string[] | null => {
+export const yearsOf = (from?: string, to?: string): string[] | null => {
   if (!from && !to) return null;
   const re = /^(\d{4})-(\d{4})$/;
   const a = re.exec(from ?? to ?? '');
@@ -405,19 +405,20 @@ export const dossierService = {
     const filter: Record<string, unknown> = { ...scope };
     if (q.designation) filter.designation = q.designation;
     if (q.search) filter.$or = [{ name: new RegExp(q.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }, { employeeId: new RegExp(`^${q.search.replace(/[^\w-]/g, '')}`, 'i') }];
-    const faculty = await Faculty.find(filter).select('name employeeId designation departmentId userId qualifications experience researchInterests basicInfo employment').lean();
+    const faculty = await Faculty.find(filter).select('name employeeId designation departmentId userId qualifications experience researchInterests basicInfo employment profilePhoto').lean();
     const fids = faculty.map((f) => f._id as Types.ObjectId);
     const uids = faculty.map((f) => f.userId as Types.ObjectId);
     const years = q.academicYear ? yearsOf(q.academicYear) : null;
+    const accounts = new Map((await User.find({ _id: { $in: uids } }).select('status').lean()).map((u) => [String(u._id), u.status]));
     const [req, depts, pubs, courses, pd, ...vals] = await Promise.all([
       requirements(),
       Department.find({}).select('code name').lean(),
       stageCounts(Publication, { facultyId: { $in: fids } }, 'verificationStatus', 'facultyId'),
       stageCounts(FacultyCourse, { facultyId: { $in: fids } }, 'status', 'facultyId'),
       stageCounts(AcademicActivity, { facultyId: { $in: fids } }, 'status', 'facultyId'),
-      ...['publications', 'grantsSanctioned', 'courses', 'certifications', 'fdps', 'studentProjects', 'phdScholars'].map((k) => metricValues(METRICS.find((m) => m.key === k)!, years, fids, uids)),
+      ...['publications', 'grantsSanctioned', 'courses', 'certifications', 'fdps', 'studentProjects', 'phdScholars', 'mentees'].map((k) => metricValues(METRICS.find((m) => m.key === k)!, years, fids, uids)),
     ]);
-    const [vPubs, vGrants, vCourses, vCerts, vFdps, vSp, vPhd] = vals;
+    const [vPubs, vGrants, vCourses, vCerts, vFdps, vSp, vPhd, vMentees] = vals;
     const pdAll = await metricValues({ ...METRICS.find((m) => m.key === 'fdps')!, verified: { status: 'VERIFIED' }, submitted: { status: { $in: ['SUBMITTED', 'UNDER_REVIEW'] } } }, years, fids, uids);
     const dname = new Map(depts.map((d) => [String(d._id), d.code]));
     const rows = faculty.map((f) => {
@@ -427,12 +428,19 @@ export const dossierService = {
       const completion = completionFor(f, req, { pubs: st(pubs), courses: st(courses), pd: st(pd) });
       const pending = [...st(pubs), ...st(courses), ...st(pd)].filter((x) => x === 'SUBMITTED').length;
       const returned = [...st(pubs), ...st(courses), ...st(pd)].filter((x) => x === 'RETURNED').length;
+      const quals = ((f as any).qualifications ?? []) as any[];
+      const highest = [...quals].sort((a, b) => DEGREE_RANK(b.degree) - DEGREE_RANK(a.degree) || (b.completionYear ?? 0) - (a.completionYear ?? 0))[0];
       return {
         facultyId: id,
         name: f.name,
         employeeId: f.employeeId,
         designation: f.designation,
         department: dname.get(String(f.departmentId)) ?? '',
+        profilePhoto: (f as any).profilePhoto ?? '',
+        accountStatus: accounts.get(u) ?? '',
+        employmentType: (f as any).employment?.employmentType ?? '',
+        highestQualification: highest?.degree ?? '',
+        experienceMonths: experienceTotals(f).overall.totalMonths,
         completion: completion.overall,
         verifiedPublications: vPubs.verified.get(id) ?? 0,
         grantsSanctioned: vGrants.verified.get(id) ?? 0,
@@ -441,6 +449,7 @@ export const dossierService = {
         fdps: vFdps.verified.get(id) ?? 0,
         studentProjects: vSp.verified.get(u) ?? 0,
         phdScholars: vPhd.verified.get(u) ?? 0,
+        mentees: vMentees.verified.get(u) ?? 0,
         pendingSubmissions: pending,
         returnedSubmissions: returned,
       };

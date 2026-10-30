@@ -21,7 +21,14 @@ const TYPE_LABELS: Record<string, string> = {
   CONSULTANCY: 'Consultancy',
   STUDENT_PROJECT: 'Student projects',
   APPRAISAL: 'Appraisals',
+  FACULTY_COURSE: 'Courses',
+  FACULTY_ACHIEVEMENT: 'Achievements',
+  QUALIFICATION: 'Qualifications',
+  EXPERIENCE: 'Experience',
 };
+/** Days after which a waiting submission counts as overdue (matches the dashboard summary). */
+const OVERDUE_DAYS = 14;
+const daysWaiting = (d: string | Date) => Math.max(0, Math.floor((Date.now() - new Date(d).getTime()) / 86_400_000));
 
 const ACTION_COPY: Record<Action, { verb: string; done: string; button: string; className: string }> = {
   APPROVE: { verb: 'Approve', done: 'Approved', button: 'Confirm approval', className: 'is-approve' },
@@ -41,6 +48,8 @@ export const HodInlineApprovals: React.FC = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const [type, setType] = useState<string>('ALL');
+  const [search, setSearch] = useState('');
+  const [order, setOrder] = useState<'oldest' | 'newest'>('oldest');
   const [open, setOpen] = useState<{ id: string; action: Action } | null>(null);
   const [reason, setReason] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -72,11 +81,17 @@ export const HodInlineApprovals: React.FC = () => {
   const pendingByType = data?.counts.pendingByType ?? {};
   const total = data?.counts.pending ?? 0;
   const items = useMemo(
-    () => (data?.items ?? []).filter((i) => type === 'ALL' || i.recordType === type),
-    [data, type]
+    () => {
+      const q = search.trim().toLowerCase();
+      const list = (data?.items ?? []).filter(
+        (i) => (type === 'ALL' || i.recordType === type) && (!q || i.title.toLowerCase().includes(q) || i.faculty.name.toLowerCase().includes(q) || i.faculty.employeeId.toLowerCase().includes(q))
+      );
+      return order === 'newest' ? [...list].reverse() : list;
+    },
+    [data, type, search, order]
   );
   const shown = items.slice(0, VISIBLE);
-  const hidden = (type === 'ALL' ? total : pendingByType[type] ?? 0) - shown.length;
+  const hidden = items.length - shown.length;
   const chips = Object.keys(TYPE_LABELS).filter((t) => pendingByType[t]);
 
   const start = (id: string, action: Action) => {
@@ -104,7 +119,14 @@ export const HodInlineApprovals: React.FC = () => {
             Pending approvals
             <span className={`hia-total ${total ? 'is-pending' : 'is-clear'}`}>{total} pending</span>
           </h3>
-          <p>Approve, return or reject right here. Oldest requests are shown first.</p>
+          <p>Approve, return or reject right here, or open a record to see its evidence and history first.</p>
+        </div>
+        <div className="hia-tools">
+          <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search faculty or title" aria-label="Search pending approvals" />
+          <select value={order} onChange={(e) => setOrder(e.target.value as 'oldest' | 'newest')} aria-label="Order">
+            <option value="oldest">Oldest first</option>
+            <option value="newest">Newest first</option>
+          </select>
         </div>
         <Link to={`${ROUTES.APPROVALS}?status=PENDING`} className="btn-outline-primary btn-sm hia-queue-link">
           Open full queue <i className="bi bi-arrow-right" aria-hidden="true" />
@@ -148,7 +170,10 @@ export const HodInlineApprovals: React.FC = () => {
                     <span className="hia-meta">
                       {item.faculty.name}
                       {item.faculty.designation ? ` · ${item.faculty.designation}` : ''} · submitted{' '}
-                      {new Date(item.submittedDate).toLocaleDateString()}
+                      {new Date(item.submittedDate).toLocaleDateString()}{' '}
+                      <span className={`hia-age ${daysWaiting(item.submittedDate) > OVERDUE_DAYS ? 'is-overdue' : daysWaiting(item.submittedDate) > OVERDUE_DAYS / 2 ? 'is-soon' : ''}`}>
+                        {daysWaiting(item.submittedDate)} day{daysWaiting(item.submittedDate) === 1 ? '' : 's'} waiting
+                      </span>
                       {item.documentCount > 0 && (
                         <>
                           {' '}
@@ -159,6 +184,9 @@ export const HodInlineApprovals: React.FC = () => {
                     {item.summary && <span className="hia-summary">{item.summary}</span>}
                   </div>
                   <div className="hia-actions" aria-label={`Actions for ${item.title}`}>
+                    <Link className="hia-btn" to={`${ROUTES.APPROVALS}?status=PENDING&open=${item.recordType}:${item.id}`}>
+                      <i className="bi bi-eye" aria-hidden="true" /> Open review
+                    </Link>
                     <button type="button" className="hia-btn is-approve" disabled={busy} onClick={() => start(item.id, 'APPROVE')}>
                       <i className="bi bi-check-lg" aria-hidden="true" /> Approve
                     </button>

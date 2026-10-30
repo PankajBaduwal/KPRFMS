@@ -60,16 +60,20 @@ export const ApprovalQueuePage: React.FC = () => {
       setStatusTab(urlStatus);
     }
   }, [urlStatus]);
-  const [recordType, setRecordType] = useState<string>('');
+  // Dashboard links can pre-select a record type, an order and a record to open
+  const [recordType, setRecordType] = useState<string>(searchParams.get('recordType') ?? '');
   const [academicYear, setAcademicYear] = useState<string>('');
   const [search, setSearch] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('submittedDate');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(searchParams.get('sort') === 'oldest' ? 'asc' : 'desc');
   const [departments, setDepartments] = useState<Array<{ _id: string; name: string; code: string }>>([]);
   const [selectedDeptId, setSelectedDeptId] = useState<string>('');
 
   // Slide-over detail panel state
-  const [selectedRecord, setSelectedRecord] = useState<{ type: string; id: string } | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<{ type: string; id: string } | null>(() => {
+    const [type, id] = (searchParams.get('open') ?? '').split(':');
+    return type && id ? { type, id } : null;
+  });
 
   // Quick Action Modal state (from table quick actions)
   const [quickActionState, setQuickActionState] = useState<{

@@ -48,7 +48,8 @@ export interface HodCharts {
   publicationsByQuartile: YearRow[];
   attendanceTrend: { date: string; rate: number; present: number; total: number }[];
   facultyByDesignation: NameValue[];
-  pendingByType: NameValue[];
+  /** `type` (an approval record type) makes the bar open that slice of the queue */
+  pendingByType: Array<NameValue & { type?: string }>;
 }
 
 export interface InstitutionCharts {
@@ -244,7 +245,7 @@ export const FacultyInsights: React.FC<{ charts?: FacultyCharts }> = ({ charts }
 // HOD
 // ------------------------------------------------------------------------------------------
 
-export const HodInsights: React.FC<{ charts?: HodCharts | null }> = ({ charts }) => {
+export const HodInsights: React.FC<{ charts?: HodCharts | null; onPendingSelect?: (type: string) => void }> = ({ charts, onPendingSelect }) => {
   const hover = useHover();
   const pendingHover = useHover();
   const anim = useChartAnimation();
@@ -252,6 +253,7 @@ export const HodInsights: React.FC<{ charts?: HodCharts | null }> = ({ charts })
 
   const quartiles = ['Q1', 'Q2', 'Q3', 'Q4', 'NA'].filter((q) => sum(charts.publicationsByQuartile, [q]) > 0);
   const pending = charts.pendingByType.filter((p) => p.value > 0);
+  const attendanceDays = charts.attendanceTrend.length;
   const avgAttendance = charts.attendanceTrend.length
     ? Math.round((charts.attendanceTrend.reduce((s, d) => s + d.rate, 0) / charts.attendanceTrend.length) * 10) / 10
     : null;
@@ -288,7 +290,7 @@ export const HodInsights: React.FC<{ charts?: HodCharts | null }> = ({ charts })
 
       <ChartCard
         title="Faculty attendance"
-        subtitle={avgAttendance !== null ? `Last 30 days · average ${avgAttendance}%` : 'Last 30 days'}
+        subtitle={avgAttendance !== null ? `Last 30 days · average ${avgAttendance}% over ${attendanceDays} day${attendanceDays === 1 ? '' : 's'} with attendance marked` : 'Last 30 days'}
         empty={charts.attendanceTrend.length === 0}
         emptyText="No attendance marked in the last 30 days."
       >
@@ -309,13 +311,22 @@ export const HodInsights: React.FC<{ charts?: HodCharts | null }> = ({ charts })
         </FitChart>
       </ChartCard>
 
-      <ChartCard title="Waiting for your review" subtitle="Pending items by type" empty={pending.length === 0} emptyText="Nothing pending. All caught up." height={220}>
+      <ChartCard title="Waiting for your review" subtitle={onPendingSelect ? 'Pending items by type · click a bar to open that queue' : 'Pending items by type'} empty={pending.length === 0} emptyText="Nothing pending. All caught up." height={Math.max(220, pending.length * 28 + 16)}>
         <FitChart>
           <BarChart data={pending} layout="vertical" margin={{ left: 8, right: 24 }} {...pendingHover.chartProps}>
             <XAxis type="number" hide allowDecimals={false} />
-            <YAxis type="category" dataKey="name" width={92} {...AXIS} />
+            <YAxis type="category" dataKey="name" width={110} interval={0} {...AXIS} />
             <Tooltip cursor={CURSOR} content={<ChartTooltip />} />
-            <Bar dataKey="value" name="Pending" radius={[0, 4, 4, 0]} barSize={18} label={{ position: 'right', fontSize: 12, fill: '#1F2937' }} {...anim}>
+            <Bar
+              dataKey="value"
+              name="Pending"
+              radius={[0, 4, 4, 0]}
+              barSize={18}
+              label={{ position: 'right', fontSize: 12, fill: '#1F2937' }}
+              cursor={onPendingSelect ? 'pointer' : undefined}
+              onClick={(d: any) => onPendingSelect && d?.type && onPendingSelect(d.type)}
+              {...anim}
+            >
               {pending.map((_, i) => (
                 <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} fillOpacity={pendingHover.opacity(i)} />
               ))}
