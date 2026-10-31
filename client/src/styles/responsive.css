@@ -79,9 +79,9 @@ body {
   box-sizing: border-box;
 }
 
-/* Charts parent protection against infinite flex blowout */
-.recharts-responsive-container,
-.recharts-wrapper {
+/* Charts parent protection against infinite flex blowout. Only the responsive container is capped:
+   Recharts 3 sizes the chart inside a zero-width box, so capping .recharts-wrapper too squeezes it to 0px. */
+.recharts-responsive-container {
   max-width: 100% !important;
   min-width: 0 !important;
 }
