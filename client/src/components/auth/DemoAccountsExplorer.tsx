@@ -42,29 +42,26 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
   const [expandedDepts, setExpandedDepts] = useState<Record<string, boolean>>({});
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
+  const loadCatalog = () => {
     setLoading(true);
+    setError(null);
     authService
       .getDemoAccounts()
       .then((data) => {
-        if (mounted) {
-          setCatalog(data);
-          if (data.institutions.length > 0) {
-            setSelectedInstCode(data.institutions[0].institution.code);
-          }
-          setLoading(false);
+        setCatalog(data);
+        if (data.institutions.length > 0) {
+          setSelectedInstCode(data.institutions[0].institution.code);
         }
+        setLoading(false);
       })
       .catch((err) => {
-        if (mounted) {
-          setError(err?.response?.data?.message || err?.message || 'Failed to load demo accounts catalog.');
-          setLoading(false);
-        }
+        setError(err?.response?.data?.message || err?.message || 'Failed to load demo accounts catalog.');
+        setLoading(false);
       });
-    return () => {
-      mounted = false;
-    };
+  };
+
+  useEffect(() => {
+    loadCatalog();
   }, []);
 
   const currentInst = useMemo<DemoInstitutionItem | null>(() => {
@@ -193,6 +190,14 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
       ) : !catalog ? (
         <div className="demo-empty-state">
           <p>Unable to load demonstration accounts at this time.</p>
+          <button
+            type="button"
+            className="login-brand-demo-btn"
+            onClick={loadCatalog}
+            style={{ marginTop: '0.75rem', padding: '0.45rem 1.25rem', fontSize: '0.85rem' }}
+          >
+            <i className="bi bi-arrow-clockwise" /> Retry Connection
+          </button>
         </div>
       ) : (
         <>

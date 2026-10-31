@@ -10,7 +10,8 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
+  // 45 seconds to allow cloud containers (e.g. Render free instance cold-starts) time to wake up
+  timeout: 45000,
 });
 
 let inMemoryCsrfToken = '';
