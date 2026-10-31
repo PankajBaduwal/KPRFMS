@@ -31,3 +31,4 @@ services:
         generateValue: true
       - key: DEMO_LOGIN_ENABLED
         value: "true"
+
