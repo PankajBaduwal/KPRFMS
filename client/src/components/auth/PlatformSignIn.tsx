@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Input, Alert } from '../index';
 import { platformApi } from '../../platform/api';
+import { authService } from '../../services/auth.service';
 import { formatErrorMessage } from '../../utils/errorHandler';
 import { PRODUCT_NAME } from '../../config/brand';
 
@@ -83,6 +84,25 @@ export const PlatformSignInForm: React.FC<PlatformSignInFormProps> = ({
     }
   };
 
+  const handleDemoSuperAdmin = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await authService.demoLogin({
+        institutionCode: 'platform',
+        email: 'superadmin@facultycore.test',
+        role: 'PLATFORM_SUPER_ADMIN',
+      });
+      queryClient.removeQueries({ queryKey: ['platform'] });
+      const dest = from && from.startsWith('/platform') && !from.startsWith('/platform/login') ? from : '/platform';
+      window.location.href = dest;
+    } catch (err) {
+      setError(formatErrorMessage(err, 'Demo Super Admin sign-in failed.'));
+      setBusy(false);
+    }
+  };
+
   return (
     <form className="login-form" noValidate onSubmit={submit} aria-label={`${PRODUCT_NAME} Super Admin sign-in`}>
       {error && (
@@ -140,7 +160,25 @@ export const PlatformSignInForm: React.FC<PlatformSignInFormProps> = ({
           </>
         )}
       </button>
-      <p className="login-help">
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '0.75rem 0 0.5rem' }}>
+        <div style={{ flex: 1, height: '1px', background: 'var(--border-color, #e2e8f0)' }} />
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted, #64748b)', fontWeight: 600, letterSpacing: '0.04em' }}>DEMO SHORTCUT</span>
+        <div style={{ flex: 1, height: '1px', background: 'var(--border-color, #e2e8f0)' }} />
+      </div>
+
+      <button
+        type="button"
+        className="login-brand-demo-btn"
+        style={{ width: '100%', justifyContent: 'center' }}
+        disabled={busy}
+        onClick={handleDemoSuperAdmin}
+      >
+        <i className="bi bi-stars" aria-hidden="true" />
+        <span>One-Click Demo Super Admin</span>
+      </button>
+
+      <p className="login-help" style={{ marginTop: '0.75rem' }}>
         College faculty and administrators should switch to <strong>Institutional Portal</strong> above.
       </p>
     </form>

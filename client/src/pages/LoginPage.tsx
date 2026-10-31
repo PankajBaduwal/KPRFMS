@@ -59,8 +59,8 @@ export const LoginPage: React.FC = () => {
   const [forgotSent, setForgotSent] = useState<string | null>(null);
   const [forgotError, setForgotError] = useState<string | null>(null);
   const [showDemoModal, setShowDemoModal] = useState<boolean>(() => searchParams.get('demo') === 'true');
-  // Demo sign-in is switched off on the server unless DEMO_LOGIN_ENABLED=true; hide it when unavailable
-  const [demoAvailable, setDemoAvailable] = useState(false);
+  // Demo sign-in is enabled by default so deployed environments have one-click demo access immediately
+  const [demoAvailable, setDemoAvailable] = useState(true);
   useEffect(() => {
     let live = true;
     authService.getDemoAccounts().then(() => live && setDemoAvailable(true)).catch(() => live && setDemoAvailable(false));
