@@ -114,6 +114,11 @@ export interface FacultyDashboardData {
     verification: { awaiting: number; returned: number };
     projects: { total: number; verifiedFunded: number };
     phdScholars: { total: number; active: number };
+    patents?: { total: number; granted: number };
+    activities?: { total: number; verified: number };
+    courses?: { total: number; verified: number };
+    achievements?: { total: number; verified: number };
+    studentProjects?: { guided: number };
   };
   /** Outstanding tasks, most urgent first (server-computed from real workflows) */
   attentionItems?: Array<{

@@ -72,7 +72,7 @@ const linkForType = (type: string) =>
  */
 export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data }) => {
   const inst = useInstitution();
-  const [moreMetrics, setMoreMetrics] = useState(false);
+  const [moreMetrics, setMoreMetrics] = useState(true);
   const [allTasks, setAllTasks] = useState(false);
   const p = data.profile;
   const m = data.metrics;
@@ -80,7 +80,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
   const shownTasks = allTasks ? tasks : tasks.slice(0, 3);
   const visible = (to: string) => !isHiddenPath(to, inst.enabledModules);
 
-  // Overview: three primary metrics, then the extra ones the dashboard already offered
+  // Overview: three primary metrics, then the rest of the faculty member's own records
   const extras = [
     m && visible(ROUTES.PROJECTS) && {
       key: 'projects',
@@ -97,6 +97,46 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
       note: `${m.phdScholars.active} currently in progress`,
       to: ROUTES.PHD_SCHOLARS,
       link: 'View scholars',
+    },
+    m?.patents && visible(ROUTES.IPR_CONSULTANCY) && {
+      key: 'patents',
+      label: 'Patents',
+      value: m.patents.total,
+      note: `${m.patents.granted} granted`,
+      to: ROUTES.IPR_CONSULTANCY,
+      link: 'View IPR',
+    },
+    m?.activities && visible(ROUTES.ACTIVITIES) && {
+      key: 'activities',
+      label: 'Academic activities',
+      value: m.activities.total,
+      note: `${m.activities.verified} verified · FDPs, workshops, talks`,
+      to: ROUTES.ACTIVITIES,
+      link: 'View activities',
+    },
+    m?.courses && visible(ROUTES.COURSES) && {
+      key: 'courses',
+      label: 'Courses & certifications',
+      value: m.courses.total,
+      note: `${m.courses.verified} verified`,
+      to: ROUTES.COURSES,
+      link: 'View courses',
+    },
+    m?.achievements && visible(ROUTES.ACHIEVEMENTS) && {
+      key: 'achievements',
+      label: 'Achievements',
+      value: m.achievements.total,
+      note: `${m.achievements.verified} verified`,
+      to: ROUTES.ACHIEVEMENTS,
+      link: 'View achievements',
+    },
+    m?.studentProjects && visible(ROUTES.STUDENT_PROJECTS) && {
+      key: 'student-projects',
+      label: 'Student projects guided',
+      value: m.studentProjects.guided,
+      note: 'Projects where you are the guide',
+      to: ROUTES.STUDENT_PROJECTS,
+      link: 'View student projects',
     },
     FEATURES.TEACHING && {
       key: 'workload',

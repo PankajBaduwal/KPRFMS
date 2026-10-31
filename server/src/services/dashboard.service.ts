@@ -112,8 +112,25 @@ export class DashboardService {
         Patent.countDocuments({ ...mine, verificationStatus: RETURNED } as any),
       ]).then(sum),
     ]);
+    // Further records of the faculty member's own (patents, activities, courses, achievements, guided projects)
+    const [patTotal, patGranted, actTotal, actVerified, courseTotal, courseVerified, achTotal, achVerified, guided] = await Promise.all([
+      Patent.countDocuments(mine as any),
+      Patent.countDocuments({ ...mine, status: 'GRANTED' } as any),
+      AcademicActivity.countDocuments(mine as any),
+      AcademicActivity.countDocuments({ ...mine, status: 'VERIFIED' } as any),
+      FacultyCourse.countDocuments(mine as any),
+      FacultyCourse.countDocuments({ ...mine, status: 'VERIFIED' } as any),
+      FacultyAchievement.countDocuments(mine as any),
+      FacultyAchievement.countDocuments({ ...mine, status: 'VERIFIED' } as any),
+      facultyId ? StudentProject.countDocuments({ guideFacultyId: facultyId } as any) : Promise.resolve(0),
+    ]);
     return {
       publications: { total: pubTotal, verified: pubVerified, indexed: pubIndexed },
+      patents: { total: patTotal, granted: patGranted },
+      activities: { total: actTotal, verified: actVerified },
+      courses: { total: courseTotal, verified: courseVerified },
+      achievements: { total: achTotal, verified: achVerified },
+      studentProjects: { guided },
       mentoring: { students: mentees, batches: (batches as unknown[]).filter(Boolean).length },
       verification: { awaiting: waiting, returned },
       projects: { total: projTotal, verifiedFunded: projFunded },
