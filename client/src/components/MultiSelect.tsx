@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useId, useMemo } from 'react';
+import { splitRequiredMark } from './formLabel';
 
 export interface MultiSelectOption {
   value: string;
@@ -109,8 +110,8 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
     <div className={containerClassName} ref={containerRef}>
       {label && (
         <label htmlFor={selectId} className="form-label-custom">
-          {label}
-          {required && <span className="text-danger ms-1" aria-hidden="true">*</span>}
+          {splitRequiredMark(label).text}
+          {(required || splitRequiredMark(label).marked) && <span className="text-danger ms-1" aria-hidden="true">*</span>}
         </label>
       )}
 

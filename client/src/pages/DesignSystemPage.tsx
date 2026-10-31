@@ -413,7 +413,7 @@ export const DesignSystemPage: React.FC = () => {
             subtitle="Illustrative sample values (component preview only)"
             legend={[
               { label: 'Q1 Quartile', color: '#0F766E' },
-              { label: 'Q2 Quartile', color: '#1B345F' },
+              { label: 'Q2 Quartile', color: '#142B4A' },
               { label: 'Q3 Quartile', color: '#B45309' },
               { label: 'Q4 Quartile', color: '#667085' },
             ]}
@@ -424,7 +424,7 @@ export const DesignSystemPage: React.FC = () => {
                 <span style={{ fontSize: '12px', marginTop: '6px', display: 'block' }}>Q1 (42)</span>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ height: '90px', width: '48px', backgroundColor: '#1B345F', borderRadius: '4px 4px 0 0' }} />
+                <div style={{ height: '90px', width: '48px', backgroundColor: '#142B4A', borderRadius: '4px 4px 0 0' }} />
                 <span style={{ fontSize: '12px', marginTop: '6px', display: 'block' }}>Q2 (28)</span>
               </div>
               <div style={{ textAlign: 'center' }}>

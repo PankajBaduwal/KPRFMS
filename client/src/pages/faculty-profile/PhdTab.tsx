@@ -64,14 +64,14 @@ export const PhdTab: React.FC<PhdTabProps> = ({ isOwner, profile, setIsAddPhdMod
                     {(profile as any).phdScholarMetrics?.currentScholars ?? 0}
                   </div>
                 </div>
-                <div style={{ padding: 'var(--space-2) var(--space-3)', background: 'rgba(16, 185, 129, 0.08)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #10b981' }}>
-                  <div style={{ fontSize: '11px', color: '#047857', fontWeight: 600, textTransform: 'uppercase' }}>Doctorates Awarded</div>
+                <div style={{ padding: 'var(--space-2) var(--space-3)', background: 'rgba(16, 185, 129, 0.08)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #2E9461' }}>
+                  <div style={{ fontSize: '11px', color: '#1E7A4C', fontWeight: 600, textTransform: 'uppercase' }}>Doctorates Awarded</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text)' }}>
                     {(profile as any).phdScholarMetrics?.completedScholars ?? 0}
                   </div>
                 </div>
-                <div style={{ padding: 'var(--space-2) var(--space-3)', background: 'rgba(168, 85, 247, 0.08)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #a855f7' }}>
-                  <div style={{ fontSize: '11px', color: '#7e22ce', fontWeight: 600, textTransform: 'uppercase' }}>Publications</div>
+                <div style={{ padding: 'var(--space-2) var(--space-3)', background: 'rgba(168, 85, 247, 0.08)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #2864A5' }}>
+                  <div style={{ fontSize: '11px', color: '#2864A5', fontWeight: 600, textTransform: 'uppercase' }}>Publications</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text)' }}>
                     {(profile as any).phdScholarMetrics?.totalPublications ?? 0}
                   </div>

@@ -233,7 +233,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
       {/* 1. Administrative Context Header Strip */}
       <div
         style={{
-          borderBottom: '2px solid #0f172a',
+          borderBottom: '2px solid #172B45',
           paddingBottom: '1rem',
           marginBottom: '1.25rem',
           display: 'flex',
@@ -272,7 +272,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
               }}
             />
             <span style={{ color: '#64748b' }}>Database:</span>
-            <strong style={{ color: '#0f172a' }}>{data.systemHealth.databaseStatus === 'CONNECTED' ? 'Online' : 'Offline'}</strong>
+            <strong style={{ color: '#172B45' }}>{data.systemHealth.databaseStatus === 'CONNECTED' ? 'Online' : 'Offline'}</strong>
           </div>
 
           <div
@@ -285,7 +285,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
             }}
           >
             <span style={{ color: '#64748b' }}>Uptime:</span>{' '}
-            <strong style={{ color: '#0f172a' }}>{data.systemHealth.serverUptime}</strong>
+            <strong style={{ color: '#172B45' }}>{data.systemHealth.serverUptime}</strong>
           </div>
 
 
@@ -381,7 +381,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                   {data.users.inactive > 0 ? `${data.users.inactive} Inactive` : '100% Active'}
                 </Badge>
               </div>
-              <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0' }}>
+              <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#172B45', margin: '0.25rem 0' }}>
                 {data.users.active}{' '}
                 <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#64748b' }}>/ {data.users.total} Total</span>
               </div>
@@ -396,11 +396,11 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                 <span style={{ fontSize: '0.725rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
                   Academic Departments
                 </span>
-                <span style={{ fontSize: '0.725rem', backgroundColor: '#e0f2fe', color: '#0369a1', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 700 }}>
+                <span style={{ fontSize: '0.725rem', backgroundColor: '#EAF2FA', color: '#0369a1', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 700 }}>
                   {data.masterData.totalPrograms} Programs
                 </span>
               </div>
-              <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0' }}>
+              <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#172B45', margin: '0.25rem 0' }}>
                 {data.masterData.activeDepartments}{' '}
                 <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#64748b' }}>/ {data.masterData.totalDepartments} Active</span>
               </div>
@@ -420,7 +420,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                   {data.configuration.activeAcademicYear ? 'Session Set' : 'Unset'}
                 </Badge>
               </div>
-              <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#2563eb', margin: '0.35rem 0' }}>
+              <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#2864A5', margin: '0.35rem 0' }}>
                 {data.configuration.activeAcademicYear || 'Not Configured'}
               </div>
               <div style={{ fontSize: '0.775rem', color: '#64748b' }}>
@@ -438,7 +438,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                   {data.configuration.appraisalCycleActive ? 'Cycle Open' : 'Cycle Closed'}
                 </Badge>
               </div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', margin: '0.45rem 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#172B45', margin: '0.45rem 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {data.configuration.activeAppraisalTitle || 'Annual Appraisal Cycle'}
               </div>
               <div style={{ fontSize: '0.775rem', color: '#64748b' }}>
@@ -453,7 +453,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
             <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', overflow: 'hidden' }}>
               <div style={{ padding: '0.85rem 1.25rem', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>
+                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#172B45' }}>
                     User Accounts & Role Distribution
                   </h4>
                   <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
@@ -462,7 +462,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                 </div>
                 <Link
                   to={`${ROUTES.ADMIN_CONSOLE}?tab=users`}
-                  style={{ fontSize: '0.775rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
+                  style={{ fontSize: '0.775rem', color: '#2864A5', fontWeight: 600, textDecoration: 'none' }}
                 >
                   Manage Users →
                 </Link>
@@ -487,17 +487,17 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                     ].map((r) => (
                       <tr key={r.role} style={{ borderBottom: '1px solid #f1f5f9' }}>
                         <td style={{ padding: '0.65rem 1rem' }}>
-                          <div style={{ fontWeight: 700, color: '#0f172a' }}>{r.label}</div>
+                          <div style={{ fontWeight: 700, color: '#172B45' }}>{r.label}</div>
                           <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{r.role}</div>
                         </td>
                         <td style={{ padding: '0.65rem 1rem', color: '#475569' }}>{r.scope}</td>
                         <td style={{ padding: '0.65rem 1rem' }}>
-                          <span style={{ fontWeight: 800, color: '#0f172a' }}>{r.count}</span> accounts
+                          <span style={{ fontWeight: 800, color: '#172B45' }}>{r.count}</span> accounts
                         </td>
                         <td style={{ padding: '0.65rem 1rem' }}>
                           <Link
                             to={`${ROUTES.ADMIN_CONSOLE}?tab=users&role=${r.role}`}
-                            style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
+                            style={{ fontSize: '0.75rem', color: '#2864A5', fontWeight: 600, textDecoration: 'none' }}
                           >
                             Filter Users →
                           </Link>
@@ -513,7 +513,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
             <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', overflow: 'hidden' }}>
               <div style={{ padding: '0.85rem 1.25rem', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>
+                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#172B45' }}>
                     Academic configuration
                   </h4>
                   <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
@@ -522,7 +522,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                 </div>
                 <Link
                   to={`${ROUTES.ADMIN_CONSOLE}?tab=academic_calendar`}
-                  style={{ fontSize: '0.775rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
+                  style={{ fontSize: '0.775rem', color: '#2864A5', fontWeight: 600, textDecoration: 'none' }}
                 >
                   Calendar Setup →
                 </Link>
@@ -539,53 +539,53 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                   </thead>
                   <tbody>
                     <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#0f172a' }}>Active Academic Year</td>
+                      <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#172B45' }}>Active Academic Year</td>
                       <td style={{ padding: '0.65rem 1rem' }}>
-                        <span style={{ fontWeight: 700, color: '#2563eb' }}>{data.configuration.activeAcademicYear || 'None'}</span>
+                        <span style={{ fontWeight: 700, color: '#2864A5' }}>{data.configuration.activeAcademicYear || 'None'}</span>
                       </td>
                       <td style={{ padding: '0.65rem 1rem' }}>{data.masterData.academicYearsCount} Years Configured</td>
                       <td style={{ padding: '0.65rem 1rem' }}>
-                        <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=academic_calendar`} style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>
+                        <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=academic_calendar`} style={{ fontSize: '0.75rem', color: '#2864A5', fontWeight: 600, textDecoration: 'none' }}>
                           Modify →
                         </Link>
                       </td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#0f172a' }}>Academic Departments</td>
-                      <td style={{ padding: '0.65rem 1rem', color: '#15803d', fontWeight: 600 }}>
+                      <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#172B45' }}>Academic Departments</td>
+                      <td style={{ padding: '0.65rem 1rem', color: '#1E7A4C', fontWeight: 600 }}>
                         {data.masterData.activeDepartments} Active
                       </td>
                       <td style={{ padding: '0.65rem 1rem' }}>{data.masterData.totalDepartments} Total Depts</td>
                       <td style={{ padding: '0.65rem 1rem' }}>
-                        <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=departments`} style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>
+                        <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=departments`} style={{ fontSize: '0.75rem', color: '#2864A5', fontWeight: 600, textDecoration: 'none' }}>
                           Manage →
                         </Link>
                       </td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#0f172a' }}>Degree Programs</td>
+                      <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#172B45' }}>Degree Programs</td>
                       <td style={{ padding: '0.65rem 1rem', color: '#475569' }}>UG & PG Offerings</td>
                       <td style={{ padding: '0.65rem 1rem' }}>{data.masterData.totalPrograms} Programs</td>
                       <td style={{ padding: '0.65rem 1rem' }}>
-                        <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=departments&sub=programs`} style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>
+                        <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=departments&sub=programs`} style={{ fontSize: '0.75rem', color: '#2864A5', fontWeight: 600, textDecoration: 'none' }}>
                           Catalog →
                         </Link>
                       </td>
                     </tr>
                     {FEATURES.TEACHING && (
                       <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#0f172a' }}>Curriculum & Subjects</td>
+                        <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#172B45' }}>Curriculum & Subjects</td>
                         <td style={{ padding: '0.65rem 1rem', color: '#475569' }}>Active Course Syllabus</td>
                         <td style={{ padding: '0.65rem 1rem' }}>{data.masterData.totalSubjects} Courses</td>
                         <td style={{ padding: '0.65rem 1rem' }}>
-                          <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=curriculum`} style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>
+                          <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=curriculum`} style={{ fontSize: '0.75rem', color: '#2864A5', fontWeight: 600, textDecoration: 'none' }}>
                             View →
                           </Link>
                         </td>
                       </tr>
                     )}
                     <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#0f172a' }}>Appraisal Submissions</td>
+                      <td style={{ padding: '0.65rem 1rem', fontWeight: 700, color: '#172B45' }}>Appraisal Submissions</td>
                       <td style={{ padding: '0.65rem 1rem' }}>
                         <Badge variant={data.configuration.appraisalCycleActive ? 'success' : 'warning'}>
                           {data.configuration.appraisalCycleActive ? 'ACTIVE' : 'LOCKED'}
@@ -595,7 +595,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                         {data.configuration.activeAppraisalTitle || 'Standard Cycle'}
                       </td>
                       <td style={{ padding: '0.65rem 1rem' }}>
-                        <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=settings&sub=appraisal`} style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}>
+                        <Link to={`${ROUTES.ADMIN_CONSOLE}?tab=settings&sub=appraisal`} style={{ fontSize: '0.75rem', color: '#2864A5', fontWeight: 600, textDecoration: 'none' }}>
                           Configure →
                         </Link>
                       </td>
@@ -628,7 +628,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
             }}
           >
             <div>
-              <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>
+              <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#172B45' }}>
                 Complete Administrative Configuration Registry
               </h4>
               <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
@@ -638,7 +638,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
             <Link
               to={ROUTES.ADMIN_CONSOLE}
               style={{
-                backgroundColor: '#0f172a',
+                backgroundColor: '#172B45',
                 color: '#ffffff',
                 padding: '0.4rem 0.85rem',
                 borderRadius: '6px',
@@ -682,8 +682,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
-                    <i className={`bi ${mod.icon}`} style={{ fontSize: '1.1rem', color: '#0f172a' }} />
-                    <h5 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>
+                    <i className={`bi ${mod.icon}`} style={{ fontSize: '1.1rem', color: '#172B45' }} />
+                    <h5 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#172B45' }}>
                       {mod.name}
                     </h5>
                   </div>
@@ -692,7 +692,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                     {mod.description}
                   </p>
 
-                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2563eb', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2864A5', marginBottom: '0.75rem' }}>
                     {mod.metric}
                   </div>
                 </div>
@@ -706,7 +706,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                     borderRadius: '6px',
                     border: '1px solid #cbd5e1',
                     backgroundColor: '#f8fafc',
-                    color: '#0f172a',
+                    color: '#172B45',
                     fontSize: '0.8rem',
                     fontWeight: 600,
                     textDecoration: 'none',
@@ -750,7 +750,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
             }}
           >
             <div>
-              <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>
+              <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#172B45' }}>
                 Recent Security & Operational Audit Log Activity
               </h4>
               <div style={{ fontSize: '0.775rem', color: '#64748b' }}>
@@ -805,7 +805,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                 style={{
                   padding: '0.35rem 0.75rem',
                   borderRadius: '6px',
-                  backgroundColor: '#0f172a',
+                  backgroundColor: '#172B45',
                   color: '#ffffff',
                   fontSize: '0.8rem',
                   fontWeight: 600,
@@ -849,11 +849,11 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
                           second: '2-digit',
                         })}
                       </td>
-                      <td style={{ padding: '0.65rem 1rem', fontWeight: 600, color: '#0f172a' }}>
+                      <td style={{ padding: '0.65rem 1rem', fontWeight: 600, color: '#172B45' }}>
                         {log.user || 'System / Guest'}
                       </td>
                       <td style={{ padding: '0.65rem 1rem' }}>
-                        <span style={{ fontWeight: 700, color: '#0f172a' }}>{log.action}</span>
+                        <span style={{ fontWeight: 700, color: '#172B45' }}>{log.action}</span>
                       </td>
                       <td style={{ padding: '0.65rem 1rem' }}>
                         <span style={{ backgroundColor: '#f1f5f9', color: '#334155', padding: '0.15rem 0.45rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
@@ -879,7 +879,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
           {/* Server Runtime Environment */}
           <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', padding: '1.25rem' }}>
-            <h4 style={{ margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>
+            <h4 style={{ margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: 700, color: '#172B45' }}>
               <i className="bi bi-hdd-network-fill me-2 text-primary" />
               Server Runtime Infrastructure
             </h4>
@@ -892,53 +892,53 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ data }) 
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#64748b' }}>Node.js Runtime:</span>
-                <strong style={{ color: '#0f172a' }}>{data.systemHealth.nodeVersion}</strong>
+                <strong style={{ color: '#172B45' }}>{data.systemHealth.nodeVersion}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#64748b' }}>Host Platform:</span>
-                <strong style={{ color: '#0f172a' }}>{data.systemHealth.platform}</strong>
+                <strong style={{ color: '#172B45' }}>{data.systemHealth.platform}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#64748b' }}>Environment Mode:</span>
-                <strong style={{ color: '#0f172a' }}>{data.systemHealth.environment}</strong>
+                <strong style={{ color: '#172B45' }}>{data.systemHealth.environment}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#64748b' }}>Process Heap Memory:</span>
-                <strong style={{ color: '#7c3aed' }}>{data.systemHealth.heapMemory}</strong>
+                <strong style={{ color: '#2864A5' }}>{data.systemHealth.heapMemory}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#64748b' }}>Cumulative Server Uptime:</span>
-                <strong style={{ color: '#0f172a' }}>{data.systemHealth.serverUptime}</strong>
+                <strong style={{ color: '#172B45' }}>{data.systemHealth.serverUptime}</strong>
               </div>
             </div>
           </div>
 
           {/* Security & Access Policies */}
           <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', padding: '1.25rem' }}>
-            <h4 style={{ margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>
+            <h4 style={{ margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: 700, color: '#172B45' }}>
               <i className="bi bi-shield-shaded me-2 text-primary" />
               Security & Access Constraints
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.825rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#64748b' }}>Authentication Strategy:</span>
-                <strong style={{ color: '#0f172a' }}>JWT + HTTP-Only Cookies</strong>
+                <strong style={{ color: '#172B45' }}>JWT + HTTP-Only Cookies</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#64748b' }}>Session Timeout:</span>
-                <strong style={{ color: '#0f172a' }}>120 Minutes (Auto-Expiry)</strong>
+                <strong style={{ color: '#172B45' }}>120 Minutes (Auto-Expiry)</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#64748b' }}>Brute-Force Lock Threshold:</span>
-                <strong style={{ color: '#0f172a' }}>5 Failed Attempts (30 min lock)</strong>
+                <strong style={{ color: '#172B45' }}>5 Failed Attempts (30 min lock)</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#64748b' }}>File Upload Maximum:</span>
-                <strong style={{ color: '#0f172a' }}>10 MB per Artifact</strong>
+                <strong style={{ color: '#172B45' }}>10 MB per Artifact</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#64748b' }}>Audit Log Immutability:</span>
-                <strong style={{ color: '#15803d' }}>Enforced (Append-Only)</strong>
+                <strong style={{ color: '#1E7A4C' }}>Enforced (Append-Only)</strong>
               </div>
             </div>
           </div>

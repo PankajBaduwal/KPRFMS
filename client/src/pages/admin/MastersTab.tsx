@@ -149,7 +149,7 @@ export const MastersTab: React.FC<MastersTabProps> = ({ filteredMasterItems, han
                         <tr key={item._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                           <td style={{ padding: '0.75rem 1rem', color: '#64748b' }}>{item.order}</td>
                           <td style={{ padding: '0.75rem 1rem', fontFamily: 'monospace', fontWeight: 600 }}>{item.code}</td>
-                          <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#0f172a' }}>{item.name}</td>
+                          <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#172B45' }}>{item.name}</td>
                           <td style={{ padding: '0.75rem 1rem', color: '#64748b' }}>{item.description || '—'}</td>
                           {masterCategory === 'DESIGNATION' && (
                             <td style={{ padding: '0.75rem 1rem' }}>

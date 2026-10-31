@@ -213,12 +213,12 @@ export const FacultyComparisonPage: React.FC = () => {
 
       switch (sortKey) {
         case 'name':
-          valA = a.name.toLowerCase();
-          valB = b.name.toLowerCase();
+          valA = (a.name ?? '').toLowerCase();
+          valB = (b.name ?? '').toLowerCase();
           break;
         case 'department':
-          valA = a.departmentName.toLowerCase();
-          valB = b.departmentName.toLowerCase();
+          valA = (a.departmentName ?? '').toLowerCase();
+          valB = (b.departmentName ?? '').toLowerCase();
           break;
         case 'publications':
           valA = a.publications.total;
@@ -355,8 +355,8 @@ export const FacultyComparisonPage: React.FC = () => {
       let valB: any = 0;
       switch (deptSortKey) {
         case 'name':
-          valA = a.departmentName.toLowerCase();
-          valB = b.departmentName.toLowerCase();
+          valA = (a.departmentName ?? '').toLowerCase();
+          valB = (b.departmentName ?? '').toLowerCase();
           break;
         case 'faculty':
           valA = a.facultyCount;
@@ -445,7 +445,7 @@ export const FacultyComparisonPage: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '4px' }}>
             <span
               style={{
-                backgroundColor: '#0f172a',
+                backgroundColor: '#172B45',
                 color: '#ffffff',
                 padding: '0.2rem 0.6rem',
                 borderRadius: '4px',
@@ -461,7 +461,7 @@ export const FacultyComparisonPage: React.FC = () => {
               Academic & Departmental Comparative Matrix
             </span>
           </div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0.25rem 0', color: '#0f172a', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0.25rem 0', color: '#172B45', letterSpacing: '-0.02em' }}>
             Institutional Faculty & Department Comparison
           </h2>
           <p style={{ margin: 0, color: '#475569', fontSize: '0.875rem' }}>
@@ -517,7 +517,7 @@ export const FacultyComparisonPage: React.FC = () => {
             style={{
               backgroundColor: '#ffffff',
               border: '1px solid #cbd5e1',
-              color: '#0f172a',
+              color: '#172B45',
               padding: '0.45rem 0.85rem',
               borderRadius: '6px',
               fontSize: '0.825rem',
@@ -547,7 +547,7 @@ export const FacultyComparisonPage: React.FC = () => {
           <div style={{ fontSize: '0.725rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
             Faculty In View
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', margin: '0.2rem 0' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#172B45', margin: '0.2rem 0' }}>
             {summaryStats.totalFaculty}
           </div>
           <div style={{ fontSize: '0.775rem', color: '#64748b' }}>
@@ -559,10 +559,10 @@ export const FacultyComparisonPage: React.FC = () => {
           <div style={{ fontSize: '0.725rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
             Publications Output
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#2563eb', margin: '0.2rem 0' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#2864A5', margin: '0.2rem 0' }}>
             {summaryStats.totalPubs}
           </div>
-          <div style={{ fontSize: '0.775rem', color: '#059669', fontWeight: 600 }}>
+          <div style={{ fontSize: '0.775rem', color: '#1E7A4C', fontWeight: 600 }}>
             {summaryStats.totalVerifiedPubs} Verified Papers
           </div>
         </div>
@@ -571,7 +571,7 @@ export const FacultyComparisonPage: React.FC = () => {
           <div style={{ fontSize: '0.725rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
             Extramural Grants
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#7c3aed', margin: '0.2rem 0' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#2864A5', margin: '0.2rem 0' }}>
             ₹{summaryStats.totalGrantsLakhs}L
           </div>
           <div style={{ fontSize: '0.775rem', color: '#64748b' }}>
@@ -584,7 +584,7 @@ export const FacultyComparisonPage: React.FC = () => {
           <div style={{ fontSize: '0.725rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
             Workload Average
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', margin: '0.2rem 0' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#172B45', margin: '0.2rem 0' }}>
             {summaryStats.avgWorkload} <span style={{ fontSize: '0.85rem', color: '#64748b' }}>hrs/wk</span>
           </div>
           <div style={{ fontSize: '0.775rem', color: summaryStats.overloadedCount === 0 ? '#15803d' : '#b91c1c', fontWeight: 600 }}>
@@ -606,7 +606,7 @@ export const FacultyComparisonPage: React.FC = () => {
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0f172a' }}>Active Filters:</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#172B45' }}>Active Filters:</span>
             <span style={{ fontSize: '0.75rem', backgroundColor: '#f1f5f9', color: '#334155', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
               Year: <strong>{filters.academicYear === 'ALL' ? 'All Years' : filters.academicYear}</strong>
             </span>
@@ -834,7 +834,7 @@ export const FacultyComparisonPage: React.FC = () => {
         <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', overflow: 'hidden', marginBottom: '1.5rem' }}>
           <div style={{ padding: '1rem 1.5rem', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div>
-              <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>
+              <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#172B45' }}>
                 Executive Department Comparative Matrix ({departmentAggregates.length} Departments)
               </h4>
               <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
@@ -862,7 +862,7 @@ export const FacultyComparisonPage: React.FC = () => {
                 </button>
               )}
               <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                Sort: <strong style={{ color: '#0f172a' }}>{deptSortKey}</strong> ({deptSortOrder})
+                Sort: <strong style={{ color: '#172B45' }}>{deptSortKey}</strong> ({deptSortOrder})
               </div>
             </div>
           </div>
@@ -873,26 +873,26 @@ export const FacultyComparisonPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${sideBySideDepts.length}, 1fr)`, gap: '1.25rem' }}>
                 {sideBySideDepts.map((d) => (
                   <div key={d.departmentId} style={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                    <div style={{ borderBottom: '2px solid #0f172a', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
-                      <span style={{ fontSize: '0.725rem', fontWeight: 800, color: '#2563eb' }}>{d.departmentCode}</span>
-                      <h4 style={{ margin: '0.2rem 0', fontSize: '1.15rem', fontWeight: 800, color: '#0f172a' }}>{d.departmentName}</h4>
+                    <div style={{ borderBottom: '2px solid #172B45', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+                      <span style={{ fontSize: '0.725rem', fontWeight: 800, color: '#2864A5' }}>{d.departmentCode}</span>
+                      <h4 style={{ margin: '0.2rem 0', fontSize: '1.15rem', fontWeight: 800, color: '#172B45' }}>{d.departmentName}</h4>
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.85rem' }}>
                       <div>
                         <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>FACULTY STRENGTH</div>
-                        <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>{d.facultyCount} Faculty</div>
+                        <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#172B45' }}>{d.facultyCount} Faculty</div>
                       </div>
                       <div>
                         <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>PUBLICATIONS & DENSITY</div>
-                        <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#2563eb' }}>
-                          {d.totalPublications} <span style={{ fontSize: '0.8rem', color: '#059669' }}>({d.verifiedPublications} verified)</span>
+                        <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#2864A5' }}>
+                          {d.totalPublications} <span style={{ fontSize: '0.8rem', color: '#1E7A4C' }}>({d.verifiedPublications} verified)</span>
                         </div>
                         <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{d.pubsPerFaculty} papers/faculty</div>
                       </div>
                       <div>
                         <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>RESEARCH FUNDING</div>
-                        <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#7c3aed' }}>
+                        <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#2864A5' }}>
                           ₹{(d.totalSanctionedAmount / 100000).toFixed(1)}L
                         </div>
                         <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{d.fundedProjectsCount} funded projects</div>
@@ -900,7 +900,7 @@ export const FacultyComparisonPage: React.FC = () => {
                       {FEATURES.TEACHING && (
                       <div>
                         <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>AVERAGE WORKLOAD</div>
-                        <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>{d.avgWorkloadHours} hrs/wk</div>
+                        <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#172B45' }}>{d.avgWorkloadHours} hrs/wk</div>
                         <div style={{ fontSize: '0.75rem', color: d.overloadedCount > 0 ? '#b91c1c' : '#15803d', fontWeight: 600 }}>
                           {d.overloadedCount > 0 ? `${d.overloadedCount} overloaded` : 'Optimal load'}
                         </div>
@@ -908,7 +908,7 @@ export const FacultyComparisonPage: React.FC = () => {
                       )}
                       <div>
                         <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>SCHOLARS & MENTORING</div>
-                        <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>
+                        <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#172B45' }}>
                           {d.phdScholarsTotal} PhD Scholars • {d.menteeCountTotal} Mentees
                         </div>
                       </div>
@@ -973,16 +973,16 @@ export const FacultyComparisonPage: React.FC = () => {
                         <td style={{ padding: '0.85rem 1rem' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b' }}>#{index + 1}</span>
-                            <span style={{ fontWeight: 700, color: '#0f172a' }}>{d.departmentName} ({d.departmentCode})</span>
+                            <span style={{ fontWeight: 700, color: '#172B45' }}>{d.departmentName} ({d.departmentCode})</span>
                           </div>
                         </td>
                         <td style={{ padding: '0.85rem 1rem', fontWeight: 600 }}>{d.facultyCount}</td>
                         <td style={{ padding: '0.85rem 1rem' }}>
-                          <span style={{ fontWeight: 700, color: '#2563eb' }}>{d.totalPublications}</span>{' '}
-                          <span style={{ fontSize: '0.725rem', color: '#059669' }}>({d.verifiedPublications} ver.)</span>
+                          <span style={{ fontWeight: 700, color: '#2864A5' }}>{d.totalPublications}</span>{' '}
+                          <span style={{ fontSize: '0.725rem', color: '#1E7A4C' }}>({d.verifiedPublications} ver.)</span>
                         </td>
                         <td style={{ padding: '0.85rem 1rem', fontWeight: 600 }}>{d.pubsPerFaculty}</td>
-                        <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#7c3aed' }}>
+                        <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#2864A5' }}>
                           ₹{(d.totalSanctionedAmount / 100000).toFixed(1)}L
                         </td>
                         <td style={{ padding: '0.85rem 1rem', fontWeight: 600 }}>{d.phdScholarsTotal}</td>
@@ -990,7 +990,7 @@ export const FacultyComparisonPage: React.FC = () => {
                         <td style={{ padding: '0.85rem 1rem' }}>
                           <span style={{ fontWeight: 600 }}>{d.avgWorkloadHours}h/wk</span>
                           {d.overloadedCount > 0 && (
-                            <span style={{ marginLeft: '0.4rem', fontSize: '0.7rem', backgroundColor: '#fee2e2', color: '#b91c1c', padding: '0.1rem 0.35rem', borderRadius: '4px', fontWeight: 700 }}>
+                            <span style={{ marginLeft: '0.4rem', fontSize: '0.7rem', backgroundColor: '#FBE4E2', color: '#B42318', padding: '0.1rem 0.35rem', borderRadius: '4px', fontWeight: 700 }}>
                               {d.overloadedCount} over
                             </span>
                           )}
@@ -1013,7 +1013,7 @@ export const FacultyComparisonPage: React.FC = () => {
           {sideBySideMode && sideBySideRecords.length >= 2 ? (
             <div style={{ marginBottom: '2rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: '#0f172a' }}>
+                <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: '#172B45' }}>
                   Side-by-Side Comparative Matrix ({sideBySideRecords.length} Faculty Members)
                 </h4>
                 <button
@@ -1050,10 +1050,10 @@ export const FacultyComparisonPage: React.FC = () => {
                     }}
                   >
                     <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '0.85rem', marginBottom: '1rem' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2563eb' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2864A5' }}>
                         {f.departmentCode} • {f.employeeId}
                       </div>
-                      <h4 style={{ margin: '0.25rem 0', fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>
+                      <h4 style={{ margin: '0.25rem 0', fontSize: '1.1rem', fontWeight: 700, color: '#172B45' }}>
                         {f.name}
                       </h4>
                       <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{f.designation}</div>
@@ -1065,8 +1065,8 @@ export const FacultyComparisonPage: React.FC = () => {
                         style={{ padding: '0.6rem', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' }}
                       >
                         <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>PUBLICATIONS</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2563eb' }}>
-                          {f.publications.total} <span style={{ fontSize: '0.8rem', color: '#059669' }}>({f.publications.verified} ver.)</span>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2864A5' }}>
+                          {f.publications.total} <span style={{ fontSize: '0.8rem', color: '#1E7A4C' }}>({f.publications.verified} ver.)</span>
                         </div>
                       </div>
 
@@ -1075,7 +1075,7 @@ export const FacultyComparisonPage: React.FC = () => {
                         style={{ padding: '0.6rem', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' }}
                       >
                         <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>FUNDED GRANTS</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#7c3aed' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2864A5' }}>
                           ₹{(f.fundedProjects.totalSanctionedAmount / 100000).toFixed(1)}L
                         </div>
                       </div>
@@ -1086,7 +1086,7 @@ export const FacultyComparisonPage: React.FC = () => {
                           style={{ padding: '0.6rem', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' }}
                         >
                           <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>WEEKLY WORKLOAD</div>
-                          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#172B45' }}>
                             {f.workload.weeklyHours} hrs/wk
                           </div>
                         </div>
@@ -1097,7 +1097,7 @@ export const FacultyComparisonPage: React.FC = () => {
                         style={{ padding: '0.6rem', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer' }}
                       >
                         <div style={{ fontSize: '0.725rem', color: '#64748b', fontWeight: 600 }}>PHD SCHOLARS</div>
-                        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#172B45' }}>
                           {f.phdScholars.total} Scholars
                         </div>
                       </div>
@@ -1111,7 +1111,7 @@ export const FacultyComparisonPage: React.FC = () => {
             <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', overflow: 'hidden' }}>
               <div style={{ padding: '1rem 1.5rem', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>
+                  <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#172B45' }}>
                     Faculty Comparative Roster ({sortedRecords.length} Faculty Members)
                   </h4>
                   <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
@@ -1124,7 +1124,7 @@ export const FacultyComparisonPage: React.FC = () => {
                     <button
                       onClick={() => setSideBySideMode(true)}
                       style={{
-                        backgroundColor: '#2563eb',
+                        backgroundColor: '#2864A5',
                         color: '#ffffff',
                         padding: '0.35rem 0.75rem',
                         borderRadius: '4px',
@@ -1138,7 +1138,7 @@ export const FacultyComparisonPage: React.FC = () => {
                     </button>
                   )}
                   <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                    Sort: <strong style={{ color: '#0f172a' }}>{sortKey}</strong> ({sortOrder})
+                    Sort: <strong style={{ color: '#172B45' }}>{sortKey}</strong> ({sortOrder})
                   </div>
                 </div>
               </div>
@@ -1210,27 +1210,27 @@ export const FacultyComparisonPage: React.FC = () => {
                               />
                             </td>
                             <td style={{ padding: '0.85rem 1rem' }}>
-                              <div style={{ fontWeight: 700, color: '#0f172a' }}>{f.name}</div>
+                              <div style={{ fontWeight: 700, color: '#172B45' }}>{f.name}</div>
                               <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
                                 {f.employeeId} • {f.designation}
                               </div>
                             </td>
                             <td style={{ padding: '0.85rem 1rem' }}>
-                              <div style={{ fontWeight: 600, color: '#0f172a' }}>{f.departmentName}</div>
+                              <div style={{ fontWeight: 600, color: '#172B45' }}>{f.departmentName}</div>
                               <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{f.departmentCode}</div>
                             </td>
                             <td
                               style={{ padding: '0.85rem 1rem', cursor: 'pointer' }}
                               onClick={() => openDrillDown(f.facultyId, f.name, 'publications', 'Publications')}
                             >
-                              <div style={{ fontWeight: 700, color: '#2563eb' }}>{f.publications.total}</div>
-                              <div style={{ fontSize: '0.725rem', color: '#059669' }}>{f.publications.verified} ver.</div>
+                              <div style={{ fontWeight: 700, color: '#2864A5' }}>{f.publications.total}</div>
+                              <div style={{ fontSize: '0.725rem', color: '#1E7A4C' }}>{f.publications.verified} ver.</div>
                             </td>
                             <td
                               style={{ padding: '0.85rem 1rem', cursor: 'pointer' }}
                               onClick={() => openDrillDown(f.facultyId, f.name, 'fundedProjects', 'Grants')}
                             >
-                              <div style={{ fontWeight: 700, color: '#7c3aed' }}>
+                              <div style={{ fontWeight: 700, color: '#2864A5' }}>
                                 ₹{(f.fundedProjects.totalSanctionedAmount / 100000).toFixed(1)}L
                               </div>
                               <div style={{ fontSize: '0.725rem', color: '#64748b' }}>{f.fundedProjects.count} proj</div>
@@ -1239,19 +1239,19 @@ export const FacultyComparisonPage: React.FC = () => {
                               style={{ padding: '0.85rem 1rem', cursor: 'pointer' }}
                               onClick={() => openDrillDown(f.facultyId, f.name, 'phdScholars', 'PhD Scholars')}
                             >
-                              <div style={{ fontWeight: 600, color: '#0f172a' }}>{f.phdScholars.total}</div>
+                              <div style={{ fontWeight: 600, color: '#172B45' }}>{f.phdScholars.total}</div>
                             </td>
                             <td
                               style={{ padding: '0.85rem 1rem', cursor: 'pointer' }}
                               onClick={() => openDrillDown(f.facultyId, f.name, 'mentoring', 'Mentoring')}
                             >
-                              <div style={{ fontWeight: 600, color: '#0f172a' }}>{f.mentoring.menteeCount}</div>
+                              <div style={{ fontWeight: 600, color: '#172B45' }}>{f.mentoring.menteeCount}</div>
                             </td>
                             <td
                               style={{ padding: '0.85rem 1rem', cursor: 'pointer' }}
                               onClick={() => openDrillDown(f.facultyId, f.name, 'facultyDevelopment', 'FDP / STTP')}
                             >
-                              <div style={{ fontWeight: 600, color: '#0f172a' }}>{f.facultyDevelopment.total}</div>
+                              <div style={{ fontWeight: 600, color: '#172B45' }}>{f.facultyDevelopment.total}</div>
                             </td>
                             {FEATURES.TEACHING && (
                             <td
@@ -1259,7 +1259,7 @@ export const FacultyComparisonPage: React.FC = () => {
                               onClick={() => openDrillDown(f.facultyId, f.name, 'workload', 'Workload')}
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                <span style={{ fontWeight: 700, color: '#0f172a' }}>{f.workload.weeklyHours}h/wk</span>
+                                <span style={{ fontWeight: 700, color: '#172B45' }}>{f.workload.weeklyHours}h/wk</span>
                                 <span
                                   style={{
                                     fontSize: '0.675rem',

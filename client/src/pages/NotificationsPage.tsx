@@ -332,14 +332,14 @@ export const NotificationsPage: React.FC = () => {
             style={{
               fontSize: '22px',
               fontWeight: 700,
-              color: 'var(--color-text, #0f172a)',
+              color: 'var(--color-text, #172B45)',
               margin: 0,
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
             }}
           >
-            <i className="bi bi-bell-fill" style={{ color: 'var(--color-primary, #2563eb)' }} />
+            <i className="bi bi-bell-fill" style={{ color: 'var(--color-primary, #2864A5)' }} />
             Notification Center
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--color-text-secondary, #64748b)' }}>
@@ -364,7 +364,7 @@ export const NotificationsPage: React.FC = () => {
                   borderRadius: '8px',
                   border: '1px solid var(--color-border, #e2e8f0)',
                   background: 'var(--color-surface, #ffffff)',
-                  color: 'var(--color-text, #0f172a)',
+                  color: 'var(--color-text, #172B45)',
                   fontSize: '12.5px',
                   fontWeight: 600,
                   cursor: markingAll ? 'not-allowed' : 'pointer',
@@ -374,7 +374,7 @@ export const NotificationsPage: React.FC = () => {
                 {markingAll ? (
                   <span className="spinner spinner-sm" aria-hidden="true" />
                 ) : (
-                  <i className="bi bi-check2-all" style={{ color: '#2563eb' }} />
+                  <i className="bi bi-check2-all" style={{ color: '#2864A5' }} />
                 )}
                 <span>{markingAll ? 'Marking...' : 'Mark All Read'}</span>
               </button>
@@ -393,7 +393,7 @@ export const NotificationsPage: React.FC = () => {
                 borderRadius: '8px',
                 border: '1px solid var(--color-border, #e2e8f0)',
                 background: 'var(--color-surface, #ffffff)',
-                color: 'var(--color-text, #0f172a)',
+                color: 'var(--color-text, #172B45)',
                 fontSize: '12.5px',
                 fontWeight: 500,
                 cursor: 'pointer',
@@ -474,8 +474,8 @@ export const NotificationsPage: React.FC = () => {
                 fontWeight: 700,
                 padding: '1px 6px',
                 borderRadius: '10px',
-                background: '#eff6ff',
-                color: '#2563eb',
+                background: '#EAF2FA',
+                color: '#2864A5',
               }}
             >
               {unreadCount}
@@ -511,9 +511,9 @@ export const NotificationsPage: React.FC = () => {
           style={{
             padding: '12px 16px',
             borderRadius: '8px',
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            color: '#b91c1c',
+            background: '#FCEFEE',
+            border: '1px solid #F3C7C2',
+            color: '#B42318',
             fontSize: '13px',
             marginBottom: '16px',
             display: 'flex',
@@ -567,7 +567,7 @@ export const NotificationsPage: React.FC = () => {
                   border: '1px solid var(--color-border, #e2e8f0)',
                   fontSize: '13px',
                   background: 'var(--color-background, #f8fafc)',
-                  color: 'var(--color-text, #0f172a)',
+                  color: 'var(--color-text, #172B45)',
                   outline: 'none',
                 }}
               />
@@ -710,7 +710,7 @@ export const NotificationsPage: React.FC = () => {
                         borderRadius: '16px',
                         border: '1px solid var(--color-border, #e2e8f0)',
                         background: '#ffffff',
-                        color: 'var(--color-primary, #2563eb)',
+                        color: 'var(--color-primary, #2864A5)',
                         fontSize: '12px',
                         fontWeight: 600,
                         cursor: 'pointer',
@@ -799,7 +799,7 @@ export const NotificationsPage: React.FC = () => {
                           style={{
                             fontWeight: item.isRead ? 600 : 700,
                             fontSize: '13.5px',
-                            color: 'var(--color-text, #0f172a)',
+                            color: 'var(--color-text, #172B45)',
                             cursor: 'pointer',
                           }}
                           onMouseEnter={(e) => (e.currentTarget.style.color = '#2563eb')}
@@ -815,7 +815,7 @@ export const NotificationsPage: React.FC = () => {
                               width: '6px',
                               height: '6px',
                               borderRadius: '50%',
-                              background: '#2563eb',
+                              background: '#2864A5',
                             }}
                             title="Unread notification"
                           />
@@ -906,9 +906,9 @@ export const NotificationsPage: React.FC = () => {
                                 gap: '4px',
                                 padding: '2px 8px',
                                 borderRadius: '4px',
-                                background: '#eff6ff',
-                                color: '#2563eb',
-                                border: '1px solid #bfdbfe',
+                                background: '#EAF2FA',
+                                color: '#2864A5',
+                                border: '1px solid #C9DCEF',
                                 fontSize: '11.5px',
                                 fontWeight: 600,
                                 cursor: 'pointer',
@@ -930,7 +930,7 @@ export const NotificationsPage: React.FC = () => {
                                 gap: '4px',
                                 background: 'transparent',
                                 border: 'none',
-                                color: 'var(--color-primary, #2563eb)',
+                                color: 'var(--color-primary, #2864A5)',
                                 fontSize: '11.5px',
                                 fontWeight: 500,
                                 cursor: 'pointer',
@@ -980,7 +980,7 @@ export const NotificationsPage: React.FC = () => {
           }}
         >
           <div style={{ marginBottom: '20px' }}>
-            <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: 'var(--color-text, #0f172a)' }}>
+            <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: 'var(--color-text, #172B45)' }}>
               Institutional Event Subscription Preferences
             </h2>
             <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--color-text-secondary, #64748b)' }}>
@@ -993,8 +993,8 @@ export const NotificationsPage: React.FC = () => {
               style={{
                 padding: '10px 14px',
                 borderRadius: '8px',
-                background: '#ecfdf5',
-                border: '1px solid #a7f3d0',
+                background: '#EAF6EF',
+                border: '1px solid #BFE3CD',
                 color: '#065f46',
                 fontSize: '13px',
                 marginBottom: '16px',
@@ -1052,7 +1052,7 @@ export const NotificationsPage: React.FC = () => {
                         <i className={`bi ${field.icon}`} />
                       </div>
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--color-text, #0f172a)' }}>
+                        <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--color-text, #172B45)' }}>
                           {field.title}
                         </div>
                         <div style={{ fontSize: '12px', color: 'var(--color-text-secondary, #64748b)', marginTop: '2px' }}>
@@ -1107,7 +1107,7 @@ export const NotificationsPage: React.FC = () => {
                   style={{
                     padding: '8px 20px',
                     borderRadius: '8px',
-                    background: '#2563eb',
+                    background: '#2864A5',
                     color: '#ffffff',
                     border: 'none',
                     fontSize: '13px',

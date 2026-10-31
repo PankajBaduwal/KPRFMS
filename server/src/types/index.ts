@@ -13,6 +13,8 @@ export interface AuthenticatedUser {
   designation?: string;
   /** Id of the browser session (absent for bearer tokens) */
   sessionId?: string;
+  /** True when operating under a designated demonstration account */
+  isDemo?: boolean;
 }
 
 export interface AuthenticatedRequest extends Request {

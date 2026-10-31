@@ -153,7 +153,7 @@ export const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
                     letterSpacing: '0.5px',
                     padding: '2px 8px',
                     borderRadius: '4px',
-                    background: 'var(--color-primary-light, #e0e7ff)',
+                    background: 'var(--color-primary-light, #DCE8F5)',
                     color: 'var(--color-primary-dark, #3730a3)',
                   }}
                 >

@@ -1,21 +1,21 @@
 /* Bulk account import (shared by the institution Admin page and the platform console) */
-.aimp { display: flex; flex-direction: column; gap: 14px; font-size: 0.875rem; color: #0f172a; }
+.aimp { display: flex; flex-direction: column; gap: 14px; font-size: 0.875rem; color: #172B45; }
 .aimp h4 { margin: 0 0 8px; font-size: 0.9rem; font-weight: 650; }
 .aimp-step { border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; background: #fff; }
 .aimp-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
-.aimp-btn { border: 1px solid #e2e8f0; background: #fff; border-radius: 8px; padding: 6px 12px; font: inherit; font-weight: 600; cursor: pointer; color: #0f172a; }
+.aimp-btn { border: 1px solid #e2e8f0; background: #fff; border-radius: 8px; padding: 6px 12px; font: inherit; font-weight: 600; cursor: pointer; color: #172B45; }
 .aimp-btn:hover:not(:disabled) { border-color: #cbd5e1; background: #f8fafc; }
 .aimp-btn:disabled { opacity: 0.55; cursor: default; }
-.aimp-primary { background: #1b345f; border-color: #1b345f; color: #fff; margin-top: 8px; }
-.aimp-primary:hover:not(:disabled) { background: #13294b; }
+.aimp-primary { background: #142B4A; border-color: #142B4A; color: #fff; margin-top: 8px; }
+.aimp-primary:hover:not(:disabled) { background: #142B4A; }
 .aimp-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; margin-bottom: 10px; }
 .aimp-modes label { display: flex; gap: 8px; align-items: flex-start; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; cursor: pointer; }
-.aimp-modes label.is-on { border-color: #1b345f; background: #f5f7fb; }
+.aimp-modes label.is-on { border-color: #142B4A; background: #f5f7fb; }
 .aimp-modes span { display: flex; flex-direction: column; gap: 2px; }
 .aimp-modes small { color: #64748b; font-size: 0.75rem; }
 .aimp-checks { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
 .aimp-checks label { display: flex; gap: 8px; align-items: center; }
-.aimp-map summary { cursor: pointer; color: #1b345f; font-size: 0.8rem; margin-bottom: 6px; }
+.aimp-map summary { cursor: pointer; color: #142B4A; font-size: 0.8rem; margin-bottom: 6px; }
 .aimp-map textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; font: inherit; font-family: ui-monospace, Consolas, monospace; font-size: 0.8rem; }
 .aimp-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-bottom: 10px; }
 .aimp-summary div { border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; }
@@ -28,13 +28,13 @@
 .aimp-details { font-size: 0.8rem; max-width: 380px; }
 .aimp-details s { color: #94a3b8; }
 .aimp-badge { font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #f1f5f9; color: #334155; white-space: nowrap; }
-.aimp-badge.is-create { background: #e8f5ee; color: #1e7a47; }
-.aimp-badge.is-update { background: #eef2ff; color: #3730a3; }
+.aimp-badge.is-create { background: #e8f5ee; color: #1E7A4C; }
+.aimp-badge.is-update { background: #EAF2FA; color: #3730a3; }
 .aimp-badge.is-skip { background: #f1f5f9; color: #64748b; }
 .aimp-badge.is-error { background: #fdecea; color: #b42318; }
 .aimp-error { color: #b42318; margin: 0; }
 .aimp-muted { color: #64748b; font-size: 0.78rem; margin: 0; }
 .aimp-note { background: #fdf5e3; color: #7a4a00; border-radius: 8px; padding: 6px 10px; margin: 0 0 8px; }
-.aimp-progress { height: 8px; background: #eef1f5; border-radius: 999px; overflow: hidden; margin-bottom: 6px; }
-.aimp-progress span { display: block; height: 100%; background: #1b345f; transition: width 300ms ease-out; }
+.aimp-progress { height: 8px; background: #EDF1F5; border-radius: 999px; overflow: hidden; margin-bottom: 6px; }
+.aimp-progress span { display: block; height: 100%; background: #142B4A; transition: width 300ms ease-out; }
 @media (prefers-reduced-motion: reduce) { .aimp-progress span { transition: none; } }

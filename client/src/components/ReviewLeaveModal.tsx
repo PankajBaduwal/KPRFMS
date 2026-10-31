@@ -103,7 +103,7 @@ export const ReviewLeaveModal: React.FC<ReviewLeaveModalProps> = ({
               display: 'flex',
               gap: '10px',
               alignItems: 'center',
-              color: '#ef4444',
+              color: '#D14343',
             }}
           >
             <ShieldAlert size={20} style={{ flexShrink: 0 }} />
@@ -146,7 +146,7 @@ export const ReviewLeaveModal: React.FC<ReviewLeaveModalProps> = ({
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: 'var(--color-text-muted)' }}>Total Days:</span>
-            <span style={{ fontWeight: 700, color: 'var(--color-primary, #3b82f6)', fontSize: '15px' }}>
+            <span style={{ fontWeight: 700, color: 'var(--color-primary, #2864A5)', fontSize: '15px' }}>
               {application.numberOfDays} {application.numberOfDays === 1 ? 'day' : 'days'}
             </span>
           </div>
@@ -175,7 +175,7 @@ export const ReviewLeaveModal: React.FC<ReviewLeaveModalProps> = ({
                 href={application.supportingDocument}
                 target="_blank"
                 rel="noreferrer"
-                style={{ color: '#3b82f6', textDecoration: 'underline', fontSize: '12px' }}
+                style={{ color: '#2864A5', textDecoration: 'underline', fontSize: '12px' }}
               >
                 View Attached Supporting Document
               </a>
@@ -264,7 +264,7 @@ export const ReviewLeaveModal: React.FC<ReviewLeaveModalProps> = ({
                   onClick={() => handleDecision('RECOMMENDED')}
                   disabled={loading && pendingAction !== 'RECOMMENDED'}
                   loading={pendingAction === 'RECOMMENDED'}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', borderColor: '#8b5cf6', color: '#8b5cf6' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', borderColor: '#2864A5', color: '#2864A5' }}
                 >
                   <ArrowUpRight size={15} />
                   Recommend to Dean/Admin

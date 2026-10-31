@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import { splitRequiredMark } from './formLabel';
 
 export interface DatePickerProps {
   label?: string;
@@ -51,8 +52,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     <div className={containerClassName}>
       {label && (
         <label htmlFor={dateId} className="form-label-custom">
-          {label}
-          {required && <span className="text-danger ms-1" aria-hidden="true">*</span>}
+          {splitRequiredMark(label).text}
+          {(required || splitRequiredMark(label).marked) && <span className="text-danger ms-1" aria-hidden="true">*</span>}
         </label>
       )}
 

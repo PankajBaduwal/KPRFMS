@@ -25,6 +25,7 @@ export interface IUser extends Document {
   designation?: string;
   profilePhoto?: string;
   status: UserStatus;
+  isDemo?: boolean;
   failedLoginAttempts: number;
   lockUntil?: Date;
   lastLogin?: Date;
@@ -114,6 +115,11 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: Object.values(USER_STATUS),
       default: USER_STATUS.ACTIVE,
+      index: true,
+    },
+    isDemo: {
+      type: Boolean,
+      default: false,
       index: true,
     },
     failedLoginAttempts: {

@@ -179,7 +179,7 @@ export const NotificationDropdown: React.FC = () => {
               height: '17px',
               padding: '0 4px',
               borderRadius: '999px',
-              background: '#2563eb', // Restrained institutional blue
+              background: '#2864A5', // Restrained institutional blue
               color: '#ffffff',
               fontSize: '10px',
               fontWeight: 700,
@@ -232,7 +232,7 @@ export const NotificationDropdown: React.FC = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--color-text, #0f172a)' }}>
+              <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--color-text, #172B45)' }}>
                 Notifications
               </span>
               {unreadCount > 0 && (
@@ -241,8 +241,8 @@ export const NotificationDropdown: React.FC = () => {
                     fontSize: '10.5px',
                     padding: '2px 7px',
                     borderRadius: '10px',
-                    background: '#eff6ff',
-                    color: '#2563eb',
+                    background: '#EAF2FA',
+                    color: '#2864A5',
                     fontWeight: 600,
                   }}
                 >
@@ -303,7 +303,7 @@ export const NotificationDropdown: React.FC = () => {
                   style={{
                     background: 'transparent',
                     border: 'none',
-                    color: 'var(--color-primary, #2563eb)',
+                    color: 'var(--color-primary, #2864A5)',
                     fontSize: '11.5px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -399,7 +399,7 @@ export const NotificationDropdown: React.FC = () => {
                         style={{
                           fontSize: '13px',
                           fontWeight: item.isRead ? 500 : 700,
-                          color: 'var(--color-text, #0f172a)',
+                          color: 'var(--color-text, #172B45)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
@@ -417,7 +417,7 @@ export const NotificationDropdown: React.FC = () => {
                               width: '6px',
                               height: '6px',
                               borderRadius: '50%',
-                              background: '#2563eb',
+                              background: '#2864A5',
                               flexShrink: 0,
                             }}
                             title="Unread"
@@ -518,7 +518,7 @@ export const NotificationDropdown: React.FC = () => {
               style={{
                 background: 'transparent',
                 border: 'none',
-                color: 'var(--color-primary, #2563eb)',
+                color: 'var(--color-primary, #2864A5)',
                 fontSize: '12px',
                 fontWeight: 600,
                 cursor: 'pointer',

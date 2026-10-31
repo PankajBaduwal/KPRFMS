@@ -139,13 +139,13 @@ const SUGGESTED_PROMPTS = [
 
 // Quick jump direct navigation links
 const QUICK_JUMP_LINKS = [
-  { label: 'Faculty Directory', url: '/portal/directory', icon: 'bi-people', color: '#2563eb' },
-  { label: 'Publications', url: '/portal/publications', icon: 'bi-journal-text', color: '#059669' },
-  { label: 'Research Projects', url: '/portal/projects', icon: 'bi-cash-coin', color: '#d97706' },
-  { label: 'Student Projects', url: '/portal/student-projects', icon: 'bi-kanban', color: '#4f46e5' },
-  { label: 'PhD Scholars', url: '/portal/phd-scholars', icon: 'bi-mortarboard', color: '#7c3aed' },
+  { label: 'Faculty Directory', url: '/portal/directory', icon: 'bi-people', color: '#2864A5' },
+  { label: 'Publications', url: '/portal/publications', icon: 'bi-journal-text', color: '#1E7A4C' },
+  { label: 'Research Projects', url: '/portal/projects', icon: 'bi-cash-coin', color: '#B45309' },
+  { label: 'Student Projects', url: '/portal/student-projects', icon: 'bi-kanban', color: '#2864A5' },
+  { label: 'PhD Scholars', url: '/portal/phd-scholars', icon: 'bi-mortarboard', color: '#2864A5' },
   { label: 'Subjects Catalog', url: '/portal/subjects', icon: 'bi-book', color: '#0891b2' },
-  { label: 'Academic Activities', url: '/portal/activities', icon: 'bi-calendar-check', color: '#e11d48' },
+  { label: 'Academic Activities', url: '/portal/activities', icon: 'bi-calendar-check', color: '#B42318' },
   { label: 'Documents Repository', url: '/portal/documents', icon: 'bi-files', color: '#475569' },
 ].filter((link) => !isHiddenPath(link.url));
 
@@ -604,7 +604,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#2563eb',
+                          color: '#2864A5',
                           fontSize: '13px',
                           flexShrink: 0,
                         }}
@@ -616,7 +616,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                           style={{
                             fontSize: '12.5px',
                             fontWeight: 600,
-                            color: 'var(--color-text, #0f172a)',
+                            color: 'var(--color-text, #172B45)',
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -695,7 +695,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                     }}
                   >
                     <i className={`bi ${link.icon}`} style={{ color: link.color, fontSize: '15px' }} />
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text, #0f172a)' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text, #172B45)' }}>
                       {link.label}
                     </span>
                   </button>
@@ -803,10 +803,10 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                   style={{
                     margin: '12px 0',
                     padding: '12px 16px',
-                    background: '#fef2f2',
-                    border: '1px solid #fecaca',
+                    background: '#FCEFEE',
+                    border: '1px solid #F3C7C2',
                     borderRadius: '8px',
-                    color: '#b91c1c',
+                    color: '#B42318',
                     fontSize: '13px',
                     display: 'flex',
                     alignItems: 'center',
@@ -824,7 +824,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                       borderRadius: '4px',
                       border: '1px solid #fca5a5',
                       background: '#ffffff',
-                      color: '#b91c1c',
+                      color: '#B42318',
                       fontSize: '11px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -857,7 +857,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                             borderRadius: '20px',
                             border: '1px solid var(--color-border, #e2e8f0)',
                             background: '#ffffff',
-                            color: 'var(--color-primary, #2563eb)',
+                            color: 'var(--color-primary, #2864A5)',
                             fontSize: '12px',
                             fontWeight: 600,
                             cursor: 'pointer',
@@ -1081,7 +1081,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                             style={{
                               fontSize: '16px',
                               fontWeight: 700,
-                              color: 'var(--color-text, #0f172a)',
+                              color: 'var(--color-text, #172B45)',
                               marginBottom: '4px',
                               lineHeight: 1.3,
                             }}
@@ -1137,69 +1137,69 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                           {Boolean(metadata.employeeId) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Employee ID</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>{String(metadata.employeeId)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>{String(metadata.employeeId)}</span>
                             </div>
                           )}
                           {Boolean(metadata.designation) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Designation</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>{String(metadata.designation)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>{String(metadata.designation)}</span>
                             </div>
                           )}
                           {Boolean(metadata.department) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Department</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>{String(metadata.department)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>{String(metadata.department)}</span>
                             </div>
                           )}
                           {Boolean(metadata.email) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Contact</span>
-                              <span style={{ fontWeight: 500, color: '#2563eb' }}>{String(metadata.email)}</span>
+                              <span style={{ fontWeight: 500, color: '#2864A5' }}>{String(metadata.email)}</span>
                             </div>
                           )}
 
                           {Boolean(metadata.journal) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Journal / Source</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>{String(metadata.journal)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>{String(metadata.journal)}</span>
                             </div>
                           )}
                           {Boolean(metadata.authors) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Authors</span>
-                              <span style={{ fontWeight: 500, color: '#0f172a' }}>{String(metadata.authors)}</span>
+                              <span style={{ fontWeight: 500, color: '#172B45' }}>{String(metadata.authors)}</span>
                             </div>
                           )}
                           {Boolean(metadata.doi) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>DOI</span>
-                              <span style={{ fontWeight: 500, color: '#2563eb' }}>{String(metadata.doi)}</span>
+                              <span style={{ fontWeight: 500, color: '#2864A5' }}>{String(metadata.doi)}</span>
                             </div>
                           )}
                           {Boolean(metadata.indexing) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Indexing</span>
-                              <span style={{ fontWeight: 600, color: '#059669' }}>{String(metadata.indexing)}</span>
+                              <span style={{ fontWeight: 600, color: '#1E7A4C' }}>{String(metadata.indexing)}</span>
                             </div>
                           )}
 
                           {Boolean(metadata.fundingAgency) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Funding Agency</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>{String(metadata.fundingAgency)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>{String(metadata.fundingAgency)}</span>
                             </div>
                           )}
                           {Boolean(metadata.projectNumber) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Project Ref</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>{String(metadata.projectNumber)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>{String(metadata.projectNumber)}</span>
                             </div>
                           )}
                           {metadata.sanctionedAmount !== undefined && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Sanctioned Grant</span>
-                              <span style={{ fontWeight: 700, color: '#d97706' }}>
+                              <span style={{ fontWeight: 700, color: '#B45309' }}>
                                 ₹{Number(metadata.sanctionedAmount).toLocaleString('en-IN')}
                               </span>
                             </div>
@@ -1207,7 +1207,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                           {Boolean(metadata.pi) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Principal Investigator</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>{String(metadata.pi)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>{String(metadata.pi)}</span>
                             </div>
                           )}
 
@@ -1220,33 +1220,33 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                           {Boolean(metadata.credits) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Credits</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>{String(metadata.credits)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>{String(metadata.credits)}</span>
                             </div>
                           )}
                           {Boolean(metadata.semester) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Semester</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>Semester {String(metadata.semester)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>Semester {String(metadata.semester)}</span>
                             </div>
                           )}
 
                           {Boolean(metadata.supervisor) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Doctoral Supervisor</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>{String(metadata.supervisor)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>{String(metadata.supervisor)}</span>
                             </div>
                           )}
                           {Boolean(metadata.stage) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Research Stage</span>
-                              <span style={{ fontWeight: 600, color: '#4f46e5' }}>{String(metadata.stage)}</span>
+                              <span style={{ fontWeight: 600, color: '#2864A5' }}>{String(metadata.stage)}</span>
                             </div>
                           )}
 
                           {Boolean(metadata.organizer) && (
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span style={{ color: '#64748b' }}>Organizer</span>
-                              <span style={{ fontWeight: 600, color: '#0f172a' }}>{String(metadata.organizer)}</span>
+                              <span style={{ fontWeight: 600, color: '#172B45' }}>{String(metadata.organizer)}</span>
                             </div>
                           )}
 
@@ -1274,7 +1274,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
                               width: '100%',
                               padding: '9px 16px',
                               borderRadius: '8px',
-                              background: '#2563eb',
+                              background: '#2864A5',
                               color: '#ffffff',
                               border: 'none',
                               fontWeight: 600,
@@ -1366,7 +1366,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#64748b' }}>
-            <i className="bi bi-shield-check" style={{ color: '#059669' }} />
+            <i className="bi bi-shield-check" style={{ color: '#1E7A4C' }} />
             <span>RBAC Protected &bull; Authorized Records Only</span>
           </div>
         </div>

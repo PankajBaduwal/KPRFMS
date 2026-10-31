@@ -7,8 +7,11 @@ export const PRODUCT_NAME = 'FacultyCore';
 export const PRODUCT_TAGLINE = 'Faculty Management & Institutional Intelligence Platform';
 export const PORTAL_NAME = 'Faculty Management Portal';
 export const PRODUCT_FULL_NAME = `${PRODUCT_NAME} Faculty Management System`;
-export const PRODUCT_MARK = '/images/facultycore-mark.svg';
+export const PRODUCT_MARK = '/images/facultycore-mark.png';
+export const PRODUCT_LOGO = '/images/facultycore-logo.png';
+export const PRODUCT_HORIZONTAL = '/images/facultycore-horizontal.png';
 /** Mark + "FacultyCore" wordmark, for platform-level pages (sign-in, console, public site) */
-export const PRODUCT_WORDMARK = '/images/facultycore-wordmark.svg';
+export const PRODUCT_WORDMARK = '/images/facultycore-horizontal.png';
 /** Prefix for this app's keys in browser storage. */
 export const STORAGE_PREFIX = 'facultycore_';
+

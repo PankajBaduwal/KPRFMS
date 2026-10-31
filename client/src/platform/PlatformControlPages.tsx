@@ -44,12 +44,64 @@ const ActivityTable: React.FC<{ items: ActivityItem[]; showIp?: boolean }> = ({ 
         )}
         {items.map((a, i) => (
           <tr key={i}>
-            <td className="pc-small">{when(a.createdAt)}</td>
-            <td>{a.label}</td>
-            <td className="pc-small">{a.actorEmail || 'system'}</td>
-            <td>{a.institutionCode ? <Link to={`/platform/institutions/${a.institutionCode}`}>{a.institutionCode}</Link> : '—'}</td>
+            <td className="pc-small" style={{ whiteSpace: 'nowrap' }}>
+              <i className="bi bi-clock" style={{ marginRight: '5px', color: '#94a3b8' }} />
+              {when(a.createdAt)}
+            </td>
+            <td>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  color: a.label.toLowerCase().includes('failed')
+                    ? '#be123c'
+                    : a.label.toLowerCase().includes('in')
+                    ? '#047857'
+                    : '#1e3a8a',
+                }}
+              >
+                <i
+                  className={`bi ${
+                    a.label.toLowerCase().includes('failed')
+                      ? 'bi-x-circle-fill'
+                      : a.label.toLowerCase().includes('in')
+                      ? 'bi-box-arrow-in-right'
+                      : 'bi-dot'
+                  }`}
+                />
+                {a.label}
+              </span>
+            </td>
+            <td className="pc-small">
+              <code style={{ fontSize: '0.78rem' }}>{a.actorEmail || 'system'}</code>
+            </td>
+            <td>
+              {a.institutionCode ? (
+                <Link
+                  to={`/platform/institutions/${a.institutionCode}`}
+                  className="pc-tag-pill"
+                  style={{ textDecoration: 'none', color: '#1F4E85', fontWeight: 650 }}
+                >
+                  <i className="bi bi-bank2" style={{ marginRight: '4px' }} />
+                  {a.institutionCode}
+                </Link>
+              ) : (
+                '—'
+              )}
+            </td>
             {showIp && <td className="pc-small">{a.ip || '—'}</td>}
-            <td className="pc-small pc-details">{Object.keys(a.details ?? {}).length ? JSON.stringify(a.details) : '—'}</td>
+            <td className="pc-small pc-details">
+              {Object.keys(a.details ?? {}).length ? (
+                <code style={{ fontSize: '0.75rem', background: '#f8fafc', padding: '2px 6px', borderRadius: '4px' }}>
+                  {JSON.stringify(a.details)}
+                </code>
+              ) : (
+                '—'
+              )}
+            </td>
           </tr>
         ))}
       </tbody>
@@ -64,52 +116,204 @@ export const PlatformOverviewPage: React.FC = () => {
   if (q.isLoading) return <Loading what="the platform overview" />;
   if (q.isError || !o) return <Failed error={q.error} what="The overview" />;
   const m = o.metrics;
-  const tiles: Array<[string, number, string, string?]> = [
-    ['Institutions', m.institutions, '/platform/institutions'],
-    ['Active', m.active, '/platform/institutions?status=ACTIVE'],
-    ['Suspended', m.suspended, '/platform/institutions?status=SUSPENDED', m.suspended ? 'is-warn' : undefined],
-    ['Archived', m.archived, '/platform/institutions?status=ARCHIVED'],
-    ['Setup failed', m.provisioningFailed, '/platform/institutions?status=PROVISIONING_FAILED', m.provisioningFailed ? 'is-warn' : undefined],
-    ['Users', m.users, '/platform/users'],
-    ['Faculty accounts', m.facultyAccounts, '/platform/institutions'],
-    ['Active accounts', m.activeUsers, '/platform/institutions'],
-    ['Pending invitations', m.pendingInvitations, '/platform/invitations?status=PENDING'],
-    ['Expired invitations', m.expiredInvitations, '/platform/invitations?status=EXPIRED', m.expiredInvitations ? 'is-warn' : undefined],
-    ['Onboarding incomplete', m.incompleteOnboarding, '/platform/onboarding'],
-    ['Need attention', m.needingAttention, '#attention', m.needingAttention ? 'is-warn' : undefined],
-  ];
+
   return (
     <div className="pc-page">
-      <Head title="Platform overview" intro="Institutions, accounts and platform health at a glance. Counts come from each institution’s own database.">
+      <Head
+        title="Platform Overview"
+        intro="Live multi-tenant institutional intelligence, account registries, and platform operations."
+      >
         <Link to="/platform/new" className="pc-btn pc-btn-primary">
-          New institution
+          <i className="bi bi-plus-lg" />
+          <span>New Institution</span>
         </Link>
       </Head>
-      {m.unreachable > 0 && <p className="pc-error">{m.unreachable} institution database(s) could not be read; their counts are left out above, not counted as zero.</p>}
-      <section className="pc-metrics" aria-label="Platform totals">
-        {tiles.map(([label, value, to, cls]) => (
-          <Link key={label} to={to} className={`pc-metric pc-metric-link ${cls ?? ''}`}>
-            <span>{label}</span>
-            <strong>{fmt(value)}</strong>
-          </Link>
-        ))}
-      </section>
 
+      {m.unreachable > 0 && (
+        <div className="pc-card" style={{ borderLeft: '5px solid #be123c', background: '#fff1f2' }}>
+          <p className="pc-error" style={{ margin: 0, fontWeight: 600 }}>
+            <i className="bi bi-exclamation-triangle-fill" style={{ marginRight: '8px' }} />
+            {m.unreachable} institution database(s) could not be read; counts are left out, not counted as zero.
+          </p>
+        </div>
+      )}
+
+      {/* Grouped KPI Decks */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {/* 1. Institutions Section */}
+        <div className="pc-metric-deck">
+          <div className="pc-deck-header">
+            <span className="pc-deck-title">
+              <i className="bi bi-bank2" /> Institutions &amp; Tenants
+            </span>
+            <Link to="/platform/institutions" className="pc-small pc-strong">
+              View directory →
+            </Link>
+          </div>
+          <div className="pc-metrics-row">
+            <Link to="/platform/institutions" className="pc-kpi-card pc-kpi-card--primary">
+              <div className="pc-kpi-icon">
+                <i className="bi bi-buildings-fill" />
+              </div>
+              <div className="pc-kpi-content">
+                <span className="pc-kpi-lbl">Total Registered</span>
+                <span className="pc-kpi-val">{fmt(m.institutions)}</span>
+                <span className="pc-kpi-sub">Across all regions</span>
+              </div>
+            </Link>
+
+            <Link to="/platform/institutions?status=ACTIVE" className="pc-kpi-card pc-kpi-card--success">
+              <div className="pc-kpi-icon">
+                <i className="bi bi-check-circle-fill" />
+              </div>
+              <div className="pc-kpi-content">
+                <span className="pc-kpi-lbl">Active &amp; Live</span>
+                <span className="pc-kpi-val">{fmt(m.active)}</span>
+                <span className="pc-kpi-sub">Operational tenants</span>
+              </div>
+            </Link>
+
+            <Link
+              to="/platform/institutions?status=SUSPENDED"
+              className={`pc-kpi-card ${m.suspended ? 'pc-kpi-card--warning is-warn' : ''}`}
+            >
+              <div className="pc-kpi-icon">
+                <i className="bi bi-pause-circle-fill" />
+              </div>
+              <div className="pc-kpi-content">
+                <span className="pc-kpi-lbl">Suspended</span>
+                <span className="pc-kpi-val">{fmt(m.suspended)}</span>
+                <span className="pc-kpi-sub">{m.suspended ? 'Requires review' : 'No suspended tenants'}</span>
+              </div>
+            </Link>
+
+            <Link
+              to="/platform/institutions?status=PROVISIONING_FAILED"
+              className={`pc-kpi-card ${m.provisioningFailed ? 'pc-kpi-card--danger is-warn' : ''}`}
+            >
+              <div className="pc-kpi-icon">
+                <i className="bi bi-exclamation-octagon-fill" />
+              </div>
+              <div className="pc-kpi-content">
+                <span className="pc-kpi-lbl">Setup Failed</span>
+                <span className="pc-kpi-val">{fmt(m.provisioningFailed)}</span>
+                <span className="pc-kpi-sub">{m.provisioningFailed ? 'Action needed' : 'Zero provisioning errors'}</span>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* 2. People & Capacity Section */}
+        <div className="pc-metric-deck">
+          <div className="pc-deck-header">
+            <span className="pc-deck-title">
+              <i className="bi bi-people-fill" /> Accounts &amp; Faculty Capacity
+            </span>
+            <Link to="/platform/users" className="pc-small pc-strong">
+              User console →
+            </Link>
+          </div>
+          <div className="pc-metrics-row">
+            <Link to="/platform/users" className="pc-kpi-card pc-kpi-card--purple">
+              <div className="pc-kpi-icon">
+                <i className="bi bi-people-fill" />
+              </div>
+              <div className="pc-kpi-content">
+                <span className="pc-kpi-lbl">Total User Accounts</span>
+                <span className="pc-kpi-val">{fmt(m.users)}</span>
+                <span className="pc-kpi-sub">Across all colleges</span>
+              </div>
+            </Link>
+
+            <Link to="/platform/institutions" className="pc-kpi-card pc-kpi-card--primary">
+              <div className="pc-kpi-icon">
+                <i className="bi bi-mortarboard-fill" />
+              </div>
+              <div className="pc-kpi-content">
+                <span className="pc-kpi-lbl">Faculty Profiles</span>
+                <span className="pc-kpi-val">{fmt(m.facultyAccounts)}</span>
+                <span className="pc-kpi-sub">Enrolled teaching staff</span>
+              </div>
+            </Link>
+
+            <Link to="/platform/institutions" className="pc-kpi-card pc-kpi-card--success">
+              <div className="pc-kpi-icon">
+                <i className="bi bi-person-check-fill" />
+              </div>
+              <div className="pc-kpi-content">
+                <span className="pc-kpi-lbl">Active Accounts</span>
+                <span className="pc-kpi-val">{fmt(m.activeUsers)}</span>
+                <span className="pc-kpi-sub">Verified &amp; active</span>
+              </div>
+            </Link>
+
+            <Link to="/platform/invitations?status=PENDING" className="pc-kpi-card pc-kpi-card--warning">
+              <div className="pc-kpi-icon">
+                <i className="bi bi-envelope-paper-fill" />
+              </div>
+              <div className="pc-kpi-content">
+                <span className="pc-kpi-lbl">Pending Invites</span>
+                <span className="pc-kpi-val">{fmt(m.pendingInvitations)}</span>
+                <span className="pc-kpi-sub">Awaiting activation</span>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Needs Your Attention Section */}
       <section className="pc-card" id="attention" aria-label="Needs your attention">
-        <h2>Needs your attention</h2>
+        <div className="pc-card-head">
+          <h2>
+            <i className="bi bi-shield-exclamation" /> Needs your attention
+          </h2>
+          {o.attention.length > 0 && (
+            <span
+              style={{
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: '#be123c',
+                background: '#fff1f2',
+                padding: '3px 10px',
+                borderRadius: '9999px',
+                border: '1px solid #fecdd3',
+              }}
+            >
+              {o.attention.length} Action Items
+            </span>
+          )}
+        </div>
+
         {o.attention.length === 0 ? (
-          <p className="pc-ok">Nothing needs attention: every institution is set up, reachable, administered and backed up.</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#1E7A4C', padding: '8px 0' }}>
+            <i className="bi bi-check-circle-fill" style={{ fontSize: '1.25rem' }} />
+            <p className="pc-ok" style={{ margin: 0, fontWeight: 600 }}>
+              Everything is operating normally: all institutions are provisioned, reachable, administered and backed up.
+            </p>
+          </div>
         ) : (
           <ul className="pc-attention">
             {o.attention.map((a) => (
               <li key={a.id} className={`is-${a.severity}`}>
-                <div>
-                  <span className="pc-sev">{a.severity}</span>
-                  <strong>{a.title}</strong>
-                  <p className="pc-muted pc-small">{a.detail}</p>
+                <div className="pc-attention-content">
+                  <i
+                    className={`bi ${
+                      a.severity === 'critical'
+                        ? 'bi-exclamation-octagon-fill'
+                        : a.severity === 'warning'
+                        ? 'bi-exclamation-triangle-fill'
+                        : 'bi-info-circle-fill'
+                    } pc-attention-icon`}
+                  />
+                  <div>
+                    <span className="pc-sev">{a.severity}</span>
+                    <strong>{a.title}</strong>
+                    <p className="pc-muted pc-small">{a.detail}</p>
+                  </div>
                 </div>
-                <Link to={a.link} className="pc-btn">
-                  {a.action}
+                <Link to={a.link} className="pc-btn pc-btn-primary">
+                  <span>{a.action}</span>
+                  <i className="bi bi-arrow-right-short" />
                 </Link>
               </li>
             ))}
@@ -117,47 +321,112 @@ export const PlatformOverviewPage: React.FC = () => {
         )}
       </section>
 
+      {/* Charts Grid */}
       <div className="pc-grid">
         <section className="pc-card">
-          <h2>Users by institution</h2>
-          <ResponsiveContainer width="100%" height={Math.max(160, o.charts.perInstitution.length * 44)}>
-            <BarChart data={o.charts.perInstitution} layout="vertical" margin={{ left: 8, right: 16 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-              <XAxis type="number" allowDecimals={false} fontSize={12} />
-              <YAxis type="category" dataKey="code" width={70} fontSize={12} />
-              <Tooltip />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="active" stackId="u" name="Active accounts" fill="#1f4e8c" />
-              <Bar dataKey="inactive" stackId="u" name="Inactive / pending" fill="#c3cfde" />
-            </BarChart>
-          </ResponsiveContainer>
+          <h2>
+            <i className="bi bi-bar-chart-line-fill" /> Users by institution
+          </h2>
+          {o.charts.perInstitution.length === 0 ? (
+            <div className="pc-empty-chart">
+              <i className="bi bi-bar-chart" />
+              <p>No user metrics recorded yet</p>
+            </div>
+          ) : (
+            <div style={{ height: 260, width: '100%' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={o.charts.perInstitution} margin={{ top: 12, right: 16, left: -10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="code" tick={{ fill: '#0f172a', fontSize: 12, fontWeight: 700 }} />
+                  <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#172B45',
+                      color: '#ffffff',
+                      borderRadius: '8px',
+                      border: 'none',
+                      fontSize: '0.82rem',
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '0.78rem', paddingTop: '8px' }} />
+                  <Bar dataKey="active" name="Active accounts" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="inactive" name="Pending / inactive" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </section>
+
         <section className="pc-card">
-          <h2>Faculty by institution</h2>
-          <ResponsiveContainer width="100%" height={Math.max(160, o.charts.perInstitution.length * 44)}>
-            <BarChart data={o.charts.perInstitution} layout="vertical" margin={{ left: 8, right: 16 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-              <XAxis type="number" allowDecimals={false} fontSize={12} />
-              <YAxis type="category" dataKey="code" width={70} fontSize={12} />
-              <Tooltip />
-              <Bar dataKey="faculty" name="Faculty profiles" fill="#315d91" />
-            </BarChart>
-          </ResponsiveContainer>
+          <h2>
+            <i className="bi bi-person-lines-fill" /> Faculty by institution
+          </h2>
+          {o.charts.perInstitution.length === 0 ? (
+            <div className="pc-empty-chart">
+              <i className="bi bi-people" />
+              <p>No faculty metrics recorded yet</p>
+            </div>
+          ) : (
+            <div style={{ height: 260, width: '100%' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={o.charts.perInstitution} margin={{ top: 12, right: 16, left: -10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="code" tick={{ fill: '#0f172a', fontSize: 12, fontWeight: 700 }} />
+                  <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#172B45',
+                      color: '#ffffff',
+                      borderRadius: '8px',
+                      border: 'none',
+                      fontSize: '0.82rem',
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '0.78rem', paddingTop: '8px' }} />
+                  <Bar dataKey="faculty" name="Faculty profiles" fill="#1e3a8a" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </section>
+
         <section className="pc-card">
-          <h2>Institutions registered</h2>
-          <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={o.charts.registrations}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="month" fontSize={12} />
-              <YAxis allowDecimals={false} fontSize={12} width={28} />
-              <Tooltip />
-              <Bar dataKey="added" name="Added that month" fill="#17365d" />
-            </BarChart>
-          </ResponsiveContainer>
+          <h2>
+            <i className="bi bi-calendar3" /> Institutions registered
+          </h2>
+          {o.charts.registrations.length === 0 ? (
+            <div className="pc-empty-chart">
+              <i className="bi bi-calendar3" />
+              <p>No registration history recorded yet</p>
+            </div>
+          ) : (
+            <div style={{ height: 260, width: '100%' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={o.charts.registrations} margin={{ top: 12, right: 16, left: -10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="month" tick={{ fill: '#0f172a', fontSize: 12, fontWeight: 600 }} />
+                  <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#172B45',
+                      color: '#ffffff',
+                      borderRadius: '8px',
+                      border: 'none',
+                      fontSize: '0.82rem',
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '0.78rem', paddingTop: '8px' }} />
+                  <Bar dataKey="added" name="Institutions added" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </section>
+
         <section className="pc-card">
-          <h2>Status and onboarding</h2>
+          <h2>
+            <i className="bi bi-pie-chart-fill" /> Status and onboarding
+          </h2>
           <ul className="pc-kv">
             {o.charts.status.map((s) => (
               <li key={s.status}>
@@ -165,19 +434,28 @@ export const PlatformOverviewPage: React.FC = () => {
               </li>
             ))}
             <li>
-              Onboarding complete <b>{o.charts.onboarding.completed}</b>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <i className="bi bi-check2-circle" style={{ color: '#1E7A4C' }} /> Onboarding complete
+              </span>
+              <b>{o.charts.onboarding.completed}</b>
             </li>
             <li>
-              Onboarding incomplete <b>{o.charts.onboarding.incomplete}</b>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <i className="bi bi-hourglass-split" style={{ color: '#B45309' }} /> Onboarding incomplete
+              </span>
+              <b>{o.charts.onboarding.incomplete}</b>
             </li>
           </ul>
         </section>
       </div>
 
+      {/* Recent Platform Activity */}
       <section className="pc-card">
-        <div className="pc-row">
-          <h2>Recent platform activity</h2>
-          <Link to="/platform/audit" className="pc-small">
+        <div className="pc-card-head">
+          <h2>
+            <i className="bi bi-clock-history" /> Recent platform activity
+          </h2>
+          <Link to="/platform/audit" className="pc-small pc-strong">
             View all audit logs →
           </Link>
         </div>
@@ -987,48 +1265,107 @@ export const InstitutionOperationsCard: React.FC<{ code: string; active: boolean
   const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
   const check = useMutation({
     mutationFn: () => controlApi.checkDatabase(code),
-    onSuccess: (r) => setNote({ ok: r.ok, text: r.ok ? `Database reachable in ${r.latencyMs} ms.` : `Database unreachable: ${r.error}` }),
+    onSuccess: (r) => setNote({ ok: r.ok, text: r.ok ? `Database reachable (${r.latencyMs} ms).` : `Database unreachable: ${r.error}` }),
     onError: (e) => setNote({ ok: false, text: formatErrorMessage(e, 'Check failed') }),
   });
   const backup = useMutation({
     mutationFn: () => controlApi.createBackup(code),
     onSuccess: (b) => {
-      setNote({ ok: true, text: `Backup created: ${fmt(b.documents)} documents, ${bytes(b.sizeBytes)}.` });
+      setNote({ ok: true, text: `Backup created: ${fmt(b.documents)} documents (${bytes(b.sizeBytes)}).` });
       queryClient.invalidateQueries({ queryKey: ['platform'] });
     },
     onError: (e) => setNote({ ok: false, text: formatErrorMessage(e, 'The backup failed.') }),
   });
+
   return (
     <section className="pc-card">
       <div className="pc-card-head">
-        <h2>Onboarding &amp; database</h2>
+        <h2>
+          <i className="bi bi-check2-all" /> Onboarding &amp; Readiness
+        </h2>
         <div className="pc-actions">
           <button type="button" className="pc-btn" disabled={check.isPending} onClick={() => check.mutate()}>
-            Test database
+            <i className="bi bi-hdd-network" />
+            <span>{check.isPending ? 'Testing…' : 'Test database'}</span>
           </button>
           {active && (
-            <button type="button" className="pc-btn" disabled={backup.isPending} onClick={() => backup.mutate()}>
-              {backup.isPending ? 'Backing up…' : 'Back up now'}
+            <button
+              type="button"
+              className="pc-btn pc-btn-primary"
+              disabled={backup.isPending}
+              onClick={() => backup.mutate()}
+            >
+              <i className="bi bi-archive-fill" />
+              <span>{backup.isPending ? 'Backing up…' : 'Back up now'}</span>
             </button>
           )}
         </div>
       </div>
-      {note && <p className={note.ok ? 'pc-ok' : 'pc-error'}>{note.text}</p>}
+
+      {note && (
+        <div
+          style={{
+            padding: '10px 14px',
+            borderRadius: '8px',
+            background: note.ok ? '#ecfdf5' : '#fff1f2',
+            border: `1px solid ${note.ok ? '#a7f3d0' : '#fecdd3'}`,
+            color: note.ok ? '#047857' : '#be123c',
+            fontWeight: 600,
+            fontSize: '0.85rem',
+            marginBottom: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <i className={`bi ${note.ok ? 'bi-check-circle-fill' : 'bi-exclamation-octagon-fill'}`} />
+          <span>{note.text}</span>
+        </div>
+      )}
+
       {ob.isLoading && <Loading what="onboarding" />}
       {ob.data && (
         <>
-          <p className="pc-muted pc-small">
-            {ob.data.completed} of {ob.data.total} stages done
-          </p>
-          <div className="pc-progress" aria-hidden>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>
+              Overall Setup Progress
+            </span>
+            <span
+              style={{
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: ob.data.completed === ob.data.total ? '#047857' : '#2563eb',
+                background: ob.data.completed === ob.data.total ? '#ecfdf5' : '#eff6ff',
+                padding: '2px 8px',
+                borderRadius: '6px',
+              }}
+            >
+              {ob.data.completed} of {ob.data.total} stages complete ({Math.round((ob.data.completed / ob.data.total) * 100)}%)
+            </span>
+          </div>
+
+          <div className="pc-progress" aria-hidden style={{ margin: '6px 0 16px' }}>
             <span style={{ width: `${Math.round((ob.data.completed / ob.data.total) * 100)}%` }} />
           </div>
+
           <ol className="pc-stages">
             {ob.data.stages.map((s) => (
               <li key={s.key} className={s.done ? 'is-done' : s.optional ? 'is-optional' : 'is-todo'}>
                 <b>
-                  {s.done ? '✓' : '○'} {s.label}
-                  {s.optional && !s.done ? ' (optional)' : ''}
+                  <i
+                    className={`bi ${
+                      s.done
+                        ? 'bi-check-circle-fill'
+                        : s.optional
+                        ? 'bi-dash-circle'
+                        : 'bi-circle'
+                    }`}
+                    style={{ fontSize: '0.85rem', marginRight: '4px' }}
+                  />
+                  <span>
+                    {s.label}
+                    {s.optional && !s.done ? ' (optional)' : ''}
+                  </span>
                 </b>
                 <span className="pc-muted pc-small">{s.detail}</span>
               </li>

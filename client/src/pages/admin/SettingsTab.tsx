@@ -73,7 +73,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                   border: '1px solid #e2e8f0',
                 }}
               >
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1.25rem', color: '#0f172a' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1.25rem', color: '#172B45' }}>
                   <i className="bi bi-building me-2 text-primary" />
                   Institutional Identity & Governance
                 </h3>
@@ -153,7 +153,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                   border: '1px solid #e2e8f0',
                 }}
               >
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1.25rem', color: '#0f172a' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1.25rem', color: '#172B45' }}>
                   <i className="bi bi-geo-alt-fill me-2 text-danger" />
                   Contact & Campus Location
                 </h3>
@@ -226,7 +226,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <div>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, color: '#0f172a' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, color: '#172B45' }}>
                       <i className="bi bi-graph-up-arrow me-2 text-success" />
                       Performance Appraisal System (PBAS / CAS) Configuration
                     </h3>
@@ -336,7 +336,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                   border: '1px solid #e2e8f0',
                 }}
               >
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, color: '#0f172a' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, color: '#172B45' }}>
                   <i className="bi bi-trophy me-2 text-warning" />
                   Department of the Year — Score Weights
                 </h3>
@@ -381,7 +381,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                   border: '1px solid #e2e8f0',
                 }}
               >
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1.25rem', color: '#0f172a' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1.25rem', color: '#172B45' }}>
                   <i className="bi bi-shield-check me-2 text-warning" />
                   Security, Platform Quotas & Governance
                 </h3>

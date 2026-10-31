@@ -86,13 +86,13 @@ export const FacultyComparisonDrillDownModal: React.FC<FacultyComparisonDrillDow
   const getStatusBadge = (status?: string) => {
     const s = (status || '').toUpperCase();
     if (['VERIFIED', 'SANCTIONED', 'APPROVED', 'COMPLETED', 'GRANTED', 'AWARDED', 'NORMAL'].includes(s)) {
-      return { bg: '#ecfdf5', text: '#059669', border: '#a7f3d0' };
+      return { bg: '#ecfdf5', text: '#059669', border: '#BFE3CD' };
     }
     if (['UNDER_REVIEW', 'SUBMITTED', 'COURSEWORK', 'IN_PREPARATION', 'ONGOING'].includes(s)) {
-      return { bg: '#fffbeb', text: '#d97706', border: '#fde68a' };
+      return { bg: '#fffbeb', text: '#d97706', border: '#F2D9A6' };
     }
     if (['OVERLOADED', 'REJECTED', 'RETURNED_FOR_CORRECTION'].includes(s)) {
-      return { bg: '#fef2f2', text: '#dc2626', border: '#fecaca' };
+      return { bg: '#fef2f2', text: '#dc2626', border: '#F3C7C2' };
     }
     return { bg: '#f3f4f6', text: '#4b5563', border: '#e5e7eb' };
   };
@@ -143,12 +143,12 @@ export const FacultyComparisonDrillDownModal: React.FC<FacultyComparisonDrillDow
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: '#0f172a' }}>
+              <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: '#172B45' }}>
                 {title}
               </h4>
               <span
                 style={{
-                  backgroundColor: '#0284c7',
+                  backgroundColor: '#2864A5',
                   color: '#ffffff',
                   fontSize: '0.75rem',
                   fontWeight: 700,
@@ -169,12 +169,12 @@ export const FacultyComparisonDrillDownModal: React.FC<FacultyComparisonDrillDow
                 flexWrap: 'wrap',
               }}
             >
-              <span>Faculty Member: <strong style={{ color: '#0f172a' }}>{facultyName}</strong></span>
+              <span>Faculty Member: <strong style={{ color: '#172B45' }}>{facultyName}</strong></span>
               {academicYear && academicYear !== 'ALL' && (
-                <span>• Academic Year: <strong style={{ color: '#0f172a' }}>{academicYear}</strong></span>
+                <span>• Academic Year: <strong style={{ color: '#172B45' }}>{academicYear}</strong></span>
               )}
               {verificationState && verificationState !== 'ALL' && (
-                <span>• State: <strong style={{ color: '#059669' }}>{verificationState}</strong></span>
+                <span>• State: <strong style={{ color: '#1E7A4C' }}>{verificationState}</strong></span>
               )}
             </div>
           </div>
@@ -214,10 +214,10 @@ export const FacultyComparisonDrillDownModal: React.FC<FacultyComparisonDrillDow
             <div
               style={{
                 padding: '1.25rem',
-                backgroundColor: '#fef2f2',
-                border: '1px solid #fecaca',
+                backgroundColor: '#FCEFEE',
+                border: '1px solid #F3C7C2',
                 borderRadius: '8px',
-                color: '#b91c1c',
+                color: '#B42318',
                 fontSize: '0.875rem',
               }}
             >
@@ -271,7 +271,7 @@ export const FacultyComparisonDrillDownModal: React.FC<FacultyComparisonDrillDow
                               textTransform: 'uppercase',
                               padding: '0.15rem 0.5rem',
                               borderRadius: '4px',
-                              backgroundColor: '#e0f2fe',
+                              backgroundColor: '#EAF2FA',
                               color: '#0369a1',
                             }}
                           >
@@ -302,7 +302,7 @@ export const FacultyComparisonDrillDownModal: React.FC<FacultyComparisonDrillDow
                             margin: '0.45rem 0 0.25rem 0',
                             fontSize: '0.95rem',
                             fontWeight: 600,
-                            color: '#1e293b',
+                            color: '#172B45',
                             lineHeight: 1.4,
                           }}
                         >
@@ -316,7 +316,7 @@ export const FacultyComparisonDrillDownModal: React.FC<FacultyComparisonDrillDow
 
                       <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                         {rec.amount !== undefined && rec.amount > 0 && (
-                          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#059669' }}>
+                          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1E7A4C' }}>
                             ₹{rec.amount.toLocaleString()}
                           </div>
                         )}
@@ -368,7 +368,7 @@ export const FacultyComparisonDrillDownModal: React.FC<FacultyComparisonDrillDow
                               <span style={{ color: '#64748b', textTransform: 'capitalize' }}>
                                 {k.replace(/([A-Z])/g, ' $1')}:{' '}
                               </span>
-                              <strong style={{ color: '#1e293b' }}>{String(v)}</strong>
+                              <strong style={{ color: '#172B45' }}>{String(v)}</strong>
                             </div>
                           );
                         })}

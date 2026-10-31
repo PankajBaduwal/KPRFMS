@@ -140,8 +140,8 @@ export const AppraisalCycleConfigModal: React.FC<Props> = ({
                 style={{
                   marginBottom: '1rem',
                   padding: '0.75rem 1rem',
-                  backgroundColor: '#fee2e2',
-                  color: '#b91c1c',
+                  backgroundColor: '#FBE4E2',
+                  color: '#B42318',
                   borderRadius: '8px',
                   fontSize: '0.85rem',
                 }}

@@ -352,7 +352,7 @@ export const LeaveManagementPage: React.FC = () => {
                 border: '1px solid rgba(16, 185, 129, 0.3)',
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#10b981',
+                color: '#2E9461',
               }}
             >
               <ShieldCheck size={14} />
@@ -672,7 +672,7 @@ export const LeaveManagementPage: React.FC = () => {
                               setSelectedLeaveForCancel(app);
                               setIsCancelModalOpen(true);
                             }}
-                            style={{ borderColor: '#ef4444', color: '#ef4444', fontSize: '11px', padding: '2px 8px' }}
+                            style={{ borderColor: '#D14343', color: '#D14343', fontSize: '11px', padding: '2px 8px' }}
                           >
                             Cancel Leave
                           </Button>
@@ -880,7 +880,7 @@ export const LeaveManagementPage: React.FC = () => {
                           href={app.supportingDocument}
                           target="_blank"
                           rel="noreferrer"
-                          style={{ color: '#3b82f6', textDecoration: 'underline', fontSize: '12px' }}
+                          style={{ color: '#2864A5', textDecoration: 'underline', fontSize: '12px' }}
                         >
                           View Supporting Document
                         </a>
@@ -1086,7 +1086,7 @@ export const LeaveManagementPage: React.FC = () => {
                     </div>
                     <div>
                       <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Days Remaining</div>
-                      <div style={{ fontSize: '16px', fontWeight: 700, color: '#10b981' }}>{b?.remaining || 0}</div>
+                      <div style={{ fontSize: '16px', fontWeight: 700, color: '#2E9461' }}>{b?.remaining || 0}</div>
                     </div>
                   </div>
                 </div>

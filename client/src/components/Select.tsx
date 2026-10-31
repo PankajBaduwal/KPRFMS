@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import { splitRequiredMark } from './formLabel';
 
 export interface SelectOption {
   value: string;
@@ -48,8 +49,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       <div className={containerClassName}>
         {label && (
           <label htmlFor={selectId} className="form-label-custom">
-            {label}
-            {required && <span className="text-danger ms-1" aria-hidden="true">*</span>}
+            {splitRequiredMark(label).text}
+            {(required || splitRequiredMark(label).marked) && <span className="text-danger ms-1" aria-hidden="true">*</span>}
           </label>
         )}
         <select

@@ -143,7 +143,109 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
         </div>
       </section>
 
-      {/* B — academic overview */}
+      {/* B — quick actions (Common tasks and shortcuts) */}
+      <QuickActions appraisalLabel={appraisalTask?.actionText} />
+
+      {/* C — at a glance: My publications, Academic activities, Leave & attendance */}
+      <section aria-label="At a glance" className="fx-glance">
+        <div className="fx-card">
+          <div className="fx-card-head">
+            <div>
+              <h2 className="fx-h2">My publications</h2>
+              <p className="fx-sub">Verified publications across last 5 academic years.</p>
+            </div>
+            {m && (
+              <span className="fx-badge ok" title="Verified publications">
+                {m.publications.verified} verified
+              </span>
+            )}
+          </div>
+          {!charts ? (
+            <p className="fx-empty">This chart could not be loaded.</p>
+          ) : (
+            <>
+              <FacultyPublicationsChart rows={charts.publicationsByYear} />
+              {charts.publicationsByYear.every((r) => Object.entries(r).every(([k, v]) => k === 'year' || k === 'academicYear' || !Number(v))) && (
+                <p className="fx-empty">No verified publications in these years yet.</p>
+              )}
+            </>
+          )}
+          <Link to={ROUTES.PUBLICATIONS} className="fx-link" style={{ marginTop: 'auto', paddingTop: 10 }}>View publications</Link>
+        </div>
+
+        <div className="fx-card">
+          <div className="fx-card-head">
+            <div>
+              <h2 className="fx-h2">Academic activities</h2>
+              <p className="fx-sub">FDPs, workshops, seminars, conferences and other recorded activities.</p>
+            </div>
+            {charts && charts.activityMix.length > 0 && (
+              <span className="fx-badge info">
+                {activityTotal} total
+              </span>
+            )}
+          </div>
+          {!charts ? (
+            <p className="fx-empty">These figures could not be loaded.</p>
+          ) : charts.activityMix.length === 0 ? (
+            <p className="fx-empty">No activities recorded yet.</p>
+          ) : (
+            <>
+              <div className="fx-total">{activityTotal}<span className="fx-sub"> total recorded</span></div>
+              <ul className="fx-rows">
+                {charts.activityMix.map((a) => (
+                  <li key={a.name} className="fx-row">
+                    <span>{ACTIVITY_LABELS[a.name] ?? words(a.name)}</span>
+                    <strong>{a.value}</strong>
+                    <span className="fx-row-bar" aria-hidden="true">
+                      <span style={{ width: `${(a.value / activityMax) * 100}%` }} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          <Link to={ROUTES.ACTIVITIES} className="fx-link" style={{ marginTop: 'auto', paddingTop: 10 }}>View my activities</Link>
+        </div>
+
+        <div className="fx-card">
+          <div className="fx-card-head">
+            <div>
+              <h2 className="fx-h2">Leave &amp; attendance</h2>
+              <p className="fx-sub">Quota utilization and 90-day attendance.</p>
+            </div>
+            {charts && charts.attendanceRate90d !== null && (
+              <span className="fx-badge ok" title="Attendance in the last 90 days">
+                <i className="bi bi-calendar-check" aria-hidden="true" /> {charts.attendanceRate90d}% attendance
+              </span>
+            )}
+          </div>
+          {!charts ? (
+            <p className="fx-empty">These figures could not be loaded.</p>
+          ) : charts.leaveBalance.length === 0 ? (
+            <p className="fx-empty">No leave balance has been set up for you this year.</p>
+          ) : (
+            <ul className="fx-rows">
+              {charts.leaveBalance.map((b) => (
+                <li key={b.type} className="fx-row">
+                  <span>{LEAVE_LABELS[b.type] ?? words(b.type)}</span>
+                  <strong>
+                    {b.remaining} of {b.total} left
+                  </strong>
+                  <span className="fx-row-bar" aria-hidden="true">
+                    <span style={{ width: `${b.total ? (b.remaining / b.total) * 100 : 0}%` }} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {visible(ROUTES.LEAVES) && (
+            <Link to={ROUTES.LEAVES} className="fx-link" style={{ marginTop: 'auto', paddingTop: 10 }}>Leave balance and applications</Link>
+          )}
+        </div>
+      </section>
+
+      {/* D — academic overview */}
       <section className="fx-card" aria-labelledby="fx-overview">
         <div className="fx-card-head">
           <div>
@@ -191,7 +293,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
         </div>
       </section>
 
-      {/* C — needs your attention */}
+      {/* E — needs your attention */}
       <section className={`fx-card fx-attention ${tasks.length === 0 ? 'is-clear' : ''}`} aria-labelledby="fx-attention">
         <div className="fx-card-head">
           <div>
@@ -233,86 +335,6 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
             ))}
           </ul>
         )}
-      </section>
-
-      {/* D — quick actions */}
-      <QuickActions appraisalLabel={appraisalTask?.actionText} />
-
-      {/* E — at a glance */}
-      <section aria-label="At a glance" className="fx-glance">
-        <div className="fx-card">
-          <h2 className="fx-h2">My publications</h2>
-          <p className="fx-sub">Verified publications across the last five academic years.</p>
-          {!charts ? (
-            <p className="fx-empty">This chart could not be loaded.</p>
-          ) : (
-            <>
-              <FacultyPublicationsChart rows={charts.publicationsByYear} />
-              {charts.publicationsByYear.every((r) => Object.entries(r).every(([k, v]) => k === 'year' || k === 'academicYear' || !Number(v))) && (
-                <p className="fx-empty">No verified publications in these years yet.</p>
-              )}
-            </>
-          )}
-        </div>
-
-        <div className="fx-card">
-          <h2 className="fx-h2">Academic activities</h2>
-          <p className="fx-sub">FDPs, workshops, seminars, conferences and other recorded activities (rejected ones excluded).</p>
-          {!charts ? (
-            <p className="fx-empty">These figures could not be loaded.</p>
-          ) : charts.activityMix.length === 0 ? (
-            <p className="fx-empty">No activities recorded yet.</p>
-          ) : (
-            <>
-              <div className="fx-total">{activityTotal}<span className="fx-sub"> total</span></div>
-              <ul className="fx-rows">
-                {charts.activityMix.map((a) => (
-                  <li key={a.name} className="fx-row">
-                    <span>{ACTIVITY_LABELS[a.name] ?? words(a.name)}</span>
-                    <strong>{a.value}</strong>
-                    <span className="fx-row-bar" aria-hidden="true">
-                      <span style={{ width: `${(a.value / activityMax) * 100}%` }} />
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-          <Link to={ROUTES.ACTIVITIES} className="fx-link" style={{ marginTop: 'auto', paddingTop: 10 }}>View my activities</Link>
-        </div>
-
-        <div className="fx-card">
-          <h2 className="fx-h2">Leave &amp; attendance</h2>
-          <p className="fx-sub">
-            {charts && charts.attendanceRate90d !== null ? (
-              <>Attendance in the last 90 days: <strong>{charts.attendanceRate90d}%</strong></>
-            ) : (
-              'No attendance marked in the last 90 days.'
-            )}
-          </p>
-          {!charts ? (
-            <p className="fx-empty">These figures could not be loaded.</p>
-          ) : charts.leaveBalance.length === 0 ? (
-            <p className="fx-empty">No leave balance has been set up for you this year.</p>
-          ) : (
-            <ul className="fx-rows">
-              {charts.leaveBalance.map((b) => (
-                <li key={b.type} className="fx-row">
-                  <span>{LEAVE_LABELS[b.type] ?? words(b.type)}</span>
-                  <strong>
-                    {b.remaining} of {b.total} left
-                  </strong>
-                  <span className="fx-row-bar" aria-hidden="true">
-                    <span style={{ width: `${b.total ? (b.remaining / b.total) * 100 : 0}%` }} />
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-          {visible(ROUTES.LEAVES) && (
-            <Link to={ROUTES.LEAVES} className="fx-link" style={{ marginTop: 'auto', paddingTop: 10 }}>Leave balance and applications</Link>
-          )}
-        </div>
       </section>
 
       {/* F — research activity and verification queue */}

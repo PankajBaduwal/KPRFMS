@@ -33,7 +33,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ overview, setActiveTab
                 <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                   Total Accounts
                 </div>
-                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#0f172a', margin: '0.35rem 0' }}>
+                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#172B45', margin: '0.35rem 0' }}>
                   {overview.metrics.totalUsers}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#16a34a', display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
@@ -53,7 +53,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ overview, setActiveTab
                 <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                   Departments
                 </div>
-                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#4f46e5', margin: '0.35rem 0' }}>
+                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#2864A5', margin: '0.35rem 0' }}>
                   {overview.metrics.totalDepartments}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
@@ -73,7 +73,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ overview, setActiveTab
                 <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                   Programs Offered
                 </div>
-                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#0284c7', margin: '0.35rem 0' }}>
+                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#2864A5', margin: '0.35rem 0' }}>
                   {overview.metrics.totalPrograms}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#64748b' }}>UG, PG & Ph.D. degree tracks</div>
@@ -92,7 +92,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ overview, setActiveTab
                 <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                   Curriculum Subjects
                 </div>
-                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#d97706', margin: '0.35rem 0' }}>
+                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#B45309', margin: '0.35rem 0' }}>
                   {overview.metrics.totalSubjects}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Total courses across departments</div>
@@ -111,7 +111,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ overview, setActiveTab
                 <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                   Security Audit Records
                 </div>
-                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#7c3aed', margin: '0.35rem 0' }}>
+                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#2864A5', margin: '0.35rem 0' }}>
                   {overview.metrics.totalAuditLogs}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#64748b' }}>System events & auth traces</div>
@@ -128,7 +128,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ overview, setActiveTab
                   border: '1px solid #e2e8f0',
                 }}
               >
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 1rem 0', color: '#0f172a' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 1rem 0', color: '#172B45' }}>
                   <i className="bi bi-person-badge-fill me-2 text-primary" />
                   Active Role Distribution
                 </h3>
@@ -150,7 +150,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ overview, setActiveTab
                         style={{
                           padding: '0.2rem 0.6rem',
                           borderRadius: '9999px',
-                          backgroundColor: '#e0e7ff',
+                          backgroundColor: '#DCE8F5',
                           color: '#3730a3',
                           fontSize: '0.75rem',
                           fontWeight: 700,
@@ -171,7 +171,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ overview, setActiveTab
                   border: '1px solid #e2e8f0',
                 }}
               >
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 1rem 0', color: '#0f172a' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: '0 0 1rem 0', color: '#172B45' }}>
                   <i className="bi bi-buildings-fill me-2 text-indigo" />
                   Institutional Configuration Snapshot
                 </h3>
@@ -186,7 +186,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ overview, setActiveTab
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', borderBottom: '1px solid #f1f5f9' }}>
                     <span style={{ color: '#64748b' }}>Active Academic Year:</span>
-                    <span style={{ fontWeight: 600, color: '#2563eb' }}>{overview.settings.currentAcademicYear}</span>
+                    <span style={{ fontWeight: 600, color: '#2864A5' }}>{overview.settings.currentAcademicYear}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', borderBottom: '1px solid #f1f5f9' }}>
                     <span style={{ color: '#64748b' }}>Active Semester Type:</span>
@@ -217,7 +217,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ overview, setActiveTab
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, color: '#0f172a' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0, color: '#172B45' }}>
                   <i className="bi bi-clock-history me-2 text-purple" />
                   Recent System Activity
                 </h3>

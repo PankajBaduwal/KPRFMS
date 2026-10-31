@@ -454,7 +454,7 @@ export const dossierService = {
         returnedSubmissions: returned,
       };
     });
-    rows.sort((a, b) => a.department.localeCompare(b.department) || a.name.localeCompare(b.name));
+    rows.sort((a, b) => (a.department ?? '').localeCompare(b.department ?? '') || (a.name ?? '').localeCompare(b.name ?? ''));
     const n = rows.length || 1;
     return {
       scope: q.departmentId || user.role === ROLES.HOD ? 'department' : 'institution',
@@ -529,7 +529,7 @@ export const dossierService = {
       submitted: submitted(f),
       completeness: completionOf(f),
     }));
-    all.sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));
+    all.sort((a, b) => b.value - a.value || (a.name ?? '').localeCompare(b.name ?? ''));
     const values = all.map((r) => r.value);
     const ranked = all.map((r) => ({ rank: sharedRank(values, r.value), ...r }));
     const limit = Math.min(Math.max(q.limit ?? 25, 1), 200);

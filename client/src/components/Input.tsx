@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import { splitRequiredMark } from './formLabel';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -41,8 +42,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <div className={containerClassName}>
         {label && (
           <label htmlFor={inputId} className="form-label-custom">
-            {label}
-            {required && <span className="text-danger ms-1" aria-hidden="true">*</span>}
+            {splitRequiredMark(label).text}
+            {(required || splitRequiredMark(label).marked) && <span className="text-danger ms-1" aria-hidden="true">*</span>}
           </label>
         )}
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>

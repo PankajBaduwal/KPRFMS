@@ -145,7 +145,7 @@ export const DepartmentConsolePage: React.FC = () => {
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <h1 style={{ margin: 0, fontSize: '1.65rem', fontWeight: 800, color: 'var(--color-text-primary, #0f172a)' }}>
+            <h1 style={{ margin: 0, fontSize: '1.65rem', fontWeight: 800, color: 'var(--color-text-primary, #172B45)' }}>
               {overview?.department?.name || 'Department Console'}
             </h1>
             {overview?.department?.code && (
@@ -156,7 +156,7 @@ export const DepartmentConsolePage: React.FC = () => {
                   padding: '3px 10px',
                   borderRadius: '6px',
                   backgroundColor: 'rgba(30, 64, 175, 0.12)',
-                  color: '#1B345F',
+                  color: '#142B4A',
                 }}
               >
                 {overview.department.code}
@@ -227,8 +227,8 @@ export const DepartmentConsolePage: React.FC = () => {
             marginBottom: '1.25rem',
             padding: '1rem 1.25rem',
             borderRadius: '10px',
-            backgroundColor: '#fee2e2',
-            border: '1px solid #fecaca',
+            backgroundColor: '#FBE4E2',
+            border: '1px solid #F3C7C2',
             color: '#991b1b',
             display: 'flex',
             alignItems: 'center',
@@ -281,13 +281,13 @@ export const DepartmentConsolePage: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#64748b' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Faculty Strength</span>
-              <i className="bi bi-people-fill" style={{ fontSize: '1.1rem', color: '#1B345F' }} />
+              <i className="bi bi-people-fill" style={{ fontSize: '1.1rem', color: '#142B4A' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '0.4rem 0' }}>
-              <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#0f172a' }}>{pInfo.activeFaculty}</span>
+              <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#172B45' }}>{pInfo.activeFaculty}</span>
               <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>/ {pInfo.totalFaculty} Active</span>
             </div>
-            <div style={{ fontSize: '0.78rem', color: '#059669', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.78rem', color: '#1E7A4C', fontWeight: 600 }}>
               {Math.round((pInfo.activeFaculty / (pInfo.totalFaculty || 1)) * 100)}% Active on duty
             </div>
           </div>
@@ -305,10 +305,10 @@ export const DepartmentConsolePage: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#64748b' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Subjects & Workload</span>
-              <i className="bi bi-book-half" style={{ fontSize: '1.1rem', color: '#0284c7' }} />
+              <i className="bi bi-book-half" style={{ fontSize: '1.1rem', color: '#2864A5' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '0.4rem 0' }}>
-              <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#0f172a' }}>{pInfo.totalSubjects}</span>
+              <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#172B45' }}>{pInfo.totalSubjects}</span>
               <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Subjects Offered</span>
             </div>
             <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
@@ -329,7 +329,7 @@ export const DepartmentConsolePage: React.FC = () => {
               cursor: 'pointer',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#ea580c' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#B45309' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Pending Approvals</span>
               <i className="bi bi-bell-fill" style={{ fontSize: '1.1rem' }} />
             </div>
@@ -356,10 +356,10 @@ export const DepartmentConsolePage: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#64748b' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Research & Funding</span>
-              <i className="bi bi-cash-stack" style={{ fontSize: '1.1rem', color: '#059669' }} />
+              <i className="bi bi-cash-stack" style={{ fontSize: '1.1rem', color: '#1E7A4C' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '0.4rem 0' }}>
-              <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#059669' }}>
+              <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#1E7A4C' }}>
                 ₹{(pInfo.totalFundingAmount / 100000).toFixed(1)}L
               </span>
             </div>
@@ -380,10 +380,10 @@ export const DepartmentConsolePage: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#64748b' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Scholars & Projects</span>
-              <i className="bi bi-mortarboard-fill" style={{ fontSize: '1.1rem', color: '#7c3aed' }} />
+              <i className="bi bi-mortarboard-fill" style={{ fontSize: '1.1rem', color: '#2864A5' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '0.4rem 0' }}>
-              <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#0f172a' }}>{pInfo.totalPhdScholars}</span>
+              <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#172B45' }}>{pInfo.totalPhdScholars}</span>
               <span style={{ fontSize: '0.85rem', color: '#64748b' }}>PhD Scholars</span>
             </div>
             <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
@@ -464,7 +464,7 @@ export const DepartmentConsolePage: React.FC = () => {
           <i className="bi bi-check2-circle" />
           Pending Approvals Hub
           {pInfo?.pendingSubmissions.total ? (
-            <span style={{ fontSize: '0.75rem', padding: '1px 6px', borderRadius: '9999px', background: '#ea580c', color: '#fff', fontWeight: 700 }}>
+            <span style={{ fontSize: '0.75rem', padding: '1px 6px', borderRadius: '9999px', background: '#B45309', color: '#fff', fontWeight: 700 }}>
               {pInfo.pendingSubmissions.total}
             </span>
           ) : null}
@@ -696,7 +696,7 @@ export const DepartmentConsolePage: React.FC = () => {
                                 height: '36px',
                                 borderRadius: '50%',
                                 backgroundColor: '#e2e8f0',
-                                color: '#1B345F',
+                                color: '#142B4A',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -712,7 +712,7 @@ export const DepartmentConsolePage: React.FC = () => {
                               )}
                             </div>
                             <div>
-                              <div style={{ fontWeight: 700, color: '#0f172a' }}>{fac.name}</div>
+                              <div style={{ fontWeight: 700, color: '#172B45' }}>{fac.name}</div>
                               <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
                                 {fac.employeeId} • {fac.email}
                               </div>
@@ -768,8 +768,8 @@ export const DepartmentConsolePage: React.FC = () => {
                                 borderRadius: '6px',
                                 fontSize: '0.75rem',
                                 fontWeight: 600,
-                                backgroundColor: '#ecfdf5',
-                                color: '#059669',
+                                backgroundColor: '#EAF6EF',
+                                color: '#1E7A4C',
                               }}
                             >
                               <i className="bi bi-person-check-fill" />
@@ -786,14 +786,14 @@ export const DepartmentConsolePage: React.FC = () => {
                                 fontWeight: 700,
                                 padding: '2px 7px',
                                 borderRadius: '9999px',
-                                backgroundColor: '#fee2e2',
-                                color: '#b91c1c',
+                                backgroundColor: '#FBE4E2',
+                                color: '#B42318',
                               }}
                             >
                               {fac.metrics.pendingSubmissionsCount} pending
                             </span>
                           ) : (
-                            <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 600 }}>
+                            <span style={{ fontSize: '0.75rem', color: '#1E7A4C', fontWeight: 600 }}>
                               <i className="bi bi-check-circle-fill" style={{ marginRight: '4px' }} />
                               Verified
                             </span>
@@ -813,7 +813,7 @@ export const DepartmentConsolePage: React.FC = () => {
                                 borderRadius: '6px',
                                 border: '1px solid #cbd5e1',
                                 backgroundColor: '#fff',
-                                color: '#1B345F',
+                                color: '#142B4A',
                                 fontSize: '0.8rem',
                                 fontWeight: 600,
                                 cursor: 'pointer',
@@ -829,8 +829,8 @@ export const DepartmentConsolePage: React.FC = () => {
                                 style={{
                                   padding: '5px 8px',
                                   borderRadius: '6px',
-                                  border: '1px solid #ea580c',
-                                  backgroundColor: '#ea580c',
+                                  border: '1px solid #B45309',
+                                  backgroundColor: '#B45309',
                                   color: '#fff',
                                   fontSize: '0.75rem',
                                   fontWeight: 600,
@@ -861,8 +861,8 @@ export const DepartmentConsolePage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '1.25rem' }}>
                 {/* Publications Timeline */}
                 <div style={{ background: '#fff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>
-                    <i className="bi bi-journal-text" style={{ marginRight: '6px', color: '#1B345F' }} />
+                  <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 700, color: '#172B45' }}>
+                    <i className="bi bi-journal-text" style={{ marginRight: '6px', color: '#142B4A' }} />
                     Publications Output by Year
                   </h3>
                   {analytics.publicationsByYear.length === 0 ? (
@@ -882,7 +882,7 @@ export const DepartmentConsolePage: React.FC = () => {
                             <div
                               style={{
                                 width: `${Math.min(100, item.count * 15)}%`,
-                                backgroundColor: '#1B345F',
+                                backgroundColor: '#142B4A',
                                 height: '100%',
                                 borderRadius: '4px',
                               }}
@@ -891,7 +891,7 @@ export const DepartmentConsolePage: React.FC = () => {
                           <span style={{ width: '70px', fontWeight: 700, textAlign: 'right' }}>
                             {item.count} papers
                           </span>
-                          <span style={{ width: '80px', fontSize: '0.75rem', color: '#059669', textAlign: 'right' }}>
+                          <span style={{ width: '80px', fontSize: '0.75rem', color: '#1E7A4C', textAlign: 'right' }}>
                             ({item.scopusSci} Scopus)
                           </span>
                         </div>
@@ -902,17 +902,17 @@ export const DepartmentConsolePage: React.FC = () => {
 
                 {/* Research Projects & Grants */}
                 <div style={{ background: '#fff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>
-                    <i className="bi bi-briefcase" style={{ marginRight: '6px', color: '#059669' }} />
+                  <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 700, color: '#172B45' }}>
+                    <i className="bi bi-briefcase" style={{ marginRight: '6px', color: '#1E7A4C' }} />
                     Research Projects & Funding Status
                   </h3>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem', marginBottom: '1rem', textAlign: 'center' }}>
                     <div style={{ background: '#f8fafc', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#059669' }}>{analytics.researchProjects.sanctioned}</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1E7A4C' }}>{analytics.researchProjects.sanctioned}</div>
                       <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Sanctioned</div>
                     </div>
                     <div style={{ background: '#f8fafc', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0284c7' }}>{analytics.researchProjects.ongoing}</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2864A5' }}>{analytics.researchProjects.ongoing}</div>
                       <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Ongoing</div>
                     </div>
                     <div style={{ background: '#f8fafc', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
@@ -920,7 +920,7 @@ export const DepartmentConsolePage: React.FC = () => {
                       <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Completed</div>
                     </div>
                     <div style={{ background: '#f8fafc', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#d97706' }}>{analytics.researchProjects.proposed}</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#B45309' }}>{analytics.researchProjects.proposed}</div>
                       <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Proposed</div>
                     </div>
                   </div>
@@ -943,8 +943,8 @@ export const DepartmentConsolePage: React.FC = () => {
               {/* Row 2: Workload Distribution across Cadres */}
               {FEATURES.TEACHING && (
               <div style={{ background: '#fff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>
-                  <i className="bi bi-pie-chart" style={{ marginRight: '6px', color: '#0284c7' }} />
+                <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 700, color: '#172B45' }}>
+                  <i className="bi bi-pie-chart" style={{ marginRight: '6px', color: '#2864A5' }} />
                   Teaching Workload Distribution by Academic Cadre
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
@@ -1092,7 +1092,7 @@ export const DepartmentConsolePage: React.FC = () => {
                   HOD recommendation queue for casual & medical leaves
                 </p>
               </div>
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ea580c' }}>
+              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#B45309' }}>
                 {pInfo?.pendingSubmissions.leaves || 0}
               </span>
             </div>
@@ -1118,7 +1118,7 @@ export const DepartmentConsolePage: React.FC = () => {
                   Biometric / check-in dispute corrections
                 </p>
               </div>
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ea580c' }}>
+              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#B45309' }}>
                 {pInfo?.pendingSubmissions.attendanceCorrections || 0}
               </span>
             </div>
@@ -1144,7 +1144,7 @@ export const DepartmentConsolePage: React.FC = () => {
                   HOD evaluation tier for 14 accredited categories
                 </p>
               </div>
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1B345F' }}>
+              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#142B4A' }}>
                 {pInfo?.pendingSubmissions.appraisals || 0}
               </span>
             </div>
@@ -1170,7 +1170,7 @@ export const DepartmentConsolePage: React.FC = () => {
                   SCI, Scopus & journal indexing validation
                 </p>
               </div>
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0284c7' }}>
+              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#2864A5' }}>
                 {pInfo?.pendingSubmissions.publications || 0}
               </span>
             </div>
@@ -1196,7 +1196,7 @@ export const DepartmentConsolePage: React.FC = () => {
                   Sanction orders & utilization reviews
                 </p>
               </div>
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#059669' }}>
+              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1E7A4C' }}>
                 {pInfo?.pendingSubmissions.projects || 0}
               </span>
             </div>
@@ -1222,7 +1222,7 @@ export const DepartmentConsolePage: React.FC = () => {
                   Conference, workshop and certification certificates
                 </p>
               </div>
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#7c3aed' }}>
+              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#2864A5' }}>
                 {pInfo?.pendingSubmissions.activities || 0}
               </span>
             </div>

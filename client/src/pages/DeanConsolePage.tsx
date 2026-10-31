@@ -191,7 +191,7 @@ export const DeanConsolePage: React.FC = () => {
               padding: '7px 14px',
               borderRadius: '8px',
               border: 'none',
-              background: '#ea580c',
+              background: '#B45309',
               color: '#fff',
               fontSize: '0.85rem',
               fontWeight: 700,
@@ -211,7 +211,7 @@ export const DeanConsolePage: React.FC = () => {
                   padding: '1px 6px',
                   borderRadius: '9999px',
                   background: '#fff',
-                  color: '#ea580c',
+                  color: '#B45309',
                   fontWeight: 800,
                 }}
               >
@@ -228,7 +228,7 @@ export const DeanConsolePage: React.FC = () => {
               padding: '7px 12px',
               borderRadius: '8px',
               border: '1px solid #334155',
-              background: '#1e293b',
+              background: '#172B45',
               color: '#cbd5e1',
               fontSize: '0.85rem',
               fontWeight: 600,
@@ -301,7 +301,7 @@ export const DeanConsolePage: React.FC = () => {
                   fontSize: '0.68rem',
                   padding: '0 5px',
                   borderRadius: '9999px',
-                  background: '#ea580c',
+                  background: '#B45309',
                   color: '#fff',
                   fontWeight: 800,
                 }}
@@ -341,7 +341,7 @@ export const DeanConsolePage: React.FC = () => {
               height: '34px',
               borderRadius: '8px',
               background: '#ffedd5',
-              color: '#ea580c',
+              color: '#B45309',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -352,10 +352,10 @@ export const DeanConsolePage: React.FC = () => {
             <i className="bi bi-speedometer2" />
           </div>
           <div>
-            <div style={{ fontSize: '0.76rem', fontWeight: 800, color: '#c2410c', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '0.76rem', fontWeight: 800, color: '#B45309', textTransform: 'uppercase' }}>
               Governance Query: Workload Balance
             </div>
-            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a', margin: '2px 0 4px' }}>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#172B45', margin: '2px 0 4px' }}>
               How is faculty workload distributed?
             </div>
             <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b', lineHeight: 1.4 }}>
@@ -370,8 +370,8 @@ export const DeanConsolePage: React.FC = () => {
           style={{
             padding: '1rem 1.15rem',
             borderRadius: '10px',
-            border: '1px solid #ddd6fe',
-            background: '#faf5ff',
+            border: '1px solid #C9DCEF',
+            background: '#EAF2FA',
             display: 'flex',
             gap: '12px',
             alignItems: 'flex-start',
@@ -382,8 +382,8 @@ export const DeanConsolePage: React.FC = () => {
               width: '34px',
               height: '34px',
               borderRadius: '8px',
-              background: '#f3e8ff',
-              color: '#7c3aed',
+              background: '#EAF2FA',
+              color: '#2864A5',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -394,10 +394,10 @@ export const DeanConsolePage: React.FC = () => {
             <i className="bi bi-graph-up-arrow" />
           </div>
           <div>
-            <div style={{ fontSize: '0.76rem', fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '0.76rem', fontWeight: 800, color: '#2864A5', textTransform: 'uppercase' }}>
               Governance Query: Research Velocity
             </div>
-            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a', margin: '2px 0 4px' }}>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#172B45', margin: '2px 0 4px' }}>
               Which departments have higher research activity?
             </div>
             <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b', lineHeight: 1.4 }}>
@@ -411,8 +411,8 @@ export const DeanConsolePage: React.FC = () => {
           style={{
             padding: '1rem 1.15rem',
             borderRadius: '10px',
-            border: '1px solid #bfdbfe',
-            background: '#eff6ff',
+            border: '1px solid #C9DCEF',
+            background: '#EAF2FA',
             display: 'flex',
             gap: '12px',
             alignItems: 'flex-start',
@@ -423,8 +423,8 @@ export const DeanConsolePage: React.FC = () => {
               width: '34px',
               height: '34px',
               borderRadius: '8px',
-              background: '#dbeafe',
-              color: '#2563eb',
+              background: '#EAF2FA',
+              color: '#2864A5',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -435,10 +435,10 @@ export const DeanConsolePage: React.FC = () => {
             <i className="bi bi-journal-check" />
           </div>
           <div>
-            <div style={{ fontSize: '0.76rem', fontWeight: 800, color: '#1d4ed8', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '0.76rem', fontWeight: 800, color: '#1F5189', textTransform: 'uppercase' }}>
               Governance Query: Publication Yield
             </div>
-            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a', margin: '2px 0 4px' }}>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#172B45', margin: '2px 0 4px' }}>
               How many publications were recorded this academic year?
             </div>
             <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b', lineHeight: 1.4 }}>
@@ -471,14 +471,14 @@ export const DeanConsolePage: React.FC = () => {
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#0f172a' }}>
+            <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#172B45' }}>
               Institutional Academic & Research Key Indicators
             </h2>
             <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>
               Every primary metric card below drills down into live underlying records.
             </p>
           </div>
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#2563eb', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#2864A5', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <i className="bi bi-hand-index-thumb" /> Click any metric to inspect underlying records
           </span>
         </div>
@@ -719,20 +719,20 @@ export const DeanConsolePage: React.FC = () => {
             style={cardStyle('#fff1f2', '#e11d48')}
           >
             <div style={cardHeaderStyle}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#e11d48', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#B42318', textTransform: 'uppercase' }}>
                 Pending Approvals
               </span>
               <div style={iconBadgeStyle('#ffe4e6', '#e11d48')}>
                 <i className="bi bi-exclamation-octagon-fill" />
               </div>
             </div>
-            <div style={{ ...cardValueStyle, color: '#e11d48' }}>
+            <div style={{ ...cardValueStyle, color: '#B42318' }}>
               {metrics?.pendingApprovals.total ?? '—'}
             </div>
             <div style={cardSubStyle}>
               {metrics?.pendingApprovals.publications ?? 0} pubs • {metrics?.pendingApprovals.projects ?? 0} projs • {metrics?.pendingApprovals.leaves ?? 0} leaves
             </div>
-            <div style={{ ...cardDrillHintStyle, color: '#e11d48' }}>Review Queue →</div>
+            <div style={{ ...cardDrillHintStyle, color: '#B42318' }}>Review Queue →</div>
           </div>
         </div>
       </div>
@@ -761,7 +761,7 @@ export const DeanConsolePage: React.FC = () => {
           }}
         >
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#0f172a' }}>
+            <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#172B45' }}>
               Department Academic & Research Performance
             </h3>
             <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
@@ -934,15 +934,15 @@ export const DeanConsolePage: React.FC = () => {
                     >
                       {/* Department Name & Code */}
                       <td style={{ padding: '12px 16px' }}>
-                        <div style={{ fontWeight: 800, color: '#0f172a' }}>{dept.name}</div>
+                        <div style={{ fontWeight: 800, color: '#172B45' }}>{dept.name}</div>
                         <span
                           style={{
                             fontSize: '0.72rem',
                             fontWeight: 700,
                             padding: '1px 6px',
                             borderRadius: '4px',
-                            background: '#eff6ff',
-                            color: '#2563eb',
+                            background: '#EAF2FA',
+                            color: '#2864A5',
                           }}
                         >
                           {dept.code}
@@ -951,7 +951,7 @@ export const DeanConsolePage: React.FC = () => {
 
                       {/* HOD */}
                       <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
-                        <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.85rem' }}>
+                        <div style={{ fontWeight: 600, color: '#172B45', fontSize: '0.85rem' }}>
                           {dept.hod?.name || 'Unassigned'}
                         </div>
                         <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
@@ -969,7 +969,7 @@ export const DeanConsolePage: React.FC = () => {
                             border: 'none',
                             cursor: 'pointer',
                             fontWeight: 700,
-                            color: '#1B345F',
+                            color: '#142B4A',
                             fontSize: '0.9rem',
                           }}
                         >
@@ -984,24 +984,24 @@ export const DeanConsolePage: React.FC = () => {
                       {FEATURES.TEACHING && (
                       <td style={{ padding: '12px 14px', minWidth: '130px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <strong style={{ fontSize: '0.88rem', color: '#0f172a' }}>
+                          <strong style={{ fontSize: '0.88rem', color: '#172B45' }}>
                             {dept.workload.averageHours}
                           </strong>
                           <span style={{ fontSize: '0.75rem', color: '#64748b' }}>hrs/wk avg</span>
                         </div>
                         <div style={{ display: 'flex', gap: '4px', marginTop: '3px' }}>
                           {dept.workload.overloadedCount > 0 && (
-                            <span style={{ fontSize: '0.68rem', padding: '1px 4px', borderRadius: '3px', background: '#fee2e2', color: '#b91c1c', fontWeight: 700 }}>
+                            <span style={{ fontSize: '0.68rem', padding: '1px 4px', borderRadius: '3px', background: '#FBE4E2', color: '#B42318', fontWeight: 700 }}>
                               {dept.workload.overloadedCount} Over
                             </span>
                           )}
                           {dept.workload.underloadedCount > 0 && (
-                            <span style={{ fontSize: '0.68rem', padding: '1px 4px', borderRadius: '3px', background: '#fef3c7', color: '#b45309', fontWeight: 700 }}>
+                            <span style={{ fontSize: '0.68rem', padding: '1px 4px', borderRadius: '3px', background: '#FDF0D5', color: '#b45309', fontWeight: 700 }}>
                               {dept.workload.underloadedCount} Under
                             </span>
                           )}
                           {dept.workload.overloadedCount === 0 && dept.workload.underloadedCount === 0 && (
-                            <span style={{ fontSize: '0.68rem', padding: '1px 4px', borderRadius: '3px', background: '#dcfce7', color: '#15803d', fontWeight: 700 }}>
+                            <span style={{ fontSize: '0.68rem', padding: '1px 4px', borderRadius: '3px', background: '#EAF6EF', color: '#1E7A4C', fontWeight: 700 }}>
                               100% Balanced
                             </span>
                           )}
@@ -1019,7 +1019,7 @@ export const DeanConsolePage: React.FC = () => {
                             border: 'none',
                             cursor: 'pointer',
                             fontWeight: 700,
-                            color: '#6b21a8',
+                            color: '#1F4E85',
                             fontSize: '0.9rem',
                           }}
                         >
@@ -1040,13 +1040,13 @@ export const DeanConsolePage: React.FC = () => {
                             border: 'none',
                             cursor: 'pointer',
                             fontWeight: 700,
-                            color: '#1B345F',
+                            color: '#142B4A',
                             fontSize: '0.9rem',
                           }}
                         >
                           {dept.researchProjects.total}
                         </button>
-                        <div style={{ fontSize: '0.72rem', color: '#047857', fontWeight: 600 }}>
+                        <div style={{ fontSize: '0.72rem', color: '#1E7A4C', fontWeight: 600 }}>
                           ₹{(dept.researchProjects.totalFunding / 100000).toFixed(1)}L
                         </div>
                       </td>
@@ -1117,7 +1117,7 @@ export const DeanConsolePage: React.FC = () => {
                             borderRadius: '6px',
                             border: '1px solid #cbd5e1',
                             background: '#fff',
-                            color: '#1B345F',
+                            color: '#142B4A',
                             fontSize: '0.8rem',
                             fontWeight: 600,
                             cursor: 'pointer',
@@ -1167,16 +1167,16 @@ export const DeanConsolePage: React.FC = () => {
                 {/* Card Header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: '#eff6ff', color: '#2563eb' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: '#EAF2FA', color: '#2864A5' }}>
                       {dept.code}
                     </span>
-                    <h4 style={{ margin: '4px 0 0', fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>
+                    <h4 style={{ margin: '4px 0 0', fontSize: '1rem', fontWeight: 800, color: '#172B45' }}>
                       {dept.name}
                     </h4>
                   </div>
                   <div style={{ textAlign: 'right', fontSize: '0.78rem', color: '#64748b' }}>
                     <div>HOD:</div>
-                    <strong style={{ color: '#1e293b' }}>{dept.hod?.name || 'Unassigned'}</strong>
+                    <strong style={{ color: '#172B45' }}>{dept.hod?.name || 'Unassigned'}</strong>
                   </div>
                 </div>
 
@@ -1187,21 +1187,21 @@ export const DeanConsolePage: React.FC = () => {
                     style={{ textAlign: 'center', cursor: 'pointer' }}
                   >
                     <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>Faculty</div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1B345F' }}>{dept.facultyCount.total}</div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#142B4A' }}>{dept.facultyCount.total}</div>
                   </div>
                   <div
                     onClick={() => openDrillDown('publications', `${dept.code} Publications`, dept.departmentId)}
                     style={{ textAlign: 'center', cursor: 'pointer' }}
                   >
                     <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>Pubs</div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#6b21a8' }}>{dept.publications.total}</div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1F4E85' }}>{dept.publications.total}</div>
                   </div>
                   <div
                     onClick={() => openDrillDown('researchProjects', `${dept.code} Projects`, dept.departmentId)}
                     style={{ textAlign: 'center', cursor: 'pointer' }}
                   >
                     <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>Projects</div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#047857' }}>{dept.researchProjects.total}</div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1E7A4C' }}>{dept.researchProjects.total}</div>
                   </div>
                 </div>
 
@@ -1227,7 +1227,7 @@ export const DeanConsolePage: React.FC = () => {
                     borderRadius: '8px',
                     border: '1px solid #cbd5e1',
                     background: '#f8fafc',
-                    color: '#1B345F',
+                    color: '#142B4A',
                     fontWeight: 700,
                     fontSize: '0.82rem',
                     cursor: 'pointer',
@@ -1298,7 +1298,7 @@ const iconBadgeStyle = (bg: string, color: string): React.CSSProperties => ({
 const cardValueStyle: React.CSSProperties = {
   fontSize: '1.65rem',
   fontWeight: 800,
-  color: '#0f172a',
+  color: '#172B45',
   letterSpacing: '-0.02em',
   margin: '4px 0',
 };
@@ -1312,7 +1312,7 @@ const cardSubStyle: React.CSSProperties = {
 const cardDrillHintStyle: React.CSSProperties = {
   fontSize: '0.72rem',
   fontWeight: 700,
-  color: '#2563eb',
+  color: '#2864A5',
   marginTop: '8px',
   display: 'flex',
   alignItems: 'center',

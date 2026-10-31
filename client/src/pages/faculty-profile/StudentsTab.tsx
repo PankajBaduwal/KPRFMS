@@ -42,7 +42,7 @@ export const StudentsTab: React.FC<StudentsTabProps> = ({ isOwner, profile, setE
                     height: '42px',
                     borderRadius: 'var(--radius-md)',
                     background: 'rgba(59, 130, 246, 0.1)',
-                    color: '#3b82f6',
+                    color: '#2864A5',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -68,7 +68,7 @@ export const StudentsTab: React.FC<StudentsTabProps> = ({ isOwner, profile, setE
                     height: '42px',
                     borderRadius: 'var(--radius-md)',
                     background: 'rgba(16, 185, 129, 0.1)',
-                    color: '#10b981',
+                    color: '#2E9461',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -81,7 +81,7 @@ export const StudentsTab: React.FC<StudentsTabProps> = ({ isOwner, profile, setE
                   <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
                     Active Mentees
                   </div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#10b981' }}>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#2E9461' }}>
                     {(profile as any).mentoringMetrics?.activeStudents ?? 0}
                   </div>
                 </div>
@@ -332,7 +332,7 @@ export const StudentsTab: React.FC<StudentsTabProps> = ({ isOwner, profile, setE
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
                 <div>
                   <h2 className="card-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ background: '#e0e7ff', color: '#3730a3', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>
+                    <span style={{ background: '#DCE8F5', color: '#3730a3', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>
                       Guided Projects
                     </span>
                     <span>Student Projects Supervised ({profile.studentProjects?.length || 0})</span>
@@ -363,14 +363,14 @@ export const StudentsTab: React.FC<StudentsTabProps> = ({ isOwner, profile, setE
   
               {/* Quick Metrics for Guided Projects */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                <div style={{ padding: 'var(--space-2) var(--space-3)', background: 'rgba(16, 185, 129, 0.08)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #10b981' }}>
-                  <div style={{ fontSize: '11px', color: '#047857', fontWeight: 600, textTransform: 'uppercase' }}>Completed</div>
+                <div style={{ padding: 'var(--space-2) var(--space-3)', background: 'rgba(16, 185, 129, 0.08)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #2E9461' }}>
+                  <div style={{ fontSize: '11px', color: '#1E7A4C', fontWeight: 600, textTransform: 'uppercase' }}>Completed</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text)' }}>
                     {(profile as any).studentProjectMetrics?.completed ?? 0}
                   </div>
                 </div>
-                <div style={{ padding: 'var(--space-2) var(--space-3)', background: 'rgba(59, 130, 246, 0.08)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #3b82f6' }}>
-                  <div style={{ fontSize: '11px', color: '#1d4ed8', fontWeight: 600, textTransform: 'uppercase' }}>Ongoing</div>
+                <div style={{ padding: 'var(--space-2) var(--space-3)', background: 'rgba(59, 130, 246, 0.08)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #2864A5' }}>
+                  <div style={{ fontSize: '11px', color: '#1F5189', fontWeight: 600, textTransform: 'uppercase' }}>Ongoing</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text)' }}>
                     {(profile as any).studentProjectMetrics?.ongoing ?? 0}
                   </div>
@@ -381,8 +381,8 @@ export const StudentsTab: React.FC<StudentsTabProps> = ({ isOwner, profile, setE
                     {(profile as any).studentProjectMetrics?.submitted ?? 0}
                   </div>
                 </div>
-                <div style={{ padding: 'var(--space-2) var(--space-3)', background: 'rgba(147, 51, 234, 0.08)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #9333ea' }}>
-                  <div style={{ fontSize: '11px', color: '#7e22ce', fontWeight: 600, textTransform: 'uppercase' }}>Under Review</div>
+                <div style={{ padding: 'var(--space-2) var(--space-3)', background: 'rgba(147, 51, 234, 0.08)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid #2864A5' }}>
+                  <div style={{ fontSize: '11px', color: '#2864A5', fontWeight: 600, textTransform: 'uppercase' }}>Under Review</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text)' }}>
                     {(profile as any).studentProjectMetrics?.underReview ?? 0}
                   </div>
@@ -459,9 +459,9 @@ export const StudentsTab: React.FC<StudentsTabProps> = ({ isOwner, profile, setE
                             </td>
                             <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
                               <div style={{ display: 'flex', gap: '4px' }}>
-                                {proj.publication?.hasPublication && <span title="Publication"><i className="bi bi-journal-check" style={{ color: '#10b981' }} /></span>}
-                                {proj.patent?.hasPatent && <span title="Patent"><i className="bi bi-award" style={{ color: '#3b82f6' }} /></span>}
-                                {proj.industryCollaboration?.hasCollaboration && <span title="Industry"><i className="bi bi-building" style={{ color: '#8b5cf6' }} /></span>}
+                                {proj.publication?.hasPublication && <span title="Publication"><i className="bi bi-journal-check" style={{ color: '#2E9461' }} /></span>}
+                                {proj.patent?.hasPatent && <span title="Patent"><i className="bi bi-award" style={{ color: '#2864A5' }} /></span>}
+                                {proj.industryCollaboration?.hasCollaboration && <span title="Industry"><i className="bi bi-building" style={{ color: '#2864A5' }} /></span>}
                                 {!proj.publication?.hasPublication && !proj.patent?.hasPatent && !proj.industryCollaboration?.hasCollaboration && <span style={{ color: '#94a3b8' }}>—</span>}
                               </div>
                             </td>

@@ -154,7 +154,7 @@ export const AttendanceCorrectionModal: React.FC<AttendanceCorrectionModalProps>
         {/* Reason for Correction */}
         <div>
           <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
-            Reason for Correction <span style={{ color: '#ef4444' }}>*</span>
+            Reason for Correction <span style={{ color: '#D14343' }}>*</span>
           </label>
           <textarea
             value={reason}

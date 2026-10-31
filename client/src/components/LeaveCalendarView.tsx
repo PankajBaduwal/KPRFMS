@@ -444,19 +444,19 @@ export const LeaveCalendarView: React.FC<LeaveCalendarViewProps> = ({
       >
         <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>Legend:</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: '#3b82f6' }} />
+          <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: '#2864A5' }} />
           <span>Casual Leave</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: '#10b981' }} />
+          <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: '#2E9461' }} />
           <span>Earned Leave</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: '#ef4444' }} />
+          <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: '#D14343' }} />
           <span>Sick / Medical</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: '#8b5cf6' }} />
+          <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: '#2864A5' }} />
           <span>On Duty</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

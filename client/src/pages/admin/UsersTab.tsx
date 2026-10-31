@@ -105,7 +105,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                       padding: '0.85rem 1.1rem',
                       borderRadius: '10px',
                       border: '1px solid #fcd34d',
-                      backgroundColor: '#fffbeb',
+                      backgroundColor: '#FDF6E7',
                       color: '#92400e',
                       fontSize: '0.875rem',
                     }}
@@ -277,7 +277,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                                         width: '34px',
                                         height: '34px',
                                         borderRadius: '50%',
-                                        backgroundColor: '#e0e7ff',
+                                        backgroundColor: '#DCE8F5',
                                         color: '#4338ca',
                                         display: 'flex',
                                         alignItems: 'center',
@@ -289,7 +289,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                                       {u.name ? u.name.charAt(0).toUpperCase() : 'U'}
                                     </div>
                                     <div>
-                                      <div style={{ fontWeight: 600, color: '#0f172a' }}>{u.name}</div>
+                                      <div style={{ fontWeight: 600, color: '#172B45' }}>{u.name}</div>
                                       <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{u.email}</div>
                                     </div>
                                   </div>
@@ -350,7 +350,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                                     </div>
                                   )}
                                   {u.twoFactorEnabled && (
-                                    <div style={{ fontSize: '0.7rem', marginTop: 4, color: '#1d4ed8' }} title="Two-factor sign-in is on">
+                                    <div style={{ fontSize: '0.7rem', marginTop: 4, color: '#1F5189' }} title="Two-factor sign-in is on">
                                       <i className="bi bi-shield-lock-fill" /> 2-step sign-in
                                     </div>
                                   )}
@@ -508,7 +508,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                   }}
                 >
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#172B45' }}>
                       Institutional Governance Roles
                     </h3>
                     <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
@@ -517,11 +517,11 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                   </div>
                   <div style={{ display: 'flex', gap: '1rem' }}>
                     <div style={{ textAlign: 'center', padding: '0.5rem 1rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#4f46e5' }}>{rolesList.length || 5}</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#2864A5' }}>{rolesList.length || 5}</div>
                       <div style={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase' }}>Configured Roles</div>
                     </div>
                     <div style={{ textAlign: 'center', padding: '0.5rem 1rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#059669' }}>5 Tiers</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1E7A4C' }}>5 Tiers</div>
                       <div style={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase' }}>Hierarchy Levels</div>
                     </div>
                   </div>
@@ -555,7 +555,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                             name: 'System Administrator',
                             hierarchy: 1,
                             description: 'Full portal governance, master taxonomy management, user credential resets, security diagnostics, and immutable audit inspection.',
-                            color: '#ef4444',
+                            color: '#D14343',
                             bg: '#fee2e2',
                           },
                           {
@@ -581,7 +581,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                             description: FEATURES.TEACHING
                               ? 'Departmental faculty management, subject allocations, timetable coordination, leave/OD approvals, and initial appraisal scoring.'
                               : 'Departmental faculty management, leave/OD approvals, and initial appraisal scoring.',
-                            color: '#8b5cf6',
+                            color: '#2864A5',
                             bg: '#f3e8ff',
                           },
                           {
@@ -591,7 +591,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                             description: FEATURES.TEACHING
                               ? 'Curriculum delivery, timetable tracking, student mentoring, publications recording, leave applications, and self-appraisal submissions.'
                               : 'Student mentoring, publications recording, leave applications, and self-appraisal submissions.',
-                            color: '#10b981',
+                            color: '#2E9461',
                             bg: '#ecfdf5',
                           },
                         ].map((r) => {
@@ -613,7 +613,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                                   {r.role}
                                 </span>
                               </td>
-                              <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#0f172a' }}>
+                              <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#172B45' }}>
                                 {r.name}
                               </td>
                               <td style={{ padding: '0.75rem 1rem' }}>
@@ -622,7 +622,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                                 </span>
                               </td>
                               <td style={{ padding: '0.75rem 1rem' }}>
-                                <span style={{ fontWeight: 700, color: '#0f172a' }}>{count}</span> Users
+                                <span style={{ fontWeight: 700, color: '#172B45' }}>{count}</span> Users
                               </td>
                               <td style={{ padding: '0.75rem 1rem', color: '#64748b', fontSize: '0.8rem', maxWidth: '380px' }}>
                                 {r.description}
@@ -666,7 +666,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                   }}
                 >
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#172B45' }}>
                       Role-Based Access Control (RBAC) Matrix
                     </h3>
                     <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
@@ -735,7 +735,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                           { module: 'Immutable Audit Trail & Forensics', admin: 'Full Forensic', principal: 'Audit Review', dean: 'Deanery Logs', hod: 'Dept Event Log', faculty: 'Restricted' },
                         ].filter((row) => FEATURES.TEACHING || !/Curriculum|Subject Allocation|Timetable/.test(row.module)).map((row, idx) => (
                           <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9', backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                            <td style={{ padding: '0.65rem 1rem', fontWeight: 600, color: '#1e293b' }}>
+                            <td style={{ padding: '0.65rem 1rem', fontWeight: 600, color: '#172B45' }}>
                               {row.module}
                             </td>
                             {[row.admin, row.principal, row.dean, row.hod, row.faculty].map((cell, cIdx) => {

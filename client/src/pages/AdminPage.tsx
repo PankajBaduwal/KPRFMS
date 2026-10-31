@@ -956,7 +956,7 @@ export const AdminPage: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '1.75rem', maxWidth: '1540px', margin: '0 auto', color: '#1e293b' }}>
+    <div style={{ padding: '1.75rem', maxWidth: '1540px', margin: '0 auto', color: '#172B45' }}>
       {/* Page Header */}
       <div
         style={{
@@ -988,7 +988,7 @@ export const AdminPage: React.FC = () => {
               <i className="bi bi-shield-lock-fill" />
             </div>
             <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 700, margin: 0, color: '#172B45' }}>
                 Administration
               </h1>
               <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b' }}>
@@ -1008,9 +1008,9 @@ export const AdminPage: React.FC = () => {
               borderRadius: '9999px',
               fontSize: '0.75rem',
               fontWeight: 600,
-              backgroundColor: '#ecfdf5',
+              backgroundColor: '#EAF6EF',
               color: '#065f46',
-              border: '1px solid #a7f3d0',
+              border: '1px solid #BFE3CD',
             }}
           >
             <span
@@ -1018,7 +1018,7 @@ export const AdminPage: React.FC = () => {
                 width: '8px',
                 height: '8px',
                 borderRadius: '50%',
-                backgroundColor: '#10b981',
+                backgroundColor: '#2E9461',
                 boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.2)',
               }}
             />
@@ -1045,8 +1045,8 @@ export const AdminPage: React.FC = () => {
       {error && (
         <div
           style={{
-            backgroundColor: '#fef2f2',
-            border: '1px solid #fecaca',
+            backgroundColor: '#FCEFEE',
+            border: '1px solid #F3C7C2',
             color: '#991b1b',
             padding: '0.875rem 1rem',
             borderRadius: '8px',
@@ -1073,8 +1073,8 @@ export const AdminPage: React.FC = () => {
       {successMsg && (
         <div
           style={{
-            backgroundColor: '#f0fdf4',
-            border: '1px solid #bbf7d0',
+            backgroundColor: '#EAF6EF',
+            border: '1px solid #BFE3CD',
             color: '#166534',
             padding: '0.875rem 1rem',
             borderRadius: '8px',
@@ -1411,8 +1411,8 @@ export const AdminPage: React.FC = () => {
               width: '50px',
               height: '50px',
               borderRadius: '50%',
-              backgroundColor: '#dcfce7',
-              color: '#15803d',
+              backgroundColor: '#EAF6EF',
+              color: '#1E7A4C',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1422,7 +1422,7 @@ export const AdminPage: React.FC = () => {
           >
             <i className="bi bi-shield-check" />
           </div>
-          <h4 style={{ fontWeight: 600, color: '#0f172a' }}>Credentials Ready</h4>
+          <h4 style={{ fontWeight: 600, color: '#172B45' }}>Credentials Ready</h4>
           <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
             Please communicate the following temporary credentials to the user.
           </p>
@@ -1449,7 +1449,7 @@ export const AdminPage: React.FC = () => {
               <span
                 style={{
                   fontFamily: 'monospace',
-                  backgroundColor: '#fee2e2',
+                  backgroundColor: '#FBE4E2',
                   color: '#991b1b',
                   padding: '0.2rem 0.5rem',
                   borderRadius: '4px',

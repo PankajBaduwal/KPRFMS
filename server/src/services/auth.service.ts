@@ -68,6 +68,7 @@ function sessionUserView(user: LoginUser) {
     departmentId: user.departmentId?.toString(),
     designation: user.designation,
     status: user.status,
+    isDemo: Boolean(user.isDemo),
     lastLogin: user.lastLogin,
   };
 }

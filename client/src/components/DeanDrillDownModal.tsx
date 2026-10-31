@@ -134,8 +134,8 @@ export const DeanDrillDownModal: React.FC<DeanDrillDownModalProps> = ({
                 width: '38px',
                 height: '38px',
                 borderRadius: '10px',
-                background: '#eff6ff',
-                color: '#2563eb',
+                background: '#EAF2FA',
+                color: '#2864A5',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -146,7 +146,7 @@ export const DeanDrillDownModal: React.FC<DeanDrillDownModalProps> = ({
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#172B45' }}>
                   {metricLabel} Drill-Down Records
                 </h3>
                 <span
@@ -154,7 +154,7 @@ export const DeanDrillDownModal: React.FC<DeanDrillDownModalProps> = ({
                     fontSize: '0.75rem',
                     padding: '2px 8px',
                     borderRadius: '9999px',
-                    background: '#2563eb',
+                    background: '#2864A5',
                     color: '#fff',
                     fontWeight: 700,
                   }}
@@ -246,7 +246,7 @@ export const DeanDrillDownModal: React.FC<DeanDrillDownModalProps> = ({
               Loading underlying records...
             </div>
           ) : error ? (
-            <div style={{ padding: '2rem', textAlign: 'center', color: '#dc2626' }}>
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#B42318' }}>
               <i className="bi bi-exclamation-circle" style={{ fontSize: '2rem', display: 'block', marginBottom: '8px' }} />
               {error}
             </div>
@@ -309,7 +309,7 @@ export const DeanDrillDownModal: React.FC<DeanDrillDownModalProps> = ({
                       }}
                     >
                       <td style={{ padding: '10px 16px', maxWidth: '320px' }}>
-                        <div style={{ fontWeight: 700, color: '#0f172a', lineHeight: 1.3 }}>
+                        <div style={{ fontWeight: 700, color: '#172B45', lineHeight: 1.3 }}>
                           {r.title}
                         </div>
                         <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -317,7 +317,7 @@ export const DeanDrillDownModal: React.FC<DeanDrillDownModalProps> = ({
                         </div>
                       </td>
                       <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
-                        <div style={{ fontWeight: 600, color: '#1e293b' }}>{r.facultyName}</div>
+                        <div style={{ fontWeight: 600, color: '#172B45' }}>{r.facultyName}</div>
                         <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{r.facultyEmployeeId}</div>
                       </td>
                       <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
@@ -325,8 +325,8 @@ export const DeanDrillDownModal: React.FC<DeanDrillDownModalProps> = ({
                           style={{
                             padding: '2px 8px',
                             borderRadius: '6px',
-                            background: '#eff6ff',
-                            color: '#1B345F',
+                            background: '#EAF2FA',
+                            color: '#142B4A',
                             fontWeight: 700,
                             fontSize: '0.75rem',
                           }}

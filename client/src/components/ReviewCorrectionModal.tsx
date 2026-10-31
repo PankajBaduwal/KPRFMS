@@ -129,7 +129,7 @@ export const ReviewCorrectionModal: React.FC<ReviewCorrectionModalProps> = ({
                 href={fileUrl(request.supportingDocumentUrl)}
                 target="_blank"
                 rel="noreferrer"
-                style={{ color: '#3b82f6', textDecoration: 'underline', fontSize: '12px' }}
+                style={{ color: '#2864A5', textDecoration: 'underline', fontSize: '12px' }}
               >
                 View Supporting Document
               </a>

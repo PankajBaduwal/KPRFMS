@@ -143,10 +143,10 @@ export const CurriculumTab: React.FC<CurriculumTabProps> = ({ defaultAcademicYea
                     {subjectsList.length > 0 ? (
                       subjectsList.map((sub) => (
                         <tr key={sub._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={{ padding: '0.75rem 1rem', fontFamily: 'monospace', fontWeight: 700, color: '#4f46e5' }}>
+                          <td style={{ padding: '0.75rem 1rem', fontFamily: 'monospace', fontWeight: 700, color: '#2864A5' }}>
                             {sub.subjectCode}
                           </td>
-                          <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#0f172a' }}>
+                          <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#172B45' }}>
                             {sub.subjectName}
                           </td>
                           <td style={{ padding: '0.75rem 1rem', color: '#475569' }}>

@@ -1,59 +1,593 @@
-/* Faculty dossier: records, completion, directory and rankings (builds on funding.css) */
+/* ==========================================================================
+   FACULTY DOSSIER & OFFICIAL EMPLOYEE RECORD STYLES
+   Master Institutional System Design
+   ========================================================================== */
+
 .ds-req { color: #b42318; }
-.ds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.ds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .fd-dialog textarea { resize: vertical; }
-.ds-note { background: #eef4ff; border: 1px solid #d6e4ff; color: #1e3a6e; border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; margin: 0; }
-.ds-note.is-warn { background: #fff8eb; border-color: #f7dfb0; color: #7a4a00; }
-.ds-evidence { display: flex; flex-direction: column; gap: 6px; border: 1px dashed var(--color-border, #e2e8f0); border-radius: 8px; padding: 10px 12px; font-size: 0.82rem; }
-.ds-evidence ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.ds-evidence li { display: flex; align-items: center; gap: 6px; }
+
+.ds-note {
+  background: #EAF2FA;
+  border: 1px solid #C9DCEF;
+  color: #142B4A;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.ds-note.is-warn {
+  background: #FDF6E7;
+  border-color: #F2D9A6;
+  color: #92400e;
+}
+
+.ds-evidence {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px dashed var(--color-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  background: #f8fafc;
+}
+
+.ds-evidence ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ds-evidence li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .ds-upload { align-self: flex-start; display: inline-flex !important; flex-direction: row !important; }
-.ds-link { border: 0; background: none; color: #1d4ed8; font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; padding: 0 4px; }
+.ds-link {
+  border: 0;
+  background: none;
+  color: #2864A5;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 4px;
+}
 .ds-link:hover { text-decoration: underline; }
 .ds-toggle { display: inline-flex; gap: 4px; }
-.ds-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-.ds-filters select { border: 1px solid var(--color-border, #e2e8f0); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 0.82rem; background: #fff; color: inherit; }
+.ds-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.ds-filters select {
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 8px;
+  padding: 7px 11px;
+  font: inherit;
+  font-size: 0.82rem;
+  background: #ffffff;
+  color: inherit;
+}
+
 .ds-row { cursor: pointer; }
 .ds-row:hover td { background: #f8fafc; }
-.ds-title { border: 0; background: none; padding: 0; font: inherit; font-weight: 600; color: #13294b; text-align: left; cursor: pointer; }
-.ds-status { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #f1f5f9; color: #334155; white-space: nowrap; }
-.ds-status.st-verified { background: #e8f5ee; color: #1e7a47; }
-.ds-status.st-submitted, .ds-status.st-under_review { background: #fdf3e3; color: #9a5b00; }
-.ds-status.st-returned_for_correction { background: #fff1e6; color: #b54708; }
-.ds-status.st-rejected { background: #fdecea; color: #b42318; }
+.ds-title {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: #142B4A;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+}
+.ds-title:hover { color: #2864A5; text-decoration: underline; }
+
+/* Status Badges */
+.ds-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  white-space: nowrap;
+}
+
+.ds-status.st-verified { background: #EAF6EF; color: #1E7A4C; border: 1px solid #BFE3CD; }
+.ds-status.st-submitted, .ds-status.st-under_review { background: #EAF2FA; color: #1F5189; border: 1px solid #C9DCEF; }
+.ds-status.st-returned_for_correction { background: #FDF6E7; color: #b45309; border: 1px solid #F2D9A6; }
+.ds-status.st-rejected { background: #FCEFEE; color: #B42318; border: 1px solid #F3C7C2; }
+
 .ds-dl { display: grid; grid-template-columns: 140px 1fr; gap: 6px 12px; margin: 0; font-size: 0.84rem; }
 .ds-dl dt { color: #64748b; font-weight: 600; }
 .ds-dl dd { margin: 0; overflow-wrap: anywhere; }
 .ds-desc { font-size: 0.84rem; margin: 0; white-space: pre-wrap; }
-.ds-history { font-size: 0.78rem; color: #475467; }
+.ds-history { font-size: 0.78rem; color: #475569; }
 .ds-history ol { margin: 6px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 2px; }
 .ds-review { border-top: 1px solid #e2e8f0; padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
 
-/* Dossier page */
-.ds-identity { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
-.ds-avatar { width: 64px; height: 64px; border-radius: 50%; background: #e8eef8; color: #13294b; display: grid; place-items: center; font-weight: 700; font-size: 1.3rem; overflow: hidden; flex: none; }
-.ds-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.ds-identity h1 { font-size: 1.3rem; margin: 0; color: #13294b; font-weight: 650; }
-.ds-facts { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.8rem; color: #475467; margin-top: 4px; }
-.ds-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
-@media (max-width: 900px) { .ds-two { grid-template-columns: 1fr; } .ds-dl { grid-template-columns: 110px 1fr; } }
-.ds-meter { height: 8px; border-radius: 999px; background: #eef2f6; overflow: hidden; }
-.ds-meter > span { display: block; height: 100%; background: #1e7a47; border-radius: inherit; }
-.ds-meter.is-mid > span { background: #c27c0e; }
-.ds-meter.is-low > span { background: #b42318; }
-.ds-overall { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
-.ds-overall strong { font-size: 2rem; color: #13294b; font-variant-numeric: tabular-nums; }
-.ds-cats { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.ds-cats li { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 0.82rem; }
-.ds-cats li .ds-meter { grid-column: 1 / -1; }
-.ds-cats a { color: #13294b; font-weight: 600; text-decoration: none; }
-.ds-cats a:hover { text-decoration: underline; }
-.ds-cats small { grid-column: 1 / -1; color: #64748b; }
+/* ==========================================================================
+   EXECUTIVE DOSSIER IDENTITY HERO CARD
+   ========================================================================== */
+.ds-banner {
+  background: linear-gradient(135deg, #0a192f 0%, #142B4A 55%, #1e3a5f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 24px 28px;
+  color: #ffffff;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 10px 25px -5px rgba(10, 25, 47, 0.35);
+  position: relative;
+  overflow: hidden;
+}
 
-/* Tabs for the leadership pages */
-.ds-tabs { display: flex; gap: 4px; border-bottom: 1px solid #e2e8f0; }
-.ds-tabs button { border: 0; background: none; padding: 8px 14px; font: inherit; font-size: 0.85rem; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-.ds-tabs button.is-on { color: #13294b; border-bottom-color: #13294b; }
-.ds-rules { margin: 0; padding-left: 18px; font-size: 0.78rem; color: #475467; display: flex; flex-direction: column; gap: 2px; }
-.ds-rank { font-weight: 700; color: #13294b; font-variant-numeric: tabular-nums; }
-.ds-search { border: 1px solid var(--color-border, #e2e8f0); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 0.82rem; min-width: 200px; }
+.ds-banner::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, rgba(37, 99, 235, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ds-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1 1 480px;
+  min-width: 280px;
+}
+
+.ds-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ds-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2864A5 0%, #1F5189 100%);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.6rem;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.ds-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ds-banner-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ds-role-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(37, 99, 235, 0.25);
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  color: #C9DCEF;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ds-name {
+  margin: 2px 0 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.ds-dept {
+  font-size: 0.92rem;
+  color: #cbd5e1;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ds-meta-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.ds-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.78rem;
+  color: #e2e8f0;
+}
+
+.ds-meta-pill i {
+  color: #A9C7E6;
+  font-size: 0.85rem;
+}
+
+.ds-meta-pill strong {
+  color: #ffffff;
+}
+
+.ds-meta-pill a {
+  color: #A9C7E6;
+  text-decoration: none;
+}
+
+.ds-meta-pill a:hover {
+  text-decoration: underline;
+}
+
+.ds-banner-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.ds-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #142B4A !important;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.15s ease-in-out;
+}
+
+.ds-banner-btn:hover {
+  background: #f1f5f9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* ==========================================================================
+   EXPERIENCE TELEMETRY TILES
+   ========================================================================== */
+.ds-exp-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.ds-exp-tile {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease-in-out;
+}
+
+.ds-exp-tile:hover {
+  border-color: #2864A5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+}
+
+.ds-exp-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #EAF2FA;
+  color: #2864A5;
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.ds-exp-tile.is-total .ds-exp-icon {
+  background: #EAF6EF;
+  color: #1E7A4C;
+}
+
+.ds-exp-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ds-exp-label {
+  font-size: 0.74rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.ds-exp-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #142B4A;
+  line-height: 1.15;
+}
+
+/* ==========================================================================
+   TWO-COLUMN LAYOUT
+   ========================================================================== */
+.ds-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 18px;
+}
+
+@media (max-width: 960px) {
+  .ds-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Overall Meter */
+.ds-overall-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.ds-overall-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ds-overall-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #142B4A;
+}
+
+.ds-overall-val {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #142B4A;
+  line-height: 1;
+}
+
+.ds-overall-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  overflow: hidden;
+  margin: 10px 0 16px;
+}
+
+.ds-overall-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2E9461 0%, #1E7A4C 100%);
+  transition: width 0.4s ease-out;
+}
+
+.ds-overall-bar.is-mid > span {
+  background: linear-gradient(90deg, #f59e0b 0%, #B45309 100%);
+}
+
+.ds-overall-bar.is-low > span {
+  background: linear-gradient(90deg, #D14343 0%, #B42318 100%);
+}
+
+.ds-cats {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ds-cat-item {
+  padding: 10px 14px;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.15s ease-in-out;
+}
+
+.ds-cat-item:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.ds-cat-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.ds-cat-top a {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #142B4A;
+  text-decoration: none;
+}
+
+.ds-cat-top a:hover {
+  color: #2864A5;
+  text-decoration: underline;
+}
+
+.ds-cat-pct {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #172B45;
+}
+
+.ds-cat-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.ds-cat-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2E9461;
+}
+
+.ds-cat-bar.is-mid > span { background: #f59e0b; }
+.ds-cat-bar.is-low > span { background: #D14343; }
+
+.ds-cat-sub {
+  font-size: 0.74rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+/* ==========================================================================
+   STATUS TILES & PORTFOLIO LEDGER
+   ========================================================================== */
+.ds-status-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.ds-status-box {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.15s ease-in-out;
+}
+
+.ds-status-box:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.ds-status-box-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.ds-status-box-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #142B4A;
+}
+
+.ds-status-box.is-verified .ds-status-box-val { color: #1E7A4C; }
+.ds-status-box.is-awaiting .ds-status-box-val { color: #2864A5; }
+.ds-status-box.is-returned .ds-status-box-val { color: #B45309; }
+.ds-status-box.is-rejected .ds-status-box-val { color: #B42318; }
+
+/* Submissions Table */
+.ds-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.ds-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ds-card-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #142B4A;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .ds-banner {
+    padding: 18px;
+  }
+  .ds-banner-left {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .ds-banner-right {
+    align-items: flex-start;
+    width: 100%;
+  }
+  .ds-banner-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .ds-name {
+    font-size: 1.35rem;
+  }
+  .ds-exp-strip {
+    grid-template-columns: 1fr;
+  }
+}

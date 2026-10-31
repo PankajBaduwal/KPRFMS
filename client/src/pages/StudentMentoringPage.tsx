@@ -223,7 +223,7 @@ export const StudentMentoringPage: React.FC = () => {
               height: '48px',
               borderRadius: 'var(--radius-md)',
               background: 'rgba(59, 130, 246, 0.1)',
-              color: '#3b82f6',
+              color: '#2864A5',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -249,7 +249,7 @@ export const StudentMentoringPage: React.FC = () => {
               height: '48px',
               borderRadius: 'var(--radius-md)',
               background: 'rgba(16, 185, 129, 0.1)',
-              color: '#10b981',
+              color: '#2E9461',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -262,7 +262,7 @@ export const StudentMentoringPage: React.FC = () => {
             <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
               Active Mentees
             </div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 700, color: '#10b981' }}>
+            <div style={{ fontSize: '1.75rem', fontWeight: 700, color: '#2E9461' }}>
               {metricsLoading ? <Skeleton variant="text" width={56} height={28} /> : metrics?.activeStudents ?? '—'}
             </div>
           </div>

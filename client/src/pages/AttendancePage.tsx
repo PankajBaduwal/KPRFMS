@@ -375,7 +375,7 @@ export const AttendancePage: React.FC = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => setIsLockModalOpen(true)}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', borderColor: '#ef4444', color: '#ef4444' }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', borderColor: '#D14343', color: '#D14343' }}
                   >
                     <Lock size={15} />
                     Lock Historical
@@ -693,14 +693,14 @@ export const AttendancePage: React.FC = () => {
                                   alignItems: 'center',
                                   gap: '4px',
                                   fontSize: '11px',
-                                  color: '#ef4444',
+                                  color: '#D14343',
                                   fontWeight: 600,
                                 }}
                               >
                                 <Lock size={12} /> Locked
                               </span>
                             ) : att ? (
-                              <span style={{ fontSize: '11px', color: '#10b981' }}>Active</span>
+                              <span style={{ fontSize: '11px', color: '#2E9461' }}>Active</span>
                             ) : (
                               '--'
                             )}
@@ -987,21 +987,21 @@ export const AttendancePage: React.FC = () => {
 
                 <div style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}>
                   <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Attendance Rate</div>
-                  <div style={{ fontSize: '22px', fontWeight: 700, color: '#10b981', marginTop: '4px' }}>
+                  <div style={{ fontSize: '22px', fontWeight: 700, color: '#2E9461', marginTop: '4px' }}>
                     {monthlySummary.attendancePercentage}%
                   </div>
                 </div>
 
                 <div style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}>
                   <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Total Working Hours</div>
-                  <div style={{ fontSize: '22px', fontWeight: 700, color: '#3b82f6', marginTop: '4px' }}>
+                  <div style={{ fontSize: '22px', fontWeight: 700, color: '#2864A5', marginTop: '4px' }}>
                     {monthlySummary.totalWorkingHours} hrs
                   </div>
                 </div>
 
                 <div style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}>
                   <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Avg Daily Hours</div>
-                  <div style={{ fontSize: '22px', fontWeight: 700, color: '#8b5cf6', marginTop: '4px' }}>
+                  <div style={{ fontSize: '22px', fontWeight: 700, color: '#2864A5', marginTop: '4px' }}>
                     {monthlySummary.averageWorkingHours} hrs/day
                   </div>
                 </div>
@@ -1205,14 +1205,14 @@ export const AttendancePage: React.FC = () => {
 
                 <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}>
                   <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Effective Days Worked</div>
-                  <div style={{ fontSize: '26px', fontWeight: 700, color: '#10b981', marginTop: '4px' }}>
+                  <div style={{ fontSize: '26px', fontWeight: 700, color: '#2E9461', marginTop: '4px' }}>
                     {yearlySummary.daysWorked}
                   </div>
                 </div>
 
                 <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}>
                   <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Annual Working Hours</div>
-                  <div style={{ fontSize: '26px', fontWeight: 700, color: '#3b82f6', marginTop: '4px' }}>
+                  <div style={{ fontSize: '26px', fontWeight: 700, color: '#2864A5', marginTop: '4px' }}>
                     {yearlySummary.totalWorkingHours} hrs
                   </div>
                 </div>
@@ -1246,7 +1246,7 @@ export const AttendancePage: React.FC = () => {
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: '13px' }}>
                           <span>{mKey}</span>
-                          <span style={{ color: '#10b981' }}>{mData.daysWorked} days</span>
+                          <span style={{ color: '#2E9461' }}>{mData.daysWorked} days</span>
                         </div>
                         <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
                           Total Hours: <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>{mData.totalHours} hrs</span>
@@ -1774,10 +1774,10 @@ export const AttendancePage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
                 {[
                   { label: 'Total Tracked', count: institutionOverview.institution.total, color: '#6366f1' },
-                  { label: 'Present', count: institutionOverview.institution.present, color: '#10b981' },
-                  { label: 'Absent', count: institutionOverview.institution.absent, color: '#ef4444' },
+                  { label: 'Present', count: institutionOverview.institution.present, color: '#2E9461' },
+                  { label: 'Absent', count: institutionOverview.institution.absent, color: '#D14343' },
                   { label: 'Half Day', count: institutionOverview.institution.halfDay, color: '#f59e0b' },
-                  { label: 'On Leave', count: institutionOverview.institution.onLeave, color: '#8b5cf6' },
+                  { label: 'On Leave', count: institutionOverview.institution.onLeave, color: '#2864A5' },
                   { label: 'Late', count: institutionOverview.institution.late, color: '#f97316' },
                   { label: 'WFH', count: institutionOverview.institution.wfh, color: '#06b6d4' },
                 ].map((st, i) => (
@@ -1850,14 +1850,14 @@ export const AttendancePage: React.FC = () => {
                               {dept.departmentName} ({dept.departmentCode})
                             </td>
                             <td style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 700 }}>{dept.total}</td>
-                            <td style={{ padding: '10px 14px', textAlign: 'center', color: '#10b981', fontWeight: 600 }}>
+                            <td style={{ padding: '10px 14px', textAlign: 'center', color: '#2E9461', fontWeight: 600 }}>
                               {dept.present}
                             </td>
-                            <td style={{ padding: '10px 14px', textAlign: 'center', color: '#ef4444', fontWeight: 600 }}>
+                            <td style={{ padding: '10px 14px', textAlign: 'center', color: '#D14343', fontWeight: 600 }}>
                               {dept.absent}
                             </td>
                             <td style={{ padding: '10px 14px', textAlign: 'center', color: '#f59e0b' }}>{dept.halfDay}</td>
-                            <td style={{ padding: '10px 14px', textAlign: 'center', color: '#8b5cf6' }}>{dept.onLeave}</td>
+                            <td style={{ padding: '10px 14px', textAlign: 'center', color: '#2864A5' }}>{dept.onLeave}</td>
                             <td style={{ padding: '10px 14px', textAlign: 'center', color: '#f97316' }}>{dept.late}</td>
                             <td style={{ padding: '10px 14px', textAlign: 'center', color: '#06b6d4' }}>{dept.wfh}</td>
                             <td style={{ padding: '10px 14px', textAlign: 'center' }}>

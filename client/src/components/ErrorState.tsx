@@ -104,7 +104,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           width: compact ? '44px' : '60px',
           height: compact ? '44px' : '60px',
           borderRadius: '50%',
-          backgroundColor: '#fef2f2',
+          backgroundColor: '#FCEFEE',
           color: config.badgeColor,
           display: 'flex',
           alignItems: 'center',
@@ -141,7 +141,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         style={{
           fontSize: compact ? '1.1rem' : '1.25rem',
           fontWeight: 700,
-          color: '#0f172a',
+          color: '#172B45',
           margin: '0 0 0.4rem 0',
         }}
       >
@@ -177,7 +177,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#64748b' }}>
             {detailItems.map((item, idx) => (
               <li key={idx} style={{ marginBottom: '0.2rem' }}>
-                {item.field && <strong style={{ color: '#0f172a' }}>{item.field}: </strong>}
+                {item.field && <strong style={{ color: '#172B45' }}>{item.field}: </strong>}
                 {item.message}
               </li>
             ))}

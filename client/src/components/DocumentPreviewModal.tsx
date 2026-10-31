@@ -351,7 +351,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                     justifyContent: 'center',
                     overflow: 'auto',
                     padding: '16px',
-                    backgroundColor: '#0f172a',
+                    backgroundColor: '#172B45',
                   }}
                 >
                   <img

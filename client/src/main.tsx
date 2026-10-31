@@ -10,6 +10,7 @@ import './styles/layouts.css';
 import './styles/responsive.css';
 import './styles/theme.css';
 import './styles/dashboard.css';
+import './styles/design-system.css';
 import { App } from './app/App';
 
 createRoot(document.getElementById('root')!).render(

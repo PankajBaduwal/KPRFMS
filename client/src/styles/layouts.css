@@ -12,7 +12,7 @@
 
 .app-layout .app-sidebar {
   width: var(--sidebar-width);
-  background: linear-gradient(180deg, #112547 0%, #1B345F 100%);
+  background: linear-gradient(180deg, #10243D 0%, #142B4A 100%);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
@@ -171,7 +171,7 @@
 
 .sidebar-close-btn:hover {
   background: rgba(239, 68, 68, 0.2);
-  color: #EF4444;
+  color: #D14343;
   border-color: rgba(239, 68, 68, 0.4);
 }
 
@@ -411,7 +411,7 @@
 
 .header-profile-dropdown-item.danger-item:hover {
   background-color: var(--color-danger-bg);
-  color: #DC2626;
+  color: #B42318;
 }
 
 .header-profile-dropdown-divider {
@@ -485,7 +485,7 @@
   bottom: 4px;
   width: 3px;
   border-radius: 0 2px 2px 0;
-  background-color: var(--inst-accent, #1B924B);
+  background-color: var(--inst-accent, #1E7A4C);
   animation: sidebarBarSlideIn 160ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -535,8 +535,8 @@
   bottom: 8px;
   width: 2px;
   border-radius: 2px;
-  background-color: var(--inst-accent, #3B82F6);
-  box-shadow: 0 0 6px var(--inst-accent, #3B82F6);
+  background-color: var(--inst-accent, #2864A5);
+  box-shadow: 0 0 6px var(--inst-accent, #2864A5);
 }
 
 /* User Identity Micro-Footer inside Sidebar */

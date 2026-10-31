@@ -54,7 +54,7 @@ export const ActionItemsBanner: React.FC<ActionItemsBannerProps> = ({ actions })
       case 'CRITICAL':
         return {
           border: '1px solid rgba(239, 68, 68, 0.25)',
-          borderLeft: '4px solid var(--color-danger, #ef4444)',
+          borderLeft: '4px solid var(--color-danger, #D14343)',
           badgeBg: 'rgba(239, 68, 68, 0.1)',
           badgeColor: '#dc2626',
           icon: 'bi-exclamation-octagon-fill',
@@ -71,7 +71,7 @@ export const ActionItemsBanner: React.FC<ActionItemsBannerProps> = ({ actions })
       default:
         return {
           border: '1px solid rgba(59, 130, 246, 0.2)',
-          borderLeft: '4px solid var(--color-primary, #2563eb)',
+          borderLeft: '4px solid var(--color-primary, #2864A5)',
           badgeBg: 'rgba(59, 130, 246, 0.1)',
           badgeColor: '#2563eb',
           icon: 'bi-info-circle-fill',
@@ -101,7 +101,7 @@ export const ActionItemsBanner: React.FC<ActionItemsBannerProps> = ({ actions })
               padding: '2px 8px',
               borderRadius: 12,
               background: 'rgba(239, 68, 68, 0.1)',
-              color: '#dc2626',
+              color: '#B42318',
             }}
           >
             {actions.length} {actions.length === 1 ? 'Item' : 'Items'}

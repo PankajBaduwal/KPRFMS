@@ -147,7 +147,7 @@ export const AcademicCalendarTab: React.FC<AcademicCalendarTabProps> = ({ academ
                         >
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              <span style={{ fontWeight: 700, fontSize: '1rem', color: '#0f172a' }}>{ay.name}</span>
+                              <span style={{ fontWeight: 700, fontSize: '1rem', color: '#172B45' }}>{ay.name}</span>
                               {ay.isCurrent && <span className="badge bg-primary">CURRENT ACTIVE</span>}
                             </div>
                             <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>
@@ -300,7 +300,7 @@ export const AcademicCalendarTab: React.FC<AcademicCalendarTabProps> = ({ academ
                         >
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#0f172a' }}>{sem.name}</span>
+                              <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#172B45' }}>{sem.name}</span>
                               <span className="badge bg-secondary">{sem.type}</span>
                               {sem.isCurrent && <span className="badge bg-success">CURRENT</span>}
                             </div>

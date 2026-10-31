@@ -298,13 +298,13 @@ export const SubjectsPage: React.FC = () => {
               <span className="subject-metric-label">Allocated</span>
               <div
                 className="subject-metric-icon-wrap"
-                style={{ background: '#ECFDF5', color: '#059669' }}
+                style={{ background: '#EAF6EF', color: '#1E7A4C' }}
               >
                 <i className="bi bi-check2-circle" />
               </div>
             </div>
             <div>
-              <div className="subject-metric-value" style={{ color: '#059669' }}>
+              <div className="subject-metric-value" style={{ color: '#1E7A4C' }}>
                 {metrics.allocatedSubjects}
               </div>
               <div className="subject-metric-subtext">Faculty mapped</div>
@@ -320,13 +320,13 @@ export const SubjectsPage: React.FC = () => {
               <span className="subject-metric-label">Unallocated</span>
               <div
                 className="subject-metric-icon-wrap"
-                style={{ background: '#FFFBEB', color: '#D97706' }}
+                style={{ background: '#FDF6E7', color: '#B45309' }}
               >
                 <i className="bi bi-exclamation-circle" />
               </div>
             </div>
             <div>
-              <div className="subject-metric-value" style={{ color: '#D97706' }}>
+              <div className="subject-metric-value" style={{ color: '#B45309' }}>
                 {metrics.unallocatedSubjects}
               </div>
               <div className="subject-metric-subtext">Pending allocation</div>
@@ -342,13 +342,13 @@ export const SubjectsPage: React.FC = () => {
               <span className="subject-metric-label">Total Allocations</span>
               <div
                 className="subject-metric-icon-wrap"
-                style={{ background: '#EEF2FF', color: '#4F46E5' }}
+                style={{ background: '#EAF2FA', color: '#2864A5' }}
               >
                 <i className="bi bi-person-lines-fill" />
               </div>
             </div>
             <div>
-              <div className="subject-metric-value" style={{ color: '#4F46E5' }}>
+              <div className="subject-metric-value" style={{ color: '#2864A5' }}>
                 {metrics.totalAllocations}
               </div>
               <div className="subject-metric-subtext">Course section mappings</div>
@@ -364,13 +364,13 @@ export const SubjectsPage: React.FC = () => {
               <span className="subject-metric-label">Faculty Assigned</span>
               <div
                 className="subject-metric-icon-wrap"
-                style={{ background: '#EFF6FF', color: '#2563EB' }}
+                style={{ background: '#EAF2FA', color: '#2864A5' }}
               >
                 <i className="bi bi-people-fill" />
               </div>
             </div>
             <div>
-              <div className="subject-metric-value" style={{ color: '#2563EB' }}>
+              <div className="subject-metric-value" style={{ color: '#2864A5' }}>
                 {metrics.uniqueFacultyAssigned}
               </div>
               <div className="subject-metric-subtext">Active instructors</div>

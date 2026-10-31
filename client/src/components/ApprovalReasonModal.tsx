@@ -164,7 +164,7 @@ export const ApprovalReasonModal: React.FC<ApprovalReasonModalProps> = ({
               />
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#172B45' }}>
                 {getActionTitle()}
               </h3>
               <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
@@ -204,7 +204,7 @@ export const ApprovalReasonModal: React.FC<ApprovalReasonModalProps> = ({
             <span style={{ fontWeight: 600, color: '#475569', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '2px' }}>
               Target Record
             </span>
-            <span style={{ fontWeight: 700, color: '#0f172a' }}>{recordTitle}</span>
+            <span style={{ fontWeight: 700, color: '#172B45' }}>{recordTitle}</span>
           </div>
 
           {/* Preset reasons dropdown */}
@@ -242,9 +242,9 @@ export const ApprovalReasonModal: React.FC<ApprovalReasonModalProps> = ({
           {/* Mandatory Reason Input */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-              <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#1e293b' }}>
+              <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#172B45' }}>
                 {isMandatory ? 'Official Reason / Review Remarks' : 'Remarks / Recommendation Note'}
-                {isMandatory && <span style={{ color: '#dc2626', marginLeft: '4px' }}>* (Mandatory)</span>}
+                {isMandatory && <span style={{ color: '#B42318', marginLeft: '4px' }}>* (Mandatory)</span>}
               </label>
               {isMandatory && (
                 <span style={{ fontSize: '0.75rem', color: reason.trim().length >= 5 ? '#16a34a' : '#94a3b8' }}>
@@ -279,7 +279,7 @@ export const ApprovalReasonModal: React.FC<ApprovalReasonModalProps> = ({
               }}
             />
             {error && (
-              <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: '#B42318', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <i className="bi bi-exclamation-circle-fill" /> {error}
               </p>
             )}

@@ -10,19 +10,19 @@ export const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({ st
   const getStatusConfig = () => {
     switch (status) {
       case 'PRESENT':
-        return { bg: 'rgba(4, 120, 87, 0.12)', color: '#047857', border: 'rgba(4, 120, 87, 0.3)', icon: 'bi-check-circle-fill', label: 'Present' };
+        return { bg: 'rgba(4, 120, 87, 0.12)', color: '#1E7A4C', border: 'rgba(4, 120, 87, 0.3)', icon: 'bi-check-circle-fill', label: 'Present' };
       case 'ABSENT':
-        return { bg: 'rgba(185, 28, 28, 0.12)', color: '#b91c1c', border: 'rgba(185, 28, 28, 0.3)', icon: 'bi-x-circle-fill', label: 'Absent' };
+        return { bg: 'rgba(185, 28, 28, 0.12)', color: '#B42318', border: 'rgba(185, 28, 28, 0.3)', icon: 'bi-x-circle-fill', label: 'Absent' };
       case 'HALF_DAY':
         return { bg: 'rgba(180, 83, 9, 0.12)', color: '#b45309', border: 'rgba(180, 83, 9, 0.3)', icon: 'bi-pie-chart-fill', label: 'Half Day' };
       case 'ON_LEAVE':
-        return { bg: 'rgba(109, 40, 217, 0.12)', color: '#6d28d9', border: 'rgba(109, 40, 217, 0.3)', icon: 'bi-calendar-minus-fill', label: 'On Leave' };
+        return { bg: 'rgba(109, 40, 217, 0.12)', color: '#1F4E85', border: 'rgba(109, 40, 217, 0.3)', icon: 'bi-calendar-minus-fill', label: 'On Leave' };
       case 'HOLIDAY':
-        return { bg: 'rgba(29, 78, 216, 0.12)', color: '#1d4ed8', border: 'rgba(29, 78, 216, 0.3)', icon: 'bi-star-fill', label: 'Holiday' };
+        return { bg: 'rgba(29, 78, 216, 0.12)', color: '#1F5189', border: 'rgba(29, 78, 216, 0.3)', icon: 'bi-star-fill', label: 'Holiday' };
       case 'WEEK_OFF':
         return { bg: 'rgba(55, 65, 81, 0.12)', color: '#374151', border: 'rgba(55, 65, 81, 0.3)', icon: 'bi-cup-hot-fill', label: 'Week Off' };
       case 'LATE':
-        return { bg: 'rgba(194, 65, 12, 0.12)', color: '#c2410c', border: 'rgba(194, 65, 12, 0.3)', icon: 'bi-clock-history', label: 'Late' };
+        return { bg: 'rgba(194, 65, 12, 0.12)', color: '#B45309', border: 'rgba(194, 65, 12, 0.3)', icon: 'bi-clock-history', label: 'Late' };
       case 'WORK_FROM_HOME':
         return { bg: 'rgba(14, 116, 144, 0.12)', color: '#0e7490', border: 'rgba(14, 116, 144, 0.3)', icon: 'bi-house-door-fill', label: 'WFH' };
       default:
@@ -64,11 +64,11 @@ export const AttendanceSourceBadge: React.FC<{ source: AttendanceSource }> = ({ 
       case 'MANUAL':
         return { label: 'Manual', color: '#475569' };
       case 'SELF_REPORT':
-        return { label: 'Self-Report', color: '#0284c7' };
+        return { label: 'Self-Report', color: '#2864A5' };
       case 'BIOMETRIC':
-        return { label: 'Biometric', color: '#047857' };
+        return { label: 'Biometric', color: '#1E7A4C' };
       case 'RFID':
-        return { label: 'RFID', color: '#6d28d9' };
+        return { label: 'RFID', color: '#1F4E85' };
       case 'SYSTEM':
         return { label: 'System', color: '#334155' };
       default:
@@ -101,9 +101,9 @@ export const CorrectionStatusBadge: React.FC<{ status: CorrectionStatus }> = ({ 
       case 'PENDING':
         return { bg: 'rgba(180, 83, 9, 0.12)', color: '#b45309', icon: 'bi-hourglass-split', label: 'Correction Pending' };
       case 'APPROVED':
-        return { bg: 'rgba(4, 120, 87, 0.12)', color: '#047857', icon: 'bi-check-circle-fill', label: 'Corrected' };
+        return { bg: 'rgba(4, 120, 87, 0.12)', color: '#1E7A4C', icon: 'bi-check-circle-fill', label: 'Corrected' };
       case 'REJECTED':
-        return { bg: 'rgba(185, 28, 28, 0.12)', color: '#b91c1c', icon: 'bi-x-circle-fill', label: 'Correction Rejected' };
+        return { bg: 'rgba(185, 28, 28, 0.12)', color: '#B42318', icon: 'bi-x-circle-fill', label: 'Correction Rejected' };
       default:
         return { bg: 'rgba(55, 65, 81, 0.12)', color: '#374151', icon: 'bi-info-circle-fill', label: status };
     }

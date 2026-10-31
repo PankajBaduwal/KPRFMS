@@ -36,11 +36,13 @@ router.post('/2fa/enable', authLimiter, requireAuth, authController.twoFactorEna
 router.post('/2fa/recovery-codes', authLimiter, requireAuth, authController.twoFactorRecoveryCodes);
 router.post('/2fa/disable', authLimiter, requireAuth, authController.twoFactorDisable);
 
+import { restrictInDemo } from '../middleware/demoGuard.js';
+
 // Administrative governance endpoints (with audit logging)
-router.patch('/role', requireAuth, requireRole(ROLES.ADMIN), (req, res, next) =>
+router.patch('/role', requireAuth, requireRole(ROLES.ADMIN), restrictInDemo, (req, res, next) =>
   authController.updateRole(req, res, next)
 );
-router.patch('/status', requireAuth, requireRole(ROLES.ADMIN), (req, res, next) =>
+router.patch('/status', requireAuth, requireRole(ROLES.ADMIN), restrictInDemo, (req, res, next) =>
   authController.updateStatus(req, res, next)
 );
 

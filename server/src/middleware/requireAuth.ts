@@ -115,6 +115,7 @@ async function continueInTenant(
       status: user.status,
       designation: user.designation,
       sessionId: payload.sid,
+      isDemo: Boolean(user.isDemo),
     };
 
     // Cookie sessions slide forward while the user is active (bearer tokens are left as issued)

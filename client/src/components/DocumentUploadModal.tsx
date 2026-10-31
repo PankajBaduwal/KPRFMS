@@ -242,7 +242,7 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#10b981',
+              color: '#2E9461',
               fontSize: '2rem',
               marginBottom: '16px',
             }}

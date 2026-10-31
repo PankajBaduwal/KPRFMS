@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Input, Alert } from '../index';
 import { platformApi } from '../../platform/api';
@@ -42,15 +41,29 @@ export const AccountTypeSwitch: React.FC<{ value: AccountType; onChange: (v: Acc
   );
 };
 
+export interface PlatformSignInFormProps {
+  from?: string;
+  initialEmail?: string;
+  initialPassword?: string;
+}
+
 /** Platform (Super Admin) sign-in. No institution is chosen: the console is above all institutions. */
-export const PlatformSignInForm: React.FC<{ from?: string }> = ({ from }) => {
-  const navigate = useNavigate();
+export const PlatformSignInForm: React.FC<PlatformSignInFormProps> = ({
+  from,
+  initialEmail = '',
+  initialPassword = '',
+}) => {
   const queryClient = useQueryClient();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(initialEmail);
+  const [password, setPassword] = useState(initialPassword);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  React.useEffect(() => {
+    if (initialEmail) setEmail(initialEmail);
+    if (initialPassword) setPassword(initialPassword);
+  }, [initialEmail, initialPassword]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,10 +74,10 @@ export const PlatformSignInForm: React.FC<{ from?: string }> = ({ from }) => {
       await platformApi.login(email.trim(), password);
       queryClient.removeQueries({ queryKey: ['platform'] });
       // Only console pages are valid destinations after a platform sign-in
-      navigate(from && from.startsWith('/platform') && !from.startsWith('/platform/login') ? from : '/platform', { replace: true });
+      const dest = from && from.startsWith('/platform') && !from.startsWith('/platform/login') ? from : '/platform';
+      window.location.href = dest;
     } catch (err) {
-      setError(formatErrorMessage(err, 'Sign-in failed.'));
-    } finally {
+      setError(formatErrorMessage(err, 'Sign-in failed. Please verify your Super Admin credentials.'));
       setBusy(false);
     }
   };
@@ -72,23 +85,24 @@ export const PlatformSignInForm: React.FC<{ from?: string }> = ({ from }) => {
   return (
     <form className="login-form" noValidate onSubmit={submit} aria-label={`${PRODUCT_NAME} Super Admin sign-in`}>
       {error && (
-        <div style={{ marginBottom: '0.5rem' }}>
+        <div style={{ marginBottom: '0.75rem' }}>
           <Alert variant="danger" title="Authentication Failed" onDismiss={() => setError(null)}>
             {error}
           </Alert>
         </div>
       )}
+
       <Input
-        label="Email"
+        label="Super Admin Email"
         type="email"
         autoComplete="username"
-        placeholder="you@facultycore.app"
+        placeholder="superadmin@facultycore.test"
         prefixIcon={<i className="bi bi-envelope" aria-hidden="true" />}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
       <Input
-        label="Password"
+        label="Master Password"
         type={showPassword ? 'text' : 'password'}
         autoComplete="current-password"
         placeholder="••••••••••••"
@@ -116,14 +130,14 @@ export const PlatformSignInForm: React.FC<{ from?: string }> = ({ from }) => {
         ) : (
           <>
             <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
-            <span>Sign in to platform administration</span>
+            <span>Sign in to Platform Administration</span>
           </>
         )}
       </button>
       <p className="login-help">
-        For {PRODUCT_NAME} operators. College staff choose <strong>Institution account</strong>. Forgotten
-        password: the platform owner can issue you a new activation link.
+        For {PRODUCT_NAME} Platform Operators. College faculty and administrators switch to <strong>Institution account</strong> above.
       </p>
     </form>
   );
 };
+

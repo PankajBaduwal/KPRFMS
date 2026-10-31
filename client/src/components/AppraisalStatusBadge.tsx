@@ -177,7 +177,7 @@ export const AppraisalStatusBadge: React.FC<Props> = ({
           fontSize: '0.72rem',
           fontWeight: 600,
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          color: '#1d4ed8',
+          color: '#1F5189',
         }}
       >
         {categoryLabel}

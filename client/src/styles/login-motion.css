@@ -98,12 +98,12 @@
 .register-panel .form-control-custom:hover { border-color: #B9C6DA; }
 .login-auth-panel .form-control-custom:focus,
 .register-panel .form-control-custom:focus {
-  border-color: #2457C5;
+  border-color: #2864A5;
   box-shadow: 0 0 0 4px rgba(36, 87, 197, 0.14);
   background: #FFFFFF;
 }
 .login-auth-panel div:focus-within > span:first-child,
-.register-panel div:focus-within > span:first-child { color: #2457C5 !important; transition: color 180ms ease; }
+.register-panel div:focus-within > span:first-child { color: #2864A5 !important; transition: color 180ms ease; }
 
 /* Primary button: light sweep on hover, lift, green confirmation after signing in */
 .login-submit-btn { position: relative; overflow: hidden; isolation: isolate; }
@@ -122,8 +122,8 @@
 .login-submit-btn:hover:not(:disabled) i { transform: translateX(3px); }
 .login-submit-btn.is-success,
 .login-submit-btn.is-success:disabled {
-  background: #1E7A47 !important;
-  border-color: #1E7A47 !important;
+  background: #1E7A4C !important;
+  border-color: #1E7A4C !important;
   opacity: 1;
   animation: successPop 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }

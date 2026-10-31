@@ -158,7 +158,7 @@ export const DepartmentsTab: React.FC<DepartmentsTabProps> = ({ departmentsList,
                           filteredDepartments.map((d) => (
                             <tr key={d._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                               <td style={{ padding: '0.75rem 1rem', fontWeight: 700, fontFamily: 'monospace' }}>{d.code}</td>
-                              <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#0f172a' }}>{d.name}</td>
+                              <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#172B45' }}>{d.name}</td>
                               <td style={{ padding: '0.75rem 1rem', color: '#475569' }}>
                                 {d.hodId ? `${d.hodId.name} (${d.hodId.employeeId})` : '— Not Assigned —'}
                               </td>
@@ -362,7 +362,7 @@ export const DepartmentsTab: React.FC<DepartmentsTabProps> = ({ departmentsList,
                             return (
                               <tr key={p._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                                 <td style={{ padding: '0.75rem 1rem', fontWeight: 700, fontFamily: 'monospace' }}>{p.code}</td>
-                                <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#0f172a' }}>{p.name}</td>
+                                <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#172B45' }}>{p.name}</td>
                                 <td style={{ padding: '0.75rem 1rem', color: '#475569' }}>{deptName}</td>
                                 <td style={{ padding: '0.75rem 1rem' }}>
                                   <span className="badge bg-secondary">{p.degreeLevel}</span>

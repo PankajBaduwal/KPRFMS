@@ -13,6 +13,7 @@ interface AuthState {
   login: (credentials: LoginCredentials) => Promise<User | TwoFactorChallenge>;
   loginTwoFactor: (challengeToken: string, code: string) => Promise<User & { recoveryCodesLeft?: number }>;
   logout: () => Promise<void>;
+  setSessionUser: (user: User) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -64,5 +65,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       queryClient.clear();
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
+  },
+
+  setSessionUser: (user: User) => {
+    queryClient.clear();
+    set({ user, isAuthenticated: true, isLoading: false });
   },
 }));

@@ -90,4 +90,57 @@ export const authService = {
     const response = await apiGet<User>('/auth/me');
     return response.data;
   },
+
+  async getDemoAccounts(): Promise<DemoCatalogResponse> {
+    const response = await apiGet<DemoCatalogResponse>('/platform/demo/accounts');
+    return response.data;
+  },
+
+  async demoLogin(payload: { institutionCode: string; email?: string; userId?: string; role?: string }): Promise<{ user: User; institution?: { code: string }; isPlatform?: boolean }> {
+    const response = await apiPost<{ user: User; institution?: { code: string }; isPlatform?: boolean }>('/platform/demo/login', payload);
+    return response.data;
+  },
 };
+
+export interface DemoAccountItem {
+  id: string;
+  employeeId: string;
+  name: string;
+  email: string;
+  role: string;
+  roleLabel?: string;
+  designation: string;
+  departmentId?: string;
+}
+
+export interface DemoDepartmentItem {
+  id: string;
+  code: string;
+  name: string;
+  hod: DemoAccountItem | null;
+  faculty: DemoAccountItem[];
+}
+
+export interface DemoInstitutionItem {
+  institution: {
+    code: string;
+    name: string;
+    type: string;
+    city?: string;
+    state?: string;
+  };
+  leadership: DemoAccountItem[];
+  departments: DemoDepartmentItem[];
+}
+
+export interface DemoCatalogResponse {
+  institutions: DemoInstitutionItem[];
+  platformSuperAdmin: {
+    email: string;
+    name: string;
+    role: string;
+    roleLabel: string;
+    designation: string;
+    isPlatform: boolean;
+  };
+}

@@ -138,25 +138,25 @@ export const AuditLogsPage: React.FC = () => {
       return { bg: '#e0e7ff', text: '#3730a3', border: '#c7d2fe' };
     }
     if (actUpper === 'CREATE' || actUpper.includes('CREATED') || actUpper === 'APPROVE' || actUpper.includes('APPROVED')) {
-      return { bg: '#dcfce7', text: '#15803d', border: '#bbf7d0' };
+      return { bg: '#dcfce7', text: '#15803d', border: '#BFE3CD' };
     }
     if (actUpper === 'UPDATE' || actUpper.includes('UPDATED') || actUpper === 'SUBMIT' || actUpper.includes('SUBMITTED')) {
       return { bg: '#e0f2fe', text: '#0369a1', border: '#bae6fd' };
     }
     if (actUpper === 'REJECT' || actUpper.includes('REJECTED') || actUpper.includes('STATUS_CHANGE') || actUpper.includes('DELETED')) {
-      return { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' };
+      return { bg: '#fee2e2', text: '#991b1b', border: '#F3C7C2' };
     }
     if (actUpper === 'RETURN' || actUpper === 'ARCHIVE' || actUpper.includes('REVISION')) {
-      return { bg: '#fef3c7', text: '#92400e', border: '#fde68a' };
+      return { bg: '#fef3c7', text: '#92400e', border: '#F2D9A6' };
     }
     if (actUpper === 'ROLE_CHANGE') {
-      return { bg: '#f3e8ff', text: '#6b21a8', border: '#e9d5ff' };
+      return { bg: '#f3e8ff', text: '#6b21a8', border: '#C9DCEF' };
     }
     return { bg: '#f1f5f9', text: '#475569', border: '#e2e8f0' };
   };
 
   return (
-    <div style={{ padding: '1.75rem', maxWidth: '1540px', margin: '0 auto', color: '#1e293b' }}>
+    <div style={{ padding: '1.75rem', maxWidth: '1540px', margin: '0 auto', color: '#172B45' }}>
       {/* Standard Institutional Header */}
       <PageHeader
         title="Audit log"
@@ -246,8 +246,8 @@ export const AuditLogsPage: React.FC = () => {
       ) : error ? (
         <div
           style={{
-            backgroundColor: '#fef2f2',
-            border: '1px solid #fecaca',
+            backgroundColor: '#FCEFEE',
+            border: '1px solid #F3C7C2',
             color: '#991b1b',
             padding: '0.875rem 1rem',
             borderRadius: '8px',
@@ -314,7 +314,7 @@ export const AuditLogsPage: React.FC = () => {
               ))}
             </div>
           </div>
-          <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#0f172a', margin: '0.35rem 0' }}>
+          <div style={{ fontSize: '1.875rem', fontWeight: 700, color: '#172B45', margin: '0.35rem 0' }}>
             {statsLoading ? '...' : stats ? stats.totalCount : totalRecords}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
@@ -379,7 +379,7 @@ export const AuditLogsPage: React.FC = () => {
                     borderRadius: '4px',
                     fontSize: '0.725rem',
                     fontWeight: 600,
-                    backgroundColor: '#e0e7ff',
+                    backgroundColor: '#DCE8F5',
                     color: '#3730a3',
                   }}
                 >
@@ -580,7 +580,7 @@ export const AuditLogsPage: React.FC = () => {
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                          <span style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.875rem' }}>{actorName}</span>
+                          <span style={{ fontWeight: 600, color: '#172B45', fontSize: '0.875rem' }}>{actorName}</span>
                           <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
                             ({employeeId} &bull; <strong style={{ color: '#475569' }}>{log.actorRole}</strong>)
                           </span>
@@ -619,9 +619,9 @@ export const AuditLogsPage: React.FC = () => {
                               borderRadius: '4px',
                               fontSize: '0.7rem',
                               fontWeight: 700,
-                              backgroundColor: '#dcfce7',
-                              color: '#15803d',
-                              border: '1px solid #bbf7d0',
+                              backgroundColor: '#EAF6EF',
+                              color: '#1E7A4C',
+                              border: '1px solid #BFE3CD',
                             }}
                           >
                             VERIFIED
@@ -705,7 +705,7 @@ export const AuditLogsPage: React.FC = () => {
                       <tr key={log._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                         {/* Timestamp */}
                         <td style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap' }}>
-                          <div style={{ fontWeight: 600, color: '#0f172a' }}>
+                          <div style={{ fontWeight: 600, color: '#172B45' }}>
                             {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                           </div>
                           <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
@@ -733,7 +733,7 @@ export const AuditLogsPage: React.FC = () => {
                               {actorName.charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <div style={{ fontWeight: 600, color: '#0f172a' }}>{actorName}</div>
+                              <div style={{ fontWeight: 600, color: '#172B45' }}>{actorName}</div>
                               <div style={{ fontSize: '0.725rem', color: '#64748b' }}>
                                 {employeeId} &bull; <span style={{ fontWeight: 600 }}>{log.actorRole}</span>
                               </div>
@@ -795,9 +795,9 @@ export const AuditLogsPage: React.FC = () => {
                               borderRadius: '4px',
                               fontSize: '0.725rem',
                               fontWeight: 700,
-                              backgroundColor: '#dcfce7',
-                              color: '#15803d',
-                              border: '1px solid #bbf7d0',
+                              backgroundColor: '#EAF6EF',
+                              color: '#1E7A4C',
+                              border: '1px solid #BFE3CD',
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '0.25rem',
@@ -814,7 +814,7 @@ export const AuditLogsPage: React.FC = () => {
                             <div
                               style={{
                                 fontStyle: 'italic',
-                                color: '#0f172a',
+                                color: '#172B45',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap',
@@ -824,7 +824,7 @@ export const AuditLogsPage: React.FC = () => {
                               &ldquo;{log.reason}&rdquo;
                             </div>
                           ) : log.previousState || log.newState ? (
-                            <span style={{ fontSize: '0.75rem', color: '#0284c7', fontWeight: 500 }}>
+                            <span style={{ fontSize: '0.75rem', color: '#2864A5', fontWeight: 500 }}>
                               <i className="bi bi-arrow-left-right me-1" /> State Transition Recorded
                             </span>
                           ) : (
@@ -987,16 +987,16 @@ export const AuditLogsPage: React.FC = () => {
             {selectedLog.reason && (
               <div
                 style={{
-                  borderLeft: '4px solid #3b82f6',
-                  backgroundColor: '#eff6ff',
+                  borderLeft: '4px solid #2864A5',
+                  backgroundColor: '#EAF2FA',
                   padding: '0.75rem 1rem',
                   borderRadius: '0 8px 8px 0',
                 }}
               >
-                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#1B345F', textTransform: 'uppercase' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#142B4A', textTransform: 'uppercase' }}>
                   Stated Reason / Governance Justification
                 </div>
-                <div style={{ fontSize: '0.9rem', color: '#1e3a8a', marginTop: '0.2rem' }}>
+                <div style={{ fontSize: '0.9rem', color: '#142B4A', marginTop: '0.2rem' }}>
                   {selectedLog.reason}
                 </div>
               </div>
@@ -1035,7 +1035,7 @@ export const AuditLogsPage: React.FC = () => {
                     <div
                       style={{
                         padding: '0.4rem 0.75rem',
-                        backgroundColor: '#fee2e2',
+                        backgroundColor: '#FBE4E2',
                         color: '#991b1b',
                         fontWeight: 600,
                         fontSize: '0.775rem',
@@ -1046,7 +1046,7 @@ export const AuditLogsPage: React.FC = () => {
                     </div>
                     <pre
                       style={{
-                        backgroundColor: '#0f172a',
+                        backgroundColor: '#172B45',
                         color: '#f8fafc',
                         padding: '1rem',
                         borderRadius: '0 0 6px 6px',
@@ -1067,7 +1067,7 @@ export const AuditLogsPage: React.FC = () => {
                     <div
                       style={{
                         padding: '0.4rem 0.75rem',
-                        backgroundColor: '#dcfce7',
+                        backgroundColor: '#EAF6EF',
                         color: '#166534',
                         fontWeight: 600,
                         fontSize: '0.775rem',
@@ -1078,7 +1078,7 @@ export const AuditLogsPage: React.FC = () => {
                     </div>
                     <pre
                       style={{
-                        backgroundColor: '#0f172a',
+                        backgroundColor: '#172B45',
                         color: '#f8fafc',
                         padding: '1rem',
                         borderRadius: '0 0 6px 6px',
@@ -1169,7 +1169,7 @@ export const AuditLogsPage: React.FC = () => {
             {inspectorTab === 'raw' && (
               <pre
                 style={{
-                  backgroundColor: '#0f172a',
+                  backgroundColor: '#172B45',
                   color: '#f8fafc',
                   padding: '1.25rem',
                   borderRadius: '8px',

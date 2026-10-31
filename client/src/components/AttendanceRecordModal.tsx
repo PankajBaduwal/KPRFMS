@@ -268,7 +268,7 @@ export const AttendanceRecordModal: React.FC<AttendanceRecordModalProps> = ({
             }}
           >
             <span style={{ color: 'var(--color-text-muted)' }}>Estimated Working Hours:</span>
-            <span style={{ fontWeight: 700, color: '#3b82f6' }}>{calculatedHours} hrs</span>
+            <span style={{ fontWeight: 700, color: '#2864A5' }}>{calculatedHours} hrs</span>
           </div>
         )}
 

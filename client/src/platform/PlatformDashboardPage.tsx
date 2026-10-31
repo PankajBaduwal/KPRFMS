@@ -4,12 +4,44 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { platformApi, STATUS_LABEL, type InstitutionStatus, type InstitutionSummary } from './api';
 
 const fmt = (n: number) => n.toLocaleString('en-IN');
-const ONBOARDING_LABEL: Record<string, string> = { NOT_STARTED: 'Not started', IN_PROGRESS: 'In progress', COMPLETED: 'Completed' };
+const ONBOARDING_LABEL: Record<string, string> = {
+  NOT_STARTED: 'Not started',
+  IN_PROGRESS: 'In progress',
+  COMPLETED: 'Completed',
+};
 
 const csvCell = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 function exportCsv(items: InstitutionSummary[]) {
-  const head = ['Name', 'Code', 'Type', 'City', 'State', 'Status', 'Onboarding', 'Faculty', 'Users', 'Active accounts', 'Departments', 'Created', 'Last activity'];
-  const rows = items.map((i) => [i.name, i.code, i.type, i.city, i.state, STATUS_LABEL[i.status], ONBOARDING_LABEL[i.onboardingStatus], i.usage.dbError ? '' : i.usage.faculty, i.usage.dbError ? '' : i.usage.users, i.usage.dbError ? '' : i.usage.activeUsers, i.usage.dbError ? '' : i.usage.departments, i.createdAt.slice(0, 10), i.usage.lastActivity?.slice(0, 10) ?? '']);
+  const head = [
+    'Name',
+    'Code',
+    'Type',
+    'City',
+    'State',
+    'Status',
+    'Onboarding',
+    'Faculty',
+    'Users',
+    'Active accounts',
+    'Departments',
+    'Created',
+    'Last activity',
+  ];
+  const rows = items.map((i) => [
+    i.name,
+    i.code,
+    i.type,
+    i.city,
+    i.state,
+    STATUS_LABEL[i.status],
+    ONBOARDING_LABEL[i.onboardingStatus],
+    i.usage.dbError ? '' : i.usage.faculty,
+    i.usage.dbError ? '' : i.usage.users,
+    i.usage.dbError ? '' : i.usage.activeUsers,
+    i.usage.dbError ? '' : i.usage.departments,
+    i.createdAt.slice(0, 10),
+    i.usage.lastActivity?.slice(0, 10) ?? '',
+  ]);
   const blob = new Blob([[head, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n')], { type: 'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -28,6 +60,7 @@ export const PlatformDashboardPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [debounced, setDebounced] = useState('');
   const [page, setPage] = useState(1);
+
   const set = (k: string, v: string) => {
     const next = new URLSearchParams(params);
     if (v) next.set(k, v);
@@ -46,31 +79,64 @@ export const PlatformDashboardPage: React.FC = () => {
 
   const list = useQuery({
     queryKey: ['platform', 'institutions', debounced, status, type, onboarding, sort, page],
-    queryFn: () => platformApi.institutions({ search: debounced || undefined, status: status || undefined, type: type || undefined, onboarding: onboarding || undefined, sort, page, limit: 20 }),
+    queryFn: () =>
+      platformApi.institutions({
+        search: debounced || undefined,
+        status: status || undefined,
+        type: type || undefined,
+        onboarding: onboarding || undefined,
+        sort,
+        page,
+        limit: 20,
+      }),
     placeholderData: keepPreviousData,
   });
-  const exportAll = async () => exportCsv((await platformApi.institutions({ search: debounced || undefined, status: status || undefined, type: type || undefined, onboarding: onboarding || undefined, sort, page: 1, limit: 100 })).items);
+
+  const exportAll = async () =>
+    exportCsv(
+      (
+        await platformApi.institutions({
+          search: debounced || undefined,
+          status: status || undefined,
+          type: type || undefined,
+          onboarding: onboarding || undefined,
+          sort,
+          page: 1,
+          limit: 100,
+        })
+      ).items
+    );
 
   return (
     <div className="pc-page">
       <div className="pc-page-head">
         <div>
-          <h1>Institutions</h1>
-          <p className="pc-muted">Every college and university on FacultyCore. Counts come from each institution’s own database.</p>
+          <h1>Institutions Directory</h1>
+          <p className="pc-muted">
+            All onboarded colleges, universities, and institutions hosted on the FacultyCore platform.
+          </p>
         </div>
         <div className="pc-actions">
           <button type="button" className="pc-btn" onClick={exportAll} disabled={!list.data?.total}>
-            Export CSV
+            <i className="bi bi-file-earmark-spreadsheet" />
+            <span>Export CSV</span>
           </button>
           <Link to="/platform/new" className="pc-btn pc-btn-primary">
-            New institution
+            <i className="bi bi-plus-lg" />
+            <span>New Institution</span>
           </Link>
         </div>
       </div>
 
       <section className="pc-card">
         <div className="pc-filters">
-          <input type="search" placeholder="Search name, code or city" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search institutions" />
+          <input
+            type="search"
+            placeholder="Search by name, code or location…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search institutions"
+          />
           <select value={status} onChange={(e) => set('status', e.target.value)} aria-label="Filter by status">
             <option value="">All statuses</option>
             {(Object.keys(STATUS_LABEL) as InstitutionStatus[]).map((s) => (
@@ -85,7 +151,11 @@ export const PlatformDashboardPage: React.FC = () => {
             <option value="UNIVERSITY">University</option>
             <option value="OTHER">Other</option>
           </select>
-          <select value={onboarding} onChange={(e) => set('onboarding', e.target.value)} aria-label="Filter by onboarding">
+          <select
+            value={onboarding}
+            onChange={(e) => set('onboarding', e.target.value)}
+            aria-label="Filter by onboarding"
+          >
             <option value="">Any onboarding</option>
             {Object.entries(ONBOARDING_LABEL).map(([k, v]) => (
               <option key={k} value={k}>
@@ -96,12 +166,13 @@ export const PlatformDashboardPage: React.FC = () => {
           <select value={sort} onChange={(e) => set('sort', e.target.value)} aria-label="Sort">
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
-            <option value="name">Name</option>
+            <option value="name">Name (A-Z)</option>
             <option value="status">Status</option>
             <option value="users">Most users</option>
           </select>
-          <span className="pc-muted pc-small">{list.data ? `${fmt(list.data.total)} found` : ''}</span>
+          <span className="pc-muted pc-small">{list.data ? `${fmt(list.data.total)} institutions found` : ''}</span>
         </div>
+
         <div className="pc-table-wrap">
           <table className="pc-table">
             <thead>
@@ -123,22 +194,23 @@ export const PlatformDashboardPage: React.FC = () => {
             <tbody>
               {list.isLoading && (
                 <tr>
-                  <td colSpan={12} className="pc-muted">
-                    Loading…
+                  <td colSpan={12} className="pc-muted" style={{ textAlign: 'center', padding: '2rem' }}>
+                    <span className="spinner spinner-sm" style={{ marginRight: '8px' }} />
+                    Loading institutions…
                   </td>
                 </tr>
               )}
               {list.isError && (
                 <tr>
-                  <td colSpan={12} className="pc-error">
+                  <td colSpan={12} className="pc-error" style={{ textAlign: 'center', padding: '2rem' }}>
                     Institutions could not be loaded.
                   </td>
                 </tr>
               )}
               {list.data?.items.length === 0 && (
                 <tr>
-                  <td colSpan={12} className="pc-muted">
-                    No institutions match.
+                  <td colSpan={12} className="pc-muted" style={{ textAlign: 'center', padding: '2rem' }}>
+                    No institutions match your filter criteria.
                   </td>
                 </tr>
               )}
@@ -149,34 +221,66 @@ export const PlatformDashboardPage: React.FC = () => {
                   <tr key={i.code}>
                     <td>
                       <div className="pc-inst">
-                        {i.logoUrl ? <img src={i.logoUrl} alt="" width={28} height={28} /> : <span className="pc-inst-mark">{i.name.charAt(0)}</span>}
+                        {i.logoUrl ? (
+                          <img src={i.logoUrl} alt="" width={32} height={32} />
+                        ) : (
+                          <span className="pc-inst-mark">{i.name.charAt(0)}</span>
+                        )}
                         <div>
                           <Link to={`/platform/institutions/${i.code}`} className="pc-strong">
                             {i.name}
                           </Link>
                           <div className="pc-muted pc-small">
-                            {i.code}
+                            <code>{i.code}</code>
                             {i.city ? ` · ${i.city}` : ''}
                             {i.state ? `, ${i.state}` : ''}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td>{i.type.toLowerCase()}</td>
+                    <td>
+                      <span className="pc-tag-pill">{i.type.toLowerCase()}</span>
+                    </td>
                     <td className="num">{n(i.usage.faculty)}</td>
                     <td className="num">{n(i.usage.users)}</td>
                     <td className="num">{n(i.usage.activeUsers)}</td>
                     <td className="num">{n(i.usage.departments)}</td>
-                    <td className="pc-small">{ONBOARDING_LABEL[i.onboardingStatus] ?? i.onboardingStatus}</td>
-                    <td className="pc-small">{['PROVISIONING', 'PROVISIONING_FAILED'].includes(i.status) ? '—' : unknown ? <span className="pc-error" title={i.usage.dbError}>Unreachable</span> : <span className="pc-ok">Reachable</span>}</td>
+                    <td className="pc-small">
+                      <span
+                        style={{
+                          fontWeight: 600,
+                          color: i.onboardingStatus === 'COMPLETED' ? '#047857' : '#b45309',
+                        }}
+                      >
+                        {ONBOARDING_LABEL[i.onboardingStatus] ?? i.onboardingStatus}
+                      </span>
+                    </td>
+                    <td className="pc-small">
+                      {['PROVISIONING', 'PROVISIONING_FAILED'].includes(i.status) ? (
+                        '—'
+                      ) : unknown ? (
+                        <span className="pc-error" title={i.usage.dbError}>
+                          <i className="bi bi-x-circle-fill" /> Unreachable
+                        </span>
+                      ) : (
+                        <span className="pc-ok">
+                          <i className="bi bi-check-circle-fill" /> Reachable
+                        </span>
+                      )}
+                    </td>
                     <td>
-                      <span className={`pc-status pc-status-${i.status.toLowerCase()}`}>{STATUS_LABEL[i.status]}</span>
+                      <span className={`pc-status pc-status-${i.status.toLowerCase()}`}>
+                        {STATUS_LABEL[i.status]}
+                      </span>
                     </td>
                     <td className="pc-small">{new Date(i.createdAt).toLocaleDateString('en-IN')}</td>
-                    <td className="pc-small">{i.usage.lastActivity ? new Date(i.usage.lastActivity).toLocaleDateString('en-IN') : '—'}</td>
+                    <td className="pc-small">
+                      {i.usage.lastActivity ? new Date(i.usage.lastActivity).toLocaleDateString('en-IN') : '—'}
+                    </td>
                     <td>
                       <Link to={`/platform/institutions/${i.code}`} className="pc-btn">
-                        Manage
+                        <i className="bi bi-gear" />
+                        <span>Manage</span>
                       </Link>
                     </td>
                   </tr>
@@ -185,15 +289,26 @@ export const PlatformDashboardPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+
         {list.data && list.data.pages > 1 && (
           <div className="pc-pager">
-            <button type="button" className="pc-btn" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+            <button
+              type="button"
+              className="pc-btn"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
               Previous
             </button>
             <span className="pc-small">
               Page {page} of {list.data.pages}
             </span>
-            <button type="button" className="pc-btn" disabled={page >= list.data.pages} onClick={() => setPage((p) => p + 1)}>
+            <button
+              type="button"
+              className="pc-btn"
+              disabled={page >= list.data.pages}
+              onClick={() => setPage((p) => p + 1)}
+            >
               Next
             </button>
           </div>

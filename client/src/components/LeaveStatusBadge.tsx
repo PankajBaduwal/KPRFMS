@@ -9,11 +9,11 @@ export const LeaveStatusBadge: React.FC<{ status: LeaveStatus; size?: 'sm' | 'md
   const getConfig = () => {
     switch (status) {
       case 'APPROVED':
-        return { bg: 'rgba(4, 120, 87, 0.12)', color: '#047857', border: 'rgba(4, 120, 87, 0.3)', icon: 'bi-check-circle-fill', label: 'Approved' };
+        return { bg: 'rgba(4, 120, 87, 0.12)', color: '#1E7A4C', border: 'rgba(4, 120, 87, 0.3)', icon: 'bi-check-circle-fill', label: 'Approved' };
       case 'PENDING':
         return { bg: 'rgba(180, 83, 9, 0.12)', color: '#b45309', border: 'rgba(180, 83, 9, 0.3)', icon: 'bi-hourglass-split', label: 'Pending Review' };
       case 'REJECTED':
-        return { bg: 'rgba(185, 28, 28, 0.12)', color: '#b91c1c', border: 'rgba(185, 28, 28, 0.3)', icon: 'bi-x-circle-fill', label: 'Rejected' };
+        return { bg: 'rgba(185, 28, 28, 0.12)', color: '#B42318', border: 'rgba(185, 28, 28, 0.3)', icon: 'bi-x-circle-fill', label: 'Rejected' };
       case 'CANCELLED':
         return { bg: 'rgba(71, 85, 105, 0.12)', color: '#475569', border: 'rgba(71, 85, 105, 0.3)', icon: 'bi-slash-circle-fill', label: 'Cancelled' };
       default:
@@ -52,15 +52,15 @@ export const LeaveTypeBadge: React.FC<{ type: LeaveType }> = ({ type }) => {
   const getColors = () => {
     switch (type) {
       case 'CASUAL_LEAVE':
-        return { bg: 'rgba(29, 78, 216, 0.12)', color: '#1d4ed8', border: 'rgba(29, 78, 216, 0.25)' };
+        return { bg: 'rgba(29, 78, 216, 0.12)', color: '#1F5189', border: 'rgba(29, 78, 216, 0.25)' };
       case 'EARNED_LEAVE':
-        return { bg: 'rgba(4, 120, 87, 0.12)', color: '#047857', border: 'rgba(4, 120, 87, 0.25)' };
+        return { bg: 'rgba(4, 120, 87, 0.12)', color: '#1E7A4C', border: 'rgba(4, 120, 87, 0.25)' };
       case 'SICK_LEAVE':
-        return { bg: 'rgba(185, 28, 28, 0.12)', color: '#b91c1c', border: 'rgba(185, 28, 28, 0.25)' };
+        return { bg: 'rgba(185, 28, 28, 0.12)', color: '#B42318', border: 'rgba(185, 28, 28, 0.25)' };
       case 'ON_DUTY':
-        return { bg: 'rgba(109, 40, 217, 0.12)', color: '#6d28d9', border: 'rgba(109, 40, 217, 0.25)' };
+        return { bg: 'rgba(109, 40, 217, 0.12)', color: '#1F4E85', border: 'rgba(109, 40, 217, 0.25)' };
       case 'COMPENSATORY_OFF':
-        return { bg: 'rgba(194, 65, 12, 0.12)', color: '#c2410c', border: 'rgba(194, 65, 12, 0.25)' };
+        return { bg: 'rgba(194, 65, 12, 0.12)', color: '#B45309', border: 'rgba(194, 65, 12, 0.25)' };
       case 'MATERNITY_PATERNITY':
         return { bg: 'rgba(190, 24, 93, 0.12)', color: '#be185d', border: 'rgba(190, 24, 93, 0.25)' };
       case 'SPECIAL_CASUAL_LEAVE':
@@ -96,9 +96,9 @@ export const WorkflowStageBadge: React.FC<{ stage: WorkflowStage }> = ({ stage }
       case 'HOD_REVIEW':
         return { label: 'Awaiting HOD', color: '#b45309' };
       case 'DEAN_ADMIN_REVIEW':
-        return { label: 'Awaiting Leadership', color: '#6d28d9' };
+        return { label: 'Awaiting Leadership', color: '#1F4E85' };
       case 'COMPLETED':
-        return { label: 'Workflow Completed', color: '#047857' };
+        return { label: 'Workflow Completed', color: '#1E7A4C' };
       default:
         return { label: stage, color: '#475569' };
     }

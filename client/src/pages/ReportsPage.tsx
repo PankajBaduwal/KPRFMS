@@ -285,9 +285,9 @@ export const ReportsPage: React.FC = () => {
       <div
         className="compliance-disclaimer-banner"
         style={{
-          background: '#fffbeb',
-          border: '1px solid #fde68a',
-          borderLeft: '5px solid #d97706',
+          background: '#FDF6E7',
+          border: '1px solid #F2D9A6',
+          borderLeft: '5px solid #B45309',
           borderRadius: '8px',
           padding: '12px 18px',
           marginBottom: '20px',
@@ -319,7 +319,7 @@ export const ReportsPage: React.FC = () => {
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#172B45', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <i className="bi bi-file-earmark-bar-graph text-primary" aria-hidden="true" />
             Select Institutional Report (20 Formats)
           </h2>
@@ -531,7 +531,7 @@ export const ReportsPage: React.FC = () => {
               padding: '8px 18px',
               borderRadius: '6px',
               border: 'none',
-              background: '#2563eb',
+              background: '#2864A5',
               color: '#ffffff',
               fontWeight: 600,
               fontSize: '13px',
@@ -577,7 +577,7 @@ export const ReportsPage: React.FC = () => {
                 borderRadius: '6px',
                 border: '1px solid #cbd5e1',
                 background: '#ffffff',
-                color: '#15803d',
+                color: '#1E7A4C',
                 fontWeight: 600,
                 fontSize: '13px',
                 cursor: 'pointer',
@@ -598,7 +598,7 @@ export const ReportsPage: React.FC = () => {
                 padding: '8px 14px',
                 borderRadius: '6px',
                 border: 'none',
-                background: '#0f172a',
+                background: '#172B45',
                 color: '#ffffff',
                 fontWeight: 600,
                 fontSize: '13px',
@@ -628,9 +628,9 @@ export const ReportsPage: React.FC = () => {
       ) : error && reportResult ? (
         <div
           style={{
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            color: '#b91c1c',
+            background: '#FCEFEE',
+            border: '1px solid #F3C7C2',
+            color: '#B42318',
             borderRadius: '8px',
             padding: '12px 16px',
             marginBottom: '20px',
@@ -697,7 +697,7 @@ export const ReportsPage: React.FC = () => {
                 <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', color: '#64748b' }}>
                   {m.label}
                 </div>
-                <div style={{ fontSize: '22px', fontWeight: 700, color: '#0f172a', margin: '4px 0' }}>
+                <div style={{ fontSize: '22px', fontWeight: 700, color: '#172B45', margin: '4px 0' }}>
                   {m.value}
                 </div>
               </div>
@@ -732,7 +732,7 @@ export const ReportsPage: React.FC = () => {
             }}
           >
             <div>
-              <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#1e293b' }}>
+              <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#172B45' }}>
                 {reportResult.reportTitle}
               </h3>
               <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
@@ -862,9 +862,9 @@ export const ReportsPage: React.FC = () => {
                             style={{
                               padding: '3px 8px',
                               borderRadius: '4px',
-                              border: '1px solid #bfdbfe',
-                              background: '#eff6ff',
-                              color: '#1d4ed8',
+                              border: '1px solid #C9DCEF',
+                              background: '#EAF2FA',
+                              color: '#1F5189',
                               fontSize: '11.5px',
                               fontWeight: 600,
                               cursor: 'pointer',
@@ -923,7 +923,7 @@ export const ReportsPage: React.FC = () => {
                 </h4>
                 <pre
                   style={{
-                    background: '#0f172a',
+                    background: '#172B45',
                     color: '#e2e8f0',
                     padding: '14px',
                     borderRadius: '6px',

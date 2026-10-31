@@ -424,6 +424,13 @@ export const AppLayout: React.FC = () => {
     if (p.includes('/documents')) return { section: 'Operations', page: 'Documents' };
     if (p.includes('/admin-console')) return { section: 'Administration', page: 'System Console' };
     if (p.includes('/audit-logs')) return { section: 'Administration', page: 'Audit Logs' };
+    if (p.includes('/funding')) return { section: 'Research', page: 'Grants & Funding' };
+    if (p.includes('/dossier')) return { section: 'Faculty', page: 'Dossier' };
+    if (p.includes('/courses')) return { section: 'Professional Development', page: 'Courses & Certifications' };
+    if (p.includes('/achievements')) return { section: 'Achievements', page: 'Achievements' };
+    if (p.includes('/faculty-insights')) return { section: 'Performance', page: 'Faculty Performance' };
+    if (p.includes('/faculty/')) return { section: 'Faculty', page: 'Faculty Profile' };
+    if (p.includes('/design-system')) return { section: 'Developer', page: 'Design System' };
     return { section: 'Portal', page: 'System Module' };
   }, [location.pathname]);
 

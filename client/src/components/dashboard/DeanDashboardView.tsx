@@ -189,7 +189,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
                 height: 36,
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: 'rgba(2, 132, 199, 0.08)',
-                color: '#0284c7',
+                color: '#2864A5',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -215,7 +215,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
                 height: 36,
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: 'rgba(5, 150, 105, 0.08)',
-                color: '#059669',
+                color: '#1E7A4C',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -498,7 +498,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
               <span style={{ color: 'var(--color-warning)' }}>Variance: {100 - compliancePercent}%</span>
             </div>
             <div style={{ width: '100%', height: 12, backgroundColor: '#e2e8f0', borderRadius: 6, overflow: 'hidden', display: 'flex' }}>
-              <div style={{ width: `${compliancePercent}%`, backgroundColor: '#10b981', height: '100%' }} />
+              <div style={{ width: `${compliancePercent}%`, backgroundColor: '#2E9461', height: '100%' }} />
               <div style={{ width: `${100 - compliancePercent}%`, backgroundColor: '#f59e0b', height: '100%' }} />
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 8 }}>
@@ -560,7 +560,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 600 }}>
               Sanctioned Grants
             </div>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, marginTop: 4, color: '#059669' }}>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, marginTop: 4, color: '#1E7A4C' }}>
               ₹{(data.research.totalSanctionedAmount / 100000).toFixed(1)}L
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: 2 }}>
@@ -573,7 +573,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
             <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--color-text-muted)', fontWeight: 600 }}>
               PhD Scholars Mentored
             </div>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, marginTop: 4, color: '#7c3aed' }}>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, marginTop: 4, color: '#2864A5' }}>
               {data.research.phdScholarsTotal}
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: 2 }}>
@@ -705,7 +705,7 @@ export const DeanDashboardView: React.FC<DeanDashboardViewProps> = ({ data }) =>
                   <td style={{ textAlign: 'center', fontWeight: 600 }}>
                     {dept.projectsCount}
                   </td>
-                  <td style={{ textAlign: 'right', fontWeight: 700, color: '#059669' }}>
+                  <td style={{ textAlign: 'right', fontWeight: 700, color: '#1E7A4C' }}>
                     ₹{(dept.totalGrants / 100000).toFixed(2)} Lakhs
                   </td>
                   <td style={{ textAlign: 'right' }}>

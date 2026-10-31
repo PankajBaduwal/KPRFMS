@@ -181,7 +181,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                   fontWeight: 700,
                   padding: '2px 8px',
                   borderRadius: '6px',
-                  background: '#e0e7ff',
+                  background: '#DCE8F5',
                   color: '#3730a3',
                   textTransform: 'uppercase',
                 }}
@@ -213,7 +213,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                 margin: 0,
                 fontSize: '1.15rem',
                 fontWeight: 700,
-                color: '#0f172a',
+                color: '#172B45',
                 lineHeight: 1.35,
               }}
             >
@@ -283,7 +283,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                 </div>
               )}
               <div>
-                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>
+                <div style={{ fontWeight: 700, color: '#172B45', fontSize: '0.95rem' }}>
                   {record.faculty.name}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
@@ -430,8 +430,8 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
               style={{
                 padding: '1rem 1.25rem',
                 borderRadius: '8px',
-                backgroundColor: '#fee2e2',
-                color: '#b91c1c',
+                backgroundColor: '#FBE4E2',
+                color: '#B42318',
                 fontSize: '0.88rem',
                 display: 'flex',
                 alignItems: 'center',
@@ -467,7 +467,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                     fontSize: '0.85rem',
                   }}
                 >
-                  <div style={{ fontWeight: 700, marginBottom: '2px', color: '#0f172a' }}>
+                  <div style={{ fontWeight: 700, marginBottom: '2px', color: '#172B45' }}>
                     Current Verification Status: {record.rawStatus}
                   </div>
                   {record.customDetails?.remarks && (
@@ -516,7 +516,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                         <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
                           {formattedKey}
                         </span>
-                        <span style={{ color: '#0f172a', fontWeight: 600, wordBreak: 'break-word' }}>
+                        <span style={{ color: '#172B45', fontWeight: 600, wordBreak: 'break-word' }}>
                           {displayVal}
                         </span>
                       </div>
@@ -551,8 +551,8 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                             width: '36px',
                             height: '36px',
                             borderRadius: '8px',
-                            background: '#eff6ff',
-                            color: '#2563eb',
+                            background: '#EAF2FA',
+                            color: '#2864A5',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -562,7 +562,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                           <i className="bi bi-file-earmark-pdf-fill" />
                         </div>
                         <div>
-                          <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a' }}>
+                          <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#172B45' }}>
                             {doc.name || 'Supporting Document'}
                           </div>
                           <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
@@ -575,7 +575,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                         <button
                           type="button"
                           onClick={() => openVaultDocument(doc.documentId!)}
-                          style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #2563eb', color: '#2563eb', fontSize: '0.82rem', fontWeight: 600, background: '#fff', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
+                          style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #2864A5', color: '#2864A5', fontSize: '0.82rem', fontWeight: 600, background: '#fff', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
                         >
                           <i className="bi bi-box-arrow-up-right" /> View
                         </button>
@@ -587,8 +587,8 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                         style={{
                           padding: '6px 14px',
                           borderRadius: '6px',
-                          border: '1px solid #2563eb',
-                          color: '#2563eb',
+                          border: '1px solid #2864A5',
+                          color: '#2864A5',
                           fontSize: '0.82rem',
                           fontWeight: 600,
                           textDecoration: 'none',
@@ -693,7 +693,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                               >
                                 {entry.action.replace(/_/g, ' ')}
                               </span>
-                              <strong style={{ fontSize: '0.85rem', color: '#0f172a' }}>
+                              <strong style={{ fontSize: '0.85rem', color: '#172B45' }}>
                                 {entry.actorName}
                               </strong>
                               <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
@@ -773,7 +773,7 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                   borderRadius: '6px',
                   border: '1px solid #fed7aa',
                   background: '#fff',
-                  color: '#c2410c',
+                  color: '#B45309',
                   fontSize: '0.84rem',
                   fontWeight: 600,
                   cursor: isOwnLeave || isBusy ? 'not-allowed' : 'pointer',
@@ -795,9 +795,9 @@ export const ApprovalDetailPanel: React.FC<ApprovalDetailPanelProps> = ({
                 style={{
                   padding: '7px 14px',
                   borderRadius: '6px',
-                  border: '1px solid #fecaca',
+                  border: '1px solid #F3C7C2',
                   background: '#fff',
-                  color: '#b91c1c',
+                  color: '#B42318',
                   fontSize: '0.84rem',
                   fontWeight: 600,
                   cursor: isOwnLeave || isBusy ? 'not-allowed' : 'pointer',

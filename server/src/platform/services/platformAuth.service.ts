@@ -21,6 +21,8 @@ const PLATFORM_KEY = () => `${env.JWT_SECRET}:platform-console`;
 const ACTIVATION_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_FAILED = 5;
 const LOCK_MS = 15 * 60 * 1000;
+/** The only platform account demo sign-in may open (local demo data; .test is a reserved domain) */
+export const DEMO_OPERATOR_EMAIL = 'superadmin@facultycore.test';
 const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,128}$/;
 const FAILED = 'Incorrect email or password. After 5 failed attempts the account is locked for 15 minutes.';
 
@@ -127,6 +129,25 @@ export const platformAuthService = {
     await user.save();
     await startSession(String(user._id), req, res);
     await recordPlatformAudit({ action: PLATFORM_AUDIT.LOGIN, actor: { id: String(user._id), email: user.email }, ip: req.ip });
+    return { email: user.email, name: user.name };
+  },
+
+  /**
+   * Demo sign-in for the local demo operator only (the route exists only when DEMO_LOGIN_ENABLED=true).
+   * No password is involved, so it is limited to the reserved .test address and never reaches a real operator.
+   */
+  async demoLogin(req: Request, res: Response) {
+    const user = await PlatformUser.findOne({ email: DEMO_OPERATOR_EMAIL, status: 'ACTIVE' });
+    if (!user) throw AppError.notFound('The demo platform operator has not been set up.');
+    user.lastLogin = new Date();
+    await user.save();
+    await startSession(String(user._id), req, res);
+    await recordPlatformAudit({
+      action: PLATFORM_AUDIT.LOGIN,
+      actor: { id: String(user._id), email: user.email },
+      ip: req.ip,
+      details: { authMethod: 'ONE_CLICK_DEMO' },
+    });
     return { email: user.email, name: user.name };
   },
 

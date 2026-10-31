@@ -133,12 +133,12 @@ export const PrincipalDrillDownModal: React.FC<PrincipalDrillDownModalProps> = (
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: '#0f172a' }}>
+              <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: '#172B45' }}>
                 {metricLabel}
               </h4>
               <span
                 style={{
-                  backgroundColor: '#0f172a',
+                  backgroundColor: '#172B45',
                   color: '#ffffff',
                   fontSize: '0.75rem',
                   fontWeight: 700,
@@ -151,9 +151,9 @@ export const PrincipalDrillDownModal: React.FC<PrincipalDrillDownModalProps> = (
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.35rem', fontSize: '0.8rem', color: '#64748b' }}>
               <span>Principal review</span>
-              {departmentName && <span>• Department: <strong style={{ color: '#0f172a' }}>{departmentName}</strong></span>}
+              {departmentName && <span>• Department: <strong style={{ color: '#172B45' }}>{departmentName}</strong></span>}
               {academicYear && academicYear !== 'ALL' && (
-                <span>• AY: <strong style={{ color: '#0f172a' }}>{academicYear}</strong></span>
+                <span>• AY: <strong style={{ color: '#172B45' }}>{academicYear}</strong></span>
               )}
             </div>
           </div>
@@ -231,7 +231,7 @@ export const PrincipalDrillDownModal: React.FC<PrincipalDrillDownModalProps> = (
               <span>Accessing real database records for Principal...</span>
             </div>
           ) : error ? (
-            <div style={{ padding: '1rem', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', color: '#b91c1c' }}>
+            <div style={{ padding: '1rem', backgroundColor: '#FCEFEE', border: '1px solid #F3C7C2', borderRadius: '6px', color: '#B42318' }}>
               <i className="bi bi-exclamation-triangle-fill me-2" />
               {error}
             </div>
@@ -322,7 +322,7 @@ export const PrincipalDrillDownModal: React.FC<PrincipalDrillDownModalProps> = (
                             margin: '0.35rem 0 0.2rem 0',
                             fontSize: '0.925rem',
                             fontWeight: 600,
-                            color: '#0f172a',
+                            color: '#172B45',
                             lineHeight: 1.4,
                           }}
                         >
@@ -336,7 +336,7 @@ export const PrincipalDrillDownModal: React.FC<PrincipalDrillDownModalProps> = (
 
                       <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                         {rec.amount !== undefined && rec.amount > 0 && (
-                          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#059669' }}>
+                          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1E7A4C' }}>
                             ₹{rec.amount.toLocaleString()}
                           </div>
                         )}
@@ -393,7 +393,7 @@ export const PrincipalDrillDownModal: React.FC<PrincipalDrillDownModalProps> = (
                               <span style={{ color: '#64748b', textTransform: 'capitalize' }}>
                                 {k.replace(/([A-Z])/g, ' $1')}:{' '}
                               </span>
-                              <strong style={{ color: '#1e293b' }}>{String(v)}</strong>
+                              <strong style={{ color: '#172B45' }}>{String(v)}</strong>
                             </div>
                           );
                         })}

@@ -149,7 +149,7 @@ export const AuditLogsTab: React.FC<AuditLogsTabProps> = ({ auditActionFilter, a
                                         width: '28px',
                                         height: '28px',
                                         borderRadius: '50%',
-                                        backgroundColor: '#e0e7ff',
+                                        backgroundColor: '#DCE8F5',
                                         color: '#4338ca',
                                         display: 'flex',
                                         alignItems: 'center',
@@ -161,7 +161,7 @@ export const AuditLogsTab: React.FC<AuditLogsTabProps> = ({ auditActionFilter, a
                                       {log.userId.name ? log.userId.name.charAt(0).toUpperCase() : 'U'}
                                     </div>
                                     <div>
-                                      <div style={{ fontWeight: 600, color: '#0f172a' }}>{log.userId.name}</div>
+                                      <div style={{ fontWeight: 600, color: '#172B45' }}>{log.userId.name}</div>
                                       <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
                                         {log.userId.employeeId} &bull; {log.userId.role}
                                       </div>
@@ -178,7 +178,7 @@ export const AuditLogsTab: React.FC<AuditLogsTabProps> = ({ auditActionFilter, a
                                   style={{
                                     padding: '0.2rem 0.55rem',
                                     borderRadius: '4px',
-                                    backgroundColor: '#e0e7ff',
+                                    backgroundColor: '#DCE8F5',
                                     color: '#3730a3',
                                     fontFamily: 'monospace',
                                     fontWeight: 600,
@@ -203,8 +203,8 @@ export const AuditLogsTab: React.FC<AuditLogsTabProps> = ({ auditActionFilter, a
                                     borderRadius: '4px',
                                     fontSize: '0.7rem',
                                     fontWeight: 700,
-                                    backgroundColor: '#dcfce7',
-                                    color: '#15803d',
+                                    backgroundColor: '#EAF6EF',
+                                    color: '#1E7A4C',
                                   }}
                                 >
                                   RECORDED
@@ -306,7 +306,7 @@ export const AuditLogsTab: React.FC<AuditLogsTabProps> = ({ auditActionFilter, a
                                 style={{
                                   padding: '0.2rem 0.55rem',
                                   borderRadius: '4px',
-                                  backgroundColor: '#e0e7ff',
+                                  backgroundColor: '#DCE8F5',
                                   color: '#3730a3',
                                   fontFamily: 'monospace',
                                   fontWeight: 600,

@@ -18,6 +18,8 @@ const envSchema = z.object({
   PUBLIC_API_URL: z.string().optional(),
   // Encrypts two-factor secrets at rest. Keep it stable: changing it turns off everyone's two-factor
   TWO_FACTOR_KEY: z.string().optional(),
+  // One-click sign-in to accounts tagged isDemo. Off unless explicitly enabled; never covers platform accounts
+  DEMO_LOGIN_ENABLED: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
   // Google Gemini for the AI assistant features (disabled when the key is missing)
   GEMINI_API_KEY: z.string().optional(),
   GEMINI_MODEL: z.string().default('gemini-flash-latest'),

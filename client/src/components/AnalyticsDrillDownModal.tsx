@@ -88,13 +88,13 @@ export const AnalyticsDrillDownModal: React.FC<AnalyticsDrillDownModalProps> = (
   const getStatusBadge = (status?: string) => {
     const s = (status || '').toUpperCase();
     if (['VERIFIED', 'SANCTIONED', 'APPROVED', 'COMPLETED', 'GRANTED', 'AWARDED', 'NORMAL'].includes(s)) {
-      return { bg: '#ecfdf5', text: '#059669', border: '#a7f3d0' };
+      return { bg: '#ecfdf5', text: '#059669', border: '#BFE3CD' };
     }
     if (['UNDER_REVIEW', 'SUBMITTED', 'COURSEWORK', 'IN_PREPARATION', 'ONGOING'].includes(s)) {
-      return { bg: '#fffbeb', text: '#d97706', border: '#fde68a' };
+      return { bg: '#fffbeb', text: '#d97706', border: '#F2D9A6' };
     }
     if (['OVERLOADED', 'REJECTED', 'RETURNED_FOR_CORRECTION'].includes(s)) {
-      return { bg: '#fef2f2', text: '#dc2626', border: '#fecaca' };
+      return { bg: '#fef2f2', text: '#dc2626', border: '#F3C7C2' };
     }
     return { bg: '#f3f4f6', text: '#4b5563', border: '#e5e7eb' };
   };
@@ -145,12 +145,12 @@ export const AnalyticsDrillDownModal: React.FC<AnalyticsDrillDownModalProps> = (
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <h4 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: '#0f172a' }}>
+              <h4 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: '#172B45' }}>
                 {title}
               </h4>
               <span
                 style={{
-                  backgroundColor: '#0284c7',
+                  backgroundColor: '#2864A5',
                   color: '#ffffff',
                   fontSize: '0.75rem',
                   fontWeight: 700,
@@ -174,12 +174,12 @@ export const AnalyticsDrillDownModal: React.FC<AnalyticsDrillDownModalProps> = (
             >
               <span>From analytics</span>
               {filters.academicYear && filters.academicYear !== 'ALL' && (
-                <span>• AY: <strong style={{ color: '#0f172a' }}>{filters.academicYear}</strong></span>
+                <span>• AY: <strong style={{ color: '#172B45' }}>{filters.academicYear}</strong></span>
               )}
               {filters.verificationStatus && filters.verificationStatus !== 'ALL' && (
-                <span>• Status: <strong style={{ color: '#0f172a' }}>{filters.verificationStatus}</strong></span>
+                <span>• Status: <strong style={{ color: '#172B45' }}>{filters.verificationStatus}</strong></span>
               )}
-              {subType && <span>• Filter: <strong style={{ color: '#0284c7' }}>{subType}</strong></span>}
+              {subType && <span>• Filter: <strong style={{ color: '#2864A5' }}>{subType}</strong></span>}
             </div>
           </div>
 
@@ -279,10 +279,10 @@ export const AnalyticsDrillDownModal: React.FC<AnalyticsDrillDownModalProps> = (
             <div
               style={{
                 padding: '1.5rem',
-                backgroundColor: '#fef2f2',
-                border: '1px solid #fecaca',
+                backgroundColor: '#FCEFEE',
+                border: '1px solid #F3C7C2',
                 borderRadius: '8px',
-                color: '#b91c1c',
+                color: '#B42318',
                 fontSize: '0.9rem',
               }}
             >
@@ -355,7 +355,7 @@ export const AnalyticsDrillDownModal: React.FC<AnalyticsDrillDownModalProps> = (
                               textTransform: 'uppercase',
                               padding: '0.15rem 0.5rem',
                               borderRadius: '4px',
-                              backgroundColor: '#e0f2fe',
+                              backgroundColor: '#EAF2FA',
                               color: '#0369a1',
                             }}
                           >
@@ -386,7 +386,7 @@ export const AnalyticsDrillDownModal: React.FC<AnalyticsDrillDownModalProps> = (
                             margin: '0.45rem 0 0.25rem 0',
                             fontSize: '0.95rem',
                             fontWeight: 600,
-                            color: '#1e293b',
+                            color: '#172B45',
                             lineHeight: 1.4,
                           }}
                         >
@@ -400,7 +400,7 @@ export const AnalyticsDrillDownModal: React.FC<AnalyticsDrillDownModalProps> = (
 
                       <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                         {rec.amount !== undefined && rec.amount > 0 && (
-                          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#059669' }}>
+                          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1E7A4C' }}>
                             ₹{rec.amount.toLocaleString()}
                           </div>
                         )}
@@ -458,7 +458,7 @@ export const AnalyticsDrillDownModal: React.FC<AnalyticsDrillDownModalProps> = (
                               <span style={{ color: '#64748b', textTransform: 'capitalize' }}>
                                 {k.replace(/([A-Z])/g, ' $1')}:{' '}
                               </span>
-                              <strong style={{ color: '#1e293b' }}>{String(v)}</strong>
+                              <strong style={{ color: '#172B45' }}>{String(v)}</strong>
                             </div>
                           );
                         })}

@@ -204,8 +204,8 @@ export const AppraisalEvaluationModal: React.FC<Props> = ({
         {isSelf && (
           <div
             style={{
-              backgroundColor: '#fee2e2',
-              color: '#b91c1c',
+              backgroundColor: '#FBE4E2',
+              color: '#B42318',
               padding: '0.75rem 1.75rem',
               fontSize: '0.85rem',
               fontWeight: 600,
@@ -283,7 +283,7 @@ export const AppraisalEvaluationModal: React.FC<Props> = ({
                   borderRadius: '10px',
                   padding: '0.75rem 1rem',
                   fontSize: '0.82rem',
-                  color: '#1B345F',
+                  color: '#142B4A',
                 }}
               >
                 <i className="bi bi-info-circle-fill" style={{ marginRight: '6px' }} />
@@ -330,7 +330,7 @@ export const AppraisalEvaluationModal: React.FC<Props> = ({
                             padding: '2px 8px',
                             borderRadius: '4px',
                             background: 'rgba(30, 64, 175, 0.1)',
-                            color: '#1B345F',
+                            color: '#142B4A',
                           }}
                         >
                           Weight: {cat.weightage}%
@@ -342,7 +342,7 @@ export const AppraisalEvaluationModal: React.FC<Props> = ({
                             padding: '2px 8px',
                             borderRadius: '4px',
                             background: 'rgba(16, 185, 129, 0.1)',
-                            color: '#059669',
+                            color: '#1E7A4C',
                           }}
                         >
                           Self: {cat.selfScore} / 100
@@ -353,7 +353,7 @@ export const AppraisalEvaluationModal: React.FC<Props> = ({
                     {/* Faculty remarks & evidence */}
                     <div style={{ marginBottom: '0.75rem', fontSize: '0.82rem' }}>
                       <strong style={{ color: 'var(--color-text-secondary, #475569)' }}>Faculty Remarks: </strong>
-                      <span style={{ color: 'var(--color-text-primary, #1e293b)' }}>
+                      <span style={{ color: 'var(--color-text-primary, #172B45)' }}>
                         {cat.facultyRemarks || 'No remarks entered by faculty.'}
                       </span>
                     </div>
@@ -383,7 +383,7 @@ export const AppraisalEvaluationModal: React.FC<Props> = ({
                                 borderRadius: '6px',
                                 background: 'var(--color-bg-secondary, #f1f5f9)',
                                 border: '1px solid var(--color-border, #cbd5e1)',
-                                color: '#1d4ed8',
+                                color: '#1F5189',
                                 fontSize: '0.78rem',
                                 textDecoration: 'none',
                                 fontWeight: 500,
@@ -519,7 +519,7 @@ export const AppraisalEvaluationModal: React.FC<Props> = ({
                               fontWeight: 600,
                               padding: '2px 6px',
                               borderRadius: '4px',
-                              background: '#e0e7ff',
+                              background: '#DCE8F5',
                               color: '#3730a3',
                             }}
                           >
@@ -533,7 +533,7 @@ export const AppraisalEvaluationModal: React.FC<Props> = ({
                       <div style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
                         <strong>Decision: </strong> {item.decision}
                         {item.overallScore !== undefined && (
-                          <span style={{ marginLeft: '12px', fontWeight: 600, color: '#059669' }}>
+                          <span style={{ marginLeft: '12px', fontWeight: 600, color: '#1E7A4C' }}>
                             Score: {item.overallScore} / 100
                           </span>
                         )}

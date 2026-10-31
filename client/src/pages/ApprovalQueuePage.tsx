@@ -226,7 +226,7 @@ export const ApprovalQueuePage: React.FC = () => {
             position: 'fixed',
             bottom: '24px',
             right: '24px',
-            backgroundColor: '#0f172a',
+            backgroundColor: '#172B45',
             color: '#fff',
             padding: '12px 20px',
             borderRadius: '10px',
@@ -279,7 +279,7 @@ export const ApprovalQueuePage: React.FC = () => {
               <i className="bi bi-check2-square" />
             </div>
             <div>
-              <h1 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>
+              <h1 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 800, color: '#172B45' }}>
                 HOD Approval Queue
               </h1>
               <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
@@ -308,7 +308,7 @@ export const ApprovalQueuePage: React.FC = () => {
                   fontSize: '0.85rem',
                   fontWeight: 600,
                   backgroundColor: '#fff',
-                  color: '#1e293b',
+                  color: '#172B45',
                 }}
               >
                 {departments.map((d) => (
@@ -330,10 +330,10 @@ export const ApprovalQueuePage: React.FC = () => {
                 border: '1px solid #e2e8f0',
                 fontSize: '0.85rem',
                 fontWeight: 700,
-                color: '#1e293b',
+                color: '#172B45',
               }}
             >
-              <i className="bi bi-building" style={{ marginRight: '6px', color: '#2563eb' }} />
+              <i className="bi bi-building" style={{ marginRight: '6px', color: '#2864A5' }} />
               {department.name} ({department.code})
             </div>
           )}
@@ -373,10 +373,10 @@ export const ApprovalQueuePage: React.FC = () => {
       >
         {[
           { key: 'ALL', label: 'All Submissions', count: counts.all, color: '#475569', activeBg: '#0f172a', activeText: '#fff' },
-          { key: 'PENDING', label: 'Pending Review', count: counts.pending, color: '#c2410c', activeBg: '#ea580c', activeText: '#fff' },
+          { key: 'PENDING', label: 'Pending Review', count: counts.pending, color: '#B45309', activeBg: '#ea580c', activeText: '#fff' },
           { key: 'APPROVED', label: 'Approved', count: counts.approved, color: '#16a34a', activeBg: '#16a34a', activeText: '#fff' },
-          { key: 'RETURNED_FOR_CORRECTION', label: 'Returned for Correction', count: counts.returned, color: '#d97706', activeBg: '#d97706', activeText: '#fff' },
-          { key: 'REJECTED', label: 'Rejected', count: counts.rejected, color: '#dc2626', activeBg: '#dc2626', activeText: '#fff' },
+          { key: 'RETURNED_FOR_CORRECTION', label: 'Returned for Correction', count: counts.returned, color: '#B45309', activeBg: '#d97706', activeText: '#fff' },
+          { key: 'REJECTED', label: 'Rejected', count: counts.rejected, color: '#B42318', activeBg: '#dc2626', activeText: '#fff' },
         ].map((tab) => {
           const isActive = statusTab === tab.key;
           return (
@@ -583,10 +583,10 @@ export const ApprovalQueuePage: React.FC = () => {
         <div
           style={{
             padding: '10px 16px',
-            backgroundColor: '#fef2f2',
-            border: '1px solid #fecaca',
+            backgroundColor: '#FCEFEE',
+            border: '1px solid #F3C7C2',
             borderRadius: '8px',
-            color: '#b91c1c',
+            color: '#B42318',
             marginBottom: '1rem',
             fontSize: '0.88rem',
             display: 'flex',
@@ -602,7 +602,7 @@ export const ApprovalQueuePage: React.FC = () => {
             type="button"
             onClick={() => setQueueError(null)}
             aria-label="Dismiss error"
-            style={{ background: 'none', border: 'none', color: '#b91c1c', cursor: 'pointer', padding: '4px' }}
+            style={{ background: 'none', border: 'none', color: '#B42318', cursor: 'pointer', padding: '4px' }}
           >
             <i className="bi bi-x-lg" aria-hidden="true" />
           </button>
@@ -690,7 +690,7 @@ export const ApprovalQueuePage: React.FC = () => {
                   if (row.recordType === 'LEAVE' || row.recordType === 'ATTENDANCE_CORRECTION') {
                     priorityConfig = { label: 'High', bg: '#fff7ed', text: '#c2410c', border: '#ffedd5' };
                   } else if (row.recordType === 'APPRAISAL') {
-                    priorityConfig = { label: 'Medium', bg: '#eff6ff', text: '#1d4ed8', border: '#dbeafe' };
+                    priorityConfig = { label: 'Medium', bg: '#eff6ff', text: '#1d4ed8', border: '#EAF2FA' };
                   }
 
                   return (
@@ -712,7 +712,7 @@ export const ApprovalQueuePage: React.FC = () => {
                         <div
                           style={{
                             fontWeight: 600,
-                            color: '#0f172a',
+                            color: '#172B45',
                             lineHeight: 1.3,
                             marginBottom: '3px',
                           }}
@@ -740,11 +740,11 @@ export const ApprovalQueuePage: React.FC = () => {
                             <span
                               style={{
                                 fontSize: '0.7rem',
-                                color: '#2563eb',
+                                color: '#2864A5',
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 gap: '3px',
-                                background: '#eff6ff',
+                                background: '#EAF2FA',
                                 padding: '1px 6px',
                                 borderRadius: '4px',
                                 fontWeight: 600,
@@ -787,7 +787,7 @@ export const ApprovalQueuePage: React.FC = () => {
                             </div>
                           )}
                           <div>
-                            <div style={{ fontWeight: 700, color: '#0f172a' }}>{row.faculty.name}</div>
+                            <div style={{ fontWeight: 700, color: '#172B45' }}>{row.faculty.name}</div>
                             <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
                               {row.faculty.employeeId || 'ID N/A'} • {row.faculty.designation}
                             </div>
@@ -888,7 +888,7 @@ export const ApprovalQueuePage: React.FC = () => {
                               borderRadius: '6px',
                               border: '1px solid #cbd5e1',
                               background: '#fff',
-                              color: '#1B345F',
+                              color: '#142B4A',
                               fontSize: '0.78rem',
                               fontWeight: 600,
                               cursor: 'pointer',
@@ -910,9 +910,9 @@ export const ApprovalQueuePage: React.FC = () => {
                                 style={{
                                   padding: '4px 8px',
                                   borderRadius: '6px',
-                                  border: '1px solid #bbf7d0',
-                                  background: '#f0fdf4',
-                                  color: '#15803d',
+                                  border: '1px solid #BFE3CD',
+                                  background: '#EAF6EF',
+                                  color: '#1E7A4C',
                                   fontSize: '0.78rem',
                                   fontWeight: 600,
                                   cursor: 'pointer',
@@ -933,7 +933,7 @@ export const ApprovalQueuePage: React.FC = () => {
                                   borderRadius: '6px',
                                   border: '1px solid #fed7aa',
                                   background: '#fff7ed',
-                                  color: '#c2410c',
+                                  color: '#B45309',
                                   fontSize: '0.78rem',
                                   fontWeight: 600,
                                   cursor: 'pointer',
@@ -952,9 +952,9 @@ export const ApprovalQueuePage: React.FC = () => {
                                 style={{
                                   padding: '4px 8px',
                                   borderRadius: '6px',
-                                  border: '1px solid #fecaca',
-                                  background: '#fef2f2',
-                                  color: '#b91c1c',
+                                  border: '1px solid #F3C7C2',
+                                  background: '#FCEFEE',
+                                  color: '#B42318',
                                   fontSize: '0.78rem',
                                   fontWeight: 600,
                                   cursor: 'pointer',

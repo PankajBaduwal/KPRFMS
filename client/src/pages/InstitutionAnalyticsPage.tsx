@@ -271,8 +271,8 @@ export const InstitutionAnalyticsPage: React.FC = () => {
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <i className="bi bi-funnel-fill" style={{ color: '#2563eb' }} />
-            <h5 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#1e293b' }}>
+            <i className="bi bi-funnel-fill" style={{ color: '#2864A5' }} />
+            <h5 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#172B45' }}>
               Multi-Criteria Filters
             </h5>
             <span style={{ fontSize: '0.75rem', color: '#64748b' }}>(Real-time server-side aggregation)</span>
@@ -512,10 +512,10 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               </span>
               <i className="bi bi-journal-text" style={{ fontSize: '1.2rem', color: COLORS.primary }} />
             </div>
-            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
+            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#172B45', margin: '0.4rem 0 0.2rem 0' }}>
               {data.summaryKpis.totalPublications}
             </div>
-            <div style={{ fontSize: '0.8rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <div style={{ fontSize: '0.8rem', color: '#2E9461', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <i className="bi bi-patch-check-fill" /> {data.summaryKpis.verifiedPublications} Verified
               <span style={{ color: '#94a3b8', marginLeft: 'auto' }}>Click to view</span>
             </div>
@@ -542,7 +542,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               </span>
               <i className="bi bi-cash-stack" style={{ fontSize: '1.2rem', color: COLORS.purple }} />
             </div>
-            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
+            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#172B45', margin: '0.4rem 0 0.2rem 0' }}>
               ₹{(data.summaryKpis.totalResearchFundingSanctioned / 100000).toFixed(1)}L
             </div>
             <div style={{ fontSize: '0.8rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -572,7 +572,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               </span>
               <i className="bi bi-person-workspace" style={{ fontSize: '1.2rem', color: COLORS.cyan }} />
             </div>
-            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
+            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#172B45', margin: '0.4rem 0 0.2rem 0' }}>
               {data.summaryKpis.fdpSttpParticipation}
             </div>
             <div style={{ fontSize: '0.8rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -602,7 +602,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               </span>
               <i className="bi bi-mic" style={{ fontSize: '1.2rem', color: COLORS.warning }} />
             </div>
-            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
+            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#172B45', margin: '0.4rem 0 0.2rem 0' }}>
               {data.summaryKpis.conferencePresentations}
             </div>
             <div style={{ fontSize: '0.8rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -632,7 +632,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               </span>
               <i className="bi bi-mortarboard-fill" style={{ fontSize: '1.2rem', color: COLORS.indigo }} />
             </div>
-            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
+            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#172B45', margin: '0.4rem 0 0.2rem 0' }}>
               {data.summaryKpis.phdScholarsCount}
             </div>
             <div style={{ fontSize: '0.8rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -663,7 +663,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               </span>
               <i className="bi bi-speedometer2" style={{ fontSize: '1.2rem', color: COLORS.danger }} />
             </div>
-            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
+            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#172B45', margin: '0.4rem 0 0.2rem 0' }}>
               {data.summaryKpis.avgWeeklyWorkloadHours} <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>hrs/wk</span>
             </div>
             <div style={{ fontSize: '0.8rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -742,10 +742,10 @@ export const InstitutionAnalyticsPage: React.FC = () => {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                 <div>
-                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#2864A5', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Institutional Governance Query 1
                   </div>
-                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#172B45' }}>
                     How many publications were recorded this academic year, and in which indexed databases?
                   </h4>
                   <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
@@ -755,9 +755,9 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                 <button
                   onClick={() => openDrillDown('publications', 'All Publications')}
                   style={{
-                    backgroundColor: '#eff6ff',
-                    color: '#2563eb',
-                    border: '1px solid #bfdbfe',
+                    backgroundColor: '#EAF2FA',
+                    color: '#2864A5',
+                    border: '1px solid #C9DCEF',
                     padding: '0.45rem 0.95rem',
                     borderRadius: '6px',
                     fontSize: '0.82rem',
@@ -772,7 +772,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
                 {/* 1A. Publication Annual Trends */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Annual Publications & Peer-Review Verification Volume
                   </div>
                   {data.publicationTrends.trendsByYear.length > 0 ? (
@@ -807,7 +807,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
 
                 {/* 1B. Indexing & Quartiles Distribution */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Indexing Distribution (Scopus, SCI, Web of Science, UGC CARE)
                   </div>
                   {data.publicationTrends.byIndexing.length > 0 ? (
@@ -869,9 +869,9 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                           const rate = t.total > 0 ? Math.round((t.verified / t.total) * 100) : 0;
                           return (
                             <tr key={t.year} style={{ borderBottom: '1px solid #f8fafc' }}>
-                              <td style={{ padding: '9px 14px', fontWeight: 700, color: '#0f172a' }}>{t.year}</td>
+                              <td style={{ padding: '9px 14px', fontWeight: 700, color: '#172B45' }}>{t.year}</td>
                               <td style={{ padding: '9px 12px', textAlign: 'center', fontWeight: 600 }}>{t.total}</td>
-                              <td style={{ padding: '9px 12px', textAlign: 'center', color: '#059669', fontWeight: 700 }}>{t.verified}</td>
+                              <td style={{ padding: '9px 12px', textAlign: 'center', color: '#1E7A4C', fontWeight: 700 }}>{t.verified}</td>
                               <td style={{ padding: '9px 12px', textAlign: 'center' }}>
                                 <span style={{ padding: '2px 6px', borderRadius: '4px', background: rate >= 80 ? '#dcfce7' : '#fef3c7', color: rate >= 80 ? '#15803d' : '#b45309', fontWeight: 700, fontSize: '0.75rem' }}>
                                   {rate}%
@@ -882,7 +882,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => openDrillDown('publications', `Publications in ${t.year}`)}
-                                  style={{ padding: '3px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#fff', color: '#1B345F', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                                  style={{ padding: '3px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#fff', color: '#142B4A', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                                 >
                                   Inspect Records →
                                 </button>
@@ -911,10 +911,10 @@ export const InstitutionAnalyticsPage: React.FC = () => {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                 <div>
-                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#2864A5', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Institutional Governance Query 2
                   </div>
-                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#172B45' }}>
                     Which agencies and funding streams support institutional research grants?
                   </h4>
                   <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
@@ -924,9 +924,9 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                 <button
                   onClick={() => openDrillDown('researchFunding', 'All Funded Projects')}
                   style={{
-                    backgroundColor: '#faf5ff',
-                    color: '#7c3aed',
-                    border: '1px solid #e9d5ff',
+                    backgroundColor: '#EAF2FA',
+                    color: '#2864A5',
+                    border: '1px solid #C9DCEF',
                     padding: '0.45rem 0.95rem',
                     borderRadius: '6px',
                     fontSize: '0.82rem',
@@ -941,7 +941,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
                 {/* 2A. Funding by Agency */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Sanctioned Amount by Sponsoring Agency (₹)
                   </div>
                   {data.researchFunding.byAgency.length > 0 ? (
@@ -978,7 +978,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
 
                 {/* 2B. Sanctioned vs Received Trends */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Sanctioned vs Received Grants by Academic Year
                   </div>
                   {data.researchFunding.trendsByYear.length > 0 ? (
@@ -1042,17 +1042,17 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                       <tbody>
                         {data.researchFunding.byAgency.map((a) => (
                           <tr key={a.agency} style={{ borderBottom: '1px solid #f8fafc' }}>
-                            <td style={{ padding: '9px 14px', fontWeight: 700, color: '#0f172a' }}>{a.agency}</td>
+                            <td style={{ padding: '9px 14px', fontWeight: 700, color: '#172B45' }}>{a.agency}</td>
                             <td style={{ padding: '9px 12px', textAlign: 'center', fontWeight: 600 }}>{a.count}</td>
                             <td style={{ padding: '9px 12px', textAlign: 'right', color: '#64748b' }}>₹{a.totalSanctioned.toLocaleString()}</td>
-                            <td style={{ padding: '9px 12px', textAlign: 'right', fontWeight: 700, color: '#7c3aed' }}>
+                            <td style={{ padding: '9px 12px', textAlign: 'right', fontWeight: 700, color: '#2864A5' }}>
                               ₹{(a.totalSanctioned / 100000).toFixed(2)}L
                             </td>
                             <td style={{ padding: '9px 14px', textAlign: 'right' }}>
                               <button
                                 type="button"
                                 onClick={() => openDrillDown('researchFunding', `Projects Funded by ${a.agency}`, a.agency)}
-                                style={{ padding: '3px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#fff', color: '#7c3aed', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                                style={{ padding: '3px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#fff', color: '#2864A5', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                               >
                                 Inspect Grants →
                               </button>
@@ -1080,10 +1080,10 @@ export const InstitutionAnalyticsPage: React.FC = () => {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                 <div>
-                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#2864A5', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Institutional Governance Query 4
                   </div>
-                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#172B45' }}>
                     What is the active milestone trajectory of sponsored research projects?
                   </h4>
                   <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
@@ -1093,9 +1093,9 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                 <button
                   onClick={() => openDrillDown('projects', 'All Research Projects')}
                   style={{
-                    backgroundColor: '#eff6ff',
-                    color: '#2563eb',
-                    border: '1px solid #bfdbfe',
+                    backgroundColor: '#EAF2FA',
+                    color: '#2864A5',
+                    border: '1px solid #C9DCEF',
                     padding: '0.45rem 0.95rem',
                     borderRadius: '6px',
                     fontSize: '0.82rem',
@@ -1110,7 +1110,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
                 {/* 3A. Pie Chart by Status */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem', textAlign: 'center' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem', textAlign: 'left' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem', textAlign: 'left' }}>
                     Project Lifecycle Distribution
                   </div>
                   {data.projectStatus.byStatus.length > 0 ? (
@@ -1145,7 +1145,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
 
                 {/* 3B. Utilization Status */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Grant Utilization Certificate Status
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
@@ -1169,7 +1169,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                         <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#334155' }}>
                           {u.utilizationStatus}
                         </span>
-                        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#2563eb' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#2864A5' }}>
                           {u.count} {u.count === 1 ? 'Project' : 'Projects'} →
                         </span>
                       </div>
@@ -1196,7 +1196,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                   <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#0891b2', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Institutional Governance Query 5
                   </div>
-                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#172B45' }}>
                     How active are faculty members in professional development (FDP, STTP, and workshops)?
                   </h4>
                   <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
@@ -1331,10 +1331,10 @@ export const InstitutionAnalyticsPage: React.FC = () => {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                 <div>
-                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#d97706', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Institutional Governance Query 8
                   </div>
-                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#172B45' }}>
                     How frequently do faculty present peer-reviewed papers at national & international conferences?
                   </h4>
                   <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
@@ -1344,9 +1344,9 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                 <button
                   onClick={() => openDrillDown('conferenceParticipation', 'All Conferences')}
                   style={{
-                    backgroundColor: '#fffbeb',
-                    color: '#d97706',
-                    border: '1px solid #fde68a',
+                    backgroundColor: '#FDF6E7',
+                    color: '#B45309',
+                    border: '1px solid #F2D9A6',
                     padding: '0.45rem 0.95rem',
                     borderRadius: '6px',
                     fontSize: '0.82rem',
@@ -1402,34 +1402,34 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                       onClick={() => openDrillDown('conferenceParticipation', 'Papers Presented', 'PRESENTED')}
                       style={{
                         padding: '1rem',
-                        backgroundColor: '#ecfdf5',
+                        backgroundColor: '#EAF6EF',
                         borderRadius: '8px',
-                        border: '1px solid #a7f3d0',
+                        border: '1px solid #BFE3CD',
                         cursor: 'pointer',
                       }}
                     >
-                      <div style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 700 }}>PAPERS PRESENTED</div>
+                      <div style={{ fontSize: '0.75rem', color: '#1E7A4C', fontWeight: 700 }}>PAPERS PRESENTED</div>
                       <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#065f46', margin: '0.25rem 0' }}>
                         {data.conferenceParticipation.papersPresented}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: '#047857' }}>Click to view details →</div>
+                      <div style={{ fontSize: '0.75rem', color: '#1E7A4C' }}>Click to view details →</div>
                     </div>
 
                     <div
                       onClick={() => openDrillDown('conferenceParticipation', 'Conference Participation', 'ALL')}
                       style={{
                         padding: '1rem',
-                        backgroundColor: '#eff6ff',
+                        backgroundColor: '#EAF2FA',
                         borderRadius: '8px',
-                        border: '1px solid #bfdbfe',
+                        border: '1px solid #C9DCEF',
                         cursor: 'pointer',
                       }}
                     >
-                      <div style={{ fontSize: '0.75rem', color: '#1d4ed8', fontWeight: 700 }}>INTERNATIONAL</div>
-                      <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#1B345F', margin: '0.25rem 0' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#1F5189', fontWeight: 700 }}>INTERNATIONAL</div>
+                      <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#142B4A', margin: '0.25rem 0' }}>
                         {data.conferenceParticipation.internationalCount}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: '#2563eb' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#2864A5' }}>
                         {data.conferenceParticipation.nationalCount} National →
                       </div>
                     </div>
@@ -1452,10 +1452,10 @@ export const InstitutionAnalyticsPage: React.FC = () => {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                 <div>
-                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#4f46e5', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#2864A5', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Institutional Governance Query 6
                   </div>
-                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#172B45' }}>
                     What is the milestone progress and thesis completion trajectory of PhD scholars?
                   </h4>
                   <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
@@ -1465,8 +1465,8 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                 <button
                   onClick={() => openDrillDown('phdProgress', 'All PhD Scholars')}
                   style={{
-                    backgroundColor: '#eef2ff',
-                    color: '#4f46e5',
+                    backgroundColor: '#EAF2FA',
+                    color: '#2864A5',
                     border: '1px solid #c7d2fe',
                     padding: '0.45rem 0.95rem',
                     borderRadius: '6px',
@@ -1482,7 +1482,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem' }}>
                 {/* 6A. Scholars by Stage */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Scholars by Progression Stage
                   </div>
                   {data.phdProgress.byStage.length > 0 ? (
@@ -1515,7 +1515,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
 
                 {/* 6B. Thesis Status Distribution */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Thesis & Degree Status
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
@@ -1538,7 +1538,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                         }}
                       >
                         <span style={{ fontWeight: 500, color: '#334155' }}>{t.thesisStatus}</span>
-                        <strong style={{ color: '#4f46e5' }}>{t.count} Scholars →</strong>
+                        <strong style={{ color: '#2864A5' }}>{t.count} Scholars →</strong>
                       </div>
                     ))}
                   </div>
@@ -1570,7 +1570,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                       <tbody>
                         {data.phdProgress.byDepartment.map((d) => (
                           <tr key={d.department} style={{ borderBottom: '1px solid #f8fafc' }}>
-                            <td style={{ padding: '9px 14px', fontWeight: 700, color: '#0f172a' }}>{d.department}</td>
+                            <td style={{ padding: '9px 14px', fontWeight: 700, color: '#172B45' }}>{d.department}</td>
                             <td style={{ padding: '9px 12px', textAlign: 'center', fontWeight: 700, color: '#4338ca' }}>{d.count}</td>
                             <td style={{ padding: '9px 12px', textAlign: 'center', color: '#64748b' }}>
                               {data.phdProgress.total > 0 ? Math.round((d.count / data.phdProgress.total) * 100) : 0}%
@@ -1607,10 +1607,10 @@ export const InstitutionAnalyticsPage: React.FC = () => {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                 <div>
-                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#15803d', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#1E7A4C', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Institutional Governance Query 7
                   </div>
-                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#172B45' }}>
                     What innovation outcomes and intellectual property emerge from student projects?
                   </h4>
                   <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
@@ -1620,9 +1620,9 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                 <button
                   onClick={() => openDrillDown('studentProjectProgress', 'All Student Projects')}
                   style={{
-                    backgroundColor: '#f0fdf4',
-                    color: '#15803d',
-                    border: '1px solid #bbf7d0',
+                    backgroundColor: '#EAF6EF',
+                    color: '#1E7A4C',
+                    border: '1px solid #BFE3CD',
                     padding: '0.45rem 0.95rem',
                     borderRadius: '6px',
                     fontSize: '0.82rem',
@@ -1637,7 +1637,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem' }}>
                 {/* 7A. Projects by Type */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Projects by Category (UG, PG, Capstone, Mini-Project)
                   </div>
                   {data.studentProjectProgress.byType.length > 0 ? (
@@ -1670,7 +1670,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
 
                 {/* 7B. Innovation Outcomes */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Innovation & Research Translation Outcomes
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '1.5rem' }}>
@@ -1685,8 +1685,8 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                         cursor: 'pointer',
                       }}
                     >
-                      <i className="bi bi-file-earmark-text" style={{ fontSize: '1.5rem', color: '#2563eb' }} />
-                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0' }}>
+                      <i className="bi bi-file-earmark-text" style={{ fontSize: '1.5rem', color: '#2864A5' }} />
+                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#172B45', margin: '0.25rem 0' }}>
                         {data.studentProjectProgress.outcomes.withPublication}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>With Publications</div>
@@ -1704,7 +1704,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                       }}
                     >
                       <i className="bi bi-lightbulb" style={{ fontSize: '1.5rem', color: '#f59e0b' }} />
-                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0' }}>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#172B45', margin: '0.25rem 0' }}>
                         {data.studentProjectProgress.outcomes.withPatent}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>With Patents</div>
@@ -1721,8 +1721,8 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                         cursor: 'pointer',
                       }}
                     >
-                      <i className="bi bi-building" style={{ fontSize: '1.5rem', color: '#10b981' }} />
-                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0' }}>
+                      <i className="bi bi-building" style={{ fontSize: '1.5rem', color: '#2E9461' }} />
+                      <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#172B45', margin: '0.25rem 0' }}>
                         {data.studentProjectProgress.outcomes.withIndustry}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>Industry Collab</div>
@@ -1756,8 +1756,8 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                       <tbody>
                         {data.studentProjectProgress.byType.map((p) => (
                           <tr key={p.projectType} style={{ borderBottom: '1px solid #f8fafc' }}>
-                            <td style={{ padding: '9px 14px', fontWeight: 700, color: '#0f172a' }}>{p.projectType}</td>
-                            <td style={{ padding: '9px 12px', textAlign: 'center', fontWeight: 700, color: '#059669' }}>{p.count}</td>
+                            <td style={{ padding: '9px 14px', fontWeight: 700, color: '#172B45' }}>{p.projectType}</td>
+                            <td style={{ padding: '9px 12px', textAlign: 'center', fontWeight: 700, color: '#1E7A4C' }}>{p.count}</td>
                             <td style={{ padding: '9px 12px', textAlign: 'center', color: '#64748b' }}>
                               {data.studentProjectProgress.total > 0 ? Math.round((p.count / data.studentProjectProgress.total) * 100) : 0}%
                             </td>
@@ -1765,7 +1765,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => openDrillDown('studentProjectProgress', `Student Projects (${p.projectType})`, p.projectType)}
-                                style={{ padding: '3px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#fff', color: '#059669', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                                style={{ padding: '3px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#fff', color: '#1E7A4C', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                               >
                                 Inspect Projects →
                               </button>
@@ -1793,10 +1793,10 @@ export const InstitutionAnalyticsPage: React.FC = () => {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                 <div>
-                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#B42318', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Institutional Governance Query 3
                   </div>
-                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>
+                  <h4 style={{ margin: '3px 0 0', fontSize: '1.2rem', fontWeight: 800, color: '#172B45' }}>
                     How is faculty workload distributed across departments against statutory norms?
                   </h4>
                   <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
@@ -1807,7 +1807,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                   onClick={() => openDrillDown('workloadDistribution', 'All Faculty Workloads')}
                   style={{
                     backgroundColor: '#fff1f2',
-                    color: '#e11d48',
+                    color: '#B42318',
                     border: '1px solid #fecdd3',
                     padding: '0.45rem 0.95rem',
                     borderRadius: '6px',
@@ -1823,7 +1823,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem' }}>
                 {/* 8A. Balance Breakdown Cards */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Workload Balance Categories (AICTE 14–16h Norm)
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
@@ -1835,18 +1835,18 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                         alignItems: 'center',
                         padding: '0.75rem 1rem',
                         borderRadius: '8px',
-                        backgroundColor: '#fef2f2',
-                        border: '1px solid #fecaca',
+                        backgroundColor: '#FCEFEE',
+                        border: '1px solid #F3C7C2',
                         cursor: 'pointer',
                       }}
                     >
                       <div>
-                        <div style={{ fontWeight: 700, color: '#b91c1c', fontSize: '0.9rem' }}>
+                        <div style={{ fontWeight: 700, color: '#B42318', fontSize: '0.9rem' }}>
                           Overloaded (&gt; 18 hrs/week)
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#ef4444' }}>Requires teaching redistribution</div>
+                        <div style={{ fontSize: '0.75rem', color: '#D14343' }}>Requires teaching redistribution</div>
                       </div>
-                      <strong style={{ fontSize: '1.15rem', color: '#b91c1c' }}>
+                      <strong style={{ fontSize: '1.15rem', color: '#B42318' }}>
                         {data.workloadDistribution.overloadedCount} Faculty →
                       </strong>
                     </div>
@@ -1859,18 +1859,18 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                         alignItems: 'center',
                         padding: '0.75rem 1rem',
                         borderRadius: '8px',
-                        backgroundColor: '#f0fdf4',
-                        border: '1px solid #bbf7d0',
+                        backgroundColor: '#EAF6EF',
+                        border: '1px solid #BFE3CD',
                         cursor: 'pointer',
                       }}
                     >
                       <div>
-                        <div style={{ fontWeight: 700, color: '#15803d', fontSize: '0.9rem' }}>
+                        <div style={{ fontWeight: 700, color: '#1E7A4C', fontSize: '0.9rem' }}>
                           Balanced & Compliant (12 - 18 hrs/week)
                         </div>
                         <div style={{ fontSize: '0.75rem', color: '#16a34a' }}>Meets AICTE & UGC norms</div>
                       </div>
-                      <strong style={{ fontSize: '1.15rem', color: '#15803d' }}>
+                      <strong style={{ fontSize: '1.15rem', color: '#1E7A4C' }}>
                         {data.workloadDistribution.normalCount} Faculty →
                       </strong>
                     </div>
@@ -1883,8 +1883,8 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                         alignItems: 'center',
                         padding: '0.75rem 1rem',
                         borderRadius: '8px',
-                        backgroundColor: '#fffbeb',
-                        border: '1px solid #fde68a',
+                        backgroundColor: '#FDF6E7',
+                        border: '1px solid #F2D9A6',
                         cursor: 'pointer',
                       }}
                     >
@@ -1892,7 +1892,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                         <div style={{ fontWeight: 700, color: '#b45309', fontSize: '0.9rem' }}>
                           Underloaded (&lt; 12 hrs/week)
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#d97706' }}>Available for further teaching/research</div>
+                        <div style={{ fontSize: '0.75rem', color: '#B45309' }}>Available for further teaching/research</div>
                       </div>
                       <strong style={{ fontSize: '1.15rem', color: '#b45309' }}>
                         {data.workloadDistribution.underloadedCount} Faculty →
@@ -1903,7 +1903,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
 
                 {/* 8B. Workload by Department */}
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: '8px', padding: '1rem' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#172B45', marginBottom: '0.75rem' }}>
                     Average Weekly Contact Hours by Department
                   </div>
                   {data.workloadDistribution.byDepartment.length > 0 ? (
@@ -1968,9 +1968,9 @@ export const InstitutionAnalyticsPage: React.FC = () => {
 
                           return (
                             <tr key={d.department} style={{ borderBottom: '1px solid #f8fafc' }}>
-                              <td style={{ padding: '9px 14px', fontWeight: 700, color: '#0f172a' }}>{d.department}</td>
+                              <td style={{ padding: '9px 14px', fontWeight: 700, color: '#172B45' }}>{d.department}</td>
                               <td style={{ padding: '9px 12px', textAlign: 'center', fontWeight: 600 }}>{d.facultyCount}</td>
-                              <td style={{ padding: '9px 12px', textAlign: 'center', fontWeight: 700, color: '#0f172a' }}>
+                              <td style={{ padding: '9px 12px', textAlign: 'center', fontWeight: 700, color: '#172B45' }}>
                                 {d.avgHours} hrs/wk
                               </td>
                               <td style={{ padding: '9px 12px', textAlign: 'center' }}>
@@ -1982,7 +1982,7 @@ export const InstitutionAnalyticsPage: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => openDrillDown('workloadDistribution', `Workload in ${d.department}`)}
-                                  style={{ padding: '3px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#fff', color: '#1B345F', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                                  style={{ padding: '3px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', background: '#fff', color: '#142B4A', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                                 >
                                   Inspect Workload →
                                 </button>

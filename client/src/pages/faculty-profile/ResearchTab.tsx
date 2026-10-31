@@ -464,7 +464,7 @@ export const ResearchTab: React.FC<ResearchTabProps> = ({ deleteConsultancyMutat
                                 {amountDisplay}
                               </strong>
                               {proj.receivedAmount > 0 && (
-                                <div style={{ fontSize: '0.75rem', color: '#059669', marginTop: '1px' }}>
+                                <div style={{ fontSize: '0.75rem', color: '#1E7A4C', marginTop: '1px' }}>
                                   Recv: ₹{proj.receivedAmount.toLocaleString()}
                                 </div>
                               )}

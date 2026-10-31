@@ -1,97 +1,197 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
-import { FEATURES } from '../constants/features';
-import { apiGet } from '../api/client';
 import { AnimatedNumber, usePrefersReducedMotion } from '../components/charts';
 import { PRODUCT_NAME, PRODUCT_MARK } from '../config/brand';
-import { useInstitutionCode } from '../lib/institution';
 
-const MODULES = [
+/** Core Platform Capabilities matching implemented features */
+const PLATFORM_CAPABILITIES = [
   {
     icon: 'bi-person-vcard',
-    title: 'Faculty profile',
-    text: 'Qualifications, experience and documents in one verified record that follows you through your career.',
+    title: 'Faculty Profile Management',
+    text: 'Comprehensive academic qualifications, career history, documents, and verified institutional service records in one unified dossier.',
   },
   {
-    icon: 'bi-journal-text',
-    title: 'Research & IPR',
-    text: 'Publications, funded projects, patents, copyrights and consultancy. Fill a paper from its DOI or ORCID in seconds.',
+    icon: 'bi-journal-richtext',
+    title: 'Research & Publications',
+    text: 'Scopus, WoS, and SCI-indexed journal papers, conference proceedings, patents, copyrights, consultancy, and research grants with DOI autofill.',
   },
   {
-    icon: 'bi-calendar-check',
-    title: 'Attendance & leave',
-    text: 'Daily attendance, correction requests and leave applications with balances and approval tracking.',
+    icon: 'bi-calendar-range',
+    title: 'Teaching & Workload',
+    text: 'Semester subject allocations, lecture slots, laboratory sessions, weekly workload balance, and class substitution tracking.',
   },
   {
     icon: 'bi-award',
-    title: 'Appraisals',
-    text: 'Annual self-appraisal with evidence, reviewed by the HOD, Dean and Principal in turn.',
+    title: 'Faculty Performance Appraisal',
+    text: 'Annual performance self-appraisals with attached evidence, multi-tier evaluation by HOD, Dean, and Principal with score benchmarks.',
   },
   {
-    icon: 'bi-check2-square',
-    title: 'Approvals',
-    text: 'One queue for everything waiting on you, with comments, returns for correction and a full history.',
+    icon: 'bi-calendar2-check',
+    title: 'Attendance & Leave Management',
+    text: 'Biometric and daily attendance logging, duty leaves, casual and medical leaves with automated entitlement balance tracking.',
   },
   {
-    icon: 'bi-file-earmark-bar-graph',
-    title: 'Reports & accreditation',
-    text: 'NAAC, NBA and NIRF reports built from verified records instead of spreadsheets collected by email.',
+    icon: 'bi-people',
+    title: 'Student Mentoring & Guidance',
+    text: 'Batch-wise mentee allocations, academic counseling logs, student project supervision, and Ph.D. scholar research tracking.',
   },
-  ...(FEATURES.TEACHING
-    ? [{ icon: 'bi-speedometer2', title: 'Teaching & workload', text: 'Subjects, allocations, timetable and substitutions.' }]
-    : []),
+  {
+    icon: 'bi-mortarboard',
+    title: 'Professional Development',
+    text: 'FDPs, workshops, STTPs, industrial training, certifications, and guest lectures with evidence upload and verification.',
+  },
+  {
+    icon: 'bi-diagram-3',
+    title: 'Department Management',
+    text: 'Departmental rosters, workload distribution, subject assignments, faculty allocations, and real-time operational status for HODs.',
+  },
+  {
+    icon: 'bi-graph-up-arrow',
+    title: 'Institutional Analytics',
+    text: 'Executive metrics comparing departmental publications, funded grants, student pass rates, and staff appraisals across academic years.',
+  },
+  {
+    icon: 'bi-file-earmark-check',
+    title: 'NAAC & NBA Reporting',
+    text: 'Pre-formatted criterion reports and compliance data tables exported directly from verified institutional databases.',
+  },
 ];
 
-const STEPS = [
-  { icon: 'bi-pencil-square', title: 'Add a record', text: 'Enter a publication, activity or leave request and attach the proof.' },
-  { icon: 'bi-shield-check', title: 'HOD verifies', text: 'Your HOD checks it against the proof, approves it or returns it with a comment.' },
-  { icon: 'bi-graph-up', title: 'Ready everywhere', text: 'Verified records appear in your profile, appraisal and the accreditation reports.' },
-];
-
-const ROLES = [
+/** Role-based management details */
+const ROLE_DETAILS = [
   {
     key: 'faculty',
-    title: 'Faculty',
-    icon: 'bi-person',
-    points: ['Keep your profile and research up to date', 'Apply for leave and see where it stands', 'Submit your appraisal with evidence attached'],
+    title: 'Faculty Member',
+    badge: 'Teaching & Research',
+    icon: 'bi-person-workspace',
+    summary: 'Manage your teaching, research portfolio, leave applications, and annual appraisals in one place.',
+    capabilities: [
+      'Maintain an updated academic profile with degrees and certifications',
+      'Log publications with DOI lookup, upload proofs, and track HOD approvals',
+      'Apply for casual, duty, and medical leaves with live balance counters',
+      'Complete annual self-appraisals and track review progression',
+      'Record student mentoring meetings and supervise final-year projects',
+    ],
+    demoRole: 'FACULTY',
   },
   {
     key: 'hod',
     title: 'Head of Department',
-    icon: 'bi-people',
-    points: ['Verify submissions from your department', 'Watch attendance and pending items', 'Review appraisals before they go to the Dean'],
+    badge: 'Departmental Leadership',
+    icon: 'bi-person-badge',
+    summary: 'Oversee department faculty, verify academic evidence, manage workloads, and evaluate appraisals.',
+    capabilities: [
+      'Review and verify faculty publication proofs and academic submissions',
+      'Monitor daily departmental attendance, leaves, and class substitutions',
+      'Review faculty annual self-appraisals and provide HOD performance scoring',
+      'Allocate subjects, balance teaching workloads, and inspect timetables',
+      'Generate department research summaries for internal quality audits',
+    ],
+    demoRole: 'HOD',
   },
   {
-    key: 'leadership',
-    title: 'Dean & Principal',
+    key: 'dean',
+    title: 'Dean (Academic Affairs)',
+    badge: 'Academic Governance',
+    icon: 'bi-mortarboard',
+    summary: 'Monitor academic health across all departments, approve curriculum offerings, and review senior appraisals.',
+    capabilities: [
+      'Inspect institution-wide academic activity across all 7 engineering departments',
+      'Evaluate HOD-reviewed faculty performance appraisals and add Dean assessments',
+      'Oversee institutional research output, patents, and funded project grants',
+      'Review cross-departmental workload equity and teaching commitments',
+      'Track academic year milestones, syllabus coverage, and semester cycles',
+    ],
+    demoRole: 'DEAN',
+  },
+  {
+    key: 'principal',
+    title: 'Principal / Head of Institution',
+    badge: 'Executive Leadership',
     icon: 'bi-bank',
-    points: ['Compare departments on research and activities', 'Give final approvals and appraisal sign-off', 'Draft accreditation text from live data'],
+    summary: 'Executive dashboard tracking institutional research growth, departmental performance, and statutory compliance.',
+    capabilities: [
+      'Access real-time institutional overview and executive summary cards',
+      'Give final sign-off and approval on annual faculty appraisal cycles',
+      'Compare departmental publications, citations, and external research funding',
+      'Monitor institution-wide leave, faculty strength, and attendance rates',
+      'Export verified accreditation datasets for NAAC, NBA, and NIRF audits',
+    ],
+    demoRole: 'PRINCIPAL',
   },
   {
     key: 'admin',
-    title: 'Administrator',
-    icon: 'bi-gear',
-    points: ['Manage users, departments and the academic calendar', 'Import faculty lists from Excel', 'Audit every sign-in, change and approval'],
+    title: 'Institution Administrator',
+    badge: 'System Governance',
+    icon: 'bi-gear-wide-connected',
+    summary: 'Configure institutional parameters, user directories, academic calendars, and system audit logs.',
+    capabilities: [
+      'Manage user accounts, department associations, and designations',
+      'Configure academic years, semester terms, and appraisal cycle windows',
+      'Set up leave policies, holiday calendars, and workload credit rules',
+      'Inspect comprehensive audit trails of every login, edit, and approval',
+      'Maintain institutional parameters and data backup schedules',
+    ],
+    demoRole: 'ADMIN',
   },
 ];
 
-const SECURITY = [
-  { icon: 'bi-person-lock', title: 'Role-based access', text: 'Everyone sees only what their role and department allow.' },
-  { icon: 'bi-phone', title: 'Two-step sign-in', text: 'Optional authenticator codes, and a list of signed-in devices you can sign out.' },
-  { icon: 'bi-folder-check', title: 'Private documents', text: 'Certificates and evidence are stored privately and checked on every download.' },
-  { icon: 'bi-clock-history', title: 'Full audit trail', text: 'Every sign-in, change and approval is recorded with who and when.' },
+/** Registered Institutional Demo Environments */
+const REGISTERED_COLLEGES = [
+  {
+    code: 'kpriet',
+    name: 'KPR Institute of Engineering and Technology',
+    location: 'Coimbatore, Tamil Nadu',
+    type: 'Autonomous Engineering College',
+    departmentsCount: 7,
+    departments: ['CSE', 'ECE', 'MECH', 'EEE', 'IT', 'AIDS', 'CIVIL'],
+    highlights: ['Autonomous Institution', 'NAAC A Grade', 'NBA Accredited Programs', 'Active Research Centers'],
+  },
+  {
+    code: 'demo',
+    name: 'Demo Institute of Technology',
+    location: 'Chennai, Tamil Nadu',
+    type: 'Collegiate Demonstration Environment',
+    departmentsCount: 7,
+    departments: ['CSE', 'ECE', 'MECH', 'EEE', 'IT', 'AIDS', 'CIVIL'],
+    highlights: ['Multi-Department Sample Roster', 'Complete Seed Data', 'Pre-configured Appraisal Cycles', 'Live Research Records'],
+  },
 ];
 
-/** Illustrative status cards floating over the portal preview (UI examples, not live data). */
-const FLOATING_CARDS = [
-  { icon: 'bi-patch-check-fill', tone: 'green', title: 'Publication verified', text: 'Approved by your HOD', pos: 'tl' },
-  { icon: 'bi-calendar2-check-fill', tone: 'blue', title: 'Leave approved', text: 'Casual leave · 2 days', pos: 'br' },
-  { icon: 'bi-bell-fill', tone: 'amber', title: 'Appraisal due', text: 'Self-appraisal opens today', pos: 'bl' },
+/** Analytics Highlights */
+const ANALYTICS_FEATURES = [
+  {
+    icon: 'bi-journal-check',
+    title: 'Research & Publications Growth',
+    text: 'Track Scopus, WoS, and SCI-indexed papers, citation trends, and conference contributions with multi-year comparisons.',
+  },
+  {
+    icon: 'bi-cash-coin',
+    title: 'Funded Projects & Consultancy',
+    text: 'Monitor external funding grants from DST, SERB, AICTE, ISRO, and industry consultancy engagements by department.',
+  },
+  {
+    icon: 'bi-speedometer',
+    title: 'Department Performance Index',
+    text: 'Benchmarking metrics evaluating teaching workload, student mentoring touchpoints, and faculty development participation.',
+  },
+  {
+    icon: 'bi-file-earmark-spreadsheet',
+    title: 'Automated Accreditation Exports',
+    text: 'Generate structured tables for NAAC Criteria 2, 3, and 6 and NBA Criterion 5 from verified transactional records.',
+  },
 ];
 
-/** True once the element has scrolled into view (stays true). */
-function useInView<T extends HTMLElement>(margin = '0px 0px -12% 0px') {
+/** Floating Cards on Hero */
+const HERO_FLOATING_CARDS = [
+  { icon: 'bi-patch-check-fill', tone: 'green', title: 'Publication Verified', text: 'IEEE Access paper approved by HOD', pos: 'tl' },
+  { icon: 'bi-calendar2-check-fill', tone: 'blue', title: 'Duty Leave Approved', text: 'Faculty FDP · 3 Days', pos: 'br' },
+  { icon: 'bi-award-fill', tone: 'amber', title: 'Appraisal Submitted', text: 'Annual evaluation with Principal review', pos: 'bl' },
+];
+
+/** True once element scrolls into view */
+function useInView<T extends HTMLElement>(margin = '0px 0px -10% 0px') {
   const ref = useRef<T>(null);
   const [inView, setInView] = useState(false);
   useEffect(() => {
@@ -115,23 +215,14 @@ function useInView<T extends HTMLElement>(margin = '0px 0px -12% 0px') {
   return { ref, inView };
 }
 
-/** Sets --mx/--my on the element so CSS can draw a glow that follows the cursor. */
-function trackPointer(e: React.PointerEvent<HTMLElement>) {
-  const target = (e.target as HTMLElement).closest<HTMLElement>('[data-spotlight]');
-  if (!target) return;
-  const r = target.getBoundingClientRect();
-  target.style.setProperty('--mx', `${e.clientX - r.left}px`);
-  target.style.setProperty('--my', `${e.clientY - r.top}px`);
-}
-
-const Section: React.FC<{ id: string; eyebrow: string; title: string; intro?: string; tone?: 'white' | 'tint'; children: React.ReactNode }> = ({
-  id,
-  eyebrow,
-  title,
-  intro,
-  tone = 'white',
-  children,
-}) => {
+const Section: React.FC<{
+  id: string;
+  eyebrow: string;
+  title: string;
+  intro?: string;
+  tone?: 'white' | 'tint';
+  children: React.ReactNode;
+}> = ({ id, eyebrow, title, intro, tone = 'white', children }) => {
   const { ref, inView } = useInView<HTMLDivElement>();
   return (
     <section id={id} className={`pub-section pub-section-${tone}`} aria-labelledby={`${id}-title`}>
@@ -147,79 +238,35 @@ const Section: React.FC<{ id: string; eyebrow: string; title: string; intro?: st
   );
 };
 
-/** Headline whose words rise into place one after another. */
-const RevealHeading: React.FC<{ text: string }> = ({ text }) => (
-  <h1 className="pub-hero-title" aria-label={text}>
-    {text.split(' ').map((word, i) => (
-      <React.Fragment key={i}>
-        <span className="pub-word" aria-hidden="true">
-          <span style={{ animationDelay: `${120 + i * 55}ms` }}>{word}</span>
-        </span>{' '}
-      </React.Fragment>
-    ))}
-  </h1>
-);
-
-const LiveStats: React.FC = () => {
-  const { ref, inView } = useInView<HTMLDivElement>('0px');
-  const [stats, setStats] = useState<{ faculty: number; departments: number; publications: number; activities: number } | null>(null);
-  // Figures belong to one institution; without a chosen institution there is nothing to show
-  const institution = useInstitutionCode();
-  useEffect(() => {
-    setStats(null);
-    if (!institution) return;
-    apiGet<{ faculty: number; departments: number; publications: number; activities: number }>('/public/overview')
-      .then((r) => setStats(r.data))
-      .catch(() => setStats(null));
-  }, [institution]);
-  if (!stats) return <div ref={ref} />;
-  const items = [
-    { value: stats.faculty, label: 'Faculty members' },
-    { value: stats.departments, label: 'Departments' },
-    { value: stats.publications, label: 'Verified publications' },
-    { value: stats.activities, label: 'Verified FDPs & events' },
-  ];
-  return (
-    <div ref={ref} className={`pub-stats ${inView ? 'is-visible' : ''}`}>
-      {items.map((s, i) => (
-        <div key={s.label} className="pub-stat" style={{ transitionDelay: `${i * 80}ms` }}>
-          <strong>{inView ? <AnimatedNumber value={s.value} duration={1200} /> : 0}</strong>
-          <span>{s.label}</span>
-        </div>
-      ))}
-      <span className="pub-stats-live">
-        <span className="pub-live-dot" /> Live figures
-      </span>
-    </div>
-  );
-};
-
 export const HomePage: React.FC = () => {
   const reducedMotion = usePrefersReducedMotion();
-  const [activeRole, setActiveRole] = useState(0);
-  const role = ROLES[activeRole];
+  const [activeRoleIndex, setActiveRoleIndex] = useState(0);
+  const activeRole = ROLE_DETAILS[activeRoleIndex];
   const visualRef = useRef<HTMLDivElement>(null);
-  const steps = useInView<HTMLOListElement>();
-  const features = useInView<HTMLDivElement>();
-  const security = useInView<HTMLDivElement>();
 
-  // Hero preview tilts gently toward the cursor
+  const capabilitiesInView = useInView<HTMLDivElement>();
+  const rolesInView = useInView<HTMLDivElement>();
+  const institutionsInView = useInView<HTMLDivElement>();
+  const analyticsInView = useInView<HTMLDivElement>();
+
+  // Tilt effect for hero browser mock
   const onHeroMove = (e: React.PointerEvent<HTMLElement>) => {
     if (reducedMotion || e.pointerType !== 'mouse' || !visualRef.current) return;
     const r = visualRef.current.getBoundingClientRect();
     const x = (e.clientX - (r.left + r.width / 2)) / r.width;
     const y = (e.clientY - (r.top + r.height / 2)) / r.height;
-    visualRef.current.style.setProperty('--ry', `${(x * 8).toFixed(2)}deg`);
-    visualRef.current.style.setProperty('--rx', `${(-y * 6).toFixed(2)}deg`);
+    visualRef.current.style.setProperty('--ry', `${(x * 6).toFixed(2)}deg`);
+    visualRef.current.style.setProperty('--rx', `${(-y * 5).toFixed(2)}deg`);
   };
+
   const onHeroLeave = () => {
-    visualRef.current?.style.setProperty('--ry', '-4deg');
+    visualRef.current?.style.setProperty('--ry', '-3deg');
     visualRef.current?.style.setProperty('--rx', '1deg');
   };
 
   return (
     <div className="pub-home">
-      {/* Hero */}
+      {/* SECTION 2: HERO */}
       <section className="pub-hero" onPointerMove={onHeroMove} onPointerLeave={onHeroLeave}>
         <div className="pub-hero-bg" aria-hidden="true">
           <span className="pub-blob pub-blob-a" />
@@ -227,28 +274,37 @@ export const HomePage: React.FC = () => {
           <span className="pub-blob pub-blob-c" />
           <span className="pub-grid" />
         </div>
+
         <div className="pub-container pub-hero-grid">
           <div className="pub-hero-copy">
             <span className="pub-hero-badge">
               <img src={PRODUCT_MARK} alt="" width={20} height={20} />
-              {PRODUCT_NAME}
+              {PRODUCT_NAME} &bull; Institutional ERP Platform
             </span>
-            <RevealHeading text="Faculty records, research and approvals in one place" />
+
+            <h1 className="pub-hero-title">
+              One Platform. Complete Academic Management.
+            </h1>
+
             <p className="pub-hero-lead">
-              {PRODUCT_NAME} replaces scattered forms and spreadsheets. Faculty keep their profile and research up to date,
-              HODs verify it online, and the same records feed appraisals and accreditation reports.
+              FacultyCore brings faculty management, academic activities, research, institutional approvals, performance
+              tracking, and accreditation reporting together in one connected platform.
             </p>
+
             <div className="pub-hero-actions">
-              <Link to={ROUTES.LOGIN} className="pub-btn pub-btn-primary pub-btn-shine">
-                Sign in
-                <i className="bi bi-arrow-right" aria-hidden="true" />
+              <Link to="/login?demo=true" className="pub-btn pub-btn-primary pub-btn-shine">
+                <i className="bi bi-compass" />
+                Explore Demo Accounts
               </Link>
-              <Link to={ROUTES.REGISTER} className="pub-btn pub-btn-ghost">
-                New faculty? Register
+              <Link to={ROUTES.LOGIN} className="pub-btn pub-btn-ghost">
+                <i className="bi bi-box-arrow-in-right" />
+                Institution Sign In
               </Link>
             </div>
+
             <p className="pub-hero-note">
-              <i className="bi bi-info-circle" aria-hidden="true" /> Sign in with your college email or employee ID.
+              <i className="bi bi-shield-check" aria-hidden="true" />
+              Live multi-college demo environments available for evaluation across all roles.
             </p>
           </div>
 
@@ -262,11 +318,16 @@ export const HomePage: React.FC = () => {
                   <i className="bi bi-lock-fill" /> {PRODUCT_NAME.toLowerCase()}.app/portal
                 </div>
               </div>
-              <img src="/images/portal-preview.jpg" alt="" width={1200} height={925} />
+              <img src="/images/portal-preview.jpg" alt="FacultyCore Dashboard" width={1200} height={925} />
               <span className="pub-browser-glare" />
             </div>
-            {FLOATING_CARDS.map((c, i) => (
-              <div key={c.title} className={`pub-float pub-float-${c.pos}`} style={{ animationDelay: `${700 + i * 260}ms, ${i * 1.3}s` }}>
+
+            {HERO_FLOATING_CARDS.map((c, i) => (
+              <div
+                key={c.title}
+                className={`pub-float pub-float-${c.pos}`}
+                style={{ animationDelay: `${600 + i * 250}ms, ${i * 1.2}s` }}
+              >
                 <span className={`pub-float-icon tone-${c.tone}`}>
                   <i className={`bi ${c.icon}`} />
                 </span>
@@ -279,129 +340,286 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="pub-container">
-          <LiveStats />
+        {/* Live figures bar */}
+        <div className="pub-container" style={{ marginTop: '2.5rem' }}>
+          <div className="pub-stats is-visible">
+            <div className="pub-stat">
+              <strong><AnimatedNumber value={2} duration={1000} /></strong>
+              <span>Registered Colleges</span>
+            </div>
+            <div className="pub-stat">
+              <strong><AnimatedNumber value={14} duration={1200} /></strong>
+              <span>Academic Departments</span>
+            </div>
+            <div className="pub-stat">
+              <strong><AnimatedNumber value={80} duration={1400} />+</strong>
+              <span>Faculty &amp; HOD Demo Accounts</span>
+            </div>
+            <div className="pub-stat">
+              <strong><AnimatedNumber value={350} duration={1600} />+</strong>
+              <span>Sample Research Records</span>
+            </div>
+            <span className="pub-stats-live">
+              <span className="pub-live-dot" /> Verified Database Roster
+            </span>
+          </div>
         </div>
       </section>
 
+      {/* SECTION 3: PLATFORM OVERVIEW (CORE CAPABILITIES) */}
       <Section
         id="features"
-        eyebrow="Features"
-        title="Everything a faculty member's year involves"
-        intro="From the first day's profile to the annual appraisal, each part uses the same verified records."
+        eyebrow="Core Capabilities"
+        title="Comprehensive Academic Management for Modern Institutions"
+        intro="FacultyCore replaces fragmented spreadsheets, manual paper forms, and isolated portals with a single verified institutional source of truth."
       >
-        <div ref={features.ref} className={`pub-feature-grid ${features.inView ? 'is-visible' : ''}`} onPointerMove={trackPointer}>
-          {MODULES.map((m, i) => (
-            <article key={m.title} className="pub-feature" data-spotlight style={{ ['--i' as string]: i }}>
+        <div
+          ref={capabilitiesInView.ref}
+          className={`pub-feature-grid ${capabilitiesInView.inView ? 'is-visible' : ''}`}
+        >
+          {PLATFORM_CAPABILITIES.map((cap, i) => (
+            <article key={cap.title} className="pub-feature" style={{ ['--i' as string]: i }}>
               <span className="pub-feature-icon">
-                <i className={`bi ${m.icon}`} aria-hidden="true" />
+                <i className={`bi ${cap.icon}`} aria-hidden="true" />
               </span>
-              <h3>{m.title}</h3>
-              <p>{m.text}</p>
+              <h3>{cap.title}</h3>
+              <p>{cap.text}</p>
             </article>
           ))}
         </div>
       </Section>
 
+      {/* SECTION 4: ROLE-BASED MANAGEMENT */}
       <Section
-        id="how-it-works"
+        id="roles"
         tone="tint"
-        eyebrow="How it works"
-        title="Enter it once, verified once, used everywhere"
-        intro="No more collecting the same details for every report."
+        eyebrow="Role-Based Workspaces"
+        title="Tailored Workspaces for Every Institutional Stakeholder"
+        intro="Each stakeholder experiences a dedicated dashboard aligned with their academic, administrative, and governance responsibilities."
       >
-        <ol ref={steps.ref} className={`pub-steps ${steps.inView ? 'is-visible' : ''}`}>
-          <span className="pub-steps-line" aria-hidden="true" />
-          {STEPS.map((s, i) => (
-            <li key={s.title} className="pub-step" style={{ ['--i' as string]: i }}>
-              <span className="pub-step-num">0{i + 1}</span>
-              <span className="pub-step-icon">
-                <i className={`bi ${s.icon}`} aria-hidden="true" />
-              </span>
-              <h3>{s.title}</h3>
-              <p>{s.text}</p>
-            </li>
-          ))}
-        </ol>
-      </Section>
-
-      <Section id="roles" eyebrow="Roles" title="Made for each person's part of the work">
-        <div className="pub-roles">
-          <div className="pub-role-tabs" role="tablist" aria-label="Roles" style={{ ['--active' as string]: activeRole }}>
+        <div ref={rolesInView.ref} className="pub-roles">
+          <div
+            className="pub-role-tabs"
+            role="tablist"
+            aria-label="Stakeholder Roles"
+            style={{ ['--active' as string]: activeRoleIndex }}
+          >
             <span className="pub-role-indicator" aria-hidden="true" />
-            {ROLES.map((r, i) => (
+            {ROLE_DETAILS.map((r, i) => (
               <button
                 key={r.key}
                 type="button"
                 role="tab"
-                aria-selected={i === activeRole}
-                className={i === activeRole ? 'is-active' : ''}
-                onClick={() => setActiveRole(i)}
-                onMouseEnter={() => !reducedMotion && setActiveRole(i)}
+                aria-selected={i === activeRoleIndex}
+                className={i === activeRoleIndex ? 'is-active' : ''}
+                onClick={() => setActiveRoleIndex(i)}
+                onMouseEnter={() => !reducedMotion && setActiveRoleIndex(i)}
               >
                 <i className={`bi ${r.icon}`} aria-hidden="true" />
                 {r.title}
               </button>
             ))}
           </div>
-          <div className="pub-role-panel" role="tabpanel" key={role.key}>
-            <span className="pub-role-panel-icon">
-              <i className={`bi ${role.icon}`} aria-hidden="true" />
-            </span>
-            <h3>{role.title}</h3>
+
+          <div className="pub-role-panel" role="tabpanel" key={activeRole.key}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <span className="pub-role-panel-icon">
+                <i className={`bi ${activeRole.icon}`} aria-hidden="true" />
+              </span>
+              <div>
+                <h3 style={{ margin: 0 }}>{activeRole.title}</h3>
+                <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>{activeRole.badge}</span>
+              </div>
+            </div>
+
+            <p style={{ color: '#475569', fontSize: '0.925rem', marginBottom: '1.25rem' }}>{activeRole.summary}</p>
+
             <ul>
-              {role.points.map((p, i) => (
-                <li key={p} style={{ animationDelay: `${80 + i * 70}ms` }}>
-                  <i className="bi bi-check2" aria-hidden="true" />
-                  {p}
+              {activeRole.capabilities.map((point, idx) => (
+                <li key={idx} style={{ animationDelay: `${60 + idx * 60}ms` }}>
+                  <i className="bi bi-check2-circle" aria-hidden="true" />
+                  {point}
                 </li>
               ))}
             </ul>
-            <Link to={ROUTES.LOGIN} className="pub-role-link">
-              Sign in as {role.title.toLowerCase().startsWith('head') ? 'HOD' : role.title.split(' ')[0]}
-              <i className="bi bi-arrow-right" aria-hidden="true" />
-            </Link>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+              <Link to={`/login?demo=true&role=${activeRole.demoRole}`} className="pub-btn pub-btn-primary pub-btn-sm">
+                <i className="bi bi-compass" /> Explore {activeRole.title} in Demo
+              </Link>
+              <Link to={ROUTES.LOGIN} className="pub-role-link" style={{ margin: 0, alignSelf: 'center' }}>
+                Sign In to Account <i className="bi bi-arrow-right" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
         </div>
       </Section>
 
+      {/* SECTION 5: INSTITUTIONAL MANAGEMENT */}
       <Section
-        id="security"
-        tone="tint"
-        eyebrow="Security"
-        title="Built for staff records"
-        intro="Faculty data stays inside your institution and every action is accountable."
+        id="institutions"
+        eyebrow="Multi-Institution Architecture"
+        title="Multi-Tenant Isolation with Dedicated College Environments"
+        intro="FacultyCore supports multiple autonomous colleges on a single platform. Each college operates with its own isolated database, custom domains, branding, and role-based permissions."
       >
-        <div ref={security.ref} className={`pub-security-grid ${security.inView ? 'is-visible' : ''}`} onPointerMove={trackPointer}>
-          {SECURITY.map((s, i) => (
-            <article key={s.title} className="pub-security" data-spotlight style={{ ['--i' as string]: i }}>
-              <span className="pub-security-icon">
-                <i className={`bi ${s.icon}`} aria-hidden="true" />
-              </span>
+        <div ref={institutionsInView.ref} className="pub-inst-grid">
+          {REGISTERED_COLLEGES.map((college) => (
+            <div key={college.code} className="pub-inst-card">
               <div>
-                <h3>{s.title}</h3>
-                <p>{s.text}</p>
+                <div className="pub-inst-card-top">
+                  <div className="pub-inst-icon">
+                    <i className="bi bi-building-check" />
+                  </div>
+                  <div>
+                    <h3 className="pub-inst-title">{college.name}</h3>
+                    <p className="pub-inst-meta">
+                      <i className="bi bi-geo-alt" /> {college.location} &bull; {college.type}
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '1rem' }}>
+                  <p style={{ fontSize: '0.85rem', color: '#475569', margin: '0 0 0.5rem 0' }}>
+                    <strong>Departments ({college.departmentsCount}):</strong>{' '}
+                    {college.departments.join(', ')}
+                  </p>
+                  <div className="pub-inst-highlights">
+                    {college.highlights.map((h) => (
+                      <span key={h} className="pub-inst-chip">
+                        {h}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </article>
+
+              <div style={{ paddingTop: '1rem', borderTop: '1px solid #e2e8f0' }}>
+                <Link
+                  to={`/login?demo=true&inst=${college.code}`}
+                  className="pub-btn pub-btn-primary pub-btn-sm"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  <i className="bi bi-compass" /> Explore {college.code.toUpperCase()} Demo Accounts
+                </Link>
+              </div>
+            </div>
           ))}
         </div>
       </Section>
 
-      {/* Closing call to action */}
+      {/* SECTION 6: REPORTS AND ANALYTICS */}
+      <Section
+        id="analytics"
+        tone="tint"
+        eyebrow="Accreditation & Analytics"
+        title="Actionable Analytics and Direct NAAC & NBA Evidence"
+        intro="Transform raw institutional transactions into compliance-ready reports, department comparisons, and research growth curves."
+      >
+        <div ref={analyticsInView.ref} className="pub-analytics-grid">
+          {ANALYTICS_FEATURES.map((item) => (
+            <div key={item.title} className="pub-analytics-card">
+              <div className="pub-analytics-icon">
+                <i className={`bi ${item.icon}`} />
+              </div>
+              <div>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* SECTION 7: ABOUT & ARCHITECTURE */}
+      <Section
+        id="about"
+        eyebrow="Platform Architecture"
+        title="Built for High Security, Integrity, and Audit Compliance"
+        intro="FacultyCore employs enterprise security standards to protect institutional data, personnel records, and intellectual property."
+      >
+        <div className="pub-security-grid is-visible">
+          <article className="pub-security">
+            <span className="pub-security-icon">
+              <i className="bi bi-database-lock" aria-hidden="true" />
+            </span>
+            <div>
+              <h3>Strict Tenant Database Isolation</h3>
+              <p>Each college's records are stored in a dedicated database container. Data crossover between tenants is structurally impossible.</p>
+            </div>
+          </article>
+
+          <article className="pub-security">
+            <span className="pub-security-icon">
+              <i className="bi bi-shield-check" aria-hidden="true" />
+            </span>
+            <div>
+              <h3>Role-Based Access Control (RBAC)</h3>
+              <p>Granular permissions ensure faculty, HODs, deans, and principals access only records authorized for their role and department.</p>
+            </div>
+          </article>
+
+          <article className="pub-security">
+            <span className="pub-security-icon">
+              <i className="bi bi-clock-history" aria-hidden="true" />
+            </span>
+            <div>
+              <h3>Comprehensive Audit Trail</h3>
+              <p>Every authentication attempt, profile edit, evidence submission, and administrative change is permanently timestamped with actor details.</p>
+            </div>
+          </article>
+
+          <article className="pub-security">
+            <span className="pub-security-icon">
+              <i className="bi bi-file-lock2" aria-hidden="true" />
+            </span>
+            <div>
+              <h3>Encrypted Evidence &amp; Documents</h3>
+              <p>Certificates, publication proofs, and appraisal documents are securely stored with authorization checks executed on every access.</p>
+            </div>
+          </article>
+        </div>
+      </Section>
+
+      {/* SECTION 8: CONTACT SUPPORT */}
+      <Section
+        id="contact"
+        tone="tint"
+        eyebrow="Assistance & Support"
+        title="Institution Onboarding and Technical Inquiries"
+        intro="Have questions about deploying FacultyCore at your university or institution? Reach out to our technical administration team."
+      >
+        <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'center', background: '#ffffff', padding: '2rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+          <i className="bi bi-headset" style={{ fontSize: '2.5rem', color: '#2864A5' }} />
+          <h3 style={{ margin: '0.75rem 0 0.5rem 0', fontSize: '1.2rem', color: '#172B45' }}>Platform Administration &amp; Support</h3>
+          <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0 0 1.25rem 0' }}>
+            For system demonstrations, institutional tenant onboarding, or account inquiries, contact our platform administrators.
+          </p>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: '#f1f5f9', borderRadius: '8px', color: '#172B45', fontWeight: 600, fontSize: '0.9rem' }}>
+            <i className="bi bi-envelope-at-fill" style={{ color: '#2864A5' }} />
+            support@facultycore.app
+          </div>
+        </div>
+      </Section>
+
+      {/* SECTION 9: CALL TO ACTION (CTA) */}
       <section className="pub-cta">
         <span className="pub-cta-sheen" aria-hidden="true" />
         <div className="pub-container pub-cta-inner">
           <div>
-            <h2>Ready to get started?</h2>
-            <p>Sign in with your institutional credentials, or register if you are new to the platform.</p>
+            <h2>Explore FacultyCore in Action</h2>
+            <p>
+              Experience live institutional dashboards with real sample data across KPRIET and Demo Institute. Sign in with
+              one click as Principal, Admin, Dean, HOD, or Faculty.
+            </p>
           </div>
           <div className="pub-hero-actions">
-            <Link to={ROUTES.LOGIN} className="pub-btn pub-btn-light pub-btn-shine">
-              Sign in
-              <i className="bi bi-arrow-right" aria-hidden="true" />
+            <Link to="/login?demo=true" className="pub-btn pub-btn-light pub-btn-shine">
+              <i className="bi bi-compass" />
+              Explore Demo Accounts
             </Link>
-            <Link to={ROUTES.REGISTER} className="pub-btn pub-btn-outline-light">
-              Register
+            <Link to={ROUTES.LOGIN} className="pub-btn pub-btn-outline-light">
+              <i className="bi bi-box-arrow-in-right" />
+              Institution Sign In
             </Link>
           </div>
         </div>

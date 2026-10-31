@@ -3,10 +3,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Input, Alert, Badge, Modal } from '../components';
+import { Input, Alert, Modal } from '../components';
 import { useAuthStore } from '../stores/authStore';
 import { ROUTES } from '../constants/routes';
-import { DEV_SEED_ACCOUNTS, SHOW_DEV_SEED_HELPERS } from '../dev/devSeedAccounts';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { authService, isTwoFactorChallenge } from '../services/auth.service';
 import '../styles/login.css';
@@ -15,6 +14,7 @@ import { AccountTypeSwitch, PlatformSignInForm, type AccountType } from '../comp
 import { InstitutionPicker } from '../components/InstitutionPicker';
 import { institutionStorageKey, useInstitutionCode } from '../lib/institution';
 import { useInstitution } from '../hooks/useInstitution';
+import { DemoAccountsExplorer } from '../components/auth/DemoAccountsExplorer';
 
 // The remembered ID belongs to the institution it was used in
 const rememberedIdKey = () => institutionStorageKey('remembered_id');
@@ -58,6 +58,18 @@ export const LoginPage: React.FC = () => {
   const [forgotIdentifier, setForgotIdentifier] = useState('');
   const [forgotSent, setForgotSent] = useState<string | null>(null);
   const [forgotError, setForgotError] = useState<string | null>(null);
+  const [showDemoModal, setShowDemoModal] = useState<boolean>(() => searchParams.get('demo') === 'true');
+  // Demo sign-in is switched off on the server unless DEMO_LOGIN_ENABLED=true; hide it when unavailable
+  const [demoAvailable, setDemoAvailable] = useState(false);
+  useEffect(() => {
+    let live = true;
+    authService.getDemoAccounts().then(() => live && setDemoAvailable(true)).catch(() => live && setDemoAvailable(false));
+    return () => {
+      live = false;
+    };
+  }, []);
+  const [platformEmail, setPlatformEmail] = useState('');
+  const [platformPassword, setPlatformPassword] = useState('');
 
   const from = (location.state as { from?: { pathname: string }; sessionExpired?: boolean })?.from?.pathname || ROUTES.PORTAL;
 
@@ -185,11 +197,6 @@ export const LoginPage: React.FC = () => {
     setForgotModalOpen(true);
   };
 
-  const setDevSeedCredentials = (id: string, pass: string) => {
-    setValue('identifier', id);
-    setValue('password', pass);
-  };
-
   return (
     <div className="login-page-container">
       <div className="login-split-layout">
@@ -232,6 +239,16 @@ export const LoginPage: React.FC = () => {
                 <span>Verified data flows into NAAC and NBA reports</span>
               </li>
             </ul>
+
+            {demoAvailable && (
+              <button
+                type="button"
+                className="login-brand-demo-btn"
+                onClick={() => setShowDemoModal(true)}
+              >
+                <i className="bi bi-compass-fill" /> Explore Demo Accounts
+              </button>
+            )}
           </div>
           <p className="login-brand-foot">{PRODUCT_NAME} · {PRODUCT_TAGLINE}</p>
         </aside>
@@ -363,7 +380,13 @@ export const LoginPage: React.FC = () => {
           {!challengeToken && !isPlatform && <InstitutionPicker />}
 
           {/* FacultyCore Super Admin: platform account store and session (checked by the server) */}
-          {isPlatform && !challengeToken && <PlatformSignInForm from={from} />}
+          {isPlatform && !challengeToken && (
+            <PlatformSignInForm
+              from={from}
+              initialEmail={platformEmail}
+              initialPassword={platformPassword}
+            />
+          )}
 
           {/* Authentication Form */}
           <form
@@ -472,54 +495,27 @@ export const LoginPage: React.FC = () => {
           </>
           )}
 
-          {/* DEVELOPMENT SEED ACCOUNTS — Rendered only in local vite dev mode */}
-          {SHOW_DEV_SEED_HELPERS && !isPlatform && (
-            <details
-              style={{
-                marginTop: '1.5rem',
-                paddingTop: '1rem',
-                borderTop: '1px dashed var(--color-border)',
-                fontSize: '0.75rem',
-              }}
+          {/* EXPLORE DEMO ACCOUNTS CTA */}
+          {demoAvailable && (
+          <div className="login-demo-cta-box">
+            <div className="login-demo-cta-text">
+              <strong>
+                <i className="bi bi-stars" style={{ color: '#2864A5' }} /> Want to explore FacultyCore?
+              </strong>
+              <span>
+                Browse the demonstration institutions and sign in with one click as
+                Principal, Admin, Dean, HOD, or Faculty.
+              </span>
+            </div>
+            <button
+              type="button"
+              className="login-demo-cta-btn"
+              onClick={() => setShowDemoModal(true)}
             >
-              <summary
-                style={{
-                  cursor: 'pointer',
-                  color: 'var(--color-text-secondary)',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
-              >
-                <Badge variant="warning">DEV ONLY</Badge>
-                <span>Quick-fill test accounts (Development mode only)</span>
-              </summary>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '0.75rem' }}>
-                {DEV_SEED_ACCOUNTS.map((account) => (
-                  <div
-                    key={account.employeeId}
-                    onClick={() => setDevSeedCredentials(account.employeeId, account.password)}
-                    style={{
-                      cursor: 'pointer',
-                      padding: '6px 10px',
-                      background: 'var(--color-background)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-sm)',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                    title={`Click to fill ${account.employeeId}`}
-                  >
-                    <span><strong>{account.employeeId}</strong> ({account.label})</span>
-                    <Badge variant={account.role === 'ADMIN' ? 'primary' : account.role === 'PRINCIPAL' ? 'warning' : 'neutral'}>
-                      {account.role}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </details>
+              <i className="bi bi-compass" />
+              <span>Explore Demo Accounts</span>
+            </button>
+          </div>
           )}
         </div>
       </div>
@@ -590,6 +586,37 @@ export const LoginPage: React.FC = () => {
         </div>
       </Modal>
 
+      {/* Demo Accounts Explorer Modal */}
+      {demoAvailable && showDemoModal && (
+        <div className="demo-modal-overlay" onClick={() => setShowDemoModal(false)}>
+          <div className="demo-modal-container" onClick={(e) => e.stopPropagation()}>
+            <DemoAccountsExplorer
+              isModal
+              onClose={() => setShowDemoModal(false)}
+              onFillCredentials={(email, role) => {
+                if (role === 'PLATFORM_SUPER_ADMIN') {
+                  setAccountType('platform');
+                  setPlatformEmail(email);
+                  setPlatformPassword('');
+                  setShowDemoModal(false);
+                } else {
+                  setAccountType('institution');
+                  setValue('identifier', email);
+                  const defaultPass: Record<string, string> = {
+                    ADMIN: 'Admin@12345',
+                    PRINCIPAL: 'Principal@12345',
+                    DEAN: 'Dean@12345',
+                    HOD: 'Hod@12345',
+                    FACULTY: 'Faculty@12345',
+                  };
+                  setValue('password', defaultPass[role] || 'Faculty@12345');
+                  setShowDemoModal(false);
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

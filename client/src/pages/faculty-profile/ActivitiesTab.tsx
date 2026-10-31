@@ -76,7 +76,7 @@ export const ActivitiesTab: React.FC<ActivitiesTabProps> = ({ deleteActMutation,
             <div className="card-custom">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
                 <h3 className="card-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ background: '#ede9fe', color: '#5b21b6', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>
+                  <span style={{ background: '#EAF2FA', color: '#1F4E85', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>
                     Conferences
                   </span>
                   <span>International & National Conferences</span>
@@ -223,7 +223,7 @@ export const ActivitiesTab: React.FC<ActivitiesTabProps> = ({ deleteActMutation,
             <div className="card-custom">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
                 <h3 className="card-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>
+                  <span style={{ background: '#EAF2FA', color: '#0369a1', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' }}>
                     Workshops & Seminars
                   </span>
                   <span>Workshops & Technical Seminars</span>

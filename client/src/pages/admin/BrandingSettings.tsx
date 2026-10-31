@@ -75,7 +75,7 @@ export const BrandingSettings: React.FC<Props> = ({ settingsForm, setSettingsFor
 
   return (
     <div style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-      <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.35rem', color: '#0f172a' }}>
+      <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.35rem', color: '#172B45' }}>
         <i className="bi bi-palette me-2 text-primary" />
         Branding, timezone and modules
       </h3>

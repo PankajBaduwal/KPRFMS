@@ -69,7 +69,7 @@ export const CancelLeaveModal: React.FC<CancelLeaveModalProps> = ({
           <div>
             Are you sure you want to cancel this leave application ({application.numberOfDays} days)?
             {wasApproved && (
-              <div style={{ marginTop: '4px', fontWeight: 600, color: '#10b981' }}>
+              <div style={{ marginTop: '4px', fontWeight: 600, color: '#2E9461' }}>
                 Note: Since this leave was already approved, {application.numberOfDays} days will be refunded to your leave balance.
               </div>
             )}
@@ -78,7 +78,7 @@ export const CancelLeaveModal: React.FC<CancelLeaveModalProps> = ({
 
         <div>
           <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
-            Reason for Cancellation <span style={{ color: '#ef4444' }}>*</span>
+            Reason for Cancellation <span style={{ color: '#D14343' }}>*</span>
           </label>
           <textarea
             value={reason}

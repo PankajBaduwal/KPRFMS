@@ -507,12 +507,12 @@ export const AppraisalManagementPage: React.FC = () => {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '0.5rem 0' }}>
-            <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-text-primary, #0f172a)' }}>
+            <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-text-primary, #172B45)' }}>
               {Math.round(liveWeightedScore * 10) / 10}
             </span>
             <span style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>/ 100</span>
             {myAppraisal?.finalScore !== undefined && (
-              <span style={{ fontSize: '0.85rem', color: '#059669', fontWeight: 700, marginLeft: 'auto' }}>
+              <span style={{ fontSize: '0.85rem', color: '#1E7A4C', fontWeight: 700, marginLeft: 'auto' }}>
                 Evaluated: {myAppraisal.finalScore} / 100
               </span>
             )}
@@ -525,7 +525,7 @@ export const AppraisalManagementPage: React.FC = () => {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#1B345F',
+                  color: '#142B4A',
                   textDecoration: 'underline',
                   cursor: 'pointer',
                   marginLeft: '8px',
@@ -555,7 +555,7 @@ export const AppraisalManagementPage: React.FC = () => {
             Supporting Evidence Files
           </span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '0.5rem 0' }}>
-            <span style={{ fontSize: '2rem', fontWeight: 800, color: '#0284c7' }}>
+            <span style={{ fontSize: '2rem', fontWeight: 800, color: '#2864A5' }}>
               {categoriesData.reduce((acc, c) => acc + (c.evidenceDocuments?.length || 0), 0)}
             </span>
             <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>documents attached</span>
@@ -583,7 +583,7 @@ export const AppraisalManagementPage: React.FC = () => {
               Pending Evaluations
             </span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '0.5rem 0' }}>
-              <span style={{ fontSize: '2rem', fontWeight: 800, color: '#ea580c' }}>
+              <span style={{ fontSize: '2rem', fontWeight: 800, color: '#B45309' }}>
                 {queueLoaded ? reviewQueue.length : <Skeleton variant="text" width={40} height={28} />}
               </span>
               <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>awaiting your review</span>
@@ -649,7 +649,7 @@ export const AppraisalManagementPage: React.FC = () => {
                 style={{
                   fontSize: '0.75rem',
                   fontWeight: 700,
-                  backgroundColor: '#ea580c',
+                  backgroundColor: '#B45309',
                   color: '#fff',
                   borderRadius: '9999px',
                   padding: '1px 7px',
@@ -828,7 +828,7 @@ export const AppraisalManagementPage: React.FC = () => {
                             padding: '2px 8px',
                             borderRadius: '9999px',
                             background: 'rgba(30, 64, 175, 0.1)',
-                            color: '#1B345F',
+                            color: '#142B4A',
                           }}
                         >
                           Weightage: {cat.weightage}%
@@ -842,7 +842,7 @@ export const AppraisalManagementPage: React.FC = () => {
                         <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
                           Weighted Contribution
                         </div>
-                        <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#1B345F' }}>
+                        <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#142B4A' }}>
                           {Math.round(((cat.selfScore || 0) / 100) * cat.weightage * 10) / 10} / {cat.weightage} pts
                         </div>
                       </div>
@@ -923,7 +923,7 @@ export const AppraisalManagementPage: React.FC = () => {
                             fontSize: '0.75rem',
                             fontWeight: 600,
                             cursor: 'pointer',
-                            color: '#1B345F',
+                            color: '#142B4A',
                           }}
                         >
                           <i className="bi bi-paperclip" />
@@ -960,12 +960,12 @@ export const AppraisalManagementPage: React.FC = () => {
                               fontSize: '0.8rem',
                             }}
                           >
-                            <i className="bi bi-file-earmark-check-fill" style={{ color: '#1B345F' }} />
+                            <i className="bi bi-file-earmark-check-fill" style={{ color: '#142B4A' }} />
                             <a
                               href={fileUrl(doc.documentUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              style={{ textDecoration: 'none', color: '#1B345F', fontWeight: 600 }}
+                              style={{ textDecoration: 'none', color: '#142B4A', fontWeight: 600 }}
                             >
                               {doc.title}
                             </a>
@@ -978,7 +978,7 @@ export const AppraisalManagementPage: React.FC = () => {
                                   background: 'none',
                                   border: 'none',
                                   cursor: 'pointer',
-                                  color: '#dc2626',
+                                  color: '#B42318',
                                   padding: 0,
                                 }}
                               >
@@ -1046,7 +1046,7 @@ export const AppraisalManagementPage: React.FC = () => {
                     <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                       Total Weighted Self Score:{' '}
                     </span>
-                    <strong style={{ fontSize: '1.25rem', color: 'var(--color-primary, #1B345F)' }}>
+                    <strong style={{ fontSize: '1.25rem', color: 'var(--color-primary, #142B4A)' }}>
                       {Math.round(liveWeightedScore * 10) / 10} / 100
                     </strong>
                   </div>
@@ -1082,7 +1082,7 @@ export const AppraisalManagementPage: React.FC = () => {
                       style={{
                         padding: '0.55rem 1.5rem',
                         borderRadius: '8px',
-                        backgroundColor: 'var(--color-primary, #1B345F)',
+                        backgroundColor: 'var(--color-primary, #142B4A)',
                         color: '#fff',
                         border: 'none',
                         fontWeight: 700,
@@ -1270,7 +1270,7 @@ export const AppraisalManagementPage: React.FC = () => {
                         <AppraisalStatusBadge stage={item.currentStage} />
                       </td>
                       <td style={{ padding: '10px 14px' }}>
-                        <span style={{ fontWeight: 700, color: '#1B345F' }}>
+                        <span style={{ fontWeight: 700, color: '#142B4A' }}>
                           {item.totalSelfScore} / 100
                         </span>
                       </td>
@@ -1292,7 +1292,7 @@ export const AppraisalManagementPage: React.FC = () => {
                               gap: '4px',
                               padding: '5px 10px',
                               borderRadius: '6px',
-                              backgroundColor: 'var(--color-primary, #1B345F)',
+                              backgroundColor: 'var(--color-primary, #142B4A)',
                               color: '#fff',
                               border: 'none',
                               fontSize: '0.8rem',
@@ -1349,19 +1349,19 @@ export const AppraisalManagementPage: React.FC = () => {
               </div>
               <div style={{ background: '#fff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                 <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>In HOD Review</span>
-                <h3 style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 800, color: '#d97706' }}>{stats.hodReview}</h3>
+                <h3 style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 800, color: '#B45309' }}>{stats.hodReview}</h3>
               </div>
               <div style={{ background: '#fff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                 <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>In Dean Review</span>
-                <h3 style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 800, color: '#9333ea' }}>{stats.deanReview}</h3>
+                <h3 style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 800, color: '#2864A5' }}>{stats.deanReview}</h3>
               </div>
               <div style={{ background: '#fff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                 <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Approved & Finalized</span>
-                <h3 style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 800, color: '#059669' }}>{stats.approved}</h3>
+                <h3 style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 800, color: '#1E7A4C' }}>{stats.approved}</h3>
               </div>
               <div style={{ background: '#fff', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                 <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Average Score</span>
-                <h3 style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 800, color: '#1B345F' }}>{stats.averageScore} / 100</h3>
+                <h3 style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 800, color: '#142B4A' }}>{stats.averageScore} / 100</h3>
               </div>
             </div>
           )}
@@ -1374,32 +1374,32 @@ export const AppraisalManagementPage: React.FC = () => {
               </h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
                 <div style={{ padding: '1rem', borderRadius: '8px', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#4f46e5' }}>Outstanding (A++)</div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#4f46e5', marginTop: '4px' }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2864A5' }}>Outstanding (A++)</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#2864A5', marginTop: '4px' }}>
                     {stats.gradeDistribution.outstanding}
                   </div>
                 </div>
                 <div style={{ padding: '1rem', borderRadius: '8px', background: 'rgba(14, 165, 233, 0.08)', border: '1px solid rgba(14, 165, 233, 0.2)' }}>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0284c7' }}>Excellent (A+)</div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0284c7', marginTop: '4px' }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2864A5' }}>Excellent (A+)</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#2864A5', marginTop: '4px' }}>
                     {stats.gradeDistribution.excellent}
                   </div>
                 </div>
                 <div style={{ padding: '1rem', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#059669' }}>Very Good (A)</div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#059669', marginTop: '4px' }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#1E7A4C' }}>Very Good (A)</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1E7A4C', marginTop: '4px' }}>
                     {stats.gradeDistribution.veryGood}
                   </div>
                 </div>
                 <div style={{ padding: '1rem', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#d97706' }}>Good (B)</div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#d97706', marginTop: '4px' }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#B45309' }}>Good (B)</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#B45309', marginTop: '4px' }}>
                     {stats.gradeDistribution.good}
                   </div>
                 </div>
                 <div style={{ padding: '1rem', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#dc2626' }}>Needs Improvement (C)</div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#dc2626', marginTop: '4px' }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#B42318' }}>Needs Improvement (C)</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#B42318', marginTop: '4px' }}>
                     {stats.gradeDistribution.needsImprovement}
                   </div>
                 </div>
@@ -1434,7 +1434,7 @@ export const AppraisalManagementPage: React.FC = () => {
                 gap: '6px',
                 padding: '0.55rem 1rem',
                 borderRadius: '8px',
-                backgroundColor: 'var(--color-primary, #1B345F)',
+                backgroundColor: 'var(--color-primary, #142B4A)',
                 color: '#fff',
                 border: 'none',
                 fontWeight: 600,
@@ -1496,7 +1496,7 @@ export const AppraisalManagementPage: React.FC = () => {
                               gap: '6px',
                               padding: '0.55rem 1rem',
                               borderRadius: '8px',
-                              backgroundColor: 'var(--color-primary, #1B345F)',
+                              backgroundColor: 'var(--color-primary, #142B4A)',
                               color: '#fff',
                               border: 'none',
                               fontWeight: 600,
@@ -1521,7 +1521,7 @@ export const AppraisalManagementPage: React.FC = () => {
                     </td>
                     <td style={{ padding: '10px 14px' }}>
                       {c.requirePrincipalApproval ? (
-                        <span style={{ color: '#059669', fontWeight: 600 }}>Enabled (Principal Tier)</span>
+                        <span style={{ color: '#1E7A4C', fontWeight: 600 }}>Enabled (Principal Tier)</span>
                       ) : (
                         <span style={{ color: '#64748b' }}>Disabled (Dean Final)</span>
                       )}

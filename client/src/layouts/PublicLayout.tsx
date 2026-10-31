@@ -3,13 +3,15 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import '../styles/public.css';
 import '../styles/public-motion.css';
-import { PRODUCT_NAME, PRODUCT_FULL_NAME, PRODUCT_TAGLINE, PRODUCT_MARK, PRODUCT_WORDMARK } from '../config/brand';
+import { PRODUCT_NAME, PRODUCT_FULL_NAME, PRODUCT_TAGLINE, PRODUCT_MARK, PRODUCT_HORIZONTAL, PRODUCT_WORDMARK } from '../config/brand';
 
 const NAV = [
   { href: '#features', label: 'Features' },
-  { href: '#how-it-works', label: 'How it works' },
   { href: '#roles', label: 'Roles' },
-  { href: '#security', label: 'Security' },
+  { href: '#institutions', label: 'Institutions' },
+  { href: '#analytics', label: 'Analytics' },
+  { href: '#about', label: 'About' },
+  { href: '#contact', label: 'Contact' },
 ];
 
 /** Public shell (home page and public status pages): slim header, content, simple footer. */
@@ -54,6 +56,10 @@ export const PublicLayout: React.FC = () => {
           )}
 
           <div className="pub-header-actions">
+            <Link to="/login?demo=true" className="pub-btn pub-btn-ghost pub-btn-sm" style={{ fontWeight: 600 }}>
+              <i className="bi bi-compass" style={{ marginRight: '4px' }} />
+              Explore Demo
+            </Link>
             <Link to={ROUTES.LOGIN} className="pub-btn pub-btn-primary pub-btn-sm">
               Sign in
             </Link>
@@ -91,24 +97,39 @@ export const PublicLayout: React.FC = () => {
       <footer className="pub-footer" role="contentinfo">
         <div className="pub-container pub-footer-grid">
           <div>
-            <img src={PRODUCT_MARK} alt={PRODUCT_NAME} width={44} height={44} className="pub-footer-logo" />
+            <img src={PRODUCT_HORIZONTAL} alt={PRODUCT_NAME} height={40} className="pub-footer-logo" />
             <p>
+
               {PRODUCT_FULL_NAME}
               <br />
               <span className="pub-footer-muted">{PRODUCT_TAGLINE}</span>
             </p>
           </div>
           <div>
+            <h2>Explore</h2>
+            <ul>
+              <li>
+                <Link to="/login?demo=true">Explore Demo Accounts</Link>
+              </li>
+              <li>
+                <a href="#institutions">Supported Colleges</a>
+              </li>
+              <li>
+                <a href="#analytics">Accreditation & Analytics</a>
+              </li>
+            </ul>
+          </div>
+          <div>
             <h2>Portal</h2>
             <ul>
               <li>
-                <Link to={ROUTES.LOGIN}>Sign in</Link>
+                <Link to={ROUTES.LOGIN}>Institution Sign in</Link>
               </li>
               <li>
-                <Link to={ROUTES.REGISTER}>Register with college email</Link>
+                <Link to={ROUTES.REGISTER}>Register Faculty Account</Link>
               </li>
               <li>
-                <a href="#features">Features</a>
+                <a href="#features">Platform Features</a>
               </li>
             </ul>
           </div>
@@ -116,18 +137,26 @@ export const PublicLayout: React.FC = () => {
             <h2>Platform</h2>
             <ul>
               <li>
-                <Link to={ROUTES.LOGIN}>Institutional Sign In</Link>
+                <Link to="/login?as=platform">Super Admin Console</Link>
               </li>
               <li>
-                <Link to="/login?as=platform">Super Admin Console</Link>
+                <a href="#about">About FacultyCore</a>
+              </li>
+              <li>
+                <a href="#contact">Contact Support</a>
               </li>
             </ul>
           </div>
         </div>
         <div className="pub-container pub-footer-bottom">
-          <span>&copy; {new Date().getFullYear()} {PRODUCT_NAME}</span>
-          <span className="pub-powered">
-            Powered by <img src={PRODUCT_WORDMARK} alt={PRODUCT_NAME} height={20} />
+          <span>&copy; {new Date().getFullYear()} {PRODUCT_NAME}. Complete Academic Management.</span>
+          <span className="pub-footer-links">
+            <span style={{ color: '#94a3b8', fontSize: '0.8rem', marginRight: '1rem' }}>
+              Multi-Tenant Institutional Architecture
+            </span>
+            <span className="pub-powered">
+              Powered by <img src={PRODUCT_WORDMARK} alt={PRODUCT_NAME} height={20} />
+            </span>
           </span>
         </div>
       </footer>
