@@ -20,10 +20,11 @@ export function generateCsrfToken(): string {
  */
 export function setCsrfCookie(res: Response, token: string): void {
   const isProd = env.NODE_ENV === 'production';
+  const sameSite = (env.COOKIE_SAME_SITE as 'lax' | 'strict' | 'none') || (isProd ? 'none' : 'lax');
   res.cookie(CSRF_COOKIE_NAME, token, {
     httpOnly: false, // Readable by frontend scripts to attach to outgoing headers
-    secure: isProd,
-    sameSite: isProd ? 'strict' : 'lax',
+    secure: isProd || sameSite === 'none',
+    sameSite,
     path: '/',
     maxAge: 30 * 24 * 60 * 60 * 1000, // CSRF token outlives sessions; it is not a credential
   });
@@ -41,6 +42,9 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
     currentToken = generateCsrfToken();
     setCsrfCookie(res, currentToken);
   }
+
+  // Always expose the current CSRF token in the response header so cross-domain SPA clients (e.g. Vercel) can capture it
+  res.setHeader(CSRF_HEADER_NAME, currentToken);
 
   // 2. Safe idempotent methods are always exempt
   const safeMethods = ['GET', 'HEAD', 'OPTIONS'];

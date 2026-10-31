@@ -45,10 +45,12 @@ export function verifyToken(token: string): JwtPayload & { iat?: number; exp?: n
 
 export function getAuthCookieOptions(): CookieOptions {
   const isProd = env.NODE_ENV === 'production';
+  // Cross-origin deployments (e.g. Vercel frontend + Render backend) require sameSite: 'none' and secure: true
+  const sameSite = (env.COOKIE_SAME_SITE as 'lax' | 'strict' | 'none') || (isProd ? 'none' : 'lax');
   return {
     httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? 'strict' : 'lax',
+    secure: isProd || sameSite === 'none',
+    sameSite,
     maxAge: getSessionLifetimeMs(),
     path: '/',
   };

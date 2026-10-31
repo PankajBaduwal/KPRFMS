@@ -13,6 +13,8 @@ export const apiClient = axios.create({
   timeout: 15000,
 });
 
+let inMemoryCsrfToken = '';
+
 const PRE_SIGN_IN_ROUTES = [
   '/auth/login',
   '/auth/register',
@@ -35,8 +37,10 @@ apiClient.interceptors.request.use((config) => {
     config.baseURL = `${API_BASE_URL}/t/${code}`;
   }
   const match = document.cookie.match(/(^| )fms_csrf_token=([^;]+)/);
-  if (match) {
-    config.headers['x-csrf-token'] = match[2];
+  const sessionToken = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('fms_csrf') : null;
+  const token = inMemoryCsrfToken || sessionToken || match?.[2];
+  if (token) {
+    config.headers['x-csrf-token'] = token;
   }
   return config;
 });
@@ -44,6 +48,15 @@ apiClient.interceptors.request.use((config) => {
 // Response interceptor: unwrap successful responses, normalize errors
 apiClient.interceptors.response.use(
   (response) => {
+    const csrf = response.headers?.['x-csrf-token'];
+    if (csrf && typeof csrf === 'string') {
+      inMemoryCsrfToken = csrf;
+      try {
+        sessionStorage.setItem('fms_csrf', csrf);
+      } catch {
+        // Ignore storage exceptions
+      }
+    }
     return response;
   },
   (error) => {

@@ -11,7 +11,9 @@ const envSchema = z.object({
   // Idle session lifetime; active sessions are renewed automatically (see refreshSessionIfStale)
   JWT_EXPIRES_IN: z.string().default('12h'),
   COOKIE_SECRET: z.string().min(1, 'COOKIE_SECRET is required'),
+  COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).optional(),
   CLIENT_URL: z.string().default('http://localhost:5180'),
+  ALLOW_VERCEL_PREVIEWS: z.string().optional(),
   // Set when running behind a reverse proxy (nginx / load balancer) so client IPs are correct
   TRUST_PROXY: z.string().optional(),
   // Public base URL of the API (used in calendar feed links). Defaults to http://localhost:PORT/api
