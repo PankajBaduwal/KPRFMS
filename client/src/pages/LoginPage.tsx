@@ -200,101 +200,150 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="login-page-container">
       <div className="login-split-layout">
+        {/* ========================================================
+            LEFT SIDE — INSTITUTIONAL SHOWCASE & BRAND PANEL
+            ======================================================== */}
         <aside className="login-brand-panel" aria-label="About the Faculty Management System">
           <span className="login-aurora login-aurora-a" aria-hidden="true" />
           <span className="login-aurora login-aurora-b" aria-hidden="true" />
+          
           <div className="login-brand-top">
+            <div className="login-brand-header-badge">
+              <div className="login-brand-logo-pill">
+                <img src={PRODUCT_MARK} alt="" width={24} height={24} />
+                <span className="login-brand-product-title">{PRODUCT_NAME}</span>
+              </div>
+              <span className="login-enterprise-badge">Enterprise ERP</span>
+            </div>
+
             {isPlatform ? (
-              <>
-                <div className="login-brand-mark">
-                  <img src={PRODUCT_MARK} alt="" width={28} height={28} />
-                  <span>{PRODUCT_NAME}</span>
-                </div>
+              <div className="login-brand-heading-block">
                 <h1 className="login-brand-title">Platform Administration</h1>
-                <p className="login-brand-desc">{PRODUCT_TAGLINE}. Create and manage colleges and universities, provision their accounts and watch platform health.</p>
-              </>
+                <p className="login-brand-desc">
+                  Unified governance console for institutional provisioning, tenant isolation, and health telemetry.
+                </p>
+              </div>
             ) : (
-              <>
-                <div className="login-brand-mark">
-                  <img src={PRODUCT_MARK} alt="" width={28} height={28} />
-                  <span>{PRODUCT_NAME}</span>
-                </div>
+              <div className="login-brand-heading-block">
                 <h1 className="login-brand-title">{PORTAL_NAME}</h1>
                 <p className="login-brand-desc">
-                  Your profile, research, leave, attendance and appraisals in one place.
+                  Comprehensive academic ERP: faculty profiles, workload, research dossiers, and multi-tier institutional appraisals.
                 </p>
-              </>
+              </div>
             )}
-            <ul className="login-brand-points" hidden={isPlatform}>
-              <li>
-                <i className="bi bi-check2-circle" aria-hidden="true" />
-                <span>Add a record once; your HOD verifies it online</span>
-              </li>
-              <li>
-                <i className="bi bi-check2-circle" aria-hidden="true" />
-                <span>Apply for leave and follow each approval step</span>
-              </li>
-              <li>
-                <i className="bi bi-check2-circle" aria-hidden="true" />
-                <span>Verified data flows into NAAC and NBA reports</span>
-              </li>
-            </ul>
+
+            {/* Feature Highlights Grid */}
+            <div className="login-features-list" hidden={isPlatform}>
+              <div className="login-feature-card">
+                <div className="login-feature-icon">
+                  <i className="bi bi-mortarboard" aria-hidden="true" />
+                </div>
+                <div className="login-feature-text">
+                  <strong>Master Academic Dossier</strong>
+                  <span>Teaching workload, publications, patents, consultancy & research in one verified record.</span>
+                </div>
+              </div>
+
+              <div className="login-feature-card">
+                <div className="login-feature-icon">
+                  <i className="bi bi-diagram-3" aria-hidden="true" />
+                </div>
+                <div className="login-feature-text">
+                  <strong>Multi-Tier Workflow</strong>
+                  <span>Transparent HOD verification, Dean oversight, and Principal approvals with audit trails.</span>
+                </div>
+              </div>
+
+              <div className="login-feature-card">
+                <div className="login-feature-icon">
+                  <i className="bi bi-award" aria-hidden="true" />
+                </div>
+                <div className="login-feature-text">
+                  <strong>Accreditation Ready</strong>
+                  <span>Automated metric aggregation for NAAC Criterion III and NBA evaluative compliance.</span>
+                </div>
+              </div>
+            </div>
 
             {demoAvailable && (
-              <button
-                type="button"
-                className="login-brand-demo-btn"
-                onClick={() => setShowDemoModal(true)}
-              >
-                <i className="bi bi-compass-fill" /> Explore Demo Accounts
-              </button>
+              <div className="login-demo-launcher-box">
+                <div className="login-demo-launcher-info">
+                  <i className="bi bi-stars" />
+                  <div>
+                    <strong>Demonstration Mode Active</strong>
+                    <span>Test sample profiles across all roles</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="login-brand-demo-btn"
+                  onClick={() => setShowDemoModal(true)}
+                >
+                  <i className="bi bi-compass-fill" /> Explore Sample Accounts
+                </button>
+              </div>
             )}
           </div>
-          <p className="login-brand-foot">{PRODUCT_NAME} · {PRODUCT_TAGLINE}</p>
+
+          <div className="login-brand-footer-row">
+            <span className="login-security-tag">
+              <i className="bi bi-shield-check" aria-hidden="true" /> Multi-Tenant · ISO-Compliant · AES-256 Encrypted
+            </span>
+            <span className="login-tagline-text">{PRODUCT_TAGLINE}</span>
+          </div>
         </aside>
 
         {/* ========================================================
-            RIGHT SIDE — LOGIN AUTHENTICATION PANEL
+            RIGHT SIDE — AUTHENTICATION REGION
             ======================================================== */}
         <div className={`login-auth-panel ${shake ? 'is-shaking' : ''}`} role="region" aria-label="Sign In Panel">
           <div className="login-panel-header">
-            <h2 className="login-panel-title">{challengeToken ? 'Two-step verification' : 'Sign in'}</h2>
-            {!challengeToken && <AccountTypeSwitch value={accountType} onChange={setAccountType} />}
+            <div className="login-title-row">
+              <h2 className="login-panel-title">
+                {challengeToken ? 'Two-step verification' : 'Welcome back'}
+              </h2>
+              <span className="login-portal-tag">
+                {isPlatform ? 'Platform Mode' : 'Institutional Portal'}
+              </span>
+            </div>
+
             <p className="login-panel-desc">
               {challengeToken
                 ? useRecoveryCode
-                  ? 'Enter one of the recovery codes you saved when you turned on two-factor sign-in.'
-                  : `Open your authenticator app and enter the 6-digit code for ${PRODUCT_NAME}.`
+                  ? 'Enter one of your saved recovery codes to authenticate.'
+                  : `Enter the 6-digit verification code from your authenticator app.`
                 : isPlatform
-                  ? 'Platform administration for FacultyCore operators. No institution needs to be chosen.'
-                  : 'Choose your institution, then use your college email or employee ID.'}
+                  ? 'Sign in to the global FacultyCore management console.'
+                  : 'Select your institution and sign in with your credentials.'}
             </p>
+
+            {!challengeToken && (
+              <AccountTypeSwitch value={accountType} onChange={setAccountType} />
+            )}
           </div>
 
           {branding.maintenanceMode && !challengeToken && !isPlatform && (
-            <div style={{ marginBottom: '1rem' }}>
-              <Alert variant="warning" title="Under maintenance">
-                {branding.name || 'This institution'} is under maintenance. Only administrators can sign in until it is finished.
+            <div style={{ marginBottom: '1.25rem' }}>
+              <Alert variant="warning" title="Institution Under Maintenance">
+                {branding.name || 'This institution'} is currently undergoing maintenance. Only designated administrators can sign in.
               </Alert>
             </div>
           )}
 
-          {/* Session Expired Alert */}
           {sessionExpired && (
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: '1.25rem' }}>
               <Alert
                 variant="warning"
                 title="Session Expired"
                 onDismiss={() => setSessionExpired(false)}
               >
-                Your institutional session has expired due to inactivity. Please sign in again to continue your work.
+                Your session has expired due to inactivity. Please sign in again.
               </Alert>
             </div>
           )}
 
-          {/* Error Alert */}
           {errorMessage && !isPlatform && (
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: '1.25rem' }}>
               <Alert
                 variant="danger"
                 title="Authentication Failed"
@@ -305,6 +354,7 @@ export const LoginPage: React.FC = () => {
             </div>
           )}
 
+          {/* 2FA Verification Form */}
           {challengeToken && (
             <form
               className="login-form"
@@ -342,12 +392,12 @@ export const LoginPage: React.FC = () => {
                 ) : verifyCode.isPending ? (
                   <>
                     <span className="spinner spinner-sm" aria-hidden="true" />
-                    <span>Verifying...</span>
+                    <span>Verifying Code...</span>
                   </>
                 ) : (
                   <>
                     <i className="bi bi-shield-check" aria-hidden="true" />
-                    <span>Verify and sign in</span>
+                    <span>Verify & Continue</span>
                   </>
                 )}
               </button>
@@ -360,7 +410,7 @@ export const LoginPage: React.FC = () => {
                     setTwoFactorCode('');
                   }}
                 >
-                  {useRecoveryCode ? 'Use authenticator app instead' : 'Lost your phone? Use a recovery code'}
+                  {useRecoveryCode ? 'Use authenticator app code' : 'Lost your phone? Use a recovery code'}
                 </button>
                 <button
                   type="button"
@@ -376,10 +426,10 @@ export const LoginPage: React.FC = () => {
             </form>
           )}
 
-          {/* Which institution's sign-in (chosen before credentials) */}
+          {/* Institutional Picker */}
           {!challengeToken && !isPlatform && <InstitutionPicker />}
 
-          {/* FacultyCore Super Admin: platform account store and session (checked by the server) */}
+          {/* Super Admin Form */}
           {isPlatform && !challengeToken && (
             <PlatformSignInForm
               from={from}
@@ -388,139 +438,126 @@ export const LoginPage: React.FC = () => {
             />
           )}
 
-          {/* Authentication Form */}
-          <form
-            onSubmit={handleSubmit((data) => signIn.run(data))}
-            noValidate
-            className="login-form"
-            style={challengeToken || isPlatform ? { display: 'none' } : undefined}
-          >
-            <Input
-              label="Email or employee ID"
-              type="text"
-              placeholder="e.g. name@college.edu or EMP1024"
-              autoComplete="username"
-              prefixIcon={<i className="bi bi-person-badge" aria-hidden="true" />}
-              error={errors.identifier?.message}
-              {...register('identifier')}
-            />
+          {/* Institutional Credentials Form */}
+          {!challengeToken && !isPlatform && (
+            <form
+              onSubmit={handleSubmit((data) => signIn.run(data))}
+              noValidate
+              className="login-form"
+            >
+              <div className="login-form-fields">
+                <Input
+                  label="Email or Employee ID"
+                  type="text"
+                  placeholder="name@college.edu or EMP001"
+                  autoComplete="username"
+                  prefixIcon={<i className="bi bi-person-badge" aria-hidden="true" />}
+                  error={errors.identifier?.message}
+                  {...register('identifier')}
+                />
 
-            <Input
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="••••••••••••"
-              autoComplete="current-password"
-              prefixIcon={<i className="bi bi-shield-lock" aria-hidden="true" />}
-              suffixAction={
+                <Input
+                  label="Password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••••••"
+                  autoComplete="current-password"
+                  prefixIcon={<i className="bi bi-shield-lock" aria-hidden="true" />}
+                  suffixAction={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      title={showPassword ? 'Hide password' : 'Show password'}
+                      className="login-eye-btn"
+                    >
+                      <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true" />
+                    </button>
+                  }
+                  error={errors.password?.message}
+                  {...register('password')}
+                />
+              </div>
+
+              {/* Remember Me & Forgot Password */}
+              <div className="login-utilities-row">
+                <label className="login-remember-label">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="login-remember-checkbox"
+                  />
+                  <span>Remember my ID</span>
+                </label>
+
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  title={showPassword ? 'Hide password' : 'Show password'}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--color-text-secondary)',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    fontSize: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    borderRadius: 'var(--radius-sm)',
-                  }}
+                  className="login-forgot-btn"
+                  onClick={openForgot}
                 >
-                  <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true" />
+                  Forgot password?
                 </button>
-              }
-              error={errors.password?.message}
-              {...register('password')}
-            />
+              </div>
 
-            {/* Utilities: Remember Me & Forgot Password */}
-            <div className="login-utilities-row">
-              <label className="login-remember-label">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  style={{ accentColor: 'var(--color-primary, #2563EB)' }}
-                />
-                <span>Remember ID on this device</span>
-              </label>
-
+              {/* Submit Button */}
               <button
-                type="button"
-                className="login-forgot-btn"
-                onClick={openForgot}
+                type="submit"
+                disabled={isSubmitting || signIn.isPending || signedIn}
+                className={`login-submit-btn ${signedIn ? 'is-success' : ''}`}
               >
-                Forgot password?
+                {signedIn ? (
+                  <>
+                    <i className="bi bi-check2-circle" aria-hidden="true" />
+                    <span>Signed in successfully</span>
+                  </>
+                ) : isSubmitting || signIn.isPending ? (
+                  <>
+                    <span className="spinner spinner-sm" aria-hidden="true" />
+                    <span>Authenticating...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
+                    <span>Sign In to Portal</span>
+                  </>
+                )}
               </button>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting || signIn.isPending || signedIn}
-              className={`login-submit-btn ${signedIn ? 'is-success' : ''}`}
-            >
-              {signedIn ? (
-                <>
-                  <i className="bi bi-check2-circle" aria-hidden="true" />
-                  <span>Signed in</span>
-                </>
-              ) : isSubmitting || signIn.isPending ? (
-                <>
-                  <span className="spinner spinner-sm" aria-hidden="true" />
-                  <span>Signing in...</span>
-                </>
-              ) : (
-                <>
-                  <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
-                  <span>Sign in</span>
-                </>
-              )}
-            </button>
-          </form>
-
-          {!isPlatform && (
-          <>
-          <div className="login-register-cta">
-            New faculty member?{' '}
-            <Link to={ROUTES.REGISTER}>Register with your college email</Link>
-          </div>
-
-          <p className="login-help">
-            Trouble signing in? Contact your administrator.
-          </p>
-          </>
+            </form>
           )}
 
-          {/* EXPLORE DEMO ACCOUNTS CTA */}
-          {demoAvailable && (
-          <div className="login-demo-cta-box">
-            <div className="login-demo-cta-text">
-              <strong>
-                <i className="bi bi-stars" style={{ color: '#2864A5' }} /> Want to explore FacultyCore?
-              </strong>
-              <span>
-                Browse the demonstration institutions and sign in with one click as
-                Principal, Admin, Dean, HOD, or Faculty.
-              </span>
+          {!isPlatform && !challengeToken && (
+            <div className="login-panel-footer">
+              <div className="login-register-prompt">
+                <span>New faculty member?</span>{' '}
+                <Link to={ROUTES.REGISTER} className="login-register-link">
+                  Register with institutional email <i className="bi bi-arrow-right" />
+                </Link>
+              </div>
+
+              {demoAvailable && (
+                <div className="login-compact-demo-banner">
+                  <span className="demo-banner-label">
+                    <i className="bi bi-stars" /> Demonstration Mode:
+                  </span>
+                  <button
+                    type="button"
+                    className="demo-banner-btn"
+                    onClick={() => setShowDemoModal(true)}
+                  >
+                    Quick-test with sample roles (Admin, Dean, HOD, Faculty) <i className="bi bi-chevron-right" />
+                  </button>
+                </div>
+              )}
+
+              <p className="login-support-note">
+                <i className="bi bi-question-circle" /> Need help signing in? Contact your institution's IT administrator.
+              </p>
             </div>
-            <button
-              type="button"
-              className="login-demo-cta-btn"
-              onClick={() => setShowDemoModal(true)}
-            >
-              <i className="bi bi-compass" />
-              <span>Explore Demo Accounts</span>
-            </button>
-          </div>
           )}
         </div>
       </div>
 
-      {/* Forgot Password: emailed reset link */}
+      {/* Forgot Password Modal */}
       <Modal
         isOpen={forgotModalOpen}
         onClose={() => setForgotModalOpen(false)}

@@ -12,13 +12,13 @@ export type AccountType = 'institution' | 'platform';
  * the server decides who is a FacultyCore Super Admin (separate account store, separate session).
  */
 export const AccountTypeSwitch: React.FC<{ value: AccountType; onChange: (v: AccountType) => void }> = ({ value, onChange }) => {
-  const options: Array<[AccountType, string]> = [
-    ['institution', 'Institution account'],
-    ['platform', `${PRODUCT_NAME} Super Admin`],
+  const options: Array<[AccountType, string, string]> = [
+    ['institution', 'Institutional Portal', 'bi-mortarboard-fill'],
+    ['platform', `${PRODUCT_NAME} Super Admin`, 'bi-shield-shaded'],
   ];
   return (
     <div className="login-account-switch" role="radiogroup" aria-label="Account type">
-      {options.map(([key, label]) => (
+      {options.map(([key, label, icon]) => (
         <button
           key={key}
           type="button"
@@ -34,7 +34,8 @@ export const AccountTypeSwitch: React.FC<{ value: AccountType; onChange: (v: Acc
           }}
           tabIndex={value === key ? 0 : -1}
         >
-          {label}
+          <i className={`bi ${icon}`} aria-hidden="true" />
+          <span>{label}</span>
         </button>
       ))}
     </div>
@@ -92,6 +93,11 @@ export const PlatformSignInForm: React.FC<PlatformSignInFormProps> = ({
         </div>
       )}
 
+      <div className="login-platform-banner">
+        <i className="bi bi-shield-check" aria-hidden="true" />
+        <span>Platform operators only. Manages institution provisioning, licenses & system health.</span>
+      </div>
+
       <Input
         label="Super Admin Email"
         type="email"
@@ -102,7 +108,7 @@ export const PlatformSignInForm: React.FC<PlatformSignInFormProps> = ({
         onChange={(e) => setEmail(e.target.value)}
       />
       <Input
-        label="Master Password"
+        label="Password"
         type={showPassword ? 'text' : 'password'}
         autoComplete="current-password"
         placeholder="••••••••••••"
@@ -125,19 +131,18 @@ export const PlatformSignInForm: React.FC<PlatformSignInFormProps> = ({
         {busy ? (
           <>
             <span className="spinner spinner-sm" aria-hidden="true" />
-            <span>Signing in...</span>
+            <span>Verifying Master Credentials...</span>
           </>
         ) : (
           <>
             <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
-            <span>Sign in to Platform Administration</span>
+            <span>Sign in to Platform Console</span>
           </>
         )}
       </button>
       <p className="login-help">
-        For {PRODUCT_NAME} Platform Operators. College faculty and administrators switch to <strong>Institution account</strong> above.
+        College faculty and administrators should switch to <strong>Institutional Portal</strong> above.
       </p>
     </form>
   );
 };
-

@@ -1,0 +1,15 @@
+# Override for a managed MongoDB (e.g. MongoDB Atlas): the bundled mongo container is not started
+# and the API connects to MONGODB_URI from .env.production instead.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.atlas.yml --env-file .env.production up -d --build
+#
+# Requires Docker Compose 2.24+ (for !reset). Allow the host's public IP in Atlas → Network Access.
+services:
+  mongo:
+    # Only started when explicitly asked for (docker compose --profile bundled-db ...)
+    profiles: ["bundled-db"]
+
+  server:
+    depends_on: !reset {}
+    environment:
+      MONGODB_URI: ${MONGODB_URI:?set MONGODB_URI (your Atlas connection string) in .env.production}
