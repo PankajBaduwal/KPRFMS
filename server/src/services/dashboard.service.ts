@@ -15,6 +15,8 @@ import { Publication, INDEXING_TYPES } from '../models/Publication.js';
 import { Project } from '../models/Project.js';
 import { AcademicActivity } from '../models/AcademicActivity.js';
 import { Patent } from '../models/Patent.js';
+import { Consultancy } from '../models/Consultancy.js';
+import { Copyright } from '../models/Copyright.js';
 import { PhdScholar } from '../models/PhdScholar.js';
 import { StudentProject } from '../models/StudentProject.js';
 import { StudentMentoring } from '../models/StudentMentoring.js';
@@ -124,6 +126,15 @@ export class DashboardService {
       FacultyAchievement.countDocuments({ ...mine, status: 'VERIFIED' } as any),
       facultyId ? StudentProject.countDocuments({ guideFacultyId: facultyId } as any) : Promise.resolve(0),
     ]);
+    // Consultancy, copyrights, and what was added in the current academic year
+    const year = await getCurrentAcademicYear();
+    const [consTotal, consOngoing, copyTotal, pubYear, actYear] = await Promise.all([
+      Consultancy.countDocuments(mine as any),
+      Consultancy.countDocuments({ ...mine, status: 'ONGOING' } as any),
+      Copyright.countDocuments(mine as any),
+      Publication.countDocuments({ ...mine, academicYear: year } as any),
+      AcademicActivity.countDocuments({ ...mine, academicYear: year } as any),
+    ]);
     return {
       publications: { total: pubTotal, verified: pubVerified, indexed: pubIndexed },
       patents: { total: patTotal, granted: patGranted },
@@ -131,6 +142,9 @@ export class DashboardService {
       courses: { total: courseTotal, verified: courseVerified },
       achievements: { total: achTotal, verified: achVerified },
       studentProjects: { guided },
+      consultancy: { total: consTotal, ongoing: consOngoing },
+      copyrights: { total: copyTotal },
+      thisYear: { academicYear: year, publications: pubYear, activities: actYear },
       mentoring: { students: mentees, batches: (batches as unknown[]).filter(Boolean).length },
       verification: { awaiting: waiting, returned },
       projects: { total: projTotal, verifiedFunded: projFunded },

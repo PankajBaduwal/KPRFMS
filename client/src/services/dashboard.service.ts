@@ -119,6 +119,9 @@ export interface FacultyDashboardData {
     courses?: { total: number; verified: number };
     achievements?: { total: number; verified: number };
     studentProjects?: { guided: number };
+    consultancy?: { total: number; ongoing: number };
+    copyrights?: { total: number };
+    thisYear?: { academicYear: string; publications: number; activities: number };
   };
   /** Outstanding tasks, most urgent first (server-computed from real workflows) */
   attentionItems?: Array<{

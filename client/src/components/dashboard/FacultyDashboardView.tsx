@@ -70,6 +70,24 @@ const linkForType = (type: string) =>
  * my attention, what I can do, the trends, and where my submissions are. Every figure comes from
  * the signed-in faculty member's own records (server-computed); nothing is filled in when missing.
  */
+const titleCase = (s: string) => s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+
+/** Appraisal workflow status in plain words */
+const appraisalLabel = (status: string) =>
+  status === 'NOT_STARTED'
+    ? 'Not started'
+    : status === 'DRAFT'
+      ? 'Draft'
+      : status.startsWith('RETURNED') || status === 'REVISION_REQUESTED'
+        ? 'Returned'
+        : status === 'APPROVED'
+          ? 'Approved'
+          : status === 'REJECTED'
+            ? 'Rejected'
+            : status.endsWith('_REVIEW')
+              ? 'In review'
+              : 'Submitted';
+
 export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data }) => {
   const inst = useInstitution();
   const [moreMetrics, setMoreMetrics] = useState(true);
@@ -79,6 +97,11 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
   const tasks = data.attentionItems ?? [];
   const shownTasks = allTasks ? tasks : tasks.slice(0, 3);
   const visible = (to: string) => !isHiddenPath(to, inst.enabledModules);
+
+  // Leave: casual leave as the headline figure (adding long leave types like maternity would mislead)
+  const balances = data.leaveStatus.balances;
+  const leaveMain = balances.find((b) => /^casual/i.test(b.type)) ?? balances[0];
+  const leaveOthers = balances.filter((b) => b !== leaveMain && /^(earned|sick)/i.test(b.type));
 
   // Overview: three primary metrics, then the rest of the faculty member's own records
   const extras = [
@@ -103,6 +126,22 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
       label: 'Patents',
       value: m.patents.total,
       note: `${m.patents.granted} granted`,
+      to: ROUTES.IPR_CONSULTANCY,
+      link: 'View IPR',
+    },
+    m?.consultancy && visible(ROUTES.IPR_CONSULTANCY) && {
+      key: 'consultancy',
+      label: 'Consultancy',
+      value: m.consultancy.total,
+      note: `${m.consultancy.ongoing} ongoing`,
+      to: ROUTES.IPR_CONSULTANCY,
+      link: 'View consultancy',
+    },
+    m?.copyrights && visible(ROUTES.IPR_CONSULTANCY) && {
+      key: 'copyrights',
+      label: 'Copyrights',
+      value: m.copyrights.total,
+      note: 'Registered and filed works',
       to: ROUTES.IPR_CONSULTANCY,
       link: 'View IPR',
     },
@@ -138,6 +177,51 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
       to: ROUTES.STUDENT_PROJECTS,
       link: 'View student projects',
     },
+    m?.thisYear && {
+      key: 'this-year',
+      label: `Added in ${m.thisYear.academicYear}`,
+      value: m.thisYear.publications,
+      note: `publication${m.thisYear.publications === 1 ? '' : 's'} · ${m.thisYear.activities} activit${m.thisYear.activities === 1 ? 'y' : 'ies'} this academic year`,
+      to: ROUTES.PUBLICATIONS,
+      link: 'View publications',
+    },
+    m && {
+      key: 'returned',
+      label: 'Returned for correction',
+      value: m.verification.returned,
+      note: m.verification.returned > 0 ? 'Sent back by your HOD to fix and resubmit' : 'Nothing waiting for correction',
+      to: '#fx-submissions',
+      link: 'Open verification queue',
+    },
+    visible(ROUTES.ATTENDANCE) && {
+      key: 'attendance',
+      label: 'Attendance this month',
+      value: data.attendance.totalMarked > 0 ? `${data.attendance.percentage}%` : '—',
+      note:
+        data.attendance.totalMarked > 0
+          ? `${data.attendance.presentDays} present · ${data.attendance.absentDays} absent of ${data.attendance.totalMarked} marked`
+          : 'No attendance marked this month',
+      to: ROUTES.ATTENDANCE,
+      link: 'View attendance',
+    },
+    visible(ROUTES.LEAVES) && {
+      key: 'leave',
+      label: leaveMain ? `${titleCase(leaveMain.type)} left` : 'Leave balance',
+      value: leaveMain ? leaveMain.remaining : '—',
+      note: leaveMain
+        ? leaveOthers.map((b) => `${titleCase(b.type)} ${b.remaining}`).join(' · ') || 'days remaining this year'
+        : 'No leave balance set up for this year',
+      to: ROUTES.LEAVES,
+      link: 'Apply or view leave',
+    },
+    visible(ROUTES.APPRAISALS) && {
+      key: 'appraisal',
+      label: 'Self-appraisal',
+      value: data.appraisalStatus.hasActiveCycle ? appraisalLabel(data.appraisalStatus.status) : '—',
+      note: data.appraisalStatus.hasActiveCycle ? data.appraisalStatus.cycleTitle : 'No appraisal cycle is open',
+      to: ROUTES.APPRAISALS,
+      link: 'Open appraisal',
+    },
     FEATURES.TEACHING && {
       key: 'workload',
       label: 'Teaching workload',
@@ -146,7 +230,7 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
       to: ROUTES.WORKLOAD,
       link: 'View workload',
     },
-  ].filter(Boolean) as Array<{ key: string; label: string; value: number; note: string; to: string; link: string }>;
+  ].filter(Boolean) as Array<{ key: string; label: string; value: number | string; note: string; to: string; link: string }>;
 
   // Submissions: pending items and recent research, one row per record
   const seen = new Set<string>();
@@ -327,7 +411,11 @@ export const FacultyDashboardView: React.FC<FacultyDashboardViewProps> = ({ data
                 <span className="fx-metric-label">{x.label}</span>
                 <span className="fx-metric-value">{x.value}</span>
                 <span className="fx-metric-note">{x.note}</span>
-                <Link to={x.to} className="fx-link">{x.link}</Link>
+                {x.to.startsWith('#') ? (
+                  <a href={x.to} className="fx-link">{x.link}</a>
+                ) : (
+                  <Link to={x.to} className="fx-link">{x.link}</Link>
+                )}
               </div>
             ))}
         </div>
