@@ -1,0 +1,879 @@
+{
+  "institutions": [
+    {
+      "institution": {
+        "code": "demo",
+        "name": "Demo Institute of Technology",
+        "type": "COLLEGE",
+        "city": "Chennai",
+        "state": "Tamil Nadu"
+      },
+      "leadership": [
+        {
+          "id": "6adf7dbe744b842df17b6bd7",
+          "employeeId": "EMP002",
+          "name": "Dr. M. Akila",
+          "email": "principal@college.edu",
+          "role": "PRINCIPAL",
+          "designation": "Principal & Professor",
+          "roleLabel": "Principal"
+        },
+        {
+          "id": "6adf7dbe744b842df17b6bd6",
+          "employeeId": "EMP001",
+          "name": "Dr. K. Admin",
+          "email": "admin@college.edu",
+          "role": "ADMIN",
+          "designation": "Chief Information Officer & Administrator",
+          "roleLabel": "Institution Admin"
+        },
+        {
+          "id": "6adf7dbe744b842df17b6bd8",
+          "employeeId": "EMP003",
+          "name": "Dr. S. Ramkumar",
+          "email": "dean.acad@college.edu",
+          "role": "DEAN",
+          "designation": "Dean (Academic Affairs)",
+          "roleLabel": "Dean (Academic Affairs)"
+        }
+      ],
+      "departments": [
+        {
+          "id": "6adf7de50cd15aaebff78f23",
+          "code": "AIDS",
+          "name": "Artificial Intelligence and Data Science",
+          "hod": {
+            "id": "6adf7de60cd15aaebff78f7e",
+            "employeeId": "DIT2125",
+            "name": "Dr. S. Gayathri",
+            "email": "hod.aids@college.edu",
+            "role": "HOD",
+            "designation": "Professor & Head",
+            "departmentId": "6adf7de50cd15aaebff78f23",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6adf7de60cd15aaebff78f7f",
+              "employeeId": "DIT2126",
+              "name": "Dr. R. Muthukumar",
+              "email": "r.muthukumar.aids@college.edu",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6adf7de50cd15aaebff78f23"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f80",
+              "employeeId": "DIT2127",
+              "name": "Ms. N. Deepika",
+              "email": "n.deepika.aids@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6adf7de50cd15aaebff78f23"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f81",
+              "employeeId": "DIT2128",
+              "name": "Mr. K. Sanjay",
+              "email": "k.sanjay.aids@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7de50cd15aaebff78f23"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f82",
+              "employeeId": "DIT2129",
+              "name": "Ms. P. Abinaya",
+              "email": "p.abinaya.aids@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7de50cd15aaebff78f23"
+            }
+          ]
+        },
+        {
+          "id": "6adf7de50cd15aaebff78f24",
+          "code": "CIVIL",
+          "name": "Civil Engineering",
+          "hod": {
+            "id": "6adf7de60cd15aaebff78f83",
+            "employeeId": "DIT2130",
+            "name": "Dr. T. Selvaraj",
+            "email": "hod.civil@college.edu",
+            "role": "HOD",
+            "designation": "Professor & Head",
+            "departmentId": "6adf7de50cd15aaebff78f24",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6adf7de60cd15aaebff78f84",
+              "employeeId": "DIT2131",
+              "name": "Dr. K. Uma Maheswari",
+              "email": "k.uma.maheswari.civil@college.edu",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6adf7de50cd15aaebff78f24"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f85",
+              "employeeId": "DIT2132",
+              "name": "Mr. B. Ashok",
+              "email": "b.ashok.civil@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6adf7de50cd15aaebff78f24"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f86",
+              "employeeId": "DIT2133",
+              "name": "Ms. M. Ramya",
+              "email": "m.ramya.civil@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7de50cd15aaebff78f24"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f87",
+              "employeeId": "DIT2134",
+              "name": "Mr. G. Praveen",
+              "email": "g.praveen.civil@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7de50cd15aaebff78f24"
+            }
+          ]
+        },
+        {
+          "id": "6adf7dbd744b842df17b6bd4",
+          "code": "CSE",
+          "name": "Computer Science and Engineering",
+          "hod": {
+            "id": "6adf7dbe744b842df17b6bd9",
+            "employeeId": "EMP004",
+            "name": "Dr. V. Seetha",
+            "email": "hod.cse@college.edu",
+            "role": "HOD",
+            "designation": "Professor & Head of Department",
+            "departmentId": "6adf7dbd744b842df17b6bd4",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6adf7dbf744b842df17b6bda",
+              "employeeId": "EMP005",
+              "name": "Dr. A. Karthik",
+              "email": "faculty.cse@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6adf7dbd744b842df17b6bd4"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f66",
+              "employeeId": "DIT2101",
+              "name": "Dr. R. Priya",
+              "email": "r.priya.cse@college.edu",
+              "role": "FACULTY",
+              "designation": "Professor",
+              "departmentId": "6adf7dbd744b842df17b6bd4"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f67",
+              "employeeId": "DIT2102",
+              "name": "Dr. S. Manikandan",
+              "email": "s.manikandan.cse@college.edu",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6adf7dbd744b842df17b6bd4"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f68",
+              "employeeId": "DIT2103",
+              "name": "Ms. K. Divya",
+              "email": "k.divya.cse@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6adf7dbd744b842df17b6bd4"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f69",
+              "employeeId": "DIT2104",
+              "name": "Mr. P. Arun Prasath",
+              "email": "p.arun.prasath.cse@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7dbd744b842df17b6bd4"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f6a",
+              "employeeId": "DIT2105",
+              "name": "Ms. J. Nivetha",
+              "email": "j.nivetha.cse@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7dbd744b842df17b6bd4"
+            }
+          ]
+        },
+        {
+          "id": "6adf7dbd744b842df17b6bd5",
+          "code": "ECE",
+          "name": "Electronics and Communication Engineering",
+          "hod": {
+            "id": "6ae46c994b9fb25b4ccdcd3e",
+            "employeeId": "DIT2009",
+            "name": "Dr. M. Senthil Kumar",
+            "email": "hod.ece@college.edu",
+            "role": "HOD",
+            "designation": "Professor & Head of Department",
+            "departmentId": "6adf7dbd744b842df17b6bd5",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6adf7de60cd15aaebff78f6b",
+              "employeeId": "DIT2106",
+              "name": "Dr. M. Senthil Kumar",
+              "email": "m.senthil.kumar.ece@college.edu",
+              "role": "FACULTY",
+              "designation": "Professor",
+              "departmentId": "6adf7dbd744b842df17b6bd5"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f6c",
+              "employeeId": "DIT2107",
+              "name": "Dr. G. Lavanya",
+              "email": "g.lavanya.ece@college.edu",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6adf7dbd744b842df17b6bd5"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f6d",
+              "employeeId": "DIT2108",
+              "name": "Mr. T. Vignesh",
+              "email": "t.vignesh.ece@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6adf7dbd744b842df17b6bd5"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f6e",
+              "employeeId": "DIT2109",
+              "name": "Ms. B. Harini",
+              "email": "b.harini.ece@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7dbd744b842df17b6bd5"
+            }
+          ]
+        },
+        {
+          "id": "6adf7de50cd15aaebff78f21",
+          "code": "EEE",
+          "name": "Electrical and Electronics Engineering",
+          "hod": {
+            "id": "6adf7de60cd15aaebff78f74",
+            "employeeId": "DIT2115",
+            "name": "Dr. P. Meenakshi",
+            "email": "hod.eee@college.edu",
+            "role": "HOD",
+            "designation": "Professor & Head",
+            "departmentId": "6adf7de50cd15aaebff78f21",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6adf7de60cd15aaebff78f75",
+              "employeeId": "DIT2116",
+              "name": "Dr. V. Balaji",
+              "email": "v.balaji.eee@college.edu",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6adf7de50cd15aaebff78f21"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f76",
+              "employeeId": "DIT2117",
+              "name": "Mr. S. Karthikeyan",
+              "email": "s.karthikeyan.eee@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6adf7de50cd15aaebff78f21"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f77",
+              "employeeId": "DIT2118",
+              "name": "Ms. R. Swathi",
+              "email": "r.swathi.eee@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7de50cd15aaebff78f21"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f78",
+              "employeeId": "DIT2119",
+              "name": "Mr. M. Naveen",
+              "email": "m.naveen.eee@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7de50cd15aaebff78f21"
+            }
+          ]
+        },
+        {
+          "id": "6adf7de50cd15aaebff78f22",
+          "code": "IT",
+          "name": "Information Technology",
+          "hod": {
+            "id": "6adf7de60cd15aaebff78f79",
+            "employeeId": "DIT2120",
+            "name": "Dr. A. Revathi",
+            "email": "hod.it@college.edu",
+            "role": "HOD",
+            "designation": "Professor & Head",
+            "departmentId": "6adf7de50cd15aaebff78f22",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6adf7de60cd15aaebff78f7a",
+              "employeeId": "DIT2121",
+              "name": "Dr. C. Prabhu",
+              "email": "c.prabhu.it@college.edu",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6adf7de50cd15aaebff78f22"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f7b",
+              "employeeId": "DIT2122",
+              "name": "Ms. L. Sowmiya",
+              "email": "l.sowmiya.it@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6adf7de50cd15aaebff78f22"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f7c",
+              "employeeId": "DIT2123",
+              "name": "Mr. D. Hariharan",
+              "email": "d.hariharan.it@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7de50cd15aaebff78f22"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f7d",
+              "employeeId": "DIT2124",
+              "name": "Ms. V. Pavithra",
+              "email": "v.pavithra.it@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7de50cd15aaebff78f22"
+            }
+          ]
+        },
+        {
+          "id": "6adf7de50cd15aaebff78f20",
+          "code": "MECH",
+          "name": "Mechanical Engineering",
+          "hod": {
+            "id": "6adf7de60cd15aaebff78f6f",
+            "employeeId": "DIT2110",
+            "name": "Dr. K. Ramasamy",
+            "email": "hod.mech@college.edu",
+            "role": "HOD",
+            "designation": "Professor & Head",
+            "departmentId": "6adf7de50cd15aaebff78f20",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6adf7de60cd15aaebff78f70",
+              "employeeId": "DIT2111",
+              "name": "Dr. N. Saravanan",
+              "email": "n.saravanan.mech@college.edu",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6adf7de50cd15aaebff78f20"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f71",
+              "employeeId": "DIT2112",
+              "name": "Mr. A. Gokul",
+              "email": "a.gokul.mech@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6adf7de50cd15aaebff78f20"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f72",
+              "employeeId": "DIT2113",
+              "name": "Ms. S. Keerthana",
+              "email": "s.keerthana.mech@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7de50cd15aaebff78f20"
+            },
+            {
+              "id": "6adf7de60cd15aaebff78f73",
+              "employeeId": "DIT2114",
+              "name": "Mr. R. Dinesh Kumar",
+              "email": "r.dinesh.kumar.mech@college.edu",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6adf7de50cd15aaebff78f20"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "institution": {
+        "code": "kpriet",
+        "name": "KPR Institute of Engineering and Technology",
+        "type": "COLLEGE",
+        "city": "Coimbatore",
+        "state": "Tamil Nadu"
+      },
+      "leadership": [
+        {
+          "id": "6ac21fbcacd001a053dca986",
+          "employeeId": "EMP002",
+          "name": "Dr. M. Akila",
+          "email": "principal@kpriet.ac.in",
+          "role": "PRINCIPAL",
+          "designation": "Principal & Professor",
+          "roleLabel": "Principal"
+        },
+        {
+          "id": "6ac21fbcacd001a053dca985",
+          "employeeId": "EMP001",
+          "name": "Dr. K. Admin",
+          "email": "admin@kpriet.ac.in",
+          "role": "ADMIN",
+          "designation": "Chief Information Officer & Administrator",
+          "roleLabel": "Institution Admin"
+        },
+        {
+          "id": "6ac21fbdacd001a053dca987",
+          "employeeId": "EMP003",
+          "name": "Dr. S. Ramkumar",
+          "email": "dean.acad@kpriet.ac.in",
+          "role": "DEAN",
+          "designation": "Dean (Academic Affairs)",
+          "roleLabel": "Dean (Academic Affairs)"
+        }
+      ],
+      "departments": [
+        {
+          "id": "6addfabe7bf9b1bf3e150221",
+          "code": "AIDS",
+          "name": "Artificial Intelligence and Data Science",
+          "hod": {
+            "id": "6addfabf7bf9b1bf3e15027c",
+            "employeeId": "KPR2125",
+            "name": "Dr. S. Gayathri",
+            "email": "hod.aids@kpriet.ac.in",
+            "role": "HOD",
+            "designation": "Professor & Head",
+            "departmentId": "6addfabe7bf9b1bf3e150221",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6addfabf7bf9b1bf3e15027d",
+              "employeeId": "KPR2126",
+              "name": "Dr. R. Muthukumar",
+              "email": "r.muthukumar.aids@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6addfabe7bf9b1bf3e150221"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e15027e",
+              "employeeId": "KPR2127",
+              "name": "Ms. N. Deepika",
+              "email": "n.deepika.aids@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6addfabe7bf9b1bf3e150221"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e15027f",
+              "employeeId": "KPR2128",
+              "name": "Mr. K. Sanjay",
+              "email": "k.sanjay.aids@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6addfabe7bf9b1bf3e150221"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150280",
+              "employeeId": "KPR2129",
+              "name": "Ms. P. Abinaya",
+              "email": "p.abinaya.aids@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6addfabe7bf9b1bf3e150221"
+            }
+          ]
+        },
+        {
+          "id": "6addfabe7bf9b1bf3e150222",
+          "code": "CIVIL",
+          "name": "Civil Engineering",
+          "hod": {
+            "id": "6addfabf7bf9b1bf3e150281",
+            "employeeId": "KPR2130",
+            "name": "Dr. T. Selvaraj",
+            "email": "hod.civil@kpriet.ac.in",
+            "role": "HOD",
+            "designation": "Professor & Head",
+            "departmentId": "6addfabe7bf9b1bf3e150222",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6addfabf7bf9b1bf3e150282",
+              "employeeId": "KPR2131",
+              "name": "Dr. K. Uma Maheswari",
+              "email": "k.uma.maheswari.civil@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6addfabe7bf9b1bf3e150222"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150283",
+              "employeeId": "KPR2132",
+              "name": "Mr. B. Ashok",
+              "email": "b.ashok.civil@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6addfabe7bf9b1bf3e150222"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150284",
+              "employeeId": "KPR2133",
+              "name": "Ms. M. Ramya",
+              "email": "m.ramya.civil@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6addfabe7bf9b1bf3e150222"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150285",
+              "employeeId": "KPR2134",
+              "name": "Mr. G. Praveen",
+              "email": "g.praveen.civil@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6addfabe7bf9b1bf3e150222"
+            }
+          ]
+        },
+        {
+          "id": "6ac21fbbacd001a053dca983",
+          "code": "CSE",
+          "name": "Computer Science and Engineering",
+          "hod": {
+            "id": "6ac21fbdacd001a053dca988",
+            "employeeId": "EMP004",
+            "name": "Dr. V. Seetha",
+            "email": "hod.cse@kpriet.ac.in",
+            "role": "HOD",
+            "designation": "Professor & Head of Department",
+            "departmentId": "6ac21fbbacd001a053dca983",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6ac21fbdacd001a053dca989",
+              "employeeId": "EMP005",
+              "name": "Dr. A. Karthik",
+              "email": "faculty.cse@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6ac21fbbacd001a053dca983"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150264",
+              "employeeId": "KPR2101",
+              "name": "Dr. R. Priya",
+              "email": "r.priya.cse@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Professor",
+              "departmentId": "6ac21fbbacd001a053dca983"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150265",
+              "employeeId": "KPR2102",
+              "name": "Dr. S. Manikandan",
+              "email": "s.manikandan.cse@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6ac21fbbacd001a053dca983"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150266",
+              "employeeId": "KPR2103",
+              "name": "Ms. K. Divya",
+              "email": "k.divya.cse@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6ac21fbbacd001a053dca983"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150267",
+              "employeeId": "KPR2104",
+              "name": "Mr. P. Arun Prasath",
+              "email": "p.arun.prasath.cse@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6ac21fbbacd001a053dca983"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150268",
+              "employeeId": "KPR2105",
+              "name": "Ms. J. Nivetha",
+              "email": "j.nivetha.cse@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6ac21fbbacd001a053dca983"
+            }
+          ]
+        },
+        {
+          "id": "6ac21fbbacd001a053dca984",
+          "code": "ECE",
+          "name": "Electronics and Communication Engineering",
+          "hod": {
+            "id": "6ac2567a1fad8628e62b56cf",
+            "employeeId": "EMP009",
+            "name": "Dr. M. Senthil Kumar",
+            "email": "hod.ece@kpriet.ac.in",
+            "role": "HOD",
+            "designation": "Professor & Head of Department",
+            "departmentId": "6ac21fbbacd001a053dca984",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6ac273818d768f43537fa67b",
+              "employeeId": "KPR-ECE-TEST-01",
+              "name": "Dr. Test ECE Faculty",
+              "email": "faculty.ece.test@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "",
+              "departmentId": "6ac21fbbacd001a053dca984"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150269",
+              "employeeId": "KPR2106",
+              "name": "Dr. M. Senthil Kumar",
+              "email": "m.senthil.kumar.ece@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Professor",
+              "departmentId": "6ac21fbbacd001a053dca984"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e15026a",
+              "employeeId": "KPR2107",
+              "name": "Dr. G. Lavanya",
+              "email": "g.lavanya.ece@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6ac21fbbacd001a053dca984"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e15026b",
+              "employeeId": "KPR2108",
+              "name": "Mr. T. Vignesh",
+              "email": "t.vignesh.ece@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6ac21fbbacd001a053dca984"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e15026c",
+              "employeeId": "KPR2109",
+              "name": "Ms. B. Harini",
+              "email": "b.harini.ece@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6ac21fbbacd001a053dca984"
+            }
+          ]
+        },
+        {
+          "id": "6addfabe7bf9b1bf3e15021f",
+          "code": "EEE",
+          "name": "Electrical and Electronics Engineering",
+          "hod": {
+            "id": "6addfabf7bf9b1bf3e150272",
+            "employeeId": "KPR2115",
+            "name": "Dr. P. Meenakshi",
+            "email": "hod.eee@kpriet.ac.in",
+            "role": "HOD",
+            "designation": "Professor & Head",
+            "departmentId": "6addfabe7bf9b1bf3e15021f",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6addfabf7bf9b1bf3e150273",
+              "employeeId": "KPR2116",
+              "name": "Dr. V. Balaji",
+              "email": "v.balaji.eee@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6addfabe7bf9b1bf3e15021f"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150274",
+              "employeeId": "KPR2117",
+              "name": "Mr. S. Karthikeyan",
+              "email": "s.karthikeyan.eee@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6addfabe7bf9b1bf3e15021f"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150275",
+              "employeeId": "KPR2118",
+              "name": "Ms. R. Swathi",
+              "email": "r.swathi.eee@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6addfabe7bf9b1bf3e15021f"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150276",
+              "employeeId": "KPR2119",
+              "name": "Mr. M. Naveen",
+              "email": "m.naveen.eee@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6addfabe7bf9b1bf3e15021f"
+            }
+          ]
+        },
+        {
+          "id": "6addfabe7bf9b1bf3e150220",
+          "code": "IT",
+          "name": "Information Technology",
+          "hod": {
+            "id": "6addfabf7bf9b1bf3e150277",
+            "employeeId": "KPR2120",
+            "name": "Dr. A. Revathi",
+            "email": "hod.it@kpriet.ac.in",
+            "role": "HOD",
+            "designation": "Professor & Head",
+            "departmentId": "6addfabe7bf9b1bf3e150220",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6addfabf7bf9b1bf3e150278",
+              "employeeId": "KPR2121",
+              "name": "Dr. C. Prabhu",
+              "email": "c.prabhu.it@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6addfabe7bf9b1bf3e150220"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150279",
+              "employeeId": "KPR2122",
+              "name": "Ms. L. Sowmiya",
+              "email": "l.sowmiya.it@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6addfabe7bf9b1bf3e150220"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e15027a",
+              "employeeId": "KPR2123",
+              "name": "Mr. D. Hariharan",
+              "email": "d.hariharan.it@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6addfabe7bf9b1bf3e150220"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e15027b",
+              "employeeId": "KPR2124",
+              "name": "Ms. V. Pavithra",
+              "email": "v.pavithra.it@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6addfabe7bf9b1bf3e150220"
+            }
+          ]
+        },
+        {
+          "id": "6addfabe7bf9b1bf3e15021e",
+          "code": "MECH",
+          "name": "Mechanical Engineering",
+          "hod": {
+            "id": "6addfabf7bf9b1bf3e15026d",
+            "employeeId": "KPR2110",
+            "name": "Dr. K. Ramasamy",
+            "email": "hod.mech@kpriet.ac.in",
+            "role": "HOD",
+            "designation": "Professor & Head",
+            "departmentId": "6addfabe7bf9b1bf3e15021e",
+            "roleLabel": "Head of Department"
+          },
+          "faculty": [
+            {
+              "id": "6addfabf7bf9b1bf3e15026e",
+              "employeeId": "KPR2111",
+              "name": "Dr. N. Saravanan",
+              "email": "n.saravanan.mech@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Associate Professor",
+              "departmentId": "6addfabe7bf9b1bf3e15021e"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e15026f",
+              "employeeId": "KPR2112",
+              "name": "Mr. A. Gokul",
+              "email": "a.gokul.mech@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor (Senior Grade)",
+              "departmentId": "6addfabe7bf9b1bf3e15021e"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150270",
+              "employeeId": "KPR2113",
+              "name": "Ms. S. Keerthana",
+              "email": "s.keerthana.mech@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6addfabe7bf9b1bf3e15021e"
+            },
+            {
+              "id": "6addfabf7bf9b1bf3e150271",
+              "employeeId": "KPR2114",
+              "name": "Mr. R. Dinesh Kumar",
+              "email": "r.dinesh.kumar.mech@kpriet.ac.in",
+              "role": "FACULTY",
+              "designation": "Assistant Professor",
+              "departmentId": "6addfabe7bf9b1bf3e15021e"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "platformSuperAdmin": {
+    "email": "superadmin@facultycore.test",
+    "name": "Demo Super Admin",
+    "role": "PLATFORM_SUPER_ADMIN",
+    "roleLabel": "Platform Super Admin",
+    "designation": "Platform Operator & Super Administrator",
+    "isPlatform": true
+  }
+}

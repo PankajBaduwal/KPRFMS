@@ -63,7 +63,7 @@ export const LoginPage: React.FC = () => {
   const [demoAvailable, setDemoAvailable] = useState(true);
   useEffect(() => {
     let live = true;
-    authService.getDemoAccounts().then(() => live && setDemoAvailable(true)).catch(() => live && setDemoAvailable(false));
+    authService.getDemoAccounts().then(() => live && setDemoAvailable(true)).catch(() => live && setDemoAvailable(true));
     return () => {
       live = false;
     };

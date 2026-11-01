@@ -2,7 +2,18 @@ import axios from 'axios';
 import type { ApiErrorResponse, ApiSuccessResponse } from '../types';
 import { getInstitutionCode } from '../lib/institution';
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5055/api';
+const getDefaultApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  // When running on HTTPS in production (e.g. Vercel), fall back to deployed Render API rather than insecure localhost
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+    return 'https://facultycore-api.onrender.com/api';
+  }
+  return 'http://localhost:5055/api';
+};
+
+export const API_BASE_URL = getDefaultApiUrl();
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -142,7 +153,7 @@ apiClient.interceptors.response.use(
       success: false,
       message: isTimeout
         ? 'Request timed out. Please check your connection and try again.'
-        : 'Unable to connect to the server. Please check your internet connection.',
+        : 'Unable to reach the server. If this is a deployed cloud instance, it may take ~30 seconds to wake up from idle. Please wait a moment and try again.',
       code: isTimeout ? 'TIMEOUT_ERROR' : 'NETWORK_ERROR',
       details: [],
       status: 0,

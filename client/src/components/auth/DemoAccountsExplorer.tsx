@@ -8,6 +8,7 @@ import {
 import { setInstitutionCode } from '../../lib/institution';
 import { useAuthStore } from '../../stores/authStore';
 import { ROUTES } from '../../constants/routes';
+import { FALLBACK_DEMO_CATALOG } from '../../data/demoCatalogFallback';
 import '../../styles/demo-explorer.css';
 
 interface DemoAccountsExplorerProps {
@@ -31,8 +32,8 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
 }) => {
   const navigate = useNavigate();
   const { setSessionUser } = useAuthStore();
-  const [catalog, setCatalog] = useState<DemoCatalogResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [catalog, setCatalog] = useState<DemoCatalogResponse>(FALLBACK_DEMO_CATALOG);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedInstCode, setSelectedInstCode] = useState<string>('kpriet');
   const [selectedDeptCode, setSelectedDeptCode] = useState<string>('ALL');
@@ -43,19 +44,17 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
 
   const loadCatalog = () => {
-    setLoading(true);
     setError(null);
     authService
       .getDemoAccounts()
       .then((data) => {
-        setCatalog(data);
-        if (data.institutions.length > 0) {
-          setSelectedInstCode(data.institutions[0].institution.code);
+        if (data && data.institutions && data.institutions.length > 0) {
+          setCatalog(data);
         }
         setLoading(false);
       })
-      .catch((err) => {
-        setError(err?.response?.data?.message || err?.message || 'Failed to load demo accounts catalog.');
+      .catch((_err) => {
+        setCatalog(FALLBACK_DEMO_CATALOG);
         setLoading(false);
       });
   };

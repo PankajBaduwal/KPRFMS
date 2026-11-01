@@ -1,5 +1,6 @@
 import { apiGet, apiPost } from '../api/client';
 import type { User } from '../types';
+import { FALLBACK_DEMO_CATALOG } from '../data/demoCatalogFallback';
 
 export interface LoginCredentials {
   identifier: string;
@@ -92,8 +93,15 @@ export const authService = {
   },
 
   async getDemoAccounts(): Promise<DemoCatalogResponse> {
-    const response = await apiGet<DemoCatalogResponse>('/platform/demo/accounts');
-    return response.data;
+    try {
+      const response = await apiGet<DemoCatalogResponse>('/platform/demo/accounts');
+      if (response?.data?.institutions && response.data.institutions.length > 0) {
+        return response.data;
+      }
+    } catch (err) {
+      console.warn('[authService] Live demo catalog request failed, using bundled fallback catalog.', err);
+    }
+    return FALLBACK_DEMO_CATALOG;
   },
 
   async demoLogin(payload: { institutionCode: string; email?: string; userId?: string; role?: string }): Promise<{ user: User; institution?: { code: string }; isPlatform?: boolean }> {
