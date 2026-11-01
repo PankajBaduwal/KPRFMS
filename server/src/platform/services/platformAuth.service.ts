@@ -68,7 +68,7 @@ function cookieOptions() {
   return { ...getAuthCookieOptions(), maxAge: getSessionLifetimeMs() };
 }
 
-async function startSession(userId: string, req: Request, res: Response) {
+async function startSession(userId: string, req: Request, res: Response): Promise<{ sid: string; token: string }> {
   const sid = randomToken(24);
   await PlatformSession.create({
     sid,
@@ -80,6 +80,7 @@ async function startSession(userId: string, req: Request, res: Response) {
   const claims: PlatformClaims = { pid: userId, sid, kind: 'platform' };
   const token = jwt.sign(claims, PLATFORM_KEY(), { expiresIn: Math.floor(getSessionLifetimeMs() / 1000) });
   res.cookie(PLATFORM_COOKIE_NAME, token, cookieOptions());
+  return { sid, token };
 }
 
 export const platformAuthService = {
@@ -99,8 +100,8 @@ export const platformAuthService = {
     user.lockUntil = undefined;
     await user.save();
     await recordPlatformAudit({ action: PLATFORM_AUDIT.ADMIN_ACTIVATED, actor: { id: String(user._id), email: user.email }, ip: req.ip });
-    await startSession(String(user._id), req, res);
-    return { email: user.email, name: user.name };
+    const { token: sessionToken } = await startSession(String(user._id), req, res);
+    return { email: user.email, name: user.name, token: sessionToken };
   },
 
   async login(email: string, password: string, req: Request, res: Response) {
@@ -127,9 +128,9 @@ export const platformAuthService = {
     user.lockUntil = undefined;
     user.lastLogin = new Date();
     await user.save();
-    await startSession(String(user._id), req, res);
+    const { token } = await startSession(String(user._id), req, res);
     await recordPlatformAudit({ action: PLATFORM_AUDIT.LOGIN, actor: { id: String(user._id), email: user.email }, ip: req.ip });
-    return { email: user.email, name: user.name };
+    return { email: user.email, name: user.name, token };
   },
 
   /**
@@ -141,14 +142,14 @@ export const platformAuthService = {
     if (!user) throw AppError.notFound('The demo platform operator has not been set up.');
     user.lastLogin = new Date();
     await user.save();
-    await startSession(String(user._id), req, res);
+    const { token } = await startSession(String(user._id), req, res);
     await recordPlatformAudit({
       action: PLATFORM_AUDIT.LOGIN,
       actor: { id: String(user._id), email: user.email },
       ip: req.ip,
       details: { authMethod: 'ONE_CLICK_DEMO' },
     });
-    return { email: user.email, name: user.name };
+    return { email: user.email, name: user.name, token };
   },
 
   async logout(actor: PlatformActor | undefined, req: Request, res: Response) {
@@ -159,9 +160,12 @@ export const platformAuthService = {
     res.clearCookie(PLATFORM_COOKIE_NAME, { ...cookieOptions(), maxAge: undefined });
   },
 
-  /** Verifies a platform session cookie; throws 401 for anything else. */
+  /** Verifies a platform session cookie or Bearer token; throws 401 for anything else. */
   async authenticate(req: Request): Promise<PlatformActor> {
-    const token = req.cookies?.[PLATFORM_COOKIE_NAME];
+    let token = req.cookies?.[PLATFORM_COOKIE_NAME];
+    if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
     if (!token) throw AppError.unauthorized('Platform sign-in required.');
     let claims: PlatformClaims;
     try {

@@ -5,6 +5,7 @@ import {
   type DemoCatalogResponse,
   type DemoInstitutionItem,
 } from '../../services/auth.service';
+import { setStoredAuthToken } from '../../api/client';
 import { setInstitutionCode } from '../../lib/institution';
 import { useAuthStore } from '../../stores/authStore';
 import { ROUTES } from '../../constants/routes';
@@ -89,6 +90,9 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
         if (onClose) onClose();
         navigate(ROUTES.PORTAL);
       } else {
+        if (res.token) {
+          setStoredAuthToken(res.token);
+        }
         if (onClose) onClose();
         window.location.href = '/platform';
       }

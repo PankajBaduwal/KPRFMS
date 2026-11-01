@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Input, Alert } from '../index';
 import { platformApi } from '../../platform/api';
 import { authService } from '../../services/auth.service';
+import { setStoredAuthToken } from '../../api/client';
 import { formatErrorMessage } from '../../utils/errorHandler';
 import { PRODUCT_NAME } from '../../config/brand';
 
@@ -89,11 +90,14 @@ export const PlatformSignInForm: React.FC<PlatformSignInFormProps> = ({
     setBusy(true);
     setError(null);
     try {
-      await authService.demoLogin({
+      const res = await authService.demoLogin({
         institutionCode: 'platform',
         email: 'superadmin@facultycore.test',
         role: 'PLATFORM_SUPER_ADMIN',
       });
+      if (res?.token) {
+        setStoredAuthToken(res.token);
+      }
       queryClient.removeQueries({ queryKey: ['platform'] });
       const dest = from && from.startsWith('/platform') && !from.startsWith('/platform/login') ? from : '/platform';
       window.location.href = dest;

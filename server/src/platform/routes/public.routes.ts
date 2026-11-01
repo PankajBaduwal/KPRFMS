@@ -200,7 +200,7 @@ router.post(['/demo/login', '/login', '/demo-login'], demoOnly, authLimiter, asy
     // Platform: only the local demo operator, never a real operator account
     if (institutionCode === 'platform' || role === 'PLATFORM_SUPER_ADMIN') {
       const result = await platformAuthService.demoLogin(req, res);
-      return sendSuccess(res, { isPlatform: true, user: result }, 'Platform Super Admin signed in successfully.');
+      return sendSuccess(res, { isPlatform: true, user: result, token: result.token }, 'Platform Super Admin signed in successfully.');
     }
 
     // Institutional Demo Login

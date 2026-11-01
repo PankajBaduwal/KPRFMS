@@ -1,4 +1,4 @@
-import { apiClient } from '../api/client';
+import { apiClient, setStoredAuthToken, clearStoredAuthToken } from '../api/client';
 
 /** Platform console API (operator only; never institution-scoped). */
 
@@ -115,9 +115,27 @@ const data = <T>(p: Promise<{ data: { data: T } }>) => p.then((r) => r.data.data
 
 export const platformApi = {
   me: () => data<PlatformMe>(apiClient.get('/platform/auth/me')),
-  login: (email: string, password: string) => data<{ email: string; name: string }>(apiClient.post('/platform/auth/login', { email, password })),
-  activate: (token: string, password: string) => data<{ email: string; name: string }>(apiClient.post('/platform/auth/activate', { token, password })),
-  logout: () => apiClient.post('/platform/auth/logout'),
+  login: async (email: string, password: string) => {
+    const res = await data<{ email: string; name: string; token?: string }>(apiClient.post('/platform/auth/login', { email, password }));
+    if (res?.token) {
+      setStoredAuthToken(res.token);
+    }
+    return res;
+  },
+  activate: async (token: string, password: string) => {
+    const res = await data<{ email: string; name: string; token?: string }>(apiClient.post('/platform/auth/activate', { token, password }));
+    if (res?.token) {
+      setStoredAuthToken(res.token);
+    }
+    return res;
+  },
+  logout: async () => {
+    try {
+      await apiClient.post('/platform/auth/logout');
+    } finally {
+      clearStoredAuthToken();
+    }
+  },
   updateProfile: (code: string, body: Record<string, unknown>) =>
     data<InstitutionDetail>(apiClient.patch(`/platform/admin/institutions/${encodeURIComponent(code)}/profile`, body)),
   uploadLogo: (code: string, file: File) => {
