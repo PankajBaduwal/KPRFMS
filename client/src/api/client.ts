@@ -32,6 +32,35 @@ export const apiClient = axios.create({
 
 let inMemoryCsrfToken = '';
 
+const TOKEN_KEY = 'fms_auth_token';
+
+export const getStoredAuthToken = (): string | null => {
+  try {
+    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+};
+
+export const setStoredAuthToken = (token: string): void => {
+  try {
+    localStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(TOKEN_KEY, token);
+  } catch {
+    // ignore
+  }
+};
+
+export const clearStoredAuthToken = (): void => {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // ignore
+  }
+};
+
+
 const PRE_SIGN_IN_ROUTES = [
   '/auth/login',
   '/auth/register',
@@ -46,6 +75,11 @@ const isPreSignInRoute = (url: string) => PRE_SIGN_IN_ROUTES.some((r) => url ===
 
 // Request interceptor: route through the chosen institution, read CSRF cookie and set X-CSRF-Token header
 apiClient.interceptors.request.use((config) => {
+  // Attach portable Bearer token header if present (ensures seamless auth in cross-origin & cookie-restricted browsers)
+  const authToken = getStoredAuthToken();
+  if (authToken && !config.headers['Authorization']) {
+    config.headers['Authorization'] = `Bearer ${authToken}`;
+  }
   // Routes used before signing in (sign-in, registration, password reset, public pages) name the
   // institution in the URL. Everything else uses the plain /api path: the server takes the
   // institution from the signed session, so a stale choice in this browser can never interfere.
@@ -96,7 +130,8 @@ apiClient.interceptors.response.use(
           // Notify any session listeners if not currently logging in or checking self
           // (platform console calls manage their own separate session)
           const url = error.config?.url ?? '';
-          if (!url.startsWith('/platform/') && !url.includes('/auth/login') && !url.includes('/auth/me')) {
+          const isLoginPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/login');
+          if (!url.startsWith('/platform/') && !url.includes('/auth/login') && !url.includes('/auth/me') && !isLoginPage) {
             window.dispatchEvent(new CustomEvent('fms:session-expired'));
           }
           break;

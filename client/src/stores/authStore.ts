@@ -3,6 +3,7 @@ import type { User } from '../types';
 import { authService, isTwoFactorChallenge, type LoginCredentials, type TwoFactorChallenge } from '../services/auth.service';
 import { setInstitutionCode } from '../lib/institution';
 import { queryClient } from '../app/queryClient';
+import { clearStoredAuthToken } from '../api/client';
 
 interface AuthState {
   user: User | null;
@@ -62,6 +63,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       await authService.logout();
     } finally {
       // Nothing from this session may be shown to the next person or institution
+      clearStoredAuthToken();
       queryClient.clear();
       set({ user: null, isAuthenticated: false, isLoading: false });
     }

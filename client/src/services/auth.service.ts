@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '../api/client';
+import { apiGet, apiPost, setStoredAuthToken, clearStoredAuthToken } from '../api/client';
 import type { User } from '../types';
 import { FALLBACK_DEMO_CATALOG } from '../data/demoCatalogFallback';
 
@@ -37,7 +37,10 @@ export const isTwoFactorChallenge = (value: unknown): value is TwoFactorChalleng
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<User | TwoFactorChallenge> {
-    const response = await apiPost<User | TwoFactorChallenge>('/auth/login', credentials);
+    const response = await apiPost<(User & { token?: string }) | TwoFactorChallenge>('/auth/login', credentials);
+    if (response.data && !isTwoFactorChallenge(response.data) && (response.data as any).token) {
+      setStoredAuthToken((response.data as any).token);
+    }
     return response.data;
   },
 
@@ -65,7 +68,12 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
-    await apiPost<null>('/auth/logout');
+    clearStoredAuthToken();
+    try {
+      await apiPost<null>('/auth/logout');
+    } catch {
+      // ignore
+    }
   },
 
   async getRegistrationOptions(): Promise<RegistrationOptions> {
@@ -104,8 +112,11 @@ export const authService = {
     return FALLBACK_DEMO_CATALOG;
   },
 
-  async demoLogin(payload: { institutionCode: string; email?: string; userId?: string; role?: string }): Promise<{ user: User; institution?: { code: string }; isPlatform?: boolean }> {
-    const response = await apiPost<{ user: User; institution?: { code: string }; isPlatform?: boolean }>('/platform/demo/login', payload);
+  async demoLogin(payload: { institutionCode: string; email?: string; userId?: string; role?: string }): Promise<{ user: User; token?: string; institution?: { code: string }; isPlatform?: boolean }> {
+    const response = await apiPost<{ user: User; token?: string; institution?: { code: string }; isPlatform?: boolean }>('/platform/demo/login', payload);
+    if (response.data?.token) {
+      setStoredAuthToken(response.data.token);
+    }
     return response.data;
   },
 };

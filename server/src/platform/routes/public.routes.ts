@@ -232,8 +232,8 @@ router.post(['/demo/login', '/login', '/demo-login'], demoOnly, authLimiter, asy
       user.lastLogin = new Date();
       await user.save();
 
-      // Issue real HTTP-only session cookie
-      await sessionService.start(user, req, res);
+      // Issue real HTTP-only session cookie and generate portable Bearer token
+      const { token } = await sessionService.start(user, req, res);
 
       await recordAudit({
         userId: user._id,
@@ -243,23 +243,27 @@ router.post(['/demo/login', '/login', '/demo-login'], demoOnly, authLimiter, asy
       });
 
       return {
-        id: user._id.toString(),
-        employeeId: user.employeeId,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        departmentId: user.departmentId?.toString(),
-        designation: user.designation,
-        status: user.status,
-        isDemo: true,
-        lastLogin: user.lastLogin,
+        user: {
+          id: user._id.toString(),
+          employeeId: user.employeeId,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          departmentId: user.departmentId?.toString(),
+          designation: user.designation,
+          status: user.status,
+          isDemo: true,
+          lastLogin: user.lastLogin,
+        },
+        token,
       };
     });
 
     sendSuccess(
       res,
       {
-        user: result,
+        user: result.user,
+        token: result.token,
         institution: { code: tenant.code },
       },
       'Demonstration session established successfully.'

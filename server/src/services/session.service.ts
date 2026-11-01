@@ -37,7 +37,7 @@ export function describeUserAgent(ua?: string): string {
 
 export const sessionService = {
   /** Records a new signed-in device and sets the session cookie. */
-  async start(user: SessionUser, req: Request, res: Response): Promise<string> {
+  async start(user: SessionUser, req: Request, res: Response): Promise<{ sid: string; token: string }> {
     const sid = randomToken(18);
     await Session.create({
       sid,
@@ -47,12 +47,13 @@ export const sessionService = {
       lastSeenAt: new Date(),
       expiresAt: new Date(Date.now() + getSessionLifetimeMs()),
     });
+    const token = generateToken({ id: user._id.toString(), email: user.email, role: user.role, departmentId: user.departmentId?.toString(), sid });
     res.cookie(
       AUTH_COOKIE_NAME,
-      generateToken({ id: user._id.toString(), email: user.email, role: user.role, departmentId: user.departmentId?.toString(), sid }),
+      token,
       getAuthCookieOptions()
     );
-    return sid;
+    return { sid, token };
   },
 
   async revoke(sid: string): Promise<void> {

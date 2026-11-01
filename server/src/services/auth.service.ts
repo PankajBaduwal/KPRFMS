@@ -197,7 +197,7 @@ export class AuthService {
     await user.save();
 
     // Issue JWT inside secure HTTP-only cookie, tied to a tracked session
-    await sessionService.start(user, req, res);
+    const { token } = await sessionService.start(user, req, res);
 
     await recordAudit({
       userId: user._id,
@@ -206,7 +206,10 @@ export class AuthService {
       details: { role: user.role, employeeId: user.employeeId, ...details },
     });
 
-    return sessionUserView(user);
+    return {
+      ...sessionUserView(user),
+      token,
+    };
   }
 
   /** Second login step for accounts with two-factor authentication: authenticator or recovery code. */

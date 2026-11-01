@@ -16,8 +16,14 @@ const AppContent: React.FC = () => {
   }, [initAuth]);
 
   useEffect(() => {
+    let lastToastTime = 0;
     const handleSessionExpired = () => {
-      addToast('Your session has expired. Please sign in again.', 'warning');
+      const now = Date.now();
+      // Debounce: prevent multiple duplicate toasts when parallel requests fail
+      if (now - lastToastTime > 6000) {
+        lastToastTime = now;
+        addToast('Your session has expired. Please sign in again.', 'warning');
+      }
       logout();
     };
 
