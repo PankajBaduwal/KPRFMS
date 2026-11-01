@@ -2,9 +2,14 @@ import axios from 'axios';
 import type { ApiErrorResponse, ApiSuccessResponse } from '../types';
 import { getInstitutionCode } from '../lib/institution';
 
+const ensureApiSuffix = (url: string) => {
+  const clean = url.trim().replace(/\/+$/, '');
+  return clean.endsWith('/api') ? clean : `${clean}/api`;
+};
+
 const getDefaultApiUrl = () => {
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+    return ensureApiSuffix(import.meta.env.VITE_API_URL);
   }
   // When running on HTTPS in production (e.g. Vercel), fall back to deployed Render API rather than insecure localhost
   if (typeof window !== 'undefined' && window.location.protocol === 'https:') {

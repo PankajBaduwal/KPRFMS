@@ -129,11 +129,18 @@ app.use('/uploads', requireAuth, async (req, res, next) => {
 });
 
 // 10. API Routes
-// Platform routes (institution finder) run outside any institution
 // Platform console (operator) sign-in and administration: separate session, no institution
 app.use('/api/platform/auth', platformAuthRoutes);
 app.use('/api/platform/admin', platformAdminRoutes);
+
+// Demonstration & public platform routes (mounted universally so tenant prefixes or direct URLs never 404)
 app.use('/api/platform', platformPublicRoutes);
+app.use('/platform', platformPublicRoutes);
+app.use('/api/demo', platformPublicRoutes);
+app.use('/demo', platformPublicRoutes);
+app.use('/api/t/:slug/platform', platformPublicRoutes);
+app.use('/api/t/:slug/demo', platformPublicRoutes);
+
 // Institution-scoped entry: /api/t/<code>/... resolves the institution from the registry first.
 // Signed-in requests may also use /api/...: their institution comes from the session token.
 app.use('/api/t/:slug', resolveSlugTenant, routes);

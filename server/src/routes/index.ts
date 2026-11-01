@@ -1,3 +1,4 @@
+import platformPublicRoutes from '../platform/routes/public.routes.js';
 import publicRoutes from './public.routes.js';
 import assignmentRoutes from './assignment.routes.js';
 import fundingRoutes from './funding.routes.js';
@@ -44,6 +45,8 @@ import dashboardRoutes from './dashboard.routes.js';
 
 const router = Router();
 
+router.use('/platform', platformPublicRoutes);
+router.use('/demo', platformPublicRoutes);
 router.use('/dashboard', dashboardRoutes);
 
 router.use('/health', healthRoutes);

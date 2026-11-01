@@ -13,7 +13,7 @@ import '../../styles/demo-explorer.css';
 
 interface DemoAccountsExplorerProps {
   onClose?: () => void;
-  onFillCredentials?: (email: string, role: string) => void;
+  onFillCredentials?: (email: string, role: string, instCode?: string) => void;
   isModal?: boolean;
 }
 
@@ -362,7 +362,7 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
                           <button
                             type="button"
                             className="demo-btn demo-btn-secondary"
-                            onClick={() => onFillCredentials(leader.email, leader.role)}
+                            onClick={() => onFillCredentials(leader.email, leader.role, currentInst.institution.code)}
                           >
                             Fill Form
                           </button>
@@ -532,7 +532,7 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
                                   <button
                                     type="button"
                                     className="demo-btn demo-btn-secondary"
-                                    onClick={() => onFillCredentials(dept.hod!.email, 'HOD')}
+                                    onClick={() => onFillCredentials(dept.hod!.email, 'HOD', currentInst.institution.code)}
                                   >
                                     Fill Form
                                   </button>
@@ -596,7 +596,7 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
                                   <button
                                     type="button"
                                     className="demo-btn demo-btn-secondary"
-                                    onClick={() => onFillCredentials(faculty.email, 'FACULTY')}
+                                    onClick={() => onFillCredentials(faculty.email, 'FACULTY', currentInst.institution.code)}
                                   >
                                     Fill Form
                                   </button>

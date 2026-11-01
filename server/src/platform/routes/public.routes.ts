@@ -61,7 +61,7 @@ router.get('/institutions', async (req, res, next) => {
  * Returns only explicitly tagged demo users (isDemo: true), organized by institutional
  * leadership and department rosters.
  */
-router.get('/demo/accounts', demoOnly, async (_req, res, next) => {
+router.get(['/demo/accounts', '/accounts'], demoOnly, async (_req, res, next) => {
   try {
     const institutions = await Institution.find({ status: 'ACTIVE' })
       .select('code name type city state')
@@ -188,9 +188,11 @@ router.get('/demo/accounts', demoOnly, async (_req, res, next) => {
  * executes real authentication within the tenant context, creates a tracked session, and sets
  * the official session cookies.
  */
-router.post('/demo/login', demoOnly, authLimiter, async (req, res, next) => {
+router.post(['/demo/login', '/login', '/demo-login'], demoOnly, authLimiter, async (req, res, next) => {
   try {
-    const { institutionCode, email, userId, role } = req.body;
+    const rawInst = req.body?.institutionCode || (req.params as any)?.slug || (req as any)?.tenant?.code || '';
+    const institutionCode = String(rawInst).trim().toLowerCase();
+    const { email, userId, role } = req.body || {};
     if (!institutionCode) {
       throw AppError.badRequest('Institution code is required.');
     }

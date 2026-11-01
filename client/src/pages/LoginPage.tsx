@@ -12,7 +12,7 @@ import '../styles/login.css';
 import { PRODUCT_NAME, PRODUCT_TAGLINE, PRODUCT_MARK, PORTAL_NAME } from '../config/brand';
 import { AccountTypeSwitch, PlatformSignInForm, type AccountType } from '../components/auth/PlatformSignIn';
 import { InstitutionPicker } from '../components/InstitutionPicker';
-import { institutionStorageKey, useInstitutionCode } from '../lib/institution';
+import { institutionStorageKey, useInstitutionCode, setInstitutionCode } from '../lib/institution';
 import { useInstitution } from '../hooks/useInstitution';
 import { DemoAccountsExplorer } from '../components/auth/DemoAccountsExplorer';
 
@@ -630,7 +630,7 @@ export const LoginPage: React.FC = () => {
             <DemoAccountsExplorer
               isModal
               onClose={() => setShowDemoModal(false)}
-              onFillCredentials={(email, role) => {
+              onFillCredentials={(email, role, instCode) => {
                 if (role === 'PLATFORM_SUPER_ADMIN') {
                   setAccountType('platform');
                   setPlatformEmail(email);
@@ -638,6 +638,9 @@ export const LoginPage: React.FC = () => {
                   setShowDemoModal(false);
                 } else {
                   setAccountType('institution');
+                  if (instCode) {
+                    setInstitutionCode(instCode);
+                  }
                   setValue('identifier', email);
                   const defaultPass: Record<string, string> = {
                     ADMIN: 'Admin@12345',
