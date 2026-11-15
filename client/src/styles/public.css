@@ -546,7 +546,7 @@
 
 .pub-footer-grid {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
   gap: 32px;
   padding-bottom: 32px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -1556,3 +1556,9 @@
 /* The band clips its overflow (light sweep), so the curve cannot overlap the seam above it; paint the
    top rows in the colour above instead, so no navy hairline shows at fractional pixel positions */
 .pub-home .pub-cta { background: linear-gradient(var(--curve-from) 0 2px, #142B4A 2px); }
+
+/* Footer on tablets: brand on its own row, then the three link columns */
+@media (max-width: 860px) and (min-width: 721px) {
+  .pub-footer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pub-footer-grid > :first-child { grid-column: 1 / -1; }
+}

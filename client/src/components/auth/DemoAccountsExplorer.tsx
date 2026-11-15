@@ -15,6 +15,10 @@ interface DemoAccountsExplorerProps {
   onClose?: () => void;
   onFillCredentials?: (email: string, role: string, instCode?: string) => void;
   isModal?: boolean;
+  /** Institution tab to open on (e.g. from a home-page link); ignored if it is not in the catalog */
+  initialInstCode?: string | null;
+  /** Role to focus on: HOD or FACULTY set the list filter; leadership roles are listed at the top already */
+  initialRole?: string | null;
 }
 
 const DEFAULT_PASSWORDS: Record<string, string> = {
@@ -29,15 +33,20 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
   onClose,
   onFillCredentials,
   isModal = false,
+  initialInstCode = null,
+  initialRole = null,
 }) => {
   const navigate = useNavigate();
   const { setSessionUser } = useAuthStore();
   const [catalog, setCatalog] = useState<DemoCatalogResponse>({ institutions: [], platformSuperAdmin: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedInstCode, setSelectedInstCode] = useState<string>('kpriet');
+  const [selectedInstCode, setSelectedInstCode] = useState<string>(initialInstCode?.toLowerCase() || 'kpriet');
   const [selectedDeptCode, setSelectedDeptCode] = useState<string>('ALL');
-  const [selectedRoleFilter, setSelectedRoleFilter] = useState<string>('ALL');
+  const [selectedRoleFilter, setSelectedRoleFilter] = useState<string>(() => {
+    const role = initialRole?.toUpperCase();
+    return role === 'HOD' || role === 'FACULTY' ? role : 'ALL';
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [authenticatingEmail, setAuthenticatingEmail] = useState<string | null>(null);
   const [expandedDepts, setExpandedDepts] = useState<Record<string, boolean>>({});
@@ -51,6 +60,12 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
       .then((data) => {
         if (data && data.institutions && data.institutions.length > 0) {
           setCatalog(data);
+          // Fall back to the first institution when the requested one is not in the catalog
+          setSelectedInstCode((code) =>
+            code === 'platform' || data.institutions.some((i) => i.institution.code === code)
+              ? code
+              : data.institutions[0].institution.code
+          );
         }
         setLoading(false);
       })

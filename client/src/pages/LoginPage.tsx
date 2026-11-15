@@ -639,6 +639,8 @@ export const LoginPage: React.FC = () => {
           <div className="demo-modal-container" onClick={(e) => e.stopPropagation()}>
             <DemoAccountsExplorer
               isModal
+              initialInstCode={searchParams.get('inst')}
+              initialRole={searchParams.get('role')}
               onClose={() => setShowDemoModal(false)}
               onFillCredentials={(email, role, instCode) => {
                 if (role === 'PLATFORM_SUPER_ADMIN') {
