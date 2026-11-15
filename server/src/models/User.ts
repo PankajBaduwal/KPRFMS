@@ -32,6 +32,10 @@ export interface IUser extends Document {
   /** When the latest "set your password" invitation was emailed */
   invitedAt?: Date;
   passwordChangedAt?: Date;
+  /** Signed in with an emailed one-time password: must choose their own before using the app */
+  mustChangePassword?: boolean;
+  /** When that one-time password stops working */
+  oneTimePasswordExpiresAt?: Date;
   /** Set for self-registrations: the address must be confirmed with an emailed code before approval */
   emailVerificationRequired?: boolean;
   emailVerifiedAt?: Date;
@@ -139,6 +143,8 @@ const userSchema = new Schema<IUser>(
     passwordChangedAt: {
       type: Date,
     },
+    mustChangePassword: { type: Boolean, default: false },
+    oneTimePasswordExpiresAt: { type: Date },
     emailVerificationRequired: { type: Boolean },
     emailVerifiedAt: { type: Date },
     emailVerification: {

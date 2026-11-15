@@ -1,4 +1,4 @@
-import { apiGet, apiPost, setStoredAuthToken, clearStoredAuthToken } from '../api/client';
+import { apiGet, apiPost, setStoredAuthToken, clearStoredAuthToken, getStoredAuthToken } from '../api/client';
 import type { User } from '../types';
 
 export interface LoginCredentials {
@@ -91,7 +91,9 @@ export const authService = {
   },
 
   async changePassword(payload: { currentPassword: string; newPassword: string }): Promise<void> {
-    await apiPost<{ message: string }>('/auth/change-password', payload);
+    const res = await apiPost<{ message: string; token?: string }>('/auth/change-password', payload);
+    // Changing the password ends older sessions; keep this one by storing its re-issued token
+    if (res.data?.token && getStoredAuthToken()) setStoredAuthToken(res.data.token);
   },
 
   async getMe(): Promise<User> {

@@ -17,6 +17,8 @@ import { env } from '../../config/env.js';
 import { mailService } from '../../services/mail.service.js';
 import { dumpDatabase, listBackups, verifyBackup, BACKUP_ROOT } from '../../services/backup.service.js';
 import { AppError } from '../../utils/AppError.js';
+import { hashPassword } from '../../utils/password.js';
+import { randomToken } from '../../utils/secureToken.js';
 
 /**
  * Platform operations for the Super Admin console: overview, tenant databases, health, platform
@@ -40,6 +42,9 @@ const AUDIT_LABEL: Record<string, string> = {
   [PLATFORM_AUDIT.INSTITUTION_STATUS_CHANGED]: 'Institution status changed',
   [PLATFORM_AUDIT.INVITATION_REISSUED]: 'Invitation re-sent',
   [PLATFORM_AUDIT.ACCOUNTS_IMPORTED]: 'Accounts imported',
+  [PLATFORM_AUDIT.PERSON_INVITED]: 'Person invited',
+  [PLATFORM_AUDIT.PERSON_ENROLLED]: 'Person enrolled',
+  [PLATFORM_AUDIT.INVITATIONS_SENT]: 'Invitations sent',
   [PLATFORM_AUDIT.INSTITUTION_PROFILE_UPDATED]: 'Institution details updated',
   [PLATFORM_AUDIT.INSTITUTION_LOGO_UPDATED]: 'Institution logo updated',
   [PLATFORM_AUDIT.ADMIN_BOOTSTRAPPED]: 'Platform administrator invited',
@@ -368,13 +373,14 @@ export const platformOpsService = {
     for (const inst of institutions) {
       try {
         const users = await runInTenant(ctx(inst), () =>
-          User.find({ $or: [{ lastLogin: { $exists: false } }, { lastLogin: null }] }).select('name email role status createdAt +passwordReset').sort({ createdAt: -1 }).lean()
+          User.find({ $or: [{ lastLogin: { $exists: false } }, { lastLogin: null }, { mustChangePassword: true }] }).select('name email role status createdAt invitedAt oneTimePasswordExpiresAt +passwordReset').sort({ createdAt: -1 }).lean()
         );
         for (const u of users as any[]) {
-          const exp: Date | undefined = u.passwordReset?.expiresAt;
+          // Invitations email a one-time password; older ones were a set-password link
+          const exp: Date | undefined = u.oneTimePasswordExpiresAt ?? u.passwordReset?.expiresAt;
           const status = !exp ? 'NOT_SENT' : exp > now ? 'PENDING' : 'EXPIRED';
           if (q.status && q.status !== status) continue;
-          out.push({ institutionCode: inst.code, institutionName: inst.name, name: u.name, email: u.email, role: u.role, accountStatus: u.status, invitedAt: u.createdAt, expiresAt: exp ?? null, status });
+          out.push({ institutionCode: inst.code, institutionName: inst.name, name: u.name, email: u.email, role: u.role, accountStatus: u.status, invitedAt: u.invitedAt ?? null, expiresAt: exp ?? null, status });
         }
       } catch {
         out.push({ institutionCode: inst.code, institutionName: inst.name, error: 'Database unreachable' });
@@ -388,7 +394,19 @@ export const platformOpsService = {
     const inst = await Institution.findOne({ code: String(code).toLowerCase() }).lean();
     if (!inst) throw AppError.notFound('Institution not found.');
     const normalized = String(email).trim().toLowerCase();
-    const res = await runInTenant(ctx(inst), () => User.updateOne({ email: normalized, $or: [{ lastLogin: { $exists: false } }, { lastLogin: null }], passwordReset: { $exists: true } }, { $unset: { passwordReset: 1 } }));
+    // Both kinds of invitation stop working: the emailed one-time password and any set-password link
+    const res = await runInTenant(ctx(inst), async () =>
+      User.updateOne(
+        {
+          email: normalized,
+          $and: [
+            { $or: [{ lastLogin: { $exists: false } }, { lastLogin: null }, { mustChangePassword: true }] },
+            { $or: [{ passwordReset: { $exists: true } }, { oneTimePasswordExpiresAt: { $gt: new Date() } }] },
+          ],
+        },
+        { $set: { passwordHash: await hashPassword(randomToken()), oneTimePasswordExpiresAt: new Date() }, $unset: { passwordReset: 1 } }
+      )
+    );
     if (!res.modifiedCount) throw AppError.notFound('No outstanding invitation for that email (the person may have already signed in).');
     await recordPlatformAudit({ action: 'INVITATION_REVOKED', actor, institutionCode: inst.code, ip, details: { email: normalized } });
     return { email: normalized, revoked: true };

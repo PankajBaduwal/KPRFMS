@@ -244,6 +244,69 @@ router.post(
   })
 );
 
+/** Departments, allowed email domains, roles and designations for the "invite one person" form. */
+router.get(
+  '/institutions/:code/people/options',
+  wrap(async (req) => ({ data: await inInstitution(String(req.params.code), () => facultyImportService.formOptions()), message: 'Form options.' }))
+);
+
+const invitePersonSchema = z.object({
+  employeeId: z.string().trim().min(1).max(20),
+  name: z.string().trim().min(3).max(120),
+  email: z.string().trim().toLowerCase().email().max(200),
+  department: z.string().trim().min(1).max(80),
+  designation: z.string().trim().max(80).default(''),
+  phone: z.string().trim().max(20).default(''),
+  role: z.enum(['FACULTY', 'HOD', 'DEAN', 'PRINCIPAL', 'ADMIN']).default('FACULTY'),
+});
+
+/**
+ * Enrolls one person in an institution. It runs through the bulk import's own rules (unique email
+ * and employee ID, college email domain, department, one HOD per department, one Principal). No
+ * email goes out unless `sendInvitation` is true: the usual flow is enroll first, then send the
+ * invitation (one-time password) from the follow-up step or the Invitations page.
+ */
+router.post(
+  '/institutions/:code/people',
+  wrap(async (req) => {
+    const person = invitePersonSchema.parse(req.body);
+    const sendInvitation = z.object({ sendInvitation: z.boolean().default(false) }).parse(req.body).sendInvitation;
+    const code = String(req.params.code).toLowerCase();
+    const options = { mode: 'create' as const, sendInvitations: sendInvitation };
+    const result = await inInstitution(code, async () => {
+      const buffer = await facultyImportService.buildSingleRow(person);
+      const plan = await facultyImportService.plan(buffer, 'enroll.xlsx', options);
+      const row = plan.rows[0];
+      if (!row || row.action === 'ERROR') throw AppError.badRequest(row?.errors.join('. ') || 'The details could not be checked.');
+      const { job } = await facultyImportService.start(buffer, 'enroll.xlsx', options, importActor(req), req, true);
+      if (job.status !== 'DONE' || job.created !== 1) {
+        const failure = job.results.find((r) => r.outcome === 'FAILED')?.message ?? job.error;
+        throw AppError.badRequest(failure || 'The account could not be created.');
+      }
+      return { email: row.email, name: row.name, role: row.role, department: row.departmentCode ?? row.department, emailed: job.emailed === 1 };
+    });
+    await recordPlatformAudit({
+      action: sendInvitation ? PLATFORM_AUDIT.PERSON_INVITED : PLATFORM_AUDIT.PERSON_ENROLLED,
+      actor: actorOf(req),
+      institutionCode: code,
+      ip: req.ip,
+      details: { email: result.email, role: result.role, department: result.department, emailed: result.emailed },
+    });
+    const message = !sendInvitation ? 'Person enrolled. No invitation sent yet.' : result.emailed ? 'Invitation sent.' : 'Account created, but the invitation email could not be sent.';
+    return { data: result, message, status: 201 };
+  })
+);
+
+/** Emails invitations (each with a new one-time password) to people already enrolled who have not chosen their own password. */
+router.post(
+  '/institutions/:code/invitations/send',
+  wrap(async (req) => {
+    const { emails } = z.object({ emails: z.array(z.string().trim().toLowerCase().email()).min(1).max(1000) }).parse(req.body);
+    const result = await platformAdminService.sendInvitations(String(req.params.code), emails, actorOf(req), req.ip);
+    return { data: result, message: `${result.sent.length} invitation(s) sent.` };
+  })
+);
+
 router.get(
   '/institutions/:code/import/jobs/:jobId',
   wrap(async (req) => ({ data: await inInstitution(String(req.params.code), () => facultyImportService.job(String(req.params.jobId))), message: 'Import progress.' }))

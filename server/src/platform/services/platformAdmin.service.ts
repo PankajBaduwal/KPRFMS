@@ -44,14 +44,16 @@ export async function usageFor(inst: Pick<IInstitution, 'code' | '_id'>): Promis
   try {
     return await runInTenant({ code: inst.code, dbName: tenantDbName(inst.code), institutionId: String(inst._id) }, async () => {
       const now = new Date();
-      const neverSignedIn = { $or: [{ lastLogin: { $exists: false } }, { lastLogin: null }] };
+      // Not yet using the account with their own password
+      const awaiting = { $or: [{ lastLogin: { $exists: false } }, { lastLogin: null }, { mustChangePassword: true }] };
       const [users, activeUsers, faculty, departments, pendingInvitations, expiredInvitations, adminSignedIn, activeAdmins, latest] = await Promise.all([
         User.countDocuments({}),
         User.countDocuments({ status: 'ACTIVE' }),
         Faculty.countDocuments({}),
         Department.countDocuments({ isActive: true }),
-        User.countDocuments({ ...neverSignedIn, 'passwordReset.expiresAt': { $gt: now } }),
-        User.countDocuments({ ...neverSignedIn, 'passwordReset.expiresAt': { $lte: now } }),
+        // Invitations email a one-time password (older ones were a set-password link)
+        User.countDocuments({ $and: [awaiting, { $or: [{ oneTimePasswordExpiresAt: { $gt: now } }, { 'passwordReset.expiresAt': { $gt: now } }] }] }),
+        User.countDocuments({ $and: [awaiting, { $or: [{ oneTimePasswordExpiresAt: { $lte: now } }, { oneTimePasswordExpiresAt: { $exists: false }, 'passwordReset.expiresAt': { $lte: now } }] }] }),
         User.exists({ role: 'ADMIN', lastLogin: { $exists: true, $ne: null } }),
         User.countDocuments({ role: 'ADMIN', status: 'ACTIVE' }),
         User.findOne({ lastLogin: { $ne: null } }).sort({ lastLogin: -1 }).select('lastLogin').lean(),
@@ -245,15 +247,42 @@ export const platformAdminService = {
     if (inst.status !== 'ACTIVE') throw AppError.badRequest('Invitations can only be sent for an active institution.');
     const normalized = String(email).trim().toLowerCase();
     const result = await runInTenant({ code: inst.code, dbName: tenantDbName(inst.code), institutionId: String(inst._id) }, async () => {
-      const user = await User.findOne({ email: normalized }).select('name email employeeId lastLogin status').lean();
+      const user = await User.findOne({ email: normalized }).select('name email employeeId lastLogin status mustChangePassword').lean();
       if (!user) throw AppError.notFound('No account with that email in this institution.');
-      if (user.lastLogin) throw AppError.conflict('This person has already signed in; they can use “Forgot password” instead.');
+      // Someone still on their one-time password can get a new one; anyone who chose their own uses “Forgot password”
+      if (user.lastLogin && !user.mustChangePassword) throw AppError.conflict('This person has already set their own password; they can use “Forgot password” instead.');
       if (user.status !== 'ACTIVE') throw AppError.badRequest(`The account is ${user.status.toLowerCase()}.`);
       return sendWelcomeEmail(user);
     });
     if (!result) throw AppError.internal('The invitation email could not be sent.');
     await recordPlatformAudit({ action: PLATFORM_AUDIT.INVITATION_REISSUED, actor, institutionCode: inst.code, ip, details: { email: normalized } });
     return { email: normalized, sent: true };
+  },
+
+  /** Sends invitations to several enrolled people at once; each one is checked like a single resend. */
+  async sendInvitations(code: string, emails: string[], actor: Actor, ip?: string) {
+    const inst = await Institution.findOne({ code: String(code).toLowerCase() }).lean();
+    if (!inst) throw AppError.notFound('Institution not found.');
+    if (inst.status !== 'ACTIVE') throw AppError.badRequest('Invitations can only be sent for an active institution.');
+    const unique = [...new Set(emails.map((e) => String(e).trim().toLowerCase()))];
+    const sent: string[] = [];
+    const failed: Array<{ email: string; reason: string }> = [];
+    await runInTenant({ code: inst.code, dbName: tenantDbName(inst.code), institutionId: String(inst._id) }, async () => {
+      const users = await User.find({ email: { $in: unique } }).select('name email employeeId role lastLogin status mustChangePassword').lean();
+      const byEmail = new Map(users.map((u) => [u.email, u]));
+      for (const email of unique) {
+        const user = byEmail.get(email);
+        if (!user) failed.push({ email, reason: 'No account with that email in this institution.' });
+        else if (user.lastLogin && !user.mustChangePassword) failed.push({ email, reason: 'Already set their own password.' });
+        else if (user.status !== 'ACTIVE') failed.push({ email, reason: `The account is ${user.status.toLowerCase()}.` });
+        else if (await sendWelcomeEmail(user)) sent.push(email);
+        else failed.push({ email, reason: 'The email could not be sent.' });
+      }
+    });
+    if (sent.length > 0) {
+      await recordPlatformAudit({ action: PLATFORM_AUDIT.INVITATIONS_SENT, actor, institutionCode: inst.code, ip, details: { sent: sent.length, failed: failed.length, emails: sent.slice(0, 50) } });
+    }
+    return { sent, failed };
   },
 
   async audit(params: { page: number; limit: number; institution?: string }) {

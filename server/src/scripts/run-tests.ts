@@ -214,6 +214,7 @@ async function main() {
       results.push({ name: suite, ok, reason: failedLine?.trim() || (ok ? undefined : `exit code ${code}`), durationMs });
       const secs = (durationMs / 1000).toFixed(1);
       console.log(ok ? `✓ passed (${secs}s)` : `✗ FAILED (${secs}s)\n    ${results[results.length - 1].reason}`);
+      if (!ok && process.env.TEST_VERBOSE) console.log(output.slice(-4000));
       if (apiExited) {
         console.log(`\n${apiExited}\n(full log: ${API_LOG})`);
         break;

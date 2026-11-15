@@ -5,6 +5,7 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import { formatErrorMessage } from '../utils/errorHandler';
 import { STATUS_LABEL, type InstitutionStatus } from './api';
 import { controlApi, fmt, bytes, when, ago, type ActivityItem } from './controlApi';
+import { BulkEnrollDialog, EnrollPersonDialog } from './PlatformInvitePeople';
 
 /** Super Admin control centre pages. Every figure comes from the platform registry or an institution's own database. */
 
@@ -474,6 +475,7 @@ export const PlatformUsersPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [inviteDialog, setInviteDialog] = useState<'one' | 'bulk' | null>(null);
   const accounts = useQuery({ queryKey: ['platform', 'accounts'], queryFn: controlApi.platformUsers, enabled: tab === 'platform' });
   const admins = useQuery({ queryKey: ['platform', 'inst-admins', institution, role], queryFn: () => controlApi.institutionAdmins({ institution: institution || undefined, role: role || undefined }), enabled: tab === 'institution' });
   const done = (text: string) => {
@@ -579,6 +581,23 @@ export const PlatformUsersPage: React.FC = () => {
           </section>
         </>
       ) : (
+        <>
+        <section className="pc-card pc-invite-card">
+          <div>
+            <h2>Enroll people in an institution</h2>
+            <p className="pc-muted pc-small">First enroll people (one at a time or from a spreadsheet), choosing the college and the role: Faculty, Head of Department, Dean, Principal or Institution Admin. Then send the invitation: each person gets a one-time password and a sign-in link, and chooses their own password after signing in. The college’s rules apply: official email domain, one Head per department, one Principal.</p>
+          </div>
+          <div className="pc-actions">
+            <button type="button" className="pc-btn" onClick={() => setInviteDialog('bulk')}>
+              <i className="bi bi-file-earmark-spreadsheet" aria-hidden="true" /> Bulk enroll (spreadsheet)
+            </button>
+            <button type="button" className="pc-btn pc-btn-primary" onClick={() => setInviteDialog('one')}>
+              <i className="bi bi-person-plus" aria-hidden="true" /> Enroll one person
+            </button>
+          </div>
+        </section>
+        <EnrollPersonDialog open={inviteDialog === 'one'} initialCode={institution} onClose={() => setInviteDialog(null)} onDone={done} />
+        <BulkEnrollDialog open={inviteDialog === 'bulk'} initialCode={institution} onClose={() => setInviteDialog(null)} onDone={done} />
         <section className="pc-card">
           <div className="pc-filters">
             <input placeholder="Institution code (all if empty)" value={institution} onChange={(e) => setInstitution(e.target.value.trim().toLowerCase())} aria-label="Institution" />
@@ -635,7 +654,7 @@ export const PlatformUsersPage: React.FC = () => {
                         <td>
                           {!a.lastLogin && a.status === 'ACTIVE' && (
                             <button type="button" className="pc-link" disabled={resend.isPending} onClick={() => resend.mutate({ code: a.institutionCode, email: a.email! })}>
-                              Resend invitation
+                              Send invitation
                             </button>
                           )}
                         </td>
@@ -648,6 +667,7 @@ export const PlatformUsersPage: React.FC = () => {
           )}
           <p className="pc-note pc-muted pc-small">Roles and departments of institutional accounts are changed by the institution’s own administrator, not from the platform.</p>
         </section>
+        </>
       )}
     </div>
   );
@@ -672,12 +692,32 @@ export const PlatformInvitationsPage: React.FC = () => {
     queryClient.invalidateQueries({ queryKey: ['platform'] });
   };
   const onError = (err: unknown) => setMessage({ ok: false, text: formatErrorMessage(err, 'The action failed.') });
-  const resend = useMutation({ mutationFn: (v: { code: string; email: string }) => import('./api').then(({ platformApi }) => platformApi.reissue(v.code, v.email)), onSuccess: () => after('A new activation link was sent.'), onError });
+  const resend = useMutation({ mutationFn: (v: { code: string; email: string }) => import('./api').then(({ platformApi }) => platformApi.reissue(v.code, v.email)), onSuccess: () => after('Invitation emailed with a new one-time password; any earlier one no longer works.'), onError });
   const revoke = useMutation({ mutationFn: (v: { code: string; email: string }) => controlApi.revokeInvitation(v.code, v.email), onSuccess: () => after('Invitation revoked; the old link no longer works.'), onError });
-  const LABEL = { PENDING: 'Pending', EXPIRED: 'Expired', NOT_SENT: 'No active link' } as const;
+  const LABEL = { PENDING: 'Pending', EXPIRED: 'Expired', NOT_SENT: 'Not invited yet' } as const;
+  const notInvited = (q.data ?? []).filter((r) => !r.error && r.status === 'NOT_SENT' && r.accountStatus === 'ACTIVE');
+  const sendAll = useMutation({
+    mutationFn: async () => {
+      const byInstitution = new Map<string, string[]>();
+      for (const r of notInvited) byInstitution.set(r.institutionCode, [...(byInstitution.get(r.institutionCode) ?? []), r.email!]);
+      const { platformApi } = await import('./api');
+      let sent = 0;
+      let failed = 0;
+      for (const [code, emails] of byInstitution) {
+        for (let i = 0; i < emails.length; i += 1000) {
+          const res = await platformApi.sendInvitations(code, emails.slice(i, i + 1000));
+          sent += res.sent.length;
+          failed += res.failed.length;
+        }
+      }
+      return { sent, failed };
+    },
+    onSuccess: (r) => after(`${r.sent} invitation(s) sent${r.failed ? `; ${r.failed} could not be sent` : ''}.`),
+    onError,
+  });
   return (
     <div className="pc-page">
-      <Head title="Invitations" intro="Accounts that have never signed in. Pending links still work; expired ones need a new invitation. Links themselves are never shown." />
+      <Head title="Invitations" intro="People enrolled who have not chosen their own password yet. Send the invitation to people not invited yet; pending one-time passwords still work; expired ones need a new invitation. Passwords are never shown." />
       {message && <p className={message.ok ? 'pc-ok' : 'pc-error'}>{message.text}</p>}
       <section className="pc-card">
         <div className="pc-filters">
@@ -686,9 +726,19 @@ export const PlatformInvitationsPage: React.FC = () => {
             <option value="">All statuses</option>
             <option value="PENDING">Pending</option>
             <option value="EXPIRED">Expired</option>
-            <option value="NOT_SENT">No active link</option>
+            <option value="NOT_SENT">Not invited yet</option>
           </select>
           <span className="pc-muted pc-small">{q.data ? `${q.data.filter((r) => !r.error).length} found` : ''}</span>
+          {notInvited.length > 0 && (
+            <button
+              type="button"
+              className="pc-btn pc-btn-primary"
+              disabled={sendAll.isPending}
+              onClick={() => window.confirm(`Email an invitation (one-time password and sign-in link) to ${notInvited.length} ${notInvited.length === 1 ? 'person' : 'people'} not invited yet?`) && sendAll.mutate()}
+            >
+              <i className="bi bi-send" aria-hidden="true" /> {sendAll.isPending ? 'Sending…' : `Send to all not invited (${notInvited.length})`}
+            </button>
+          )}
         </div>
         {q.isLoading && <Loading what="invitations" />}
         {q.isError && <Failed error={q.error} what="Invitations" />}
@@ -739,11 +789,11 @@ export const PlatformInvitationsPage: React.FC = () => {
                       <td className="pc-nowrap">
                         {r.accountStatus === 'ACTIVE' && (
                           <button type="button" className="pc-link" disabled={resend.isPending} onClick={() => resend.mutate({ code: r.institutionCode, email: r.email! })}>
-                            {r.status === 'PENDING' ? 'Resend' : 'Send new link'}
+                            {r.status === 'PENDING' ? 'Resend' : r.status === 'NOT_SENT' ? 'Send invitation' : 'Send new invitation'}
                           </button>
                         )}{' '}
                         {r.status === 'PENDING' && (
-                          <button type="button" className="pc-link" disabled={revoke.isPending} onClick={() => window.confirm(`Revoke the activation link for ${r.email}? It stops working immediately.`) && revoke.mutate({ code: r.institutionCode, email: r.email! })}>
+                          <button type="button" className="pc-link" disabled={revoke.isPending} onClick={() => window.confirm(`Revoke the invitation for ${r.email}? Their one-time password stops working immediately.`) && revoke.mutate({ code: r.institutionCode, email: r.email! })}>
                             Revoke
                           </button>
                         )}

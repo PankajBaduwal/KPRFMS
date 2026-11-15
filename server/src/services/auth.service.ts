@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { User, USER_STATUS, markPasswordChanged } from '../models/User.js';
 import { AppError } from '../utils/AppError.js';
-import { comparePassword, hashPassword } from '../utils/password.js';
+import { comparePassword, hashPassword, generateOneTimePassword } from '../utils/password.js';
 import {
   generateToken,
   AUTH_COOKIE_NAME,
@@ -53,6 +53,7 @@ const timingSafeMiss = async (password: string) => {
 const LOCK_TIME_MS = 15 * 60 * 1000; // 15 minutes
 const RESET_LINK_TTL_MS = 30 * 60 * 1000;
 const WELCOME_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const ROLE_LABELS: Record<string, string> = { FACULTY: 'Faculty', HOD: 'Head of Department', DEAN: 'Dean', PRINCIPAL: 'Principal', ADMIN: 'Institution Administrator' };
 const VERIFICATION_CODE_TTL_MS = 15 * 60 * 1000;
 const MAX_VERIFICATION_ATTEMPTS = 5;
 
@@ -70,6 +71,7 @@ function sessionUserView(user: LoginUser) {
     status: user.status,
     isDemo: Boolean(user.isDemo),
     lastLogin: user.lastLogin,
+    mustChangePassword: Boolean(user.mustChangePassword),
   };
 }
 
@@ -88,18 +90,36 @@ export async function createPasswordLink(userId: string, ttlMs = RESET_LINK_TTL_
 
 /** Emails a new account its "set your password" link (bulk import, provisioning, reminders). */
 export async function sendWelcomeEmail(user: { _id: unknown; name: string; email: string; employeeId: string }, opts: { reminder?: boolean } = {}) {
-  const link = await createPasswordLink(String(user._id), WELCOME_LINK_TTL_MS);
-  await User.updateOne({ _id: String(user._id) }, { $set: { invitedAt: new Date() } });
+  // A fresh one-time password each time: any earlier one (and any old set-password link) stops working
+  const oneTimePassword = generateOneTimePassword();
+  const expiresAt = new Date(Date.now() + WELCOME_LINK_TTL_MS);
+  const account = await User.findByIdAndUpdate(
+    String(user._id),
+    {
+      $set: { passwordHash: await hashPassword(oneTimePassword), mustChangePassword: true, oneTimePasswordExpiresAt: expiresAt, invitedAt: new Date(), failedLoginAttempts: 0 },
+      $unset: { passwordReset: 1, lockUntil: 1 },
+    },
+    { new: true }
+  )
+    .select('role')
+    .lean();
+  const roleLabel = account?.role ? ROLE_LABELS[account.role] ?? account.role : 'a member of staff';
+  const until = expiresAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata' });
   return mailService.send({
     to: user.email,
     subject: opts.reminder ? `Reminder: your ${PRODUCT_NAME} account is waiting` : `Your ${PRODUCT_NAME} account is ready`,
     lines: [
       `Dear ${user.name},`,
-      ...(opts.reminder ? ['You have not signed in yet. Here is a new link; the earlier one no longer works.'] : []),
-      `${(await getInstitutionProfile()).name} has created an account for you on ${PRODUCT_NAME} (employee ID ${user.employeeId}).`,
-      'Choose your password with the button below. The link works once and expires in 7 days.',
+      ...(opts.reminder ? ['You have not signed in yet, so here is a new one-time password. The earlier one no longer works.'] : []),
+      `${(await getInstitutionProfile()).name} has created an account for you on ${PRODUCT_NAME} as ${roleLabel}.`,
+      `Sign in with your email (${user.email}) or employee ID (${user.employeeId}) and this one-time password:`,
     ],
-    action: { label: 'Set my password', url: link },
+    code: oneTimePassword,
+    action: { label: 'Sign in', url: clientUrl('/login') },
+    footnote: [
+      `The one-time password works until ${until}. Right after you sign in you will be asked to choose your own password.`,
+      'Do not share this email. If you were not expecting it, you can ignore it.',
+    ],
   });
 }
 
@@ -190,6 +210,10 @@ export class AuthService {
   }
 
   private async completeLogin(user: LoginUser, req: Request, res: Response, details: Record<string, unknown> = {}) {
+    // An emailed one-time password only works until it expires (checked after the password matched)
+    if (user.mustChangePassword && user.oneTimePasswordExpiresAt && user.oneTimePasswordExpiresAt.getTime() < Date.now()) {
+      throw AppError.unauthorized('Your one-time password has expired. Ask your institution administrator to send a new invitation.');
+    }
     // Reset failed login attempts on successful authentication
     user.failedLoginAttempts = 0;
     user.lockUntil = undefined;
@@ -526,6 +550,8 @@ export class AuthService {
 
     user.passwordHash = await hashPassword(input.password);
     user.passwordReset = undefined;
+    user.mustChangePassword = false;
+    user.oneTimePasswordExpiresAt = undefined;
     user.failedLoginAttempts = 0;
     user.lockUntil = undefined;
     markPasswordChanged(user);
@@ -573,21 +599,21 @@ export class AuthService {
     }
 
     user.passwordHash = await hashPassword(input.newPassword);
+    // Their own password now: the one-time password requirement is over
+    user.mustChangePassword = false;
+    user.oneTimePasswordExpiresAt = undefined;
     // Revoke every other session; this one is re-issued below
     markPasswordChanged(user);
     await user.save();
 
-    res.cookie(
-      AUTH_COOKIE_NAME,
-      generateToken({
-        id: user._id.toString(),
-        email: user.email,
-        role: user.role,
-        departmentId: user.departmentId?.toString(),
-        sid: sessionId,
-      }),
-      getAuthCookieOptions()
-    );
+    const token = generateToken({
+      id: user._id.toString(),
+      email: user.email,
+      role: user.role,
+      departmentId: user.departmentId?.toString(),
+      sid: sessionId,
+    });
+    res.cookie(AUTH_COOKIE_NAME, token, getAuthCookieOptions());
     await sessionService.revokeAllForUser(user._id, sessionId);
 
     await recordAudit({
@@ -597,7 +623,8 @@ export class AuthService {
       details: { success: true },
     });
 
-    return { message: 'Password changed successfully.' };
+    // The re-issued token is returned too, for web sessions that send it as a bearer token
+    return { message: 'Password changed successfully.', token };
   }
 
   async updateUserRole(input: UpdateRoleInput, adminId: string, req: Request) {

@@ -362,9 +362,15 @@ async function run() {
   const imported = await admin.request('POST', '/admin/users/import', form(false));
   assert(imported.status === 200 && imported.data.data.created === 1 && imported.data.data.emailed === 1, 'Import creates the valid account and emails it', imported.data);
   const welcome = await waitForMail((m) => m.to === `p60.imp1@${domain}` && /account is ready/i.test(m.subject));
-  const welcomeToken = tokenFromLink(welcome?.action?.url);
-  const setPw = await anon.request('POST', '/auth/reset-password', { token: welcomeToken, password });
-  assert(setPw.status === 200 && (await new Client().login(`p60.imp1@${domain}`, password)).status === 200, 'Imported person sets a password from the email and signs in');
+  // The invitation carries a one-time password; the person must choose their own right after signing in
+  const oneTime = welcome?.code ?? '';
+  assert(/^[A-Za-z0-9@$!%*?&]{14}$/.test(oneTime) && /sign in/i.test(welcome?.action?.label ?? ''), 'The invitation email contains a one-time password and a sign-in button', welcome?.subject);
+  const newcomer = new Client();
+  const firstLogin = await newcomer.login(`p60.imp1@${domain}`, oneTime);
+  assert(firstLogin.status === 200 && firstLogin.data?.data?.mustChangePassword === true, 'Signing in with the one-time password works and asks for a new password', firstLogin.data);
+  const changed = await newcomer.request('POST', '/auth/change-password', { currentPassword: oneTime, newPassword: password });
+  assert(changed.status === 200 && (await new Client().login(`p60.imp1@${domain}`, password)).status === 200, 'Imported person chooses their own password and signs in with it');
+  assert((await new Client().login(`p60.imp1@${domain}`, oneTime)).status === 401, 'The one-time password no longer works');
   const bad = new FormData();
   bad.append('file', new Blob([Buffer.from('MZ fake exe')]), 'evil.exe');
   assert((await admin.request('POST', '/admin/users/import', bad)).status === 400, 'Non-spreadsheet upload refused');

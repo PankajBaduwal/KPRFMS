@@ -9,6 +9,9 @@ import { resolveActiveTenant } from '../tenancy/registry.js';
 import { getInstitutionProfile, moduleForPath } from '../utils/institution.js';
 import { ROLES } from '../permissions/roles.js';
 
+/** The only endpoints an account still on its emailed one-time password may use. */
+const PASSWORD_CHANGE_ALLOWED = /^\/api(\/t\/[^/]+)?\/auth\/(me|logout|change-password)$/;
+
 export async function requireAuth(
   req: AuthenticatedRequest,
   res: Response,
@@ -99,6 +102,11 @@ async function continueInTenant(
     if (profile.maintenanceMode && user.role !== ROLES.ADMIN && !authPath) {
       throw AppError.maintenance();
     }
+    // Signed in with an emailed one-time password: only choosing their own password (and the
+    // session endpoints: who am I, sign out) is allowed until then
+    if (user.mustChangePassword && !PASSWORD_CHANGE_ALLOWED.test(apiPath)) {
+      throw new AppError('Choose your own password before continuing.', 403, 'PASSWORD_CHANGE_REQUIRED');
+    }
     // Modules the institution has switched off
     const mod = moduleForPath(req.baseUrl);
     if (mod && !profile.enabledModules.includes(mod)) {
@@ -116,6 +124,7 @@ async function continueInTenant(
       designation: user.designation,
       sessionId: payload.sid,
       isDemo: Boolean(user.isDemo),
+      mustChangePassword: Boolean(user.mustChangePassword),
     };
 
     // Cookie sessions slide forward while the user is active (bearer tokens are left as issued)

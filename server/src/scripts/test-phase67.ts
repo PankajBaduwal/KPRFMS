@@ -214,21 +214,25 @@ async function run() {
   assert((await runInTenant(A, () => User.countDocuments({ email: /@testd\.edu\.in$/ }))) === 0, 'Nothing was written into another institution');
 
   console.log('\n--- Activation invitations ---');
-  const invite = latestMail('admin@testd.edu.in');
-  const inviteToken = /token=([A-Za-z0-9_-]+)/.exec(invite?.text ?? '')?.[1];
-  assert(Boolean(invite) && /institution=testd/.test(invite!.text), 'Admin received an activation email naming the institution', invite?.subject);
-  // The only 'password' line allowed is the set-password link itself
-  assert(!/password\s*:\s*(?!https?:\/\/)\S+/i.test(invite?.text ?? ''), 'No password in the email', invite?.text);
-  const setPw = await new Client().request('POST', '/t/testd/auth/reset-password', { token: inviteToken, password: 'Admin@Testd2026!' });
-  assert(setPw.status === 200, 'The admin sets their own password from the link', setPw.data);
+  const invite = latestMail('admin@testd.edu.in') as { subject: string; text: string; code?: string } | undefined;
+  const oneTime = invite?.code ?? '';
+  assert(Boolean(invite) && /institution=testd/.test(invite!.text), 'Admin received an invitation email naming the institution', invite?.subject);
+  assert(/^[A-Za-z0-9@$!%*?&]{14}$/.test(oneTime) && invite!.text.includes(oneTime), 'The invitation carries a one-time password', invite?.text);
   const adminD = new Client();
-  assert((await adminD.request('POST', '/t/testd/auth/login', { identifier: 'admin@testd.edu.in', password: 'Admin@Testd2026!' })).status === 200, 'The new admin signs in to their institution');
+  const first = await adminD.request('POST', '/t/testd/auth/login', { identifier: 'admin@testd.edu.in', password: oneTime });
+  assert(first.status === 200 && first.data?.data?.mustChangePassword === true, 'The admin signs in with the one-time password and is asked for a new one', first.data);
+  const mustChange = await adminD.request('GET', '/t/testd/admin/users');
+  assert(mustChange.status === 403 && mustChange.data?.code === 'PASSWORD_CHANGE_REQUIRED', 'Nothing else works until they choose their own password', mustChange.status);
+  const changed = await adminD.request('POST', '/t/testd/auth/change-password', { currentPassword: oneTime, newPassword: 'Admin@Testd2026!' });
+  assert(changed.status === 200, 'The admin chooses their own password', changed.data);
+  assert((await new Client().request('POST', '/t/testd/auth/login', { identifier: 'admin@testd.edu.in', password: oneTime })).status === 401, 'The one-time password stops working');
+  assert((await new Client().request('POST', '/t/testd/auth/login', { identifier: 'admin@testd.edu.in', password: 'Admin@Testd2026!' })).status === 200, 'The new admin signs in to their institution with their own password');
   const afterLogin = (await ops.request('GET', '/platform/admin/institutions/testd')).data?.data;
   assert(afterLogin?.onboardingStatus === 'COMPLETED', 'Onboarding completes once the administrator has signed in', afterLogin?.onboardingStatus);
   const reissue = await ops.request('POST', '/platform/admin/institutions/testd/invitations', { email: 'principal@testd.edu.in' });
-  assert(reissue.status === 200 && /institution=testd/.test(latestMail('principal@testd.edu.in')?.text ?? ''), 'A new link can be sent to someone who has not signed in');
+  assert(reissue.status === 200 && /institution=testd/.test(latestMail('principal@testd.edu.in')?.text ?? ''), 'A new one-time password can be sent to someone who has not signed in');
   const reissueActive = await ops.request('POST', '/platform/admin/institutions/testd/invitations', { email: 'admin@testd.edu.in' });
-  assert(reissueActive.status === 409, 'No new link for someone who already signed in', reissueActive.status);
+  assert(reissueActive.status === 409, 'No new invitation for someone who already chose their own password', reissueActive.status);
 
   console.log('\n--- A failed setup is never usable and resumes ---');
   const blockedDb = mongoose.connection.getClient().db(tenantDbName('teste'));

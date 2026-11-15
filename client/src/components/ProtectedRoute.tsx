@@ -3,6 +3,7 @@ import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import type { Role } from '../types';
 import { LoadingState } from './LoadingState';
+import { ForcedPasswordChange } from './ForcedPasswordChange';
 import { ROUTES } from '../constants/routes';
 
 interface ProtectedRouteProps {
@@ -24,6 +25,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, ch
 
   if (!isAuthenticated || !user) {
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
+  }
+
+  // Signed in with an emailed one-time password: nothing else until they choose their own
+  if (user.mustChangePassword) {
+    return <ForcedPasswordChange />;
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {

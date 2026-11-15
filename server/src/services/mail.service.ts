@@ -17,6 +17,8 @@ export interface MailMessage {
   action?: { label: string; url: string };
   /** Optional large code (e.g. a verification code). */
   code?: string;
+  /** Optional small print shown after the code and the button. */
+  footnote?: string[];
 }
 
 let transporter: Transporter | null = null;
@@ -86,17 +88,18 @@ function renderHtml(msg: MailMessage, brand: Brand): string {
   const accent = brand.accent;
   const paragraphs = msg.lines.map((l) => `<p style="margin:0 0 14px;line-height:1.55">${escapeHtml(l)}</p>`).join('');
   const code = msg.code
-    ? `<p style="margin:6px 0 18px;font-size:28px;font-weight:700;letter-spacing:6px;color:${accent}">${escapeHtml(msg.code)}</p>`
+    ? `<p style="margin:6px 0 18px;font-size:28px;font-weight:700;letter-spacing:6px;font-family:Consolas,Menlo,monospace;color:${accent}">${escapeHtml(msg.code)}</p>`
     : '';
   const action = msg.action
     ? `<p style="margin:8px 0 18px"><a href="${escapeHtml(msg.action.url)}" style="background:${accent};color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:600">${escapeHtml(msg.action.label)}</a></p>
        <p style="margin:0 0 14px;font-size:12px;color:#667">Or open this link: ${escapeHtml(msg.action.url)}</p>`
     : '';
+  const footnote = (msg.footnote ?? []).map((l) => `<p style="margin:0 0 10px;font-size:13px;line-height:1.5;color:#556">${escapeHtml(l)}</p>`).join('');
   const sub = brand === PLATFORM_BRAND ? '' : `<div style="font-weight:400;font-size:12px;opacity:.85">${escapeHtml(PRODUCT_NAME)}</div>`;
   return `<!doctype html><html><body style="margin:0;background:#f3f5f9;font-family:Segoe UI,Arial,sans-serif;color:#1d2433">
   <div style="max-width:560px;margin:24px auto;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e2e6ee">
     <div style="background:${accent};color:#fff;padding:16px 22px;font-weight:700">${escapeHtml(brand.title)}${sub}</div>
-    <div style="padding:22px">${paragraphs}${code}${action}</div>
+    <div style="padding:22px">${paragraphs}${code}${action}${footnote}</div>
     <div style="padding:12px 22px;font-size:12px;color:#778;border-top:1px solid #eef0f4">${escapeHtml(brand.footer)}</div>
   </div></body></html>`;
 }
@@ -106,6 +109,7 @@ function renderText(msg: MailMessage, brand: Brand): string {
     ...msg.lines,
     ...(msg.code ? ['', msg.code, ''] : []),
     ...(msg.action ? [`${msg.action.label}: ${msg.action.url}`] : []),
+    ...(msg.footnote?.length ? ['', ...msg.footnote] : []),
     '',
     `— ${brand.footer}`,
   ].join('\n');

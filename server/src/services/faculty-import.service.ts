@@ -210,6 +210,32 @@ export const facultyImportService = {
     return Buffer.from(await workbook.xlsx.writeBuffer());
   },
 
+  /** Departments and email domains, for forms that add one person (e.g. a single invitation). */
+  async formOptions() {
+    const [departments, domains] = await Promise.all([
+      Department.find({ isActive: true }).select('code name').sort({ code: 1 }).lean(),
+      allowedEmailDomains(),
+    ]);
+    return {
+      departments: departments.map((d) => ({ code: d.code, name: d.name })),
+      domains,
+      roles: IMPORTABLE_ROLES,
+      designations: REGISTRATION_DESIGNATIONS,
+    };
+  },
+
+  /**
+   * One person as a one-row workbook in the template layout, so a single invitation goes through
+   * exactly the same validation and creation path as a bulk import. Cells are written as text.
+   */
+  async buildSingleRow(entry: Partial<Record<ColumnKey, string>>): Promise<Buffer> {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Faculty');
+    sheet.addRow(COLUMNS.map((c) => c.header));
+    sheet.addRow(COLUMNS.map((c) => String(entry[c.key] ?? '')));
+    return Buffer.from(await workbook.xlsx.writeBuffer());
+  },
+
   /** Validates every row and plans what would happen. Nothing is saved. */
   async plan(buffer: Buffer, filename: string, opts: Partial<ImportOptions> = {}): Promise<ImportPlan> {
     const options: ImportOptions = { ...DEFAULT_IMPORT_OPTIONS, ...opts, departmentMap: { ...(opts.departmentMap ?? {}) } };

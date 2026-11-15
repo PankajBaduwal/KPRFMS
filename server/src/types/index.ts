@@ -15,6 +15,8 @@ export interface AuthenticatedUser {
   sessionId?: string;
   /** True when operating under a designated demonstration account */
   isDemo?: boolean;
+  /** Signed in with an emailed one-time password and has not chosen their own yet */
+  mustChangePassword?: boolean;
 }
 
 export interface AuthenticatedRequest extends Request {

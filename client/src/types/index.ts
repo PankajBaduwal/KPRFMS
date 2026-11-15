@@ -16,6 +16,8 @@ export interface User {
   profilePhoto?: string;
   status: UserStatus;
   lastLogin?: string;
+  /** Signed in with an emailed one-time password: must choose their own before using the app */
+  mustChangePassword?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
