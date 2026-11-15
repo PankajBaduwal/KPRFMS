@@ -13,17 +13,23 @@ const envSchema = z.object({
   COOKIE_SECRET: z.string().min(1, 'COOKIE_SECRET is required'),
   COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).optional(),
   CLIENT_URL: z.string().default('http://localhost:5180'),
-  ALLOW_VERCEL_PREVIEWS: z.string().optional(),
   // Set when running behind a reverse proxy (nginx / load balancer) so client IPs are correct
   TRUST_PROXY: z.string().optional(),
   // Public base URL of the API (used in calendar feed links). Defaults to http://localhost:PORT/api
   PUBLIC_API_URL: z.string().optional(),
   // Encrypts two-factor secrets at rest. Keep it stable: changing it turns off everyone's two-factor
   TWO_FACTOR_KEY: z.string().optional(),
-  // One-click sign-in to accounts tagged isDemo. Enabled by default; set to false to disable in production
+  // One-click sign-in to accounts tagged isDemo. Off unless set to true (only for demonstration sites)
   DEMO_LOGIN_ENABLED: z
     .string()
-    .default('true')
+    .default('false')
+    .transform((v) => ['true', '1', 'yes'].includes(String(v).trim().toLowerCase())),
+  // One-click sign-in to the demo platform operator (superadmin@facultycore.test). Separate from
+  // DEMO_LOGIN_ENABLED and off unless set to true: it opens the console above every institution,
+  // so never turn it on for a site on the public internet
+  DEMO_PLATFORM_LOGIN_ENABLED: z
+    .string()
+    .default('false')
     .transform((v) => ['true', '1', 'yes'].includes(String(v).trim().toLowerCase())),
   // Google Gemini for the AI assistant features (disabled when the key is missing)
   GEMINI_API_KEY: z.string().optional(),

@@ -1,6 +1,5 @@
 import { apiGet, apiPost, setStoredAuthToken, clearStoredAuthToken } from '../api/client';
 import type { User } from '../types';
-import { FALLBACK_DEMO_CATALOG } from '../data/demoCatalogFallback';
 
 export interface LoginCredentials {
   identifier: string;
@@ -100,16 +99,10 @@ export const authService = {
     return response.data;
   },
 
+  /** The demo account catalog; rejects when the server has demo sign-in switched off (404) or is unreachable. */
   async getDemoAccounts(): Promise<DemoCatalogResponse> {
-    try {
-      const response = await apiGet<DemoCatalogResponse>('/platform/demo/accounts');
-      if (response?.data?.institutions && response.data.institutions.length > 0) {
-        return response.data;
-      }
-    } catch (err) {
-      console.warn('[authService] Live demo catalog request failed, using bundled fallback catalog.', err);
-    }
-    return FALLBACK_DEMO_CATALOG;
+    const response = await apiGet<DemoCatalogResponse>('/platform/demo/accounts');
+    return response.data;
   },
 
   async demoLogin(payload: { institutionCode: string; email?: string; userId?: string; role?: string }): Promise<{ user: User; token?: string; institution?: { code: string }; isPlatform?: boolean }> {
@@ -161,5 +154,5 @@ export interface DemoCatalogResponse {
     roleLabel: string;
     designation: string;
     isPlatform: boolean;
-  };
+  } | null;
 }

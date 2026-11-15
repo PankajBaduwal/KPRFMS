@@ -59,11 +59,20 @@ export const LoginPage: React.FC = () => {
   const [forgotSent, setForgotSent] = useState<string | null>(null);
   const [forgotError, setForgotError] = useState<string | null>(null);
   const [showDemoModal, setShowDemoModal] = useState<boolean>(() => searchParams.get('demo') === 'true');
-  // Demo sign-in is enabled by default so deployed environments have one-click demo access immediately
-  const [demoAvailable, setDemoAvailable] = useState(true);
+  // Demo entry points only when the server offers demo sign-in (DEMO_LOGIN_ENABLED=true). A 404 means it is
+  // switched off; any other failure (e.g. a server still waking up) keeps the button so the explorer can retry
+  const [demoAvailable, setDemoAvailable] = useState(false);
+  const [demoPlatform, setDemoPlatform] = useState(false);
   useEffect(() => {
     let live = true;
-    authService.getDemoAccounts().then(() => live && setDemoAvailable(true)).catch(() => live && setDemoAvailable(true));
+    authService
+      .getDemoAccounts()
+      .then((c) => {
+        if (!live) return;
+        setDemoAvailable(true);
+        setDemoPlatform(Boolean(c?.platformSuperAdmin));
+      })
+      .catch((err) => live && setDemoAvailable((err as { response?: { status?: number } })?.response?.status !== 404));
     return () => {
       live = false;
     };
@@ -435,6 +444,7 @@ export const LoginPage: React.FC = () => {
               from={from}
               initialEmail={platformEmail}
               initialPassword={platformPassword}
+              demoShortcut={demoPlatform}
             />
           )}
 

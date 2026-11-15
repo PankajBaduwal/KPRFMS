@@ -17,10 +17,9 @@ services:
         value: "1"
       - key: COOKIE_SAME_SITE
         value: none
-      - key: ALLOW_VERCEL_PREVIEWS
-        value: "true"
       - key: MONGODB_URI
         sync: false
+      # The site address(es) allowed to call the API, e.g. https://your-app.vercel.app (comma-separated, exact)
       - key: CLIENT_URL
         sync: false
       - key: JWT_SECRET
@@ -29,6 +28,8 @@ services:
         generateValue: true
       - key: TWO_FACTOR_KEY
         generateValue: true
+      # One-click demo accounts for institutions. Set to "false" once real staff use the site.
+      # Super Admin one-click (DEMO_PLATFORM_LOGIN_ENABLED) is deliberately not set: it stays off here.
       - key: DEMO_LOGIN_ENABLED
         value: "true"
 

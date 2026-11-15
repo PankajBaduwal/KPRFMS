@@ -48,6 +48,8 @@ export interface PlatformSignInFormProps {
   from?: string;
   initialEmail?: string;
   initialPassword?: string;
+  /** Show the one-click demo Super Admin shortcut (only when the server offers it) */
+  demoShortcut?: boolean;
 }
 
 /** Platform (Super Admin) sign-in. No institution is chosen: the console is above all institutions. */
@@ -55,6 +57,7 @@ export const PlatformSignInForm: React.FC<PlatformSignInFormProps> = ({
   from,
   initialEmail = '',
   initialPassword = '',
+  demoShortcut = false,
 }) => {
   const queryClient = useQueryClient();
   const [email, setEmail] = useState(initialEmail);
@@ -165,6 +168,8 @@ export const PlatformSignInForm: React.FC<PlatformSignInFormProps> = ({
         )}
       </button>
 
+      {demoShortcut && (
+      <>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '0.75rem 0 0.5rem' }}>
         <div style={{ flex: 1, height: '1px', background: 'var(--border-color, #e2e8f0)' }} />
         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted, #64748b)', fontWeight: 600, letterSpacing: '0.04em' }}>DEMO SHORTCUT</span>
@@ -181,6 +186,8 @@ export const PlatformSignInForm: React.FC<PlatformSignInFormProps> = ({
         <i className="bi bi-stars" aria-hidden="true" />
         <span>One-Click Demo Super Admin</span>
       </button>
+      </>
+      )}
 
       <p className="login-help" style={{ marginTop: '0.75rem' }}>
         College faculty and administrators should switch to <strong>Institutional Portal</strong> above.

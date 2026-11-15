@@ -9,7 +9,6 @@ import { setStoredAuthToken } from '../../api/client';
 import { setInstitutionCode } from '../../lib/institution';
 import { useAuthStore } from '../../stores/authStore';
 import { ROUTES } from '../../constants/routes';
-import { FALLBACK_DEMO_CATALOG } from '../../data/demoCatalogFallback';
 import '../../styles/demo-explorer.css';
 
 interface DemoAccountsExplorerProps {
@@ -33,8 +32,8 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
 }) => {
   const navigate = useNavigate();
   const { setSessionUser } = useAuthStore();
-  const [catalog, setCatalog] = useState<DemoCatalogResponse>(FALLBACK_DEMO_CATALOG);
-  const [loading, setLoading] = useState(false);
+  const [catalog, setCatalog] = useState<DemoCatalogResponse>({ institutions: [], platformSuperAdmin: null });
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedInstCode, setSelectedInstCode] = useState<string>('kpriet');
   const [selectedDeptCode, setSelectedDeptCode] = useState<string>('ALL');
@@ -46,6 +45,7 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
 
   const loadCatalog = () => {
     setError(null);
+    setLoading(true);
     authService
       .getDemoAccounts()
       .then((data) => {
@@ -54,8 +54,9 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
         }
         setLoading(false);
       })
-      .catch((_err) => {
-        setCatalog(FALLBACK_DEMO_CATALOG);
+      .catch(() => {
+        // The server may be waking up (free hosting) or have demo sign-in switched off
+        setError('Demo accounts could not be loaded. The server may still be starting up; try again in a moment.');
         setLoading(false);
       });
   };
@@ -190,7 +191,7 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
           <div className="demo-spinner" />
           <p>Loading verified college accounts and departmental rosters...</p>
         </div>
-      ) : !catalog ? (
+      ) : catalog.institutions.length === 0 && !catalog.platformSuperAdmin ? (
         <div className="demo-empty-state">
           <p>Unable to load demonstration accounts at this time.</p>
           <button
@@ -284,9 +285,9 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
                     onClick={() =>
                       handleDemoLogin({
                         institutionCode: 'platform',
-                        email: catalog.platformSuperAdmin.email,
+                        email: catalog.platformSuperAdmin?.email ?? '',
                         role: 'PLATFORM_SUPER_ADMIN',
-                        name: catalog.platformSuperAdmin.name,
+                        name: catalog.platformSuperAdmin?.name ?? '',
                       })
                     }
                   >

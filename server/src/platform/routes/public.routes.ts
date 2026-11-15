@@ -157,7 +157,7 @@ router.get(['/demo/accounts', '/accounts'], demoOnly, async (_req, res, next) =>
 
 
     // The demo operator is offered only when that local account exists and is active
-    const operator = await PlatformUser.findOne({ email: DEMO_OPERATOR_EMAIL, status: 'ACTIVE' }).select('email name').lean();
+    const operator = env.DEMO_PLATFORM_LOGIN_ENABLED && await PlatformUser.findOne({ email: DEMO_OPERATOR_EMAIL, status: 'ACTIVE' }).select('email name').lean();
     const platformSuperAdmin = operator
       ? {
           email: operator.email,
@@ -199,6 +199,7 @@ router.post(['/demo/login', '/login', '/demo-login'], demoOnly, authLimiter, asy
 
     // Platform: only the local demo operator, never a real operator account
     if (institutionCode === 'platform' || role === 'PLATFORM_SUPER_ADMIN') {
+      if (!env.DEMO_PLATFORM_LOGIN_ENABLED) throw AppError.forbidden('One-click Super Admin sign-in is not enabled on this server.');
       const result = await platformAuthService.demoLogin(req, res);
       return sendSuccess(res, { isPlatform: true, user: result, token: result.token }, 'Platform Super Admin signed in successfully.');
     }
