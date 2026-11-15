@@ -94,7 +94,7 @@ export const PublicLayout: React.FC = () => {
         <Outlet />
       </main>
 
-      <footer className="pub-footer" role="contentinfo">
+      <footer className={`pub-footer${isHome ? ' pub-curve-footer' : ''}`} role="contentinfo">
         <div className="pub-container pub-footer-grid">
           <div>
             <img src={PRODUCT_HORIZONTAL} alt={PRODUCT_NAME} height={40} className="pub-footer-logo" />

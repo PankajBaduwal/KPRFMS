@@ -1505,3 +1505,54 @@
   line-height: 1.55;
   margin: 0;
 }
+
+/* ---------------------------------------------------------------- Curved section breaks (home page)
+   Each section opens with a soft curve in the colour of the section above it, in place of a
+   straight edge. The curve is a masked block, so its colour comes from --curve-from. */
+.pub-home .pub-hero {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6F8FB 100%);
+  border-bottom: 0;
+}
+
+.pub-home .pub-section,
+.pub-home .pub-cta {
+  position: relative;
+  isolation: isolate;
+}
+
+.pub-home .pub-section-tint { border-top: 0; border-bottom: 0; }
+
+.pub-home .pub-section::before,
+.pub-home .pub-cta::before,
+.pub-curve-footer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: clamp(28px, 4.5vw, 64px);
+  background: var(--curve-from);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1440V18C1200 70 960 80 720 80S240 70 0 18Z'/%3E%3C/svg%3E") center top / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1440V18C1200 70 960 80 720 80S240 70 0 18Z'/%3E%3C/svg%3E") center top / 100% 100% no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Colour of the section above each break (sections alternate white and tint; the hero ends in tint) */
+.pub-home .pub-section-white { --curve-from: #F6F8FB; }
+.pub-home .pub-section-tint { --curve-from: #FFFFFF; }
+.pub-home .pub-cta { --curve-from: #F6F8FB; }
+
+/* Content sits above the curve */
+.pub-home .pub-section > *,
+.pub-home .pub-cta > :not(.pub-cta-sheen) { position: relative; z-index: 1; }
+
+/* Footer under the home page call-to-action band */
+.pub-curve-footer { position: relative; --curve-from: #142B4A; }
+.pub-curve-footer > * { position: relative; z-index: 1; }
+
+/* The navy band gets a little more room so the curve does not crowd its text */
+.pub-home .pub-cta { padding-top: calc(56px + clamp(16px, 2.5vw, 32px)); }
+/* The band clips its overflow (light sweep), so the curve cannot overlap the seam above it; paint the
+   top rows in the colour above instead, so no navy hairline shows at fractional pixel positions */
+.pub-home .pub-cta { background: linear-gradient(var(--curve-from) 0 2px, #142B4A 2px); }
