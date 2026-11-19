@@ -140,6 +140,9 @@ export const platformAuthService = {
   async demoLogin(req: Request, res: Response) {
     const user = await PlatformUser.findOne({ email: DEMO_OPERATOR_EMAIL, status: 'ACTIVE' });
     if (!user) throw AppError.notFound('The demo platform operator has not been set up.');
+    // Same as the institution demo sign-in: earlier typed-password failures must not leave the demo account locked
+    user.failedLoginAttempts = 0;
+    user.lockUntil = undefined;
     user.lastLogin = new Date();
     await user.save();
     const { token } = await startSession(String(user._id), req, res);
