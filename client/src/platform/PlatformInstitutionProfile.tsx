@@ -3,6 +3,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { platformApi, type InstitutionDetail } from './api';
 import { formatErrorMessage } from '../utils/errorHandler';
 
+const LOGO_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+const LOGO_MAX_BYTES = 512 * 1024;
+
 const TYPES: Array<[InstitutionDetail['type'], string]> = [
   ['COLLEGE', 'College'],
   ['UNIVERSITY', 'University'],
@@ -27,7 +30,8 @@ export const InstitutionProfileEditor: React.FC<{ inst: InstitutionDetail; onClo
     domains: inst.officialEmailDomains.join(', '),
   });
   const [error, setError] = useState<string | null>(null);
-  const [logoMsg, setLogoMsg] = useState<string | null>(null);
+  const [logoMsg, setLogoMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [logoUrl, setLogoUrl] = useState(inst.logoUrl ?? '');
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['platform'] });
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
 
@@ -51,12 +55,23 @@ export const InstitutionProfileEditor: React.FC<{ inst: InstitutionDetail; onClo
   });
   const logo = useMutation({
     mutationFn: (file: File | null) => (file ? platformApi.uploadLogo(inst.code, file) : platformApi.removeLogo(inst.code)),
-    onSuccess: (_d, file) => {
-      setLogoMsg(file ? 'Logo updated.' : 'Logo removed.');
+    onSuccess: (d, file) => {
+      setLogoUrl(file ? d?.logoUrl ?? '' : '');
+      setLogoMsg({ ok: true, text: file ? 'Logo updated. It now shows on the college’s sign-in page, navigation and reports.' : 'Logo removed.' });
       refresh();
     },
-    onError: (e) => setLogoMsg(formatErrorMessage(e, 'The logo could not be changed.')),
+    onError: (e) => setLogoMsg({ ok: false, text: formatErrorMessage(e, 'The logo could not be changed.') }),
+    onSettled: () => {
+      if (fileRef.current) fileRef.current.value = '';
+    },
   });
+  const pickLogo = (file: File | undefined) => {
+    if (!file) return;
+    if (!LOGO_TYPES.includes(file.type)) return setLogoMsg({ ok: false, text: 'Choose a PNG, JPEG or WebP image.' });
+    if (file.size > LOGO_MAX_BYTES) return setLogoMsg({ ok: false, text: `That file is ${Math.ceil(file.size / 1024)} KB; the logo can be at most 512 KB.` });
+    setLogoMsg(null);
+    logo.mutate(file);
+  };
 
   return (
     <div className="pc-profile-edit">
@@ -99,15 +114,29 @@ export const InstitutionProfileEditor: React.FC<{ inst: InstitutionDetail; onClo
         </label>
       </div>
       <div className="pc-logo-row">
-        <span className="pc-muted pc-small">Logo (PNG, JPEG or WebP, up to 512 KB)</span>
-        <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => e.target.files?.[0] && logo.mutate(e.target.files[0])} />
-        <button type="button" className="pc-btn" disabled={logo.isPending} onClick={() => fileRef.current?.click()}>
-          Upload logo
-        </button>
-        <button type="button" className="pc-btn" disabled={logo.isPending} onClick={() => logo.mutate(null)}>
-          Remove
-        </button>
-        {logoMsg && <span className="pc-small" role="status">{logoMsg}</span>}
+        <div className="pc-logo-preview" aria-hidden={!logoUrl}>
+          {logoUrl ? <img src={logoUrl} alt={`${inst.name} logo`} /> : <i className="bi bi-image" aria-hidden="true" />}
+        </div>
+        <div className="pc-logo-info">
+          <strong className="pc-small">College logo</strong>
+          <span className="pc-muted pc-small">PNG, JPEG or WebP, up to 512 KB. Saved as soon as you choose a file. The college admin can also change it under Settings.</span>
+          {logoMsg && (
+            <span className={`pc-small ${logoMsg.ok ? 'pc-ok' : 'pc-error'}`} role={logoMsg.ok ? 'status' : 'alert'}>
+              {logoMsg.text}
+            </span>
+          )}
+        </div>
+        <input ref={fileRef} type="file" accept={LOGO_TYPES.join(',')} hidden onChange={(e) => pickLogo(e.target.files?.[0])} />
+        <div className="pc-logo-actions">
+          <button type="button" className="pc-btn" disabled={logo.isPending} onClick={() => fileRef.current?.click()}>
+            <i className="bi bi-upload" aria-hidden="true" /> {logo.isPending ? 'Working…' : logoUrl ? 'Replace logo' : 'Upload logo'}
+          </button>
+          {logoUrl && (
+            <button type="button" className="pc-btn" disabled={logo.isPending} onClick={() => window.confirm(`Remove the logo of ${inst.name}?`) && logo.mutate(null)}>
+              Remove
+            </button>
+          )}
+        </div>
       </div>
       {error && <p className="pc-error" role="alert">{error}</p>}
       <div className="pc-actions">
