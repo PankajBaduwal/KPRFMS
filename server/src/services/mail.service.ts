@@ -155,6 +155,35 @@ export const mailService = {
     }
   },
 
+  /**
+   * A one-off test message from the Super Admin console. Unlike send() it reports why delivery
+   * failed (server unreachable, login refused), so SMTP settings can be checked before inviting people.
+   */
+  async test(to: string): Promise<{ via: 'smtp' | 'outbox'; ok: boolean; error?: string }> {
+    const smtp = getTransporter();
+    const msg: MailMessage = {
+      to,
+      subject: 'FacultyCore test email',
+      lines: ['This is a test message from the FacultyCore Super Admin console.', 'If you can read it, outgoing email is working.'],
+    };
+    if (!smtp) {
+      const brand = await brandForCurrentInstitution();
+      await writeToOutbox(msg, env.MAIL_FROM, renderHtml(msg, brand), renderText(msg, brand));
+      return { via: 'outbox', ok: true };
+    }
+    try {
+      await smtp.verify();
+      const brand = await brandForCurrentInstitution();
+      await smtp.sendMail({ from: env.MAIL_FROM, to, subject: msg.subject, html: renderHtml(msg, brand), text: renderText(msg, brand) });
+      return { via: 'smtp', ok: true };
+    } catch (error) {
+      // The server's own reason, minus anything that looks like a credential
+      const raw = String((error as Error).message || 'unknown error');
+      const reason = (env.SMTP_PASS ? raw.split(env.SMTP_PASS).join('***') : raw).slice(0, 300);
+      return { via: 'smtp', ok: false, error: reason };
+    }
+  },
+
   /** Fire-and-forget variant for notifications triggered inside other workflows. */
   queue(msg: MailMessage): void {
     void this.send(msg);

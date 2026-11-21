@@ -1053,6 +1053,37 @@ export const PlatformBackupsPage: React.FC = () => {
 };
 
 // ---- System health ------------------------------------------------------------------------------
+/** Sends one test message so SMTP settings in server/.env can be checked before inviting people. */
+const TestEmailCard: React.FC = () => {
+  const [to, setTo] = useState('');
+  const send = useMutation({ mutationFn: () => controlApi.testEmail(to.trim()) });
+  const r = send.data;
+  return (
+    <section className="pc-card">
+      <h2>Test outgoing email</h2>
+      <p className="pc-muted pc-small">
+        Emails (invitations, one-time passwords, password resets) are sent through the SMTP server set in <code>server/.env</code>: SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS and MAIL_FROM. Restart the server after changing them, then send a test here.
+      </p>
+      <form
+        className="pc-filters"
+        onSubmit={(e) => {
+          e.preventDefault();
+          send.mutate();
+        }}
+      >
+        <input type="email" required value={to} onChange={(e) => setTo(e.target.value)} placeholder="your.address@example.com" aria-label="Send the test email to" />
+        <button type="submit" className="pc-btn pc-btn-primary" disabled={send.isPending}>
+          {send.isPending ? 'Sending…' : 'Send test email'}
+        </button>
+      </form>
+      {send.isError && <p className="pc-error" role="alert">{formatErrorMessage(send.error, 'The test email could not be sent.')}</p>}
+      {r && r.via === 'outbox' && <p className="pc-note pc-small" role="status">SMTP is not configured, so the test was written to the outbox folder instead of being delivered.</p>}
+      {r && r.via === 'smtp' && r.ok && <p className="pc-ok" role="status">Sent through your SMTP server. Check the inbox (and spam folder) of {to}.</p>}
+      {r && r.via === 'smtp' && !r.ok && <p className="pc-error" role="alert">The SMTP server refused it: {r.error}</p>}
+    </section>
+  );
+};
+
 export const PlatformHealthPage: React.FC = () => {
   const q = useQuery({ queryKey: ['platform', 'health'], queryFn: controlApi.health });
   return (
@@ -1080,6 +1111,7 @@ export const PlatformHealthPage: React.FC = () => {
               ))}
             </ul>
           </section>
+          <TestEmailCard />
           <section className="pc-card">
             <h2>Recent failures</h2>
             {q.data.recentFailures.length === 0 ? (

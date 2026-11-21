@@ -2,6 +2,7 @@ import { Request } from 'express';
 import { Types } from 'mongoose';
 import { User, USER_STATUS } from '../models/User.js';
 import { Faculty } from '../models/Faculty.js';
+import { ensureFacultyProfile } from './facultyProfile.js';
 import { Department } from '../models/Department.js';
 import { AUDIT_ACTIONS } from '../models/AuditLog.js';
 import { ROLES, type Role } from '../permissions/roles.js';
@@ -140,6 +141,8 @@ export const assignmentService = {
     await user.save();
     // Keep the faculty profile's current department in step; past records keep their own department
     await Faculty.updateOne({ userId: user._id }, { $set: { departmentId: user.departmentId } });
+    // A Dean or Principal given a home department (or anyone moved into an academic role) gets a profile if missing
+    await ensureFacultyProfile(user);
 
     // Taking up a headship (replacing any previous head, confirmed above)
     if (role === ROLES.HOD && departmentId) {

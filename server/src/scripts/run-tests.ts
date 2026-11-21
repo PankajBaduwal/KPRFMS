@@ -45,6 +45,8 @@ const testEnv: NodeJS.ProcessEnv = {
   // Emails go to a separate outbox folder that phase 60 reads
   MAIL_OUTBOX_DIR: 'mail-outbox-test',
   SMTP_HOST: '',
+  // The test API never backs up on a timer; phase 79 runs the scheduler directly
+  BACKUP_EVERY_HOURS: '0',
   // Tests never call the paid AI service; phase 61 checks the AI routes with AI switched off
   GEMINI_API_KEY: '',
   // Multi-institution: a separate platform registry and test-only institution databases.

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useOpenFromQuery } from '../hooks/useOpenFromQuery';
 import { useAuthStore } from '../stores/authStore';
+import { noProfileMessage } from '../components/noProfileMessage';
 import { leaveService } from '../services/leave.service';
 import { facultyService } from '../services/faculty.service';
 import { departmentService } from '../services/department.service';
@@ -79,6 +80,8 @@ export const LeaveManagementPage: React.FC = () => {
 
   // 2. Balances state
   const [myBalances, setMyBalances] = useState<LeaveBalanceSummary | null>(null);
+  // No faculty profile (e.g. an administrator, or a Dean/Principal without a home department): no personal balance
+  const [noProfile, setNoProfile] = useState(false);
   const [loadingBalances, setLoadingBalances] = useState(true);
 
   // 3. Calendar Leaves state
@@ -141,8 +144,10 @@ export const LeaveManagementPage: React.FC = () => {
     try {
       const data = await leaveService.getMyBalance(academicYear);
       setMyBalances(data);
+      setNoProfile(false);
     } catch (err: any) {
-      console.error(err);
+      if (err?.status === 404 || err?.response?.status === 404) setNoProfile(true);
+      else console.error(err);
     } finally {
       setLoadingBalances(false);
     }
@@ -373,6 +378,11 @@ export const LeaveManagementPage: React.FC = () => {
       />
 
       {/* Leave Balance Cards (Show: leave balance) */}
+      {noProfile && (
+        <div role="note" style={{ padding: '12px 16px', border: '1px solid #C9DCEF', background: '#EAF2FA', borderRadius: 10, fontSize: '0.85rem', color: '#172B45' }}>
+          <strong>No personal leave balance.</strong> {noProfileMessage(user?.role, 'leave balance')} You can still review and approve others' leave.
+        </div>
+      )}
       {!myBalances && loadingBalances && (
         <div role="status" aria-busy="true" aria-label="Loading leave balances">
           <SkeletonStats count={LEAVE_TYPES.length} />

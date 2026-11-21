@@ -1,3 +1,4 @@
+import { ensureFacultyProfile } from './facultyProfile.js';
 import { sessionService } from './session.service.js';
 import { mailService } from './mail.service.js';
 import { Types } from 'mongoose';
@@ -236,25 +237,8 @@ export class AdminService {
       status: (input.status || USER_STATUS.ACTIVE) as any,
     });
 
-    // If role is FACULTY or HOD and department is specified, create placeholder Faculty master profile if none exists
-    if ((user.role === ROLES.FACULTY || user.role === ROLES.HOD) && user.departmentId) {
-      const existingFaculty = await Faculty.findOne({ employeeId: user.employeeId });
-      if (!existingFaculty) {
-        await Faculty.create({
-          userId: user._id,
-          employeeId: user.employeeId,
-          name: user.name,
-          designation: user.designation || 'Assistant Professor',
-          departmentId: user.departmentId,
-          verificationStatus: 'VERIFIED',
-          basicInfo: {
-            title: user.name.startsWith('Dr.') ? 'Dr.' : 'Mr./Ms.',
-            gender: 'MALE',
-            dateOfBirth: new Date('1990-01-01'),
-          },
-        });
-      }
-    }
+    // Academic roles with a home department get their faculty profile straight away
+    await ensureFacultyProfile(user);
 
     await recordAudit({
       userId: user._id,

@@ -4,6 +4,7 @@ import { useQuery,useMutation,useQueryClient } from '@tanstack/react-query';
 import { facultyService } from '../services/faculty.service';
 import { publicationService } from '../services/publication.service';
 import { useAuthStore } from '../stores/authStore';
+import { noProfileMessage } from '../components/noProfileMessage';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { FacultyProfileHeader } from '../components/FacultyProfileHeader';
 import {
@@ -558,7 +559,7 @@ export const FacultyProfilePage: React.FC = () => {
       <ErrorState
         variant="notFound"
         title="No Faculty Profile Linked"
-        message="This account does not have a faculty master profile. Faculty profiles are created for faculty members by the administrator."
+        message={noProfileMessage(user?.role, 'profile')}
       />
     );
   }

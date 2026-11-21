@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { mailService } from '../../services/mail.service.js';
 import { sendSuccess } from '../../utils/apiResponse.js';
 import { requirePlatformAdmin, type PlatformRequest } from '../middleware/requirePlatformAdmin.js';
 import { platformAdminService } from '../services/platformAdmin.service.js';
@@ -338,6 +339,15 @@ router.get('/overview', wrap(async () => ({ data: await platformOpsService.overv
 router.get('/databases', wrap(async () => ({ data: await platformOpsService.databases(), message: 'Institution databases.' })));
 router.post('/databases/:code/check', wrap(async (req) => ({ data: await platformOpsService.checkDatabase(codeParam(req), actorOf(req), req.ip), message: 'Database checked.' })));
 router.get('/health', wrap(async () => ({ data: await platformOpsService.health(), message: 'System health.' })));
+router.post(
+  '/health/test-email',
+  wrap(async (req) => {
+    const { to } = z.object({ to: z.string().trim().toLowerCase().email() }).parse(req.body);
+    const result = await mailService.test(to);
+    await recordPlatformAudit({ action: PLATFORM_AUDIT.TEST_EMAIL_SENT, actor: actorOf(req), ip: req.ip, details: { to, via: result.via, ok: result.ok } });
+    return { data: result, message: result.ok ? 'Test email sent.' : 'The test email could not be sent.' };
+  })
+);
 
 router.get('/platform-users', wrap(async () => ({ data: await platformOpsService.platformUsers(), message: 'Platform administrators.' })));
 router.post(

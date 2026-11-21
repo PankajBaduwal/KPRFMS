@@ -1,3 +1,5 @@
+import { useAuthStore } from '../stores/authStore';
+import { noProfileMessage } from '../components/noProfileMessage';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
@@ -95,7 +97,7 @@ export const DossierPage: React.FC = () => {
     return (
       <div className="ds-card">
         <h2>No faculty profile linked</h2>
-        <p className="fd-muted">This account does not have a faculty profile, so there is no personal dossier. Faculty profiles are created by the administrator.</p>
+        <p className="fd-muted">{noProfileMessage(useAuthStore.getState().user?.role, 'dossier')}</p>
       </div>
     );
   }

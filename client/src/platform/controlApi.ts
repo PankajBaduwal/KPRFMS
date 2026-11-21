@@ -145,6 +145,7 @@ export const controlApi = {
   overview: () => data<Overview>(apiClient.get(`${A}/overview`)),
   databases: () => data<DatabaseRow[]>(apiClient.get(`${A}/databases`)),
   checkDatabase: (code: string) => data<{ ok: boolean; latencyMs: number; error?: string }>(apiClient.post(`${A}/databases/${encodeURIComponent(code)}/check`)),
+  testEmail: (to: string) => data<{ via: 'smtp' | 'outbox'; ok: boolean; error?: string }>(apiClient.post(`${A}/health/test-email`, { to })),
   health: () => data<{ checkedAt: string; checks: HealthCheck[]; recentFailures: Array<{ label: string; institutionCode: string; createdAt: string; details: Record<string, unknown> }> }>(apiClient.get(`${A}/health`)),
   platformUsers: () => data<PlatformAccount[]>(apiClient.get(`${A}/platform-users`)),
   invitePlatformUser: (email: string, name: string) => data<{ email: string; expiresAt: string; emailed: boolean }>(apiClient.post(`${A}/platform-users`, { email, name })),

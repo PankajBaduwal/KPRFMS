@@ -45,6 +45,7 @@ const AUDIT_LABEL: Record<string, string> = {
   [PLATFORM_AUDIT.PERSON_INVITED]: 'Person invited',
   [PLATFORM_AUDIT.PERSON_ENROLLED]: 'Person enrolled',
   [PLATFORM_AUDIT.INVITATIONS_SENT]: 'Invitations sent',
+  [PLATFORM_AUDIT.TEST_EMAIL_SENT]: 'Test email sent',
   [PLATFORM_AUDIT.INSTITUTION_PROFILE_UPDATED]: 'Institution details updated',
   [PLATFORM_AUDIT.INSTITUTION_LOGO_UPDATED]: 'Institution logo updated',
   [PLATFORM_AUDIT.ADMIN_BOOTSTRAPPED]: 'Platform administrator invited',

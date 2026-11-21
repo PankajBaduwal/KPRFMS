@@ -6,7 +6,7 @@ import { ROUTES } from './routes';
  */
 export const FEATURES = {
   /** Teaching module: Subjects, Subject Allocation, Workload, Timetable, Substitution */
-  TEACHING: false,
+  TEACHING: true,
 } as const;
 
 const TEACHING_PATHS = [ROUTES.SUBJECTS, ROUTES.WORKLOAD, ROUTES.TIMETABLE];

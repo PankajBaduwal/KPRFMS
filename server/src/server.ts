@@ -4,6 +4,7 @@ import { connectDatabase, disconnectDatabase } from './config/database.js';
 import { logger } from './utils/logger.js';
 import { PRODUCT_NAME } from './config/brand.js';
 import { enableServerMode } from './tenancy/context.js';
+import { startBackupSchedule } from './platform/services/backupScheduler.js';
 
 async function startServer(): Promise<void> {
   // Only per-request institution context from here on (no process-wide tenant)
@@ -20,10 +21,14 @@ async function startServer(): Promise<void> {
   server.keepAliveTimeout = 65_000;
   server.headersTimeout = 66_000;
 
+  // Automatic daily backups of the platform registry and every institution (BACKUP_EVERY_HOURS, 0 = off)
+  const stopBackups = startBackupSchedule();
+
   // Graceful shutdown
   const shutdown = async (signal: string): Promise<void> => {
     logger.info(`${signal} received. Starting graceful shutdown...`);
 
+    stopBackups();
     server.close(async () => {
       logger.info('HTTP server closed');
       await disconnectDatabase();

@@ -19,6 +19,7 @@ import { ErrorState } from '../components/ErrorState';
 import { SkeletonStats, SkeletonTable } from '../components/Skeleton';
 import { useAcademicYears } from '../hooks/useAcademicYears';
 import { useAuthStore } from '../stores/authStore';
+import { useInstitution } from '../hooks/useInstitution';
 import { ROUTES } from '../constants/routes';
 import { FEATURES } from '../constants/features';
 import { apiClient } from '../api/client';
@@ -34,6 +35,7 @@ const CADRE_COLORS = ['#1e3a8a', '#2563eb', '#60a5fa'];
 export const PrincipalConsolePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const institution = useInstitution();
   const [academicYear, setAcademicYear] = useState<string>('ALL');
   const { years } = useAcademicYears();
   const [trendYears, setTrendYears] = useState<string[]>([]);
@@ -377,7 +379,7 @@ export const PrincipalConsolePage: React.FC = () => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
               <h1 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.01em' }}>
-                {user?.name || 'Dr. M. Akila'}
+                {user?.name}
               </h1>
               <span
                 style={{
@@ -391,8 +393,9 @@ export const PrincipalConsolePage: React.FC = () => {
                   letterSpacing: '0.04em',
                 }}
               >
-                Principal & Head of Institution
+                {user?.role === 'PRINCIPAL' ? 'Principal & Head of Institution' : 'Institution Admin · Principal view'}
               </span>
+              {institution.affiliation && (
               <span
                 style={{
                   fontSize: '0.75rem',
@@ -403,15 +406,16 @@ export const PrincipalConsolePage: React.FC = () => {
                   borderRadius: '999px',
                 }}
               >
-                Autonomous • NAAC A++ • NBA
+                {institution.affiliation}
               </span>
+              )}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.4rem', flexWrap: 'wrap' }}>
-              <span>{user?.designation || 'Principal & Professor'}</span>
+              <span>{user?.designation || (user?.role === 'PRINCIPAL' ? 'Principal' : 'Institution Admin')}</span>
               <span>&bull;</span>
-              <span>ID: <strong style={{ color: '#f8fafc' }}>{user?.employeeId || 'EMP002'}</strong></span>
+              <span>ID: <strong style={{ color: '#f8fafc' }}>{user?.employeeId}</strong></span>
               <span>&bull;</span>
-              <span style={{ color: '#cbd5e1' }}>{user?.email || 'principal@college.edu'}</span>
+              <span style={{ color: '#cbd5e1' }}>{user?.email}</span>
               <span>&bull;</span>
               <span style={{ color: '#38bdf8' }}>
                 <InstitutionName fallback="FacultyCore Institution" />
