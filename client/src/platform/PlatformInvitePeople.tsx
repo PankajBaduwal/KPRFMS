@@ -52,7 +52,7 @@ const Dialog: React.FC<{ open: boolean; title: string; onClose: () => void; wide
 };
 
 /** Active institutions only: people can only be added to an active institution. */
-const InstitutionSelect: React.FC<{ value: string; onChange: (code: string) => void }> = ({ value, onChange }) => {
+const InstitutionSelect: React.FC<{ value: string; onChange: (code: string) => void; locked?: boolean }> = ({ value, onChange, locked }) => {
   const list = useQuery({
     queryKey: ['platform', 'institutions', 'active-for-invite'],
     queryFn: () => platformApi.institutions({ status: 'ACTIVE', sort: 'name', page: 1, limit: 100 }),
@@ -63,7 +63,7 @@ const InstitutionSelect: React.FC<{ value: string; onChange: (code: string) => v
   return (
     <label>
       Institution
-      <select required value={value} onChange={(e) => onChange(e.target.value)} disabled={list.isLoading}>
+      <select required value={value} onChange={(e) => onChange(e.target.value)} disabled={list.isLoading || locked}>
         <option value="">{list.isLoading ? 'Loading…' : 'Choose an institution'}</option>
         {list.data?.items.map((i) => (
           <option key={i.code} value={i.code}>
@@ -141,7 +141,7 @@ const SendInvitationsStep: React.FC<{ code: string; emails: string[]; onSent?: (
 const EMPTY_PERSON: InvitePersonInput = { employeeId: '', name: '', email: '', department: '', designation: '', phone: '', role: 'FACULTY' };
 type Enrolled = { email: string; name: string; role: string; department: string };
 
-export const EnrollPersonDialog: React.FC<{ open: boolean; onClose: () => void; initialCode?: string; onDone: (text: string) => void }> = ({ open, onClose, initialCode = '', onDone }) => {
+export const EnrollPersonDialog: React.FC<{ open: boolean; onClose: () => void; initialCode?: string; lockCode?: boolean; onDone: (text: string) => void }> = ({ open, onClose, initialCode = '', lockCode, onDone }) => {
   const queryClient = useQueryClient();
   const [code, setCode] = useState(initialCode);
   const [person, setPerson] = useState<InvitePersonInput>(EMPTY_PERSON);
@@ -152,12 +152,12 @@ export const EnrollPersonDialog: React.FC<{ open: boolean; onClose: () => void; 
 
   useEffect(() => {
     if (open) {
-      setCode((c) => c || initialCode);
+      setCode((c) => (lockCode ? initialCode : c || initialCode));
       setError(null);
       setEnrolled(null);
       setInvited(false);
     }
-  }, [open, initialCode]);
+  }, [open, initialCode, lockCode]);
 
   const set = (key: keyof InvitePersonInput) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setPerson((p) => ({ ...p, [key]: e.target.value }));
   const enroll = useMutation({
@@ -230,6 +230,7 @@ export const EnrollPersonDialog: React.FC<{ open: boolean; onClose: () => void; 
           <div className="span-2">
             <InstitutionSelect
               value={code}
+              locked={lockCode}
               onChange={(c) => {
                 setCode(c);
                 setPerson((p) => ({ ...p, department: '' }));
@@ -317,7 +318,7 @@ const saveBlob = (blob: Blob, name: string) => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
-export const BulkEnrollDialog: React.FC<{ open: boolean; onClose: () => void; initialCode?: string; onDone: (text: string) => void }> = ({ open, onClose, initialCode = '', onDone }) => {
+export const BulkEnrollDialog: React.FC<{ open: boolean; onClose: () => void; initialCode?: string; lockCode?: boolean; onDone: (text: string) => void }> = ({ open, onClose, initialCode = '', lockCode, onDone }) => {
   const queryClient = useQueryClient();
   const [code, setCode] = useState(initialCode);
   const [file, setFile] = useState<File | null>(null);
@@ -340,10 +341,10 @@ export const BulkEnrollDialog: React.FC<{ open: boolean; onClose: () => void; in
   };
   useEffect(() => {
     if (open) {
-      setCode((c) => c || initialCode);
+      setCode((c) => (lockCode ? initialCode : c || initialCode));
       reset();
     }
-  }, [open, initialCode]);
+  }, [open, initialCode, lockCode]);
 
   const template = useMutation({
     mutationFn: () => platformApi.importTemplate(code),
@@ -403,6 +404,7 @@ export const BulkEnrollDialog: React.FC<{ open: boolean; onClose: () => void; in
             <div>
               <InstitutionSelect
                 value={code}
+                locked={lockCode}
                 onChange={(c) => {
                   setCode(c);
                   setPlan(null);

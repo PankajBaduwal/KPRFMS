@@ -6,6 +6,7 @@ import { formatErrorMessage } from '../utils/errorHandler';
 import { STATUS_LABEL, type InstitutionStatus } from './api';
 import { controlApi, fmt, bytes, when, ago, type ActivityItem } from './controlApi';
 import { BulkEnrollDialog, EnrollPersonDialog } from './PlatformInvitePeople';
+import { apiAssetUrl } from '../api/client';
 
 /** Super Admin control centre pages. Every figure comes from the platform registry or an institution's own database. */
 
@@ -469,15 +470,28 @@ export const PlatformOverviewPage: React.FC = () => {
 // ---- User management -------------------------------------------------------------------------------
 export const PlatformUsersPage: React.FC = () => {
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<'platform' | 'institution'>('platform');
-  const [institution, setInstitution] = useState('');
+  const [params, setParams] = useSearchParams();
+  const tab: 'platform' | 'institution' = params.get('tab') === 'institution' ? 'institution' : 'platform';
+  const institution = (params.get('college') ?? '').toLowerCase();
+  const setTab = (t: 'platform' | 'institution') => setParams(t === 'institution' ? { tab: t, ...(institution ? { college: institution } : {}) } : {});
+  const setInstitution = (code: string) => {
+    setParams(code ? { tab: 'institution', college: code } : { tab: 'institution' });
+    setMessage(null);
+  };
   const [role, setRole] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [inviteDialog, setInviteDialog] = useState<'one' | 'bulk' | null>(null);
   const accounts = useQuery({ queryKey: ['platform', 'accounts'], queryFn: controlApi.platformUsers, enabled: tab === 'platform' });
-  const admins = useQuery({ queryKey: ['platform', 'inst-admins', institution, role], queryFn: () => controlApi.institutionAdmins({ institution: institution || undefined, role: role || undefined }), enabled: tab === 'institution' });
+  const admins = useQuery({ queryKey: ['platform', 'inst-admins', institution, role], queryFn: () => controlApi.institutionAdmins({ institution, role: role || undefined }), enabled: tab === 'institution' && !!institution });
+  const colleges = useQuery({
+    queryKey: ['platform', 'institutions', 'for-user-management'],
+    queryFn: () => import('./api').then(({ platformApi }) => platformApi.institutions({ sort: 'name', page: 1, limit: 100 })),
+    enabled: tab === 'institution',
+  });
+  const manageable = (colleges.data?.items ?? []).filter((c) => c.status === 'ACTIVE' || c.status === 'SUSPENDED');
+  const college = manageable.find((c) => c.code === institution);
   const done = (text: string) => {
     setMessage({ ok: true, text });
     queryClient.invalidateQueries({ queryKey: ['platform'] });
@@ -491,10 +505,10 @@ export const PlatformUsersPage: React.FC = () => {
     <div className="pc-page">
       <Head title="User management" intro="Platform administrator accounts, and each institution’s administrative accounts. Institutional roles are managed by the institution itself." />
       <div className="pc-tabs" role="tablist">
-        <button type="button" className={tab === 'platform' ? 'active' : ''} onClick={() => setTab('platform')}>
+        <button type="button" role="tab" aria-selected={tab === 'platform'} className={tab === 'platform' ? 'active' : ''} onClick={() => setTab('platform')}>
           Platform administrators
         </button>
-        <button type="button" className={tab === 'institution' ? 'active' : ''} onClick={() => setTab('institution')}>
+        <button type="button" role="tab" aria-selected={tab === 'institution'} className={tab === 'institution' ? 'active' : ''} onClick={() => setTab('institution')}>
           Institution administrators
         </button>
       </div>
@@ -581,32 +595,88 @@ export const PlatformUsersPage: React.FC = () => {
           </section>
         </>
       ) : (
+        !institution || !college ? (
+          <section className="pc-card">
+            <h2>Choose a college to manage</h2>
+            <p className="pc-muted pc-small">User management works one college at a time. Pick the college whose people you want to enroll, invite or review.</p>
+            {institution && colleges.data && !college && <p className="pc-error">No active college with the code “{institution}”. Choose one below.</p>}
+            {colleges.isLoading && <Loading what="colleges" />}
+            {colleges.isError && <Failed error={colleges.error} what="Colleges" />}
+            {colleges.data && manageable.length === 0 && <p className="pc-muted">No active colleges yet. Create one under New institution.</p>}
+            <div className="pc-college-grid">
+              {manageable.map((c) => (
+                <button key={c.code} type="button" className="pc-college-card" onClick={() => setInstitution(c.code)}>
+                  <span className="pc-college-logo" aria-hidden="true">
+                    {c.logoUrl ? <img src={apiAssetUrl(c.logoUrl)} alt="" /> : <i className="bi bi-buildings" />}
+                  </span>
+                  <span className="pc-college-text">
+                    <strong>{c.name}</strong>
+                    <span className="pc-muted pc-small">
+                      {c.code}
+                      {c.city ? ` · ${c.city}` : ''}
+                      {c.status === 'SUSPENDED' ? ' · suspended' : ''}
+                    </span>
+                    <span className="pc-small">
+                      {c.usage?.users ?? 0} people{c.usage?.pendingInvitations ? ` · ${c.usage.pendingInvitations} invitation(s) pending` : ''}
+                    </span>
+                  </span>
+                  <i className="bi bi-chevron-right pc-muted" aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : (
         <>
-        <section className="pc-card pc-invite-card">
-          <div>
-            <h2>Enroll people in an institution</h2>
-            <p className="pc-muted pc-small">First enroll people (one at a time or from a spreadsheet), choosing the college and the role: Faculty, Head of Department, Dean, Principal or Institution Admin. Then send the invitation: each person gets a one-time password and a sign-in link, and chooses their own password after signing in. The college’s rules apply: official email domain, one Head per department, one Principal.</p>
+        <section className="pc-card pc-college-bar">
+          <span className="pc-college-logo" aria-hidden="true">
+            {college.logoUrl ? <img src={apiAssetUrl(college.logoUrl)} alt="" /> : <i className="bi bi-buildings" />}
+          </span>
+          <div className="pc-college-text">
+            <span className="pc-muted pc-small">Managing users of</span>
+            <strong>{college.name}</strong>
+            <span className="pc-muted pc-small">
+              {college.code}
+              {college.status === 'SUSPENDED' ? ' · suspended' : ''} · {college.usage?.users ?? 0} people
+            </span>
           </div>
           <div className="pc-actions">
-            <button type="button" className="pc-btn" onClick={() => setInviteDialog('bulk')}>
+            <Link className="pc-btn" to={`/platform/institutions/${college.code}`}>
+              College page
+            </Link>
+            <button type="button" className="pc-btn" onClick={() => setInstitution('')}>
+              <i className="bi bi-arrow-left-right" aria-hidden="true" /> Change college
+            </button>
+          </div>
+        </section>
+        <section className="pc-card pc-invite-card">
+          <div>
+            <h2>Enroll people in {college.name}</h2>
+            <p className="pc-muted pc-small">First enroll people (one at a time or from a spreadsheet) with their role: Faculty, Head of Department, Dean, Principal or Institution Admin. Then send the invitation: each person gets a one-time password and a sign-in link, and chooses their own password after signing in. The college’s rules apply: official email domain, one Head per department, one Principal.</p>
+            {college.status !== 'ACTIVE' && <p className="pc-note pc-small">This college is suspended: people can be enrolled again once it is reactivated.</p>}
+          </div>
+          <div className="pc-actions">
+            <button type="button" className="pc-btn" disabled={college.status !== 'ACTIVE'} onClick={() => setInviteDialog('bulk')}>
               <i className="bi bi-file-earmark-spreadsheet" aria-hidden="true" /> Bulk enroll (spreadsheet)
             </button>
-            <button type="button" className="pc-btn pc-btn-primary" onClick={() => setInviteDialog('one')}>
+            <button type="button" className="pc-btn pc-btn-primary" disabled={college.status !== 'ACTIVE'} onClick={() => setInviteDialog('one')}>
               <i className="bi bi-person-plus" aria-hidden="true" /> Enroll one person
             </button>
           </div>
         </section>
-        <EnrollPersonDialog open={inviteDialog === 'one'} initialCode={institution} onClose={() => setInviteDialog(null)} onDone={done} />
-        <BulkEnrollDialog open={inviteDialog === 'bulk'} initialCode={institution} onClose={() => setInviteDialog(null)} onDone={done} />
+        <EnrollPersonDialog key={`one-${college.code}`} open={inviteDialog === 'one'} initialCode={college.code} lockCode onClose={() => setInviteDialog(null)} onDone={done} />
+        <BulkEnrollDialog key={`bulk-${college.code}`} open={inviteDialog === 'bulk'} initialCode={college.code} lockCode onClose={() => setInviteDialog(null)} onDone={done} />
         <section className="pc-card">
+          <h2>Leadership accounts</h2>
           <div className="pc-filters">
-            <input placeholder="Institution code (all if empty)" value={institution} onChange={(e) => setInstitution(e.target.value.trim().toLowerCase())} aria-label="Institution" />
             <select value={role} onChange={(e) => setRole(e.target.value)} aria-label="Role">
               <option value="">Admin, Principal and Dean</option>
               <option value="ADMIN">Institution Admin</option>
               <option value="PRINCIPAL">Principal</option>
               <option value="DEAN">Dean</option>
             </select>
+            <Link className="pc-link pc-small" to={`/platform/invitations?institution=${college.code}`}>
+              Invitations for this college →
+            </Link>
           </div>
           {admins.isLoading && <Loading what="administrators" />}
           {admins.isError && <Failed error={admins.error} what="Administrators" />}
@@ -615,7 +685,6 @@ export const PlatformUsersPage: React.FC = () => {
               <table className="pc-table">
                 <thead>
                   <tr>
-                    <th>Institution</th>
                     <th>Name</th>
                     <th>Role</th>
                     <th>Status</th>
@@ -626,7 +695,7 @@ export const PlatformUsersPage: React.FC = () => {
                 <tbody>
                   {admins.data.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="pc-muted">
+                      <td colSpan={5} className="pc-muted">
                         No accounts match.
                       </td>
                     </tr>
@@ -634,16 +703,12 @@ export const PlatformUsersPage: React.FC = () => {
                   {admins.data.map((a, i) =>
                     a.error ? (
                       <tr key={i}>
-                        <td>{a.institutionName}</td>
                         <td colSpan={5} className="pc-error">
                           {a.error}
                         </td>
                       </tr>
                     ) : (
                       <tr key={i}>
-                        <td>
-                          <Link to={`/platform/institutions/${a.institutionCode}`}>{a.institutionCode}</Link>
-                        </td>
                         <td>
                           {a.name}
                           <div className="pc-muted pc-small">{a.email}</div>
@@ -665,9 +730,10 @@ export const PlatformUsersPage: React.FC = () => {
               </table>
             </div>
           )}
-          <p className="pc-note pc-muted pc-small">Roles and departments of institutional accounts are changed by the institution’s own administrator, not from the platform.</p>
+          <p className="pc-note pc-muted pc-small">Roles and departments of a college’s accounts are changed by that college’s own administrator, not from the platform.</p>
         </section>
         </>
+        )
       )}
     </div>
   );

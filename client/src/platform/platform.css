@@ -1452,3 +1452,21 @@
   .pc-dialog .pc-form-grid label.span-2 { grid-column: auto; }
   .pc-dialog-actions .pc-btn { flex: 1 1 100%; }
 }
+
+/* User management: choose a college first */
+.pc-college-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 12px; }
+.pc-college-card { display: flex; align-items: center; gap: 12px; padding: 14px; text-align: left; background: var(--pc-card-bg); border: 1px solid var(--pc-line); border-radius: 12px; cursor: pointer; font: inherit; color: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
+.pc-college-card:hover, .pc-college-card:focus-visible { border-color: var(--pc-accent-line); box-shadow: 0 2px 10px rgba(20, 43, 74, 0.08); outline: none; }
+.pc-college-logo { width: 48px; height: 48px; flex: none; display: grid; place-items: center; border: 1px solid var(--pc-line); border-radius: 10px; background: var(--pc-bg); color: var(--pc-muted); font-size: 1.3rem; overflow: hidden; }
+.pc-college-logo img { max-width: 42px; max-height: 42px; object-fit: contain; }
+.pc-college-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pc-college-text strong { color: var(--pc-ink); overflow-wrap: anywhere; }
+.pc-college-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border-left: 4px solid var(--pc-accent); }
+.pc-college-bar .pc-actions { margin-top: 0; }
+
+/* Page tabs (User management) */
+.pc-tabs { display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 16px; background: var(--pc-line-subtle); border: 1px solid var(--pc-line); border-radius: 10px; flex-wrap: wrap; }
+.pc-tabs button { padding: 8px 16px; border: 0; border-radius: 7px; background: transparent; color: var(--pc-ink-secondary); font: inherit; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+.pc-tabs button:hover { color: var(--pc-ink); }
+.pc-tabs button.active { background: var(--pc-card-bg); color: var(--pc-accent); box-shadow: 0 1px 3px rgba(15, 31, 56, 0.12); }
+.pc-tabs button:focus-visible { outline: 2px solid var(--pc-accent-line); outline-offset: 1px; }
