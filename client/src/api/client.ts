@@ -20,6 +20,16 @@ const getDefaultApiUrl = () => {
 
 export const API_BASE_URL = getDefaultApiUrl();
 
+/**
+ * Files the API serves (an institution's logo, /api/t/<code>/public/logo) as an address the browser
+ * can load: in development the web app and the API run on different ports, so "/api/…" alone would
+ * be requested from the web app and come back as a page, not an image.
+ */
+export function apiAssetUrl(url: string | undefined | null): string {
+  if (!url) return '';
+  return url.startsWith('/api/') ? `${new URL(API_BASE_URL, window.location.origin).origin}${url}` : url;
+}
+
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,

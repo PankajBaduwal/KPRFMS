@@ -1,3 +1,4 @@
+import { apiAssetUrl } from '../api/client';
 import React, { useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { platformApi, type InstitutionDetail } from './api';
@@ -115,7 +116,7 @@ export const InstitutionProfileEditor: React.FC<{ inst: InstitutionDetail; onClo
       </div>
       <div className="pc-logo-row">
         <div className="pc-logo-preview" aria-hidden={!logoUrl}>
-          {logoUrl ? <img src={logoUrl} alt={`${inst.name} logo`} /> : <i className="bi bi-image" aria-hidden="true" />}
+          {logoUrl ? <img src={apiAssetUrl(logoUrl)} alt={`${inst.name} logo`} /> : <i className="bi bi-image" aria-hidden="true" />}
         </div>
         <div className="pc-logo-info">
           <strong className="pc-small">College logo</strong>

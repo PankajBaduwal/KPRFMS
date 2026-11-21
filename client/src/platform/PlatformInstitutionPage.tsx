@@ -1,3 +1,4 @@
+import { apiAssetUrl } from '../api/client';
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -130,7 +131,7 @@ export const PlatformInstitutionPage: React.FC = () => {
           <div className="pc-hero-main">
             <div className="pc-hero-avatar">
               {i.logoUrl ? (
-                <img src={i.logoUrl} alt="" />
+                <img src={apiAssetUrl(i.logoUrl)} alt="" />
               ) : (
                 <span>{initials}</span>
               )}

@@ -1,3 +1,4 @@
+import { apiAssetUrl } from '../api/client';
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
@@ -222,7 +223,7 @@ export const PlatformDashboardPage: React.FC = () => {
                     <td>
                       <div className="pc-inst">
                         {i.logoUrl ? (
-                          <img src={i.logoUrl} alt="" width={32} height={32} />
+                          <img src={apiAssetUrl(i.logoUrl)} alt="" width={32} height={32} />
                         ) : (
                           <span className="pc-inst-mark">{i.name.charAt(0)}</span>
                         )}

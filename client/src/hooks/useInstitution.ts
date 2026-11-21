@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { apiGet, API_BASE_URL } from '../api/client';
+import { apiGet, apiAssetUrl } from '../api/client';
 import { useInstitutionCode } from '../lib/institution';
 
 export interface InstitutionBranding {
@@ -60,7 +60,7 @@ export function useInstitution(): InstitutionBranding {
     queryFn: async () => {
       const b = (await apiGet<InstitutionBranding>('/public/institution')).data;
       // An uploaded logo is served by the API, which may be on another origin
-      return { ...b, logoUrl: b.logoUrl.startsWith('/api/') ? `${new URL(API_BASE_URL).origin}${b.logoUrl}` : b.logoUrl };
+      return { ...b, logoUrl: apiAssetUrl(b.logoUrl) };
     },
     staleTime: 5 * 60_000,
   });
