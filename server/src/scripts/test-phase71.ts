@@ -65,6 +65,8 @@ const b = (p: string, method = 'GET', token?: string, body?: unknown, headers?: 
 async function tokenFor(ctx: TenantContext, filter: Record<string, unknown>, sid?: string) {
   const u = await runInTenant(ctx, () => User.findOne(filter).lean());
   if (!u) throw new Error(`No user ${JSON.stringify(filter)} in ${ctx.code}`);
+  // A real sign-in records lastLogin; without it, invitation reminders would treat the account as never used
+  if (!u.lastLogin) await runInTenant(ctx, () => User.updateOne({ _id: u._id }, { $set: { lastLogin: new Date() } }));
   return runInTenant(ctx, () => generateToken({ id: String(u._id), email: u.email, role: u.role, departmentId: u.departmentId ? String(u.departmentId) : undefined, ...(sid ? { sid } : {}) }));
 }
 const pdf = () => Buffer.concat([Buffer.from('%PDF-1.4\n%test\n'), crypto.randomBytes(64), Buffer.from('\n%%EOF\n')]);
@@ -193,7 +195,10 @@ async function run() {
     const nameA = (await a('/public/institution')).data.data.name as string;
     const shortA = (await a('/public/institution')).data.data.shortCode as string;
     assert(fresh.length > 0 && fresh.every((m) => m.subject.startsWith(`[${shortA}]`) && m.from.includes(nameA) && m.html.includes(nameA)), 'Reminders carry the institution’s name in subject, sender and body', fresh[0]?.subject);
-    assert(fresh.every((m) => !m.to.includes(',') && !m.text.includes('@college.edu') || m.text.split('@college.edu').length <= 2), 'Each email goes to one person and lists no one else’s address');
+    // Only the recipient's own address and the institution's help contact may appear in the text
+    const contactA = String((await a('/public/institution')).data.data.contactEmail ?? '').toLowerCase();
+    const onlyOwn = (m: { to: string; text: string }) => (m.text.match(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g) ?? []).every((addr) => [m.to.toLowerCase(), contactA].includes(addr.toLowerCase()));
+    assert(fresh.every((m) => !m.to.includes(',') && onlyOwn(m)), 'Each email goes to one person and lists no one else’s address', fresh.find((m) => !onlyOwn(m))?.text);
     const again = await a('/admin/users/invitations/remind', 'POST', adminA, {});
     assert(again.data?.data?.sent === 0 && again.data?.data?.skippedRecentlyInvited >= remind.data.data.sent, 'Nobody is reminded twice in a day', again.data);
   } else {

@@ -10,8 +10,8 @@ const MIN_GAP_MS = 24 * 60 * 60 * 1000;
 const MAX_PER_RUN = 200;
 
 /**
- * Invitation reminders: a fresh "set your password" link for active accounts in this institution
- * that have never signed in. Each email goes to that person only.
+ * Invitation reminders: a new one-time password for active accounts in this institution that have
+ * never signed in. Each email goes to that person only.
  */
 export const invitationService = {
   async pending() {
@@ -25,7 +25,12 @@ export const invitationService = {
 
   async remind(userIds: string[] | undefined, adminId: string, req?: Request) {
     const filter: Record<string, unknown> = { status: USER_STATUS.ACTIVE, lastLogin: { $exists: false } };
-    if (userIds?.length) filter._id = { $in: userIds.filter((id) => Types.ObjectId.isValid(id)).map((id) => new Types.ObjectId(id)) };
+    // Never the administrator sending the reminders: a reminder replaces the password with a one-time one
+    const self = Types.ObjectId.isValid(adminId) ? new Types.ObjectId(adminId) : undefined;
+    filter._id = {
+      ...(userIds?.length ? { $in: userIds.filter((id) => Types.ObjectId.isValid(id)).map((id) => new Types.ObjectId(id)) } : {}),
+      ...(self ? { $ne: self } : {}),
+    };
     const candidates = await User.find(filter).select('name email employeeId invitedAt').limit(MAX_PER_RUN).lean();
     let sent = 0;
     let tooSoon = 0;
