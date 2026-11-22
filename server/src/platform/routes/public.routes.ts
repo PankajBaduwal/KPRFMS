@@ -63,7 +63,7 @@ router.get('/institutions', async (req, res, next) => {
  */
 router.get(['/demo/accounts', '/accounts'], demoOnly, async (_req, res, next) => {
   try {
-    const institutions = await Institution.find({ status: 'ACTIVE' })
+    const institutions = await Institution.find({ status: 'ACTIVE', ...(env.DEMO_INSTITUTIONS.length ? { code: { $in: env.DEMO_INSTITUTIONS } } : {}) })
       .select('code name type city state')
       .sort({ name: 1 })
       .lean();
@@ -204,7 +204,10 @@ router.post(['/demo/login', '/login', '/demo-login'], demoOnly, authLimiter, asy
       return sendSuccess(res, { isPlatform: true, user: result, token: result.token }, 'Platform Super Admin signed in successfully.');
     }
 
-    // Institutional Demo Login
+    // Institutional Demo Login (only the institutions the demo picker offers)
+    if (env.DEMO_INSTITUTIONS.length && !env.DEMO_INSTITUTIONS.includes(institutionCode)) {
+      throw AppError.forbidden('One-click demo sign-in is not offered for this institution.');
+    }
     const tenant = await resolveActiveTenant(institutionCode);
     const result = await runInTenant(tenant, async () => {
       const query: Record<string, unknown> = {

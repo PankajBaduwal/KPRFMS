@@ -47,6 +47,8 @@ const testEnv: NodeJS.ProcessEnv = {
   SMTP_HOST: '',
   // The test API never backs up on a timer; phase 79 runs the scheduler directly
   BACKUP_EVERY_HOURS: '0',
+  // Every test institution may use one-click demo sign-in, whatever the local .env limits it to
+  DEMO_INSTITUTIONS: '',
   // Tests never call the paid AI service; phase 61 checks the AI routes with AI switched off
   GEMINI_API_KEY: '',
   // Multi-institution: a separate platform registry and test-only institution databases.

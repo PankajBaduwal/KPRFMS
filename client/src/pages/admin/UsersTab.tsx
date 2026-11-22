@@ -7,6 +7,7 @@ import type { IAdminDepartment, IAdminOverview, IAdminRole, IAdminUser } from '.
 import { ConfirmationDialog } from '../../components/ConfirmationDialog';
 import { adminService } from '../../services/admin.service';
 import { FacultyImportModal } from './FacultyImportModal';
+import { NotSignedInPanel } from './NotSignedInPanel';
 
 export interface UsersTabProps {
   departmentsList: IAdminDepartment[];
@@ -126,6 +127,7 @@ export const UsersTab: React.FC<UsersTabProps> = ({ departmentsList, handleAppro
                     </button>
                   </div>
                 )}
+                <NotSignedInPanel showToast={showToast} refreshKey={users} />
                 {/* Filter Bar & Action Header */}
                 <div
                   style={{

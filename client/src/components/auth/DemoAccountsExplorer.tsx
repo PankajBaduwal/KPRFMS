@@ -41,7 +41,7 @@ export const DemoAccountsExplorer: React.FC<DemoAccountsExplorerProps> = ({
   const [catalog, setCatalog] = useState<DemoCatalogResponse>({ institutions: [], platformSuperAdmin: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedInstCode, setSelectedInstCode] = useState<string>(initialInstCode?.toLowerCase() || 'kpriet');
+  const [selectedInstCode, setSelectedInstCode] = useState<string>(initialInstCode?.toLowerCase() || 'demo');
   const [selectedDeptCode, setSelectedDeptCode] = useState<string>('ALL');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState<string>(() => {
     const role = initialRole?.toUpperCase();

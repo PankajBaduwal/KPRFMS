@@ -207,7 +207,7 @@ const ROLE_DETAILS = [
       tag: 'System Administration',
       stat1: { label: 'Active Users', val: '172' },
       stat2: { label: 'Audit Trail Records', val: '3,100+' },
-      stat3: { label: 'Database Isolation', val: 'fc_t_kpriet' },
+      stat3: { label: 'Database Isolation', val: 'fc_t_demo' },
       status: 'System Healthy · SSL Encrypted',
     },
   },
@@ -215,16 +215,6 @@ const ROLE_DETAILS = [
 
 /** Registered Institutional Demo Environments */
 const REGISTERED_COLLEGES = [
-  {
-    code: 'kpriet',
-    name: 'KPR Institute of Engineering and Technology',
-    location: 'Coimbatore, Tamil Nadu',
-    type: 'Autonomous Engineering College',
-    departmentsCount: 7,
-    departments: ['CSE', 'ECE', 'MECH', 'EEE', 'IT', 'AI&DS', 'CIVIL'],
-    facultyCount: '165+ Faculty Members',
-    highlights: ['Autonomous Institution', 'NAAC A Grade', 'NBA Accredited Programs', 'Active Research Centers'],
-  },
   {
     code: 'demo',
     name: 'Demo Institute of Technology',
@@ -451,7 +441,7 @@ export const HomePage: React.FC = () => {
                 <strong><AnimatedNumber value={2} duration={1000} /></strong>
               </div>
               <span>Registered Colleges</span>
-              <small>KPRIET &amp; Demo Institute</small>
+              <small>Each with its own database</small>
             </div>
 
             <div className="pub-stat">
@@ -889,7 +879,7 @@ export const HomePage: React.FC = () => {
           <div className="pub-cta-copy">
             <h2>Explore FacultyCore in Action</h2>
             <p>
-              Experience live institutional dashboards with real sample data across KPRIET and Demo Institute. Sign in with
+              Experience live institutional dashboards with real sample data from the Demo Institute of Technology. Sign in with
               one click as Principal, Admin, Dean, HOD, or Faculty.
             </p>
           </div>

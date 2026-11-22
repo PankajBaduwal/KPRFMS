@@ -31,6 +31,12 @@ const envSchema = z.object({
     .string()
     .default('false')
     .transform((v) => ['true', '1', 'yes'].includes(String(v).trim().toLowerCase())),
+  // Which institutions the one-click demo picker offers, as comma-separated codes (e.g. "demo").
+  // Empty = every active institution that has accounts tagged isDemo
+  DEMO_INSTITUTIONS: z
+    .string()
+    .default('')
+    .transform((v) => v.split(',').map((c) => c.trim().toLowerCase()).filter(Boolean)),
   // Google Gemini for the AI assistant features (disabled when the key is missing)
   GEMINI_API_KEY: z.string().optional(),
   GEMINI_MODEL: z.string().default('gemini-flash-latest'),

@@ -43,7 +43,14 @@ function assertEnabled() {
 }
 
 /** Errors worth retrying on the fallback model: overload, rate limit, server error, timeout. */
-class RetryableError extends Error {}
+const BUSY_RETRY_DELAY_MS = process.env.NODE_ENV === 'test' ? 0 : 2000;
+
+class RetryableError extends Error {
+  /** true for "too busy" answers (429/503), which usually clear within seconds */
+  constructor(message: string, readonly busy = false) {
+    super(message);
+  }
+}
 
 async function callModel(model: string, options: GenerateOptions): Promise<string> {
   const body = {
@@ -72,7 +79,7 @@ async function callModel(model: string, options: GenerateOptions): Promise<strin
   const data = (await res.json().catch(() => ({}))) as any;
   if (!res.ok) {
     const message = data?.error?.message || `HTTP ${res.status}`;
-    if ([429, 500, 502, 503, 504].includes(res.status)) throw new RetryableError(`Gemini (${model}): ${message}`);
+    if ([429, 500, 502, 503, 504].includes(res.status)) throw new RetryableError(`Gemini (${model}): ${message}`, res.status === 429 || res.status === 503);
     if (res.status === 400 && /api key/i.test(message)) {
       throw new AppError('The AI key is invalid. Check GEMINI_API_KEY in server/.env.', 503, 'AI_KEY_INVALID');
     }
@@ -95,14 +102,21 @@ async function callModel(model: string, options: GenerateOptions): Promise<strin
 async function generate(options: GenerateOptions): Promise<string> {
   assertEnabled();
   const models = [...new Set([env.GEMINI_MODEL, env.GEMINI_FALLBACK_MODEL].filter(Boolean))];
-  let lastError: Error | null = null;
-  for (const model of models) {
-    try {
-      return await callModel(model, options);
-    } catch (error) {
-      if (!(error instanceof RetryableError)) throw error;
-      lastError = error;
-      logger.warn(error.message);
+  let lastError: RetryableError | null = null;
+  // Second round only when every model said "busy": demand spikes usually pass within seconds
+  for (let round = 0; round < 2; round++) {
+    if (round === 1) {
+      if (!lastError?.busy) break;
+      await new Promise((r) => setTimeout(r, BUSY_RETRY_DELAY_MS));
+    }
+    for (const model of models) {
+      try {
+        return await callModel(model, options);
+      } catch (error) {
+        if (!(error instanceof RetryableError)) throw error;
+        lastError = error;
+        logger.warn(error.message);
+      }
     }
   }
   throw new AppError(

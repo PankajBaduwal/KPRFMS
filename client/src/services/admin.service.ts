@@ -62,6 +62,18 @@ export const adminService = {
     return res.data.data;
   },
 
+  /** Active accounts that have never signed in (invitation not used yet) */
+  async notSignedIn(): Promise<Array<{ id: string; name: string; email: string; role: string; invitedAt: string | null }>> {
+    const res = await apiClient.get(`${BASE}/users/invitations/pending`);
+    return res.data.data;
+  },
+
+  /** Emails a fresh one-time password and sign-in link; all not-signed-in accounts when userIds is omitted */
+  async sendInvitationReminders(userIds?: string[]): Promise<{ sent: number; skippedRecentlyInvited: number; failed: number }> {
+    const res = await apiClient.post(`${BASE}/users/invitations/remind`, userIds ? { userIds } : {});
+    return res.data.data;
+  },
+
   async approveRegistration(id: string): Promise<IAdminUser> {
     const res = await apiClient.post(`${BASE}/users/${id}/approve-registration`);
     return res.data.data;
