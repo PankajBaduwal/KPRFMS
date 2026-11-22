@@ -43,7 +43,7 @@ export const CANONICAL_GROUPS: ICanonicalGroupDef[] = ([
   },
   {
     id: 'PUBLICATIONS',
-    label: 'Publications',
+    label: 'Publications & Patents',
     icon: 'bi-journal-bookmark',
     accent: '#059669',
     bgLight: '#ecfdf5',

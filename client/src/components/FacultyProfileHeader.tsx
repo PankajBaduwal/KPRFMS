@@ -173,9 +173,9 @@ export const FacultyProfileHeader: React.FC<FacultyProfileHeaderProps> = ({ prof
             <span className="dossier-summary-tile-val">{publicationsCount}</span>
           </div>
 
-          <div className="dossier-summary-tile" title="Funded and Student Research Projects">
+          <div className="dossier-summary-tile" title="Funded research projects plus student projects guided">
             <div className="dossier-summary-tile-top">
-              <span className="dossier-summary-tile-label">Projects</span>
+              <span className="dossier-summary-tile-label">All Projects</span>
               <i className="bi bi-folder2-open dossier-summary-tile-icon" aria-hidden="true" />
             </div>
             <span className="dossier-summary-tile-val">{totalProjectsCount}</span>
@@ -197,7 +197,7 @@ export const FacultyProfileHeader: React.FC<FacultyProfileHeaderProps> = ({ prof
             <span className="dossier-summary-tile-val">{fundedProjectsCount}</span>
           </div>
 
-          <div className="dossier-summary-tile" title="Doctoral Scholars Supervised">
+          <div className="dossier-summary-tile" title="All doctoral scholars supervised, including completed">
             <div className="dossier-summary-tile-top">
               <span className="dossier-summary-tile-label">PhD Scholars</span>
               <i className="bi bi-mortarboard dossier-summary-tile-icon" aria-hidden="true" />

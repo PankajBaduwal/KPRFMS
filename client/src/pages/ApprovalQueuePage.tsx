@@ -280,7 +280,7 @@ export const ApprovalQueuePage: React.FC = () => {
             </div>
             <div>
               <h1 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 800, color: '#172B45' }}>
-                HOD Approval Queue
+                {user?.role === 'HOD' ? 'Department Approval Queue' : 'Approval Queue'}
               </h1>
               <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
                 Institutional verification console for faculty submissions across research, {FEATURES.TEACHING ? 'teaching, ' : ''}leaves, and appraisal

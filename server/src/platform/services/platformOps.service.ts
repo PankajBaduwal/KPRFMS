@@ -15,7 +15,7 @@ import { User } from '../../models/User.js';
 import { Department } from '../../models/Department.js';
 import { env } from '../../config/env.js';
 import { mailService } from '../../services/mail.service.js';
-import { dumpDatabase, listBackups, verifyBackup, BACKUP_ROOT } from '../../services/backup.service.js';
+import { dumpDatabase, listBackups, verifyBackup, BACKUP_ROOT, backupIntervalHours } from '../../services/backup.service.js';
 import { AppError } from '../../utils/AppError.js';
 import { hashPassword } from '../../utils/password.js';
 import { randomToken } from '../../utils/secureToken.js';
@@ -426,7 +426,7 @@ export const platformOpsService = {
 
   // ---- Backups ------------------------------------------------------------------------------
   backups() {
-    return { root: BACKUP_ROOT(), staleAfterDays: BACKUP_STALE_DAYS, items: listBackups() };
+    return { root: BACKUP_ROOT(), staleAfterDays: BACKUP_STALE_DAYS, everyHours: backupIntervalHours(), items: listBackups() };
   },
 
   /** Backs up the platform database or one institution (by registry code; never a database name). */

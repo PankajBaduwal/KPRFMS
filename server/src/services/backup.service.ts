@@ -146,3 +146,10 @@ export async function verifyBackup(id: string): Promise<{ id: string; ok: boolea
   }
   return { id, ok: problems.length === 0, checked, problems };
 }
+
+/** Hours between automatic backups (BACKUP_EVERY_HOURS, default 24); 0 means they are switched off. */
+export function backupIntervalHours(): number {
+  const raw = process.env.BACKUP_EVERY_HOURS;
+  const hours = raw === undefined || raw === '' ? 24 : Number(raw);
+  return Number.isFinite(hours) && hours > 0 ? hours : 0;
+}

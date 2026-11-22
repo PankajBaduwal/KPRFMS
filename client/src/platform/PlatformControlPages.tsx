@@ -1045,7 +1045,14 @@ export const PlatformBackupsPage: React.FC = () => {
         </div>
         {message && <p className={message.ok ? 'pc-ok' : 'pc-error'}>{message.text}</p>}
         <p className="pc-muted pc-small">
-          {q.data ? `Stored in ${q.data.root}. The newest 14 backups of each are kept. Copy this folder off the server regularly.` : ''} Schedule <code>npm run backup -- --all</code> daily on the server for automatic backups.
+          {q.data && (
+            <>
+              {q.data.everyHours
+                ? `Automatic backups run every ${q.data.everyHours === 24 ? 'day' : `${q.data.everyHours} hours`} for the platform and each active or suspended college (BACKUP_EVERY_HOURS in server/.env; 0 switches them off). `
+                : 'Automatic backups are switched off (BACKUP_EVERY_HOURS=0 in server/.env); use Back up now. '}
+              Stored in {q.data.root}. The newest 14 backups of each are kept. Copy this folder off the server regularly.
+            </>
+          )}
         </p>
       </section>
       <section className="pc-card">

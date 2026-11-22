@@ -1,5 +1,5 @@
 import { Institution } from '../models/Institution.js';
-import { listBackups } from '../../services/backup.service.js';
+import { listBackups, backupIntervalHours } from '../../services/backup.service.js';
 import { platformOpsService } from './platformOps.service.js';
 import { logger } from '../../utils/logger.js';
 
@@ -13,11 +13,7 @@ const SYSTEM_ACTOR = { id: 'system', email: 'scheduled-backup' };
 const FIRST_RUN_DELAY_MS = 2 * 60_000;
 const CHECK_EVERY_MS = 60 * 60_000;
 
-export function backupIntervalHours(): number {
-  const raw = process.env.BACKUP_EVERY_HOURS;
-  const hours = raw === undefined || raw === '' ? 24 : Number(raw);
-  return Number.isFinite(hours) && hours > 0 ? hours : 0;
-}
+export { backupIntervalHours };
 
 let running = false;
 

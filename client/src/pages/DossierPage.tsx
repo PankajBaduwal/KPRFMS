@@ -137,7 +137,7 @@ export const DossierPage: React.FC = () => {
           <div className="ds-banner-info">
             <div className="ds-role-tag">
               <i className="bi bi-shield-check" aria-hidden="true" />
-              <span>{id.cadre || 'Professor'} &bull; {id.designation}</span>
+              <span>{id.cadre && id.cadre.trim().toLowerCase() !== (id.designation || '').trim().toLowerCase() ? <>{id.cadre} &bull; {id.designation}</> : id.designation}</span>
             </div>
             <h1 className="ds-name">
               {id.title && !id.name.toLowerCase().startsWith(id.title.toLowerCase().replace(/\.$/, '')) ? `${id.title} ` : ''}

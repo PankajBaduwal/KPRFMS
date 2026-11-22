@@ -195,7 +195,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
             </div>
             <div className="pedigree-box-sub">
               Emp ID: <strong>{profile.employeeId}</strong>
-              {profile.employment?.biometricId ? ` &bull; Bio: ${profile.employment.biometricId}` : ''}
+              {profile.employment?.biometricId ? ` • Bio: ${profile.employment.biometricId}` : ''}
             </div>
           </div>
 

@@ -2422,9 +2422,11 @@ textarea.form-control-custom {
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 0.05em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Wrap instead of cutting the label off on narrow screens */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+  min-width: 0;
 }
 
 .dossier-summary-tile-icon {
