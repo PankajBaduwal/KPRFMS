@@ -880,3 +880,19 @@
     display: none;
   }
 }
+
+/* Developer credit (all footers) */
+.dev-credit-link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.dev-credit-link:hover,
+.dev-credit-link:focus-visible {
+  color: var(--color-royal-blue, #2864A5);
+}
+.pub-footer .dev-credit-link:hover,
+.pub-footer .dev-credit-link:focus-visible {
+  color: #ffffff;
+}

@@ -10,7 +10,7 @@ import { ROUTES } from '../constants/routes';
 import { FEATURES, isHiddenPath } from '../constants/features';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 import { useAcademicYears } from '../hooks/useAcademicYears';
-import { PRODUCT_NAME, PRODUCT_TAGLINE, PORTAL_NAME, PRODUCT_FULL_NAME } from '../config/brand';
+import { PRODUCT_NAME, PRODUCT_TAGLINE, PORTAL_NAME, PRODUCT_FULL_NAME, DEVELOPER_NAME, DEVELOPER_URL } from '../config/brand';
 import { BrandMark } from '../components/BrandMark';
 import { useInstitution } from '../hooks/useInstitution';
 import { useQuery } from '@tanstack/react-query';
@@ -933,6 +933,8 @@ export const AppLayout: React.FC = () => {
               <span>Academic Year: <strong>{currentYear || '2026-2027'}</strong></span>
               <span className="app-footer-divider">&bull;</span>
               <span>Powered by <strong>{PRODUCT_NAME}</strong></span>
+              <span className="app-footer-divider">&bull;</span>
+              <span>Developed by <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="dev-credit-link">{DEVELOPER_NAME}</a></span>
               <span className="app-footer-divider">&bull;</span>
               <span className="app-footer-status">
                 <span className="status-dot" aria-hidden="true" />

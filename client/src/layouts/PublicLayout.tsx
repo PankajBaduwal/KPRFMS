@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import '../styles/public.css';
 import '../styles/public-motion.css';
-import { PRODUCT_NAME, PRODUCT_FULL_NAME, PRODUCT_TAGLINE, PRODUCT_MARK, PRODUCT_HORIZONTAL, PRODUCT_WORDMARK } from '../config/brand';
+import { PRODUCT_NAME, PRODUCT_FULL_NAME, PRODUCT_TAGLINE, PRODUCT_MARK, PRODUCT_HORIZONTAL, PRODUCT_WORDMARK, DEVELOPER_NAME, DEVELOPER_URL } from '../config/brand';
 
 const NAV = [
   { href: '#features', label: 'Features' },
@@ -149,7 +149,9 @@ export const PublicLayout: React.FC = () => {
           </div>
         </div>
         <div className="pub-container pub-footer-bottom">
-          <span>&copy; {new Date().getFullYear()} {PRODUCT_NAME}. Complete Academic Management.</span>
+          <span>
+            &copy; {new Date().getFullYear()} {PRODUCT_NAME}. Complete Academic Management. Developed by <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="dev-credit-link">{DEVELOPER_NAME}</a>
+          </span>
           <span className="pub-footer-links">
             <span style={{ color: '#94a3b8', fontSize: '0.8rem', marginRight: '1rem' }}>
               Multi-Tenant Institutional Architecture

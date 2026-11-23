@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet, Link, useSearchParams } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import '../styles/login.css';
-import { PRODUCT_NAME, PRODUCT_TAGLINE, PRODUCT_MARK } from '../config/brand';
+import { PRODUCT_NAME, PRODUCT_TAGLINE, PRODUCT_MARK, DEVELOPER_NAME, DEVELOPER_URL } from '../config/brand';
 
 /** Shell for sign in, register and reset password: slim header, centred content, one-line footer. */
 export const AuthLayout: React.FC = () => {
@@ -24,6 +24,8 @@ export const AuthLayout: React.FC = () => {
         <Outlet />
         <p className="auth-footer-line">
           &copy; {new Date().getFullYear()} {PRODUCT_NAME} · {PRODUCT_TAGLINE}
+          <br />
+          Developed by <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="dev-credit-link">{DEVELOPER_NAME}</a>
         </p>
       </main>
     </div>

@@ -15,3 +15,6 @@ export const PRODUCT_WORDMARK = '/images/facultycore-horizontal.png';
 /** Prefix for this app's keys in browser storage. */
 export const STORAGE_PREFIX = 'facultycore_';
 
+/** Developer credit shown in every footer */
+export const DEVELOPER_NAME = 'Pankaj Baduwal';
+export const DEVELOPER_URL = 'https://pankajbaduwal.vercel.app/#home';
