@@ -134,6 +134,7 @@ export const institutionSettingsSchema = z.object({
   currentSemesterType: z.enum(['ODD', 'EVEN']).default('ODD'),
   allowSelfRegistration: z.boolean().optional().default(false),
   maintenanceMode: z.boolean().optional().default(false),
+  requireAdminTwoFactor: z.boolean().optional().default(false),
   sessionTimeoutMinutes: z.coerce.number().min(15).max(1440).default(60),
   maxUploadSizeMb: z.coerce.number().min(1).max(100).default(10),
   accentColor: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/, 'Accent colour must be a hex colour such as #13294B').optional(),

@@ -17,6 +17,8 @@ import { recordAudit } from '../audit/auditLogger.js';
 import { AUDIT_ACTIONS } from '../models/AuditLog.js';
 import { mailService } from './mail.service.js';
 import { PRODUCT_NAME } from '../config/brand.js';
+import { getInstitutionProfile } from '../utils/institution.js';
+import { ROLES } from '../permissions/roles.js';
 
 async function loadUser(userId: string) {
   const user = await User.findById(userId).select('+twoFactor +passwordHash');
@@ -112,6 +114,9 @@ export const twoFactorService = {
     const user = await loadUser(userId);
     if (!(await comparePassword(password, user.passwordHash))) throw AppError.badRequest('Password is incorrect.');
     if (!user.twoFactor?.enabled) return { enabled: false };
+    if (user.role === ROLES.ADMIN && (await getInstitutionProfile()).requireAdminTwoFactor) {
+      throw AppError.forbidden('Your institution requires two-factor sign-in for administrators, so it cannot be turned off.');
+    }
 
     user.twoFactor = { enabled: false, recoveryCodeHashes: [] };
     user.markModified('twoFactor');

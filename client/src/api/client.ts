@@ -148,6 +148,10 @@ apiClient.interceptors.response.use(
         case 403:
           fallbackCode = 'FORBIDDEN';
           fallbackMessage = 'You do not have permission to perform this action.';
+          // The session now needs a step first (own password, two-factor setup): reload who is signed in
+          if (errorData?.code === 'TWO_FACTOR_SETUP_REQUIRED' || errorData?.code === 'PASSWORD_CHANGE_REQUIRED') {
+            window.dispatchEvent(new CustomEvent('fms:session-step-required'));
+          }
           break;
         case 404:
           fallbackCode = 'NOT_FOUND';

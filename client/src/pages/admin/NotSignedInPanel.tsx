@@ -100,7 +100,7 @@ export const NotSignedInPanel: React.FC<{ showToast: (message: string) => void; 
         title={target === 'all' ? `Remind ${people.length} people?` : 'Send a reminder?'}
         message={
           <>
-            {target === 'all' ? 'Everyone who has not signed in yet' : <strong>{target && target !== 'all' ? target.name : ''}</strong>} will get an email with a new
+            {target === 'all' ? 'Everyone who has not signed in yet' : <strong>{target?.name ?? ''}</strong>} will get an email with a new
             one-time password and the sign-in link; any earlier one-time password stops working. People invited in the last day are skipped. You are never included.
           </>
         }

@@ -230,8 +230,11 @@ export class AuthService {
       details: { role: user.role, employeeId: user.employeeId, ...details },
     });
 
+    const twoFactorSetupRequired =
+      user.role === ROLES.ADMIN && !user.twoFactor?.enabled && (await getInstitutionProfile()).requireAdminTwoFactor;
     return {
       ...sessionUserView(user),
+      twoFactorSetupRequired,
       token,
     };
   }

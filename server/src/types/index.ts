@@ -17,6 +17,8 @@ export interface AuthenticatedUser {
   isDemo?: boolean;
   /** Signed in with an emailed one-time password and has not chosen their own yet */
   mustChangePassword?: boolean;
+  /** Institution requires two-factor sign-in for this administrator, who has not turned it on yet */
+  twoFactorSetupRequired?: boolean;
 }
 
 export interface AuthenticatedRequest extends Request {

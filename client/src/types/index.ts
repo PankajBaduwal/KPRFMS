@@ -18,6 +18,8 @@ export interface User {
   lastLogin?: string;
   /** Signed in with an emailed one-time password: must choose their own before using the app */
   mustChangePassword?: boolean;
+  /** The institution requires two-factor sign-in for administrators and this one has not turned it on */
+  twoFactorSetupRequired?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

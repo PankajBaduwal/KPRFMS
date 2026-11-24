@@ -123,6 +123,18 @@ export const errorHandler: ErrorRequestHandler = (
     return;
   }
 
+  // 9b. Other body-parser refusals (body too large, unsupported charset or encoding, too many fields):
+  //     the client's fault, so a 4xx with a fixed message, never a 500
+  const parserErr = err as { type?: string; status?: number; expose?: boolean };
+  if (parserErr.type === 'entity.too.large') {
+    sendError(res, 'The request is too large.', 'PAYLOAD_TOO_LARGE', 413);
+    return;
+  }
+  if (parserErr.expose && typeof parserErr.status === 'number' && parserErr.status >= 400 && parserErr.status < 500 && typeof parserErr.type === 'string') {
+    sendError(res, 'The request body could not be read.', 'BAD_REQUEST_BODY', parserErr.status);
+    return;
+  }
+
   // 10. Database unreachable: tell the client to retry, without any connection details
   if (/^Mongo(ServerSelection|NetworkTimeout|Network|NotConnected)Error$/.test(err.name) || /buffering timed out/i.test(err.message ?? '')) {
     logger.error('Database unavailable', { name: err.name });

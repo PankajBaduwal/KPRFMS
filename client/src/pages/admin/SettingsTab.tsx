@@ -435,6 +435,21 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ handleSaveSettings, se
                         Allow faculty self-registration (college email, admin approval required)
                       </label>
                     </div>
+                    <div className="form-check form-switch mt-2">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="adminTwoFactorSwitch"
+                        checked={settingsForm.requireAdminTwoFactor || false}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, requireAdminTwoFactor: e.target.checked })}
+                      />
+                      <label className="form-check-label font-semibold text-sm" htmlFor="adminTwoFactorSwitch">
+                        Require two-factor sign-in for administrators
+                      </label>
+                      <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                        Administrators without it are asked to set it up before they can continue, and cannot turn it off.
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

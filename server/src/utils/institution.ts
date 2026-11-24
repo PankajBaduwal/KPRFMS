@@ -28,6 +28,7 @@ export interface InstitutionProfile {
   accentColor: string;
   timezone: string;
   maintenanceMode: boolean;
+  requireAdminTwoFactor: boolean;
   sessionTimeoutMinutes: number;
   maxUploadSizeMb: number;
   enabledModules: OptionalModule[];
@@ -40,6 +41,7 @@ const FALLBACK: InstitutionProfile = {
   accentColor: DEFAULT_ACCENT_COLOR,
   timezone: DEFAULT_TIMEZONE,
   maintenanceMode: false,
+  requireAdminTwoFactor: false,
   sessionTimeoutMinutes: 60,
   maxUploadSizeMb: 10,
   enabledModules: [...OPTIONAL_MODULE_KEYS],
@@ -53,7 +55,7 @@ export async function getInstitutionProfile(): Promise<InstitutionProfile> {
   const hit = cached.get(key);
   if (hit && Date.now() - hit.at < TTL_MS) return hit.value;
   const s = await InstitutionSettings.findOne()
-    .select('name shortCode city state address contactEmail logoUrl logoFile accentColor timezone maintenanceMode sessionTimeoutMinutes maxUploadSizeMb enabledModules')
+    .select('name shortCode city state address contactEmail logoUrl logoFile accentColor timezone maintenanceMode requireAdminTwoFactor sessionTimeoutMinutes maxUploadSizeMb enabledModules')
     .lean();
   const value: InstitutionProfile = s
     ? {
@@ -68,6 +70,7 @@ export async function getInstitutionProfile(): Promise<InstitutionProfile> {
         accentColor: s.accentColor || DEFAULT_ACCENT_COLOR,
         timezone: s.timezone || DEFAULT_TIMEZONE,
         maintenanceMode: Boolean(s.maintenanceMode),
+        requireAdminTwoFactor: Boolean(s.requireAdminTwoFactor),
         sessionTimeoutMinutes: s.sessionTimeoutMinutes || 60,
         maxUploadSizeMb: s.maxUploadSizeMb || 10,
         // Settings saved before modules existed have none stored: everything stays on

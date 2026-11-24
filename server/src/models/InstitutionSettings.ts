@@ -60,6 +60,8 @@ export interface IInstitutionSettings extends Document {
   currentSemesterType: 'ODD' | 'EVEN';
   allowSelfRegistration: boolean;
   maintenanceMode: boolean;
+  /** Administrators must turn on two-factor sign-in before they can use the app */
+  requireAdminTwoFactor: boolean;
   sessionTimeoutMinutes: number;
   maxUploadSizeMb: number;
   leaderboardWeights: LeaderboardWeights;
@@ -164,6 +166,10 @@ const institutionSettingsSchema = new Schema<IInstitutionSettings>(
       default: false,
     },
     maintenanceMode: {
+      type: Boolean,
+      default: false,
+    },
+    requireAdminTwoFactor: {
       type: Boolean,
       default: false,
     },

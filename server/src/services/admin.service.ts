@@ -123,6 +123,7 @@ export class AdminService {
         currentAcademicYear: settings.currentAcademicYear,
         currentSemesterType: settings.currentSemesterType,
         maintenanceMode: settings.maintenanceMode,
+        requireAdminTwoFactor: Boolean(settings.requireAdminTwoFactor),
         sessionTimeoutMinutes: settings.sessionTimeoutMinutes,
         maxUploadSizeMb: settings.maxUploadSizeMb,
         enabledModules: settings.enabledModules,

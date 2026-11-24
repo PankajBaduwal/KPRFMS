@@ -153,6 +153,7 @@ export interface IAdminInstitutionSettings {
   currentSemesterType: string;
   allowSelfRegistration: boolean;
   maintenanceMode: boolean;
+  requireAdminTwoFactor?: boolean;
   sessionTimeoutMinutes: number;
   maxUploadSizeMb: number;
   leaderboardWeights?: { publications: number; projects: number; patents: number; activities: number };

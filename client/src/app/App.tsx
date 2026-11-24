@@ -5,6 +5,7 @@ import { queryClient } from './queryClient';
 import { router } from './router';
 import { ToastProvider, ErrorBoundary, useToast } from '../components';
 import { useAuthStore } from '../stores/authStore';
+import { authService } from '../services/auth.service';
 
 const AppContent: React.FC = () => {
   const initAuth = useAuthStore((state) => state.initAuth);
@@ -27,9 +28,26 @@ const AppContent: React.FC = () => {
       logout();
     };
 
+    // A request was refused until the user finishes a required step: refresh the session so the
+    // route guard shows that step (choose a password, turn on two-factor sign-in)
+    let refreshing = false;
+    const handleStepRequired = () => {
+      if (refreshing) return;
+      refreshing = true;
+      authService
+        .getMe()
+        .then((me) => useAuthStore.getState().setSessionUser(me))
+        .catch(() => null)
+        .finally(() => {
+          refreshing = false;
+        });
+    };
+
     window.addEventListener('fms:session-expired', handleSessionExpired);
+    window.addEventListener('fms:session-step-required', handleStepRequired);
     return () => {
       window.removeEventListener('fms:session-expired', handleSessionExpired);
+      window.removeEventListener('fms:session-step-required', handleStepRequired);
     };
   }, [addToast, logout]);
 

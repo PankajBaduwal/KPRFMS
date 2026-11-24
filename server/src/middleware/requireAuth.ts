@@ -11,6 +11,8 @@ import { ROLES } from '../permissions/roles.js';
 
 /** The only endpoints an account still on its emailed one-time password may use. */
 const PASSWORD_CHANGE_ALLOWED = /^\/api(\/t\/[^/]+)?\/auth\/(me|logout|change-password)$/;
+/** The only endpoints an administrator may use while the institution requires two-factor sign-in they have not set up. */
+const TWO_FACTOR_SETUP_ALLOWED = /^\/api(\/t\/[^/]+)?\/auth\/(me|logout|2fa|2fa\/setup|2fa\/enable)$/;
 
 export async function requireAuth(
   req: AuthenticatedRequest,
@@ -82,7 +84,7 @@ async function continueInTenant(
       throw AppError.unauthorized('Session has expired or is invalid. Please sign in again.');
     }
 
-    const user = await User.findById(payload.id);
+    const user = await User.findById(payload.id).select('+twoFactor');
     if (!user) {
       throw AppError.unauthorized('User account associated with this session no longer exists.');
     }
@@ -107,6 +109,11 @@ async function continueInTenant(
     if (user.mustChangePassword && !PASSWORD_CHANGE_ALLOWED.test(apiPath)) {
       throw new AppError('Choose your own password before continuing.', 403, 'PASSWORD_CHANGE_REQUIRED');
     }
+    // Institution policy: administrators must turn on two-factor sign-in before anything else
+    const twoFactorSetupRequired = profile.requireAdminTwoFactor && user.role === ROLES.ADMIN && !user.twoFactor?.enabled;
+    if (twoFactorSetupRequired && !user.mustChangePassword && !TWO_FACTOR_SETUP_ALLOWED.test(apiPath)) {
+      throw new AppError('Your institution requires two-factor sign-in for administrators. Turn it on to continue.', 403, 'TWO_FACTOR_SETUP_REQUIRED');
+    }
     // Modules the institution has switched off
     const mod = moduleForPath(req.baseUrl);
     if (mod && !profile.enabledModules.includes(mod)) {
@@ -125,6 +132,7 @@ async function continueInTenant(
       sessionId: payload.sid,
       isDemo: Boolean(user.isDemo),
       mustChangePassword: Boolean(user.mustChangePassword),
+      twoFactorSetupRequired,
     };
 
     // Cookie sessions slide forward while the user is active (bearer tokens are left as issued)

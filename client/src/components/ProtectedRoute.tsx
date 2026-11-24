@@ -4,6 +4,7 @@ import { useAuthStore } from '../stores/authStore';
 import type { Role } from '../types';
 import { LoadingState } from './LoadingState';
 import { ForcedPasswordChange } from './ForcedPasswordChange';
+import { ForcedTwoFactorSetup } from './ForcedTwoFactorSetup';
 import { ROUTES } from '../constants/routes';
 
 interface ProtectedRouteProps {
@@ -30,6 +31,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, ch
   // Signed in with an emailed one-time password: nothing else until they choose their own
   if (user.mustChangePassword) {
     return <ForcedPasswordChange />;
+  }
+
+  // Institution requires two-factor sign-in for administrators: set it up before anything else
+  if (user.twoFactorSetupRequired) {
+    return <ForcedTwoFactorSetup />;
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
